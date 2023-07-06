@@ -49,9 +49,53 @@ You can restore the project to a pristine state:
 + using Windows Command Prompt: `.\gradlew clean`
 
 
+## Acknowledgments
+
+Much of the V-Sport Project is derived from [Vulkan-Tutorial-Java][vtj]
+by Cristian Herrera, which was in turn ported from
+[Alexander Overvoorde's Vulkan tutorial][vt].
+I am deeply grateful for all the work that went into these invaluable tutorials.
+
+This project has made use of the following libraries and software tools:
+
+  + the [Firefox] web browser
+  + the [Git] revision-control system and GitK commit viewer
+  + the [GitKraken] client
+  + the [GLFW] library
+  + the [Gradle] build tool
+  + the [Java] compiler, standard doclet, and runtime environment
+  + the [Java OpenGL Math Library][joml]
+  + [the Lightweight Java Gaming Library][lwjgl]
+  + the [Markdown] document-conversion tool
+  + the [NetBeans] integrated development environment
+  + Microsoft Windows
+  + the [Vulkan] API
+
+I am grateful to [GitHub] and [Imgur]
+for providing free hosting for this project
+and many other open-source projects.
+
+I'm also grateful to my dear Holly, for keeping me sane.
+
+If I've misattributed anything or left anyone out, please let me know, so I can
+correct the situation: sgold@sonic.net
+
+
 [adoptium]: https://adoptium.net/releases.html "Adoptium Project"
+[firefox]: https://www.mozilla.org/en-US/firefox "Firefox"
+[git]: https://git-scm.com "Git"
+[github]: https://github.com "GitHub"openm
+[gitkraken]: https://www.gitkraken.com "GitKraken client"
+[glfw]: https://www.glfw.org "GLFW library"
 [gradle]: https://gradle.org "Gradle Project"
+[imgur]: https://imgur.com/ "Imgur"
 [java]: https://en.wikipedia.org/wiki/Java_(programming_language) "Java programming language"
+[joml]: https://joml-ci.github.io/JOML/ "JOML"
 [license]: https://github.com/stephengold/V-Sport/blob/master/LICENSE "V-Sport license"
+[lwjgl]: https://www.lwjgl.org/ "LWJGL"
+[markdown]: https://daringfireball.net/projects/markdown "Markdown Project"
+[netbeans]: https://netbeans.org "NetBeans Project"
 [project]: https://github.com/stephengold/V-Sport "V-Sport Project"
+[vt]: https://vulkan-tutorial.com/
+[vtj]: https://github.com/Naitsirc98/Vulkan-Tutorial-Java "Vulkan tutorial in Java"
 [vulkan]: https://www.vulkan.org/ "Vulkan API"
