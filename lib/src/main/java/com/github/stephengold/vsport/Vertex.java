@@ -1,0 +1,144 @@
+/*
+ Copyright (c) 2023, Stephen Gold
+ All rights reserved.
+
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions are met:
+
+ 1. Redistributions of source code must retain the above copyright notice, this
+    list of conditions and the following disclaimer.
+
+ 2. Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions and the following disclaimer in the documentation
+    and/or other materials provided with the distribution.
+
+ 3. Neither the name of the copyright holder nor the names of its
+    contributors may be used to endorse or promote products derived from
+    this software without specific prior written permission.
+
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+package com.github.stephengold.vsport;
+
+import java.nio.ByteBuffer;
+import org.joml.Vector2fc;
+import org.joml.Vector3fc;
+import org.lwjgl.system.MemoryStack;
+import org.lwjgl.vulkan.VK10;
+import org.lwjgl.vulkan.VkVertexInputAttributeDescription;
+import org.lwjgl.vulkan.VkVertexInputBindingDescription;
+
+/**
+ * The attributes of a single vertex in a mesh.
+ *
+ * @author Stephen Gold sgold@sonic.net
+ *
+ * Derived from the Vertex class in Cristian Herrera's Vulkan-Tutorial-Java
+ * project.
+ */
+class Vertex {
+    // *************************************************************************
+    // fields
+
+    final private Vector2fc pos;
+    final private Vector3fc color;
+    // *************************************************************************
+    // constructors
+
+    /**
+     * Instantiate a mesh vertex from attribute values.
+     *
+     * @param pos the desired location of the vertex (in model coordinates)
+     * @param color the desired color of the vertex
+     */
+    Vertex(Vector2fc pos, Vector3fc color) {
+        this.pos = pos;
+        this.color = color;
+    }
+    // *************************************************************************
+    // new methods exposed
+
+    /**
+     * Generate an attribute-description buffer.
+     *
+     * @param stack
+     * @return a new temporary buffer
+     */
+    static VkVertexInputAttributeDescription.Buffer
+            createAttributeDescriptions(MemoryStack stack) {
+        VkVertexInputAttributeDescription.Buffer result
+                = VkVertexInputAttributeDescription.calloc(2);
+        int bindingIndex = 0;
+
+        // position attribute (2 signed floats in slot 0)
+        VkVertexInputAttributeDescription posDescription = result.get(0);
+        posDescription.binding(bindingIndex);
+        posDescription.format(VK10.VK_FORMAT_R32G32_SFLOAT);
+        posDescription.location(0); // slot 0 (see the vertex shader)
+        posDescription.offset(0); // start offset in bytes
+
+        // color attribute (3 signed floats in slot 1)
+        VkVertexInputAttributeDescription colorDescription = result.get(1);
+        colorDescription.binding(bindingIndex);
+        colorDescription.format(VK10.VK_FORMAT_R32G32B32_SFLOAT);
+        colorDescription.location(1); // slot 1 (see the vertex shader)
+        colorDescription.offset(2 * Float.BYTES); // start offset in bytes
+
+        return result;
+    }
+
+    /**
+     * Generate a binding-description buffer.
+     *
+     * @param stack
+     * @return a new temporary buffer
+     */
+    static VkVertexInputBindingDescription.Buffer
+            createBindingDescription(MemoryStack stack) {
+        VkVertexInputBindingDescription.Buffer result
+                = VkVertexInputBindingDescription.calloc(1, stack);
+
+        int index = 0;
+        result.binding(index);
+
+        result.inputRate(VK10.VK_VERTEX_INPUT_RATE_VERTEX);
+
+        int stride = numBytes();
+        result.stride(stride);
+
+        return result;
+    }
+
+    /**
+     *
+     * @return
+     */
+    static int numBytes() {
+        int result = (2 + 3) * Float.BYTES;
+        return result;
+    }
+
+    /**
+     * Write the vertex data to the specified ByteBuffer, starting at the
+     * current position) and advances the buffer position.
+     *
+     * @param target the buffer to write to (not null, modified)
+     */
+    void writeTo(ByteBuffer target) {
+        target.putFloat(pos.x());
+        target.putFloat(pos.y());
+
+        target.putFloat(color.x());
+        target.putFloat(color.y());
+        target.putFloat(color.z());
+    }
+}
