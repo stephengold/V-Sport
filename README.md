@@ -1,6 +1,6 @@
 <img height="150" src="https://i.imgur.com/YEPFEcx.png" alt="Libbulletjme Project logo">
 
-[V-Sport Project][project] will implement
+[The V-Sport Project][project] will implement
 a simple [Vulkan]-based graphics engine for physics demos.
 
 It contains 2 sub-projects:
@@ -84,7 +84,7 @@ correct the situation: sgold@sonic.net
 [adoptium]: https://adoptium.net/releases.html "Adoptium Project"
 [firefox]: https://www.mozilla.org/en-US/firefox "Firefox"
 [git]: https://git-scm.com "Git"
-[github]: https://github.com "GitHub"openm
+[github]: https://github.com "GitHub"
 [gitkraken]: https://www.gitkraken.com "GitKraken client"
 [glfw]: https://www.glfw.org "GLFW library"
 [gradle]: https://gradle.org "Gradle Project"
