@@ -7,7 +7,7 @@ plugins {
 // tasks to run specific apps:
 
 tasks.register('HelloVSport', JavaExec) {
-    mainClass = 'com.github.stephengold.sport.vulkan.test.HelloVSport'
+    mainClass = 'com.github.stephengold.vsport.test.HelloVSport'
 }
 
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
