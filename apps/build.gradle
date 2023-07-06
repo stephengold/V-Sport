@@ -1,0 +1,61 @@
+// Gradle script to build the V-Sport/apps sub-project
+
+plugins {
+    id 'application' // to support building a Java application
+}
+
+// tasks to run specific apps:
+
+tasks.register('HelloVSport', JavaExec) {
+    mainClass = 'com.github.stephengold.sport.vulkan.test.HelloVSport'
+}
+
+import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
+OperatingSystem os = DefaultNativePlatform.currentOperatingSystem
+Boolean includeLinux = os.isLinux()
+Boolean includeMacOsX = os.isMacOsX()
+Boolean includeWindows = os.isWindows()
+
+tasks.withType(JavaExec) { // Java runtime options:
+    if (os.isMacOsX()) {
+        jvmArgs '-XstartOnFirstThread' // required for GLFW on macOS
+    }
+    classpath sourceSets.main.runtimeClasspath
+    enableAssertions true
+}
+
+dependencies {
+    // LWJGL's Vulkan bindings do not require natives, except on macOS.
+    if (includeLinux) {
+        runtimeOnly "org.lwjgl:lwjgl:${lwjglVersion}:natives-linux"
+        runtimeOnly "org.lwjgl:lwjgl-glfw:${lwjglVersion}:natives-linux"
+
+        runtimeOnly "org.lwjgl:lwjgl:${lwjglVersion}:natives-linux-arm32"
+        runtimeOnly "org.lwjgl:lwjgl-glfw:${lwjglVersion}:natives-linux-arm32"
+
+        runtimeOnly "org.lwjgl:lwjgl:${lwjglVersion}:natives-linux-arm64"
+        runtimeOnly "org.lwjgl:lwjgl-glfw:${lwjglVersion}:natives-linux-arm64"
+    }
+
+    if (includeMacOsX) {
+        runtimeOnly "org.lwjgl:lwjgl:${lwjglVersion}:natives-macos"
+        runtimeOnly "org.lwjgl:lwjgl-glfw:${lwjglVersion}:natives-macos"
+        runtimeOnly "org.lwjgl:lwjgl-vulkan:${lwjglVersion}:natives-macos"
+
+        runtimeOnly "org.lwjgl:lwjgl:${lwjglVersion}:natives-macos-arm64"
+        runtimeOnly "org.lwjgl:lwjgl-glfw:${lwjglVersion}:natives-macos-arm64"
+        runtimeOnly "org.lwjgl:lwjgl-vulkan:${lwjglVersion}:natives-macos-arm64"
+    }
+
+    if (includeWindows) {
+        runtimeOnly "org.lwjgl:lwjgl:${lwjglVersion}:natives-windows"
+        runtimeOnly "org.lwjgl:lwjgl-glfw:${lwjglVersion}:natives-windows"
+        runtimeOnly "org.lwjgl:lwjgl-shaderc:${lwjglVersion}:natives-windows"
+
+        runtimeOnly "org.lwjgl:lwjgl:${lwjglVersion}:natives-windows-x86"
+        runtimeOnly "org.lwjgl:lwjgl-glfw:${lwjglVersion}:natives-windows-x86"
+        runtimeOnly "org.lwjgl:lwjgl-shaderc:${lwjglVersion}:natives-windows-x86"
+    }
+
+    implementation project(':lib')
+}

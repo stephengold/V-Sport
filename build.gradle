@@ -1,0 +1,33 @@
+// Gradle build script for the V-Sport project
+
+plugins {
+    id 'base' // to add a "clean" task to the root project
+    id 'java'
+}
+
+ext {
+    // current versions of libraries:
+    lbjVersion = '18.4.0'
+    lwjglVersion = '3.3.2'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+subprojects {
+    apply from: rootProject.file('common.gradle')
+}
+
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds' // to disable caching of SNAPSHOTs
+}
+
+tasks.register('HelloVSport') {
+    dependsOn ':apps:HelloVSport'
+    description 'Runs the HelloVSport example app.'
+}
+
+
+
