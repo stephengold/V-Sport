@@ -68,6 +68,7 @@ This project has made use of the following libraries and software tools:
   + [the Lightweight Java Gaming Library][lwjgl]
   + the [Markdown] document-conversion tool
   + the [NetBeans] integrated development environment
+  + [the shaderc project][shaderc]
   + Microsoft Windows
   + the [Vulkan] API
 
@@ -96,6 +97,7 @@ correct the situation: sgold@sonic.net
 [markdown]: https://daringfireball.net/projects/markdown "Markdown Project"
 [netbeans]: https://netbeans.org "NetBeans Project"
 [project]: https://github.com/stephengold/V-Sport "V-Sport Project"
+[shaderc]: https://github.com/google/shaderc "shaderc project"
 [vt]: https://vulkan-tutorial.com/
 [vtj]: https://github.com/Naitsirc98/Vulkan-Tutorial-Java "Vulkan tutorial in Java"
 [vulkan]: https://www.vulkan.org/ "Vulkan API"
