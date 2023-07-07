@@ -181,13 +181,17 @@ public abstract class BaseApplication {
      */
     private static boolean needsResize = false;
     /**
+     * vertex color buffer
+     */
+    private static BufferResource colorBuffer;
+    /**
      * index buffer
      */
     private static BufferResource indexBuffer;
     /**
-     * vertex buffer
+     * vertex position buffer
      */
-    private static BufferResource vertexBuffer;
+    private static BufferResource positionBuffer;
     /**
      * print Vulkan debugging information (typically to the console) or null if
      * not created
@@ -1507,19 +1511,30 @@ public abstract class BaseApplication {
     }
 
     /**
-     * Create a vertex buffer (with interleaved attributes) from the specified
-     * vertices.
+     * Create a 2 vertex buffers for the sample mesh.
      */
     private static void createVertexBuffer() {
         int numVertices = sampleVertices.length;
-        int numBytes = numVertices * Vertex.numBytes();
         boolean staging = true;
-        vertexBuffer = new BufferResource(
+
+        int numBytes = numVertices * 2 * Float.BYTES;
+        positionBuffer = new BufferResource(
                 numBytes, VK10.VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, staging) {
             @Override
             void fill(ByteBuffer destinationBuffer) {
                 for (Vertex vertex : sampleVertices) {
-                    vertex.writeTo(destinationBuffer);
+                    vertex.writePositionsTo(destinationBuffer);
+                }
+            }
+        };
+
+        numBytes = numVertices * 3 * Float.BYTES;
+        colorBuffer = new BufferResource(
+                numBytes, VK10.VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, staging) {
+            @Override
+            void fill(ByteBuffer destinationBuffer) {
+                for (Vertex vertex : sampleVertices) {
+                    vertex.writeColorsTo(destinationBuffer);
                 }
             }
         };
@@ -1718,7 +1733,8 @@ public abstract class BaseApplication {
      * Destroy all vertex buffers.
      */
     private static void destroyVertexBuffers() {
-        vertexBuffer.destroy();
+        colorBuffer.destroy();
+        positionBuffer.destroy();
     }
 
     /**
@@ -2003,8 +2019,10 @@ public abstract class BaseApplication {
 
                 // command to bind the vertex buffers:
                 int firstBinding = 0;
-                LongBuffer vertexBuffers = stack.longs(vertexBuffer.handle());
-                LongBuffer offsets = stack.longs(0);
+                LongBuffer vertexBuffers = stack.longs(
+                        positionBuffer.handle(), colorBuffer.handle()
+                );
+                LongBuffer offsets = stack.longs(0, 0);
                 VK10.vkCmdBindVertexBuffers(
                         commandBuffer, firstBinding, vertexBuffers, offsets);
 

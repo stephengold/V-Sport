@@ -77,21 +77,20 @@ class Vertex {
             createAttributeDescriptions(MemoryStack stack) {
         VkVertexInputAttributeDescription.Buffer result
                 = VkVertexInputAttributeDescription.calloc(2);
-        int bindingIndex = 0;
 
         // position attribute (2 signed floats in slot 0)
         VkVertexInputAttributeDescription posDescription = result.get(0);
-        posDescription.binding(bindingIndex);
+        posDescription.binding(0);
         posDescription.format(VK10.VK_FORMAT_R32G32_SFLOAT);
         posDescription.location(0); // slot 0 (see the vertex shader)
         posDescription.offset(0); // start offset in bytes
 
         // color attribute (3 signed floats in slot 1)
         VkVertexInputAttributeDescription colorDescription = result.get(1);
-        colorDescription.binding(bindingIndex);
+        colorDescription.binding(1);
         colorDescription.format(VK10.VK_FORMAT_R32G32B32_SFLOAT);
         colorDescription.location(1); // slot 1 (see the vertex shader)
-        colorDescription.offset(2 * Float.BYTES); // start offset in bytes
+        colorDescription.offset(0); // start offset in bytes
 
         return result;
     }
@@ -105,15 +104,19 @@ class Vertex {
     static VkVertexInputBindingDescription.Buffer
             createBindingDescription(MemoryStack stack) {
         VkVertexInputBindingDescription.Buffer result
-                = VkVertexInputBindingDescription.calloc(1, stack);
+                = VkVertexInputBindingDescription.calloc(2, stack);
 
-        int index = 0;
-        result.binding(index);
+        // Describe the first slot:
+        VkVertexInputBindingDescription pos = result.get(0);
+        pos.binding(0);
+        pos.inputRate(VK10.VK_VERTEX_INPUT_RATE_VERTEX);
+        pos.stride(2 * Float.BYTES);
 
-        result.inputRate(VK10.VK_VERTEX_INPUT_RATE_VERTEX);
-
-        int stride = numBytes();
-        result.stride(stride);
+        // Describe the 2nd slot:
+        VkVertexInputBindingDescription color = result.get(1);
+        color.binding(1);
+        color.inputRate(VK10.VK_VERTEX_INPUT_RATE_VERTEX);
+        color.stride(3 * Float.BYTES);
 
         return result;
     }
@@ -128,17 +131,25 @@ class Vertex {
     }
 
     /**
-     * Write the vertex data to the specified ByteBuffer, starting at the
+     * Write the vertex color data to the specified ByteBuffer, starting at the
      * current buffer position) and advances the buffer position.
      *
      * @param target the buffer to write to (not null, modified)
      */
-    void writeTo(ByteBuffer target) {
-        target.putFloat(pos.x());
-        target.putFloat(pos.y());
-
+    void writeColorsTo(ByteBuffer target) {
         target.putFloat(color.x());
         target.putFloat(color.y());
         target.putFloat(color.z());
+    }
+
+    /**
+     * Write the vertex position data to the specified ByteBuffer, starting at
+     * the current buffer position) and advances the buffer position.
+     *
+     * @param target the buffer to write to (not null, modified)
+     */
+    void writePositionsTo(ByteBuffer target) {
+        target.putFloat(pos.x());
+        target.putFloat(pos.y());
     }
 }
