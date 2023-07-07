@@ -32,7 +32,7 @@ package com.github.stephengold.vsport.test;
 import com.github.stephengold.vsport.BaseApplication;
 
 /**
- * The first example app for the V-Sport graphics engine.
+ * The first tutorial app for the V-Sport graphics engine.
  *
  * @author Stephen Gold sgold@sonic.net
  */

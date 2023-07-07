@@ -129,7 +129,7 @@ class Vertex {
 
     /**
      * Write the vertex data to the specified ByteBuffer, starting at the
-     * current position) and advances the buffer position.
+     * current buffer position) and advances the buffer position.
      *
      * @param target the buffer to write to (not null, modified)
      */

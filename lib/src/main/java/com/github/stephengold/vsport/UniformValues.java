@@ -105,7 +105,7 @@ class UniformValues {
 
     /**
      * Write the uniform data to the specified ByteBuffer (starting at the
-     * current position) and advance the buffer position.
+     * current buffer position) and advance the buffer position.
      *
      * @param target the buffer to write to (not null, modified)
      */

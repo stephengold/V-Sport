@@ -151,7 +151,7 @@ public abstract class BaseApplication {
      */
     final public static long noTimeout = 0xFFFFFFFFFFFFFFFFL;
     /**
-     * sample index data
+     * indices for the sample mesh
      */
     final public static short[] sampleIndices = {
         0, 1, 2, 2, 3, 0
@@ -161,7 +161,7 @@ public abstract class BaseApplication {
      */
     final private static String engineName = "V-Sport";
     /**
-     * sample vertex data
+     * vertex data for the sample mesh
      */
     final private static Vertex[] sampleVertices = {
         new Vertex(new Vector2f(-0.5f, -0.5f), new Vector3f(1f, 0f, 0f)),
@@ -563,7 +563,8 @@ public abstract class BaseApplication {
     }
 
     /**
-     * Test whether debuggins is enabled.
+     * Test whether debugging is enabled.
+     *
      * @return true if enabled, otherwise false
      */
     public static boolean isDebuggingEnabled() {
