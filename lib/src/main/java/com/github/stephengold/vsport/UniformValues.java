@@ -51,13 +51,13 @@ class UniformValues {
      */
     final private Matrix4f model = new Matrix4f();
     /**
-     * world-to-view coordinate transform
-     */
-    final private Matrix4f view = new Matrix4f();
-    /**
      * view-to-clip coordinate transform
      */
     final private Matrix4f proj = new Matrix4f();
+    /**
+     * world-to-view coordinate transform
+     */
+    final private Matrix4f view = new Matrix4f();
     // *************************************************************************
     // constructors
 
