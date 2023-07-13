@@ -106,13 +106,15 @@ class BufferResource {
                         stagingMemoryHandle, offset, numBytes, flags, pPointer);
                 Utils.checkForError(retCode, "map staging buffer's memory");
 
-                int index = 0;
+                int index = 0; // the index within pPointer
                 this.data = pPointer.getByteBuffer(index, numBytes);
                 fill(data);
                 this.data = null;
                 VK10.vkUnmapMemory(logicalDevice, stagingMemoryHandle);
-
-                // Create the buffer:
+                /*
+                 * Create a device-local buffer that's optimized for being a
+                 * copy destination:
+                 */
                 createUsage = usage | VK10.VK_BUFFER_USAGE_TRANSFER_DST_BIT;
                 properties = VK10.VK_MEMORY_HEAP_DEVICE_LOCAL_BIT;
                 BaseApplication.createBuffer(numBytes, createUsage,

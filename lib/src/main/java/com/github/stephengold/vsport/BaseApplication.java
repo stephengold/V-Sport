@@ -485,8 +485,8 @@ public abstract class BaseApplication {
      * @param bufferBytes the desired size in bytes
      * @param usage a bitmask
      * @param requiredProperties a bitmask
-     * @param pBuffer to store the handle of the buffer object (not null,
-     * modified)
+     * @param pBuffer to store the handle of the resulting buffer object (not
+     * null, modified)
      * @param pMemory to store the handle of the buffer's memory (not null,
      * modified)
      */
@@ -531,8 +531,8 @@ public abstract class BaseApplication {
 
             // Bind the newly allocated memory to the buffer object:
             int offset = 0;
-            retCode = VK10.vkBindBufferMemory(logicalDevice, bufferHandle,
-                    memoryHandle, offset);
+            retCode = VK10.vkBindBufferMemory(
+                    logicalDevice, bufferHandle, memoryHandle, offset);
             Utils.checkForError(retCode, "bind memory to a buffer object");
         }
     }
@@ -1802,7 +1802,8 @@ public abstract class BaseApplication {
         }
 
         // Request callback when the frame buffer of the main window is resized:
-        GLFW.glfwSetFramebufferSizeCallback(windowHandle, BaseApplication::frameBufferResizeCallback);
+        GLFW.glfwSetFramebufferSizeCallback(
+                windowHandle, BaseApplication::frameBufferResizeCallback);
     }
 
     /**
