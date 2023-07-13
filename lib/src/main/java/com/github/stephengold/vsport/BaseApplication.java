@@ -1028,51 +1028,59 @@ public abstract class BaseApplication {
     }
 
     /**
+     * Create an image view for the specified image.
+     *
+     * @param imageHandle the handle of the image
+     * @param format the desired format for the view
+     * @return the handle of the new image view
+     */
+    private static long createImageView(long imageHandle, int format) {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            VkImageViewCreateInfo createInfo
+                    = VkImageViewCreateInfo.calloc(stack);
+            createInfo.sType(VK10.VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO);
+
+            createInfo.format(format);
+            createInfo.image(imageHandle);
+            createInfo.viewType(VK10.VK_IMAGE_VIEW_TYPE_2D);
+
+            // Don't swizzle the color channels:
+            VkComponentMapping swizzle = createInfo.components();
+            swizzle.r(VK10.VK_COMPONENT_SWIZZLE_IDENTITY);
+            swizzle.g(VK10.VK_COMPONENT_SWIZZLE_IDENTITY);
+            swizzle.b(VK10.VK_COMPONENT_SWIZZLE_IDENTITY);
+            swizzle.a(VK10.VK_COMPONENT_SWIZZLE_IDENTITY);
+            /*
+             * The image will be used as a single-layer color target
+             * without any mipmapping.
+             */
+            VkImageSubresourceRange range = createInfo.subresourceRange();
+            range.aspectMask(VK10.VK_IMAGE_ASPECT_COLOR_BIT);
+            range.baseArrayLayer(0);
+            range.baseMipLevel(0);
+            range.layerCount(1);
+            range.levelCount(1);
+
+            LongBuffer pHandle = stack.mallocLong(1);
+            int retCode = VK10.vkCreateImageView(
+                    logicalDevice, createInfo, defaultAllocator, pHandle);
+            Utils.checkForError(retCode, "create image view");
+            long result = pHandle.get(0);
+
+            return result;
+        }
+    }
+
+    /**
      * Create a view for each image in the swapchain.
      */
     private static void createImageViews() {
         int numImages = chainImageHandles.size();
         chainViewHandles = new ArrayList<>(numImages);
 
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            LongBuffer pHandle = stack.mallocLong(1);
-
-            // Create view-creation information for each image:
-            VkImageViewCreateInfo.Buffer createInfos
-                    = VkImageViewCreateInfo.calloc(numImages, stack);
-
-            for (int imageIndex = 0; imageIndex < numImages; ++imageIndex) {
-                long imageHandle = chainImageHandles.get(imageIndex);
-                VkImageViewCreateInfo createInfo = createInfos.get(imageIndex);
-                createInfo.sType(VK10.VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO);
-
-                createInfo.format(chainImageFormat);
-                createInfo.image(imageHandle);
-                createInfo.viewType(VK10.VK_IMAGE_VIEW_TYPE_2D);
-
-                // Don't swizzle the color channels:
-                VkComponentMapping swizzle = createInfo.components();
-                swizzle.r(VK10.VK_COMPONENT_SWIZZLE_IDENTITY);
-                swizzle.g(VK10.VK_COMPONENT_SWIZZLE_IDENTITY);
-                swizzle.b(VK10.VK_COMPONENT_SWIZZLE_IDENTITY);
-                swizzle.a(VK10.VK_COMPONENT_SWIZZLE_IDENTITY);
-                /*
-                 * Each image will be used as a single-layer color target
-                 * without any mipmapping.
-                 */
-                VkImageSubresourceRange range = createInfo.subresourceRange();
-                range.aspectMask(VK10.VK_IMAGE_ASPECT_COLOR_BIT);
-                range.baseArrayLayer(0);
-                range.baseMipLevel(0);
-                range.layerCount(1);
-                range.levelCount(1);
-
-                int retCode = VK10.vkCreateImageView(
-                        logicalDevice, createInfo, defaultAllocator, pHandle);
-                Utils.checkForError(retCode, "create image view");
-                long viewHandle = pHandle.get(0);
-                chainViewHandles.add(viewHandle);
-            }
+        for (long imageHandle : chainImageHandles) {
+            long viewHandle = createImageView(imageHandle, chainImageFormat);
+            chainViewHandles.add(viewHandle);
         }
     }
 
