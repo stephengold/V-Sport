@@ -1704,7 +1704,9 @@ public abstract class BaseApplication {
      * Destroy all index buffers.
      */
     private static void destroyIndexBuffers() {
-        indexBuffer.destroy();
+        if (indexBuffer != null) {
+            indexBuffer.destroy();
+        }
     }
 
     /**
@@ -1733,8 +1735,12 @@ public abstract class BaseApplication {
      * Destroy all vertex buffers.
      */
     private static void destroyVertexBuffers() {
-        colorBuffer.destroy();
-        positionBuffer.destroy();
+        if (colorBuffer != null) {
+            colorBuffer.destroy();
+        }
+        if (positionBuffer != null) {
+            positionBuffer.destroy();
+        }
     }
 
     /**
