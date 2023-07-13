@@ -419,63 +419,17 @@ public abstract class BaseApplication {
      */
     static void copyBuffer(long sourceHandle, long destHandle, long size) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
-            // Allocate a temporary command buffer:
-            // TODO a pool of short-lived command buffers
-            PointerBuffer pPointer = stack.mallocPointer(1);
-            VkCommandBufferAllocateInfo allocInfo
-                    = VkCommandBufferAllocateInfo.calloc(stack);
-            allocInfo.sType(
-                    VK10.VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO);
-
-            allocInfo.commandBufferCount(1);
-            allocInfo.commandPool(commandPoolHandle);
-            allocInfo.level(VK10.VK_COMMAND_BUFFER_LEVEL_PRIMARY);
-
-            VK10.vkAllocateCommandBuffers(logicalDevice, allocInfo, pPointer);
-            long pointer = pPointer.get(0);
-            VkCommandBuffer commandBuffer
-                    = new VkCommandBuffer(pointer, logicalDevice);
-
-            VkCommandBufferBeginInfo beginInfo
-                    = VkCommandBufferBeginInfo.calloc(stack);
-            beginInfo.sType(VK10.VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO);
-
-            beginInfo.flags(VK10.VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
-            int retCode
-                    = VK10.vkBeginCommandBuffer(commandBuffer, beginInfo);
-            Utils.checkForError(retCode, "begin recording commands");
+            VkCommandBuffer commandBuffer = beginSingleTimeCommands();
 
             // command to copy a buffer:
             VkBufferCopy.Buffer pRegion = VkBufferCopy.calloc(1, stack);
-            pRegion.srcOffset(0);
             pRegion.dstOffset(0);
             pRegion.size(size);
+            pRegion.srcOffset(0);
             VK10.vkCmdCopyBuffer(
                     commandBuffer, sourceHandle, destHandle, pRegion);
 
-            VK10.vkEndCommandBuffer(commandBuffer);
-
-            // info to submit a command buffer to the graphics queue:
-            VkSubmitInfo.Buffer pSubmitInfo = VkSubmitInfo.calloc(1, stack);
-            pSubmitInfo.sType(VK10.VK_STRUCTURE_TYPE_SUBMIT_INFO);
-
-            PointerBuffer pCommandBuffer = stack.pointers(commandBuffer);
-            pSubmitInfo.pCommandBuffers(pCommandBuffer);
-
-            // Submit the command buffer:
-            long fenceHandle = VK10.VK_NULL_HANDLE;
-            retCode = VK10.vkQueueSubmit(
-                    graphicsQueue, pSubmitInfo, fenceHandle);
-            Utils.checkForError(retCode, "submit buffer-copy command");
-
-            // Wait until the command queue is idle:
-            // TODO use a fence to allow multiple transfers in parallel
-            retCode = VK10.vkQueueWaitIdle(graphicsQueue);
-            Utils.checkForError(retCode, "wait for queue to be idle");
-
-            // Free the command buffer:
-            VK10.vkFreeCommandBuffers(
-                    logicalDevice, commandPoolHandle, pCommandBuffer);
+            endSingleTimeCommands(commandBuffer);
         }
     }
 
@@ -764,6 +718,45 @@ public abstract class BaseApplication {
 
                 VK10.vkUpdateDescriptorSets(logicalDevice, pWriteInfo, null);
             }
+        }
+    }
+
+    /**
+     * Begin recording a single-time command sequence.
+     *
+     * @return a new command buffer, ready to receive commands
+     */
+    private static VkCommandBuffer beginSingleTimeCommands() {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            // Allocate a temporary command buffer:
+            // TODO a pool of short-lived command buffers - see copyBuffer()
+            VkCommandBufferAllocateInfo allocInfo
+                    = VkCommandBufferAllocateInfo.calloc(stack);
+            allocInfo.sType(
+                    VK10.VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO);
+
+            allocInfo.commandBufferCount(1);
+            allocInfo.commandPool(commandPoolHandle);
+            allocInfo.level(VK10.VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+
+            PointerBuffer pPointer = stack.mallocPointer(1);
+            int retCode = VK10.vkAllocateCommandBuffers(
+                    logicalDevice, allocInfo, pPointer);
+            Utils.checkForError(retCode, "allocate command buffer");
+            long pointer = pPointer.get(0);
+            VkCommandBuffer result
+                    = new VkCommandBuffer(pointer, logicalDevice);
+
+            VkCommandBufferBeginInfo beginInfo
+                    = VkCommandBufferBeginInfo.calloc(stack);
+            beginInfo.sType(VK10.VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO);
+
+            beginInfo.flags(VK10.VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+
+            retCode = VK10.vkBeginCommandBuffer(result, beginInfo);
+            Utils.checkForError(retCode, "begin recording commands");
+
+            return result;
         }
     }
 
@@ -1748,6 +1741,40 @@ public abstract class BaseApplication {
         }
         if (positionBuffer != null) {
             positionBuffer.destroy();
+        }
+    }
+
+    /**
+     * Finish recording a single-time command sequence and submit it to the
+     * graphics queue.
+     *
+     * @param commandBuffer a command buffer containing commands
+     */
+    private static void endSingleTimeCommands(VkCommandBuffer commandBuffer) {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            VK10.vkEndCommandBuffer(commandBuffer);
+
+            // info to submit a command buffer to the graphics queue:
+            VkSubmitInfo.Buffer pSubmitInfo = VkSubmitInfo.calloc(1, stack);
+            pSubmitInfo.sType(VK10.VK_STRUCTURE_TYPE_SUBMIT_INFO);
+
+            PointerBuffer pCommandBuffer = stack.pointers(commandBuffer);
+            pSubmitInfo.pCommandBuffers(pCommandBuffer);
+
+            // Submit the command buffer to the graphics queue:
+            long fenceHandle = VK10.VK_NULL_HANDLE;
+            int retCode = VK10.vkQueueSubmit(
+                    graphicsQueue, pSubmitInfo, fenceHandle);
+            Utils.checkForError(retCode, "submit buffer-copy command");
+
+            // Wait until the graphics queue is idle:
+            // TODO use a fence to submit multiple command sequences in parallel
+            retCode = VK10.vkQueueWaitIdle(graphicsQueue);
+            Utils.checkForError(retCode, "wait for queue to be idle");
+
+            // Free the command buffer:
+            VK10.vkFreeCommandBuffers(
+                    logicalDevice, commandPoolHandle, commandBuffer);
         }
     }
 
