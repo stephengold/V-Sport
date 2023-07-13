@@ -29,9 +29,12 @@
  */
 package com.github.stephengold.vsport;
 
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
+import javax.imageio.ImageIO;
 import jme3utilities.MyString;
 import org.lwjgl.vulkan.KHRSwapchain;
 import org.lwjgl.vulkan.VK10;
@@ -87,6 +90,32 @@ final class Utils {
             result = max;
         } else {
             result = input;
+        }
+
+        return result;
+    }
+
+    /**
+     * Load a BufferedImage from the named resource.
+     *
+     * @param resourceName the name of the resource (not null)
+     * @return a new instance
+     */
+    public static BufferedImage loadResourceAsImage(String resourceName) {
+        InputStream inputStream = Utils.class.getResourceAsStream(resourceName);
+        if (inputStream == null) {
+            String q = MyString.quote(resourceName);
+            throw new RuntimeException("resource not found:  " + q);
+        }
+
+        ImageIO.setUseCache(false);
+
+        BufferedImage result;
+        try {
+            result = ImageIO.read(inputStream);
+        } catch (IOException exception) {
+            String q = MyString.quote(resourceName);
+            throw new RuntimeException("unable to read " + q);
         }
 
         return result;
