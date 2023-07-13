@@ -482,7 +482,7 @@ public abstract class BaseApplication {
     /**
      * Create a buffer object with some memory bound to it.
      *
-     * @param bufferBytes the desired size in bytes
+     * @param numBytes the desired buffer capacity (in bytes)
      * @param usage a bitmask
      * @param requiredProperties a bitmask
      * @param pBuffer to store the handle of the resulting buffer object (not
@@ -490,7 +490,7 @@ public abstract class BaseApplication {
      * @param pMemory to store the handle of the buffer's memory (not null,
      * modified)
      */
-    static void createBuffer(long bufferBytes, int usage,
+    static void createBuffer(long numBytes, int usage,
             int requiredProperties, LongBuffer pBuffer, LongBuffer pMemory) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             // Create the buffer object:
@@ -498,7 +498,7 @@ public abstract class BaseApplication {
             createInfo.sType(VK10.VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO);
 
             createInfo.sharingMode(VK10.VK_SHARING_MODE_EXCLUSIVE);
-            createInfo.size(bufferBytes);
+            createInfo.size(numBytes);
             createInfo.usage(usage);
 
             int retCode = VK10.vkCreateBuffer(
