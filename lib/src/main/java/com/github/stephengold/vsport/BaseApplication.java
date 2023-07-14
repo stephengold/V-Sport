@@ -1806,6 +1806,24 @@ public abstract class BaseApplication {
     }
 
     /**
+     * Test whether the specified device supports anisotropic sampling of
+     * textures.
+     *
+     * @param device the device to test (not null)
+     * @return true if supported, otherwise false
+     */
+    private static boolean hasAnisotropySupport(VkPhysicalDevice device) {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            VkPhysicalDeviceFeatures supportedFeatures
+                    = VkPhysicalDeviceFeatures.malloc(stack);
+            VK10.vkGetPhysicalDeviceFeatures(device, supportedFeatures);
+            boolean result = supportedFeatures.samplerAnisotropy();
+
+            return result;
+        }
+    }
+
+    /**
      * Initialize GLFW and create a main window for the application.
      *
      * @param initialTitle the initial text for the window's title bar (not
@@ -2292,6 +2310,11 @@ public abstract class BaseApplication {
         if (!queueFamilies.isComplete()) {
             //String hex = Long.toHexString(device.address());
             //System.out.println(hex + " doesn't provide both queue families");
+            return 0f;
+        }
+
+        // Does the device support anisotropic sampling of textures?
+        if (!hasAnisotropySupport(device)) {
             return 0f;
         }
 
