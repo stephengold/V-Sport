@@ -29,6 +29,7 @@
  */
 package com.github.stephengold.vsport;
 
+import java.awt.image.BufferedImage;
 import java.io.PrintStream;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -287,6 +288,10 @@ public abstract class BaseApplication {
      */
     private static long textureMemoryHandle = VK10.VK_NULL_HANDLE;
     /**
+     * handle of the image view for the texture
+     */
+    private static long textureViewHandle = VK10.VK_NULL_HANDLE;
+    /**
      * GLFW handle of the window used to render geometries
      */
     private static long windowHandle = VK10.VK_NULL_HANDLE;
@@ -379,6 +384,13 @@ public abstract class BaseApplication {
 
         destroyVertexBuffers();
         destroyIndexBuffers();
+
+        // Destroy the texture image view:
+        if (textureViewHandle != VK10.VK_NULL_HANDLE) {
+            VK10.vkDestroyImageView(
+                    logicalDevice, textureViewHandle, defaultAllocator);
+            textureViewHandle = VK10.VK_NULL_HANDLE;
+        }
 
         // Destroy the texture image:
         if (textureMemoryHandle != VK10.VK_NULL_HANDLE) {
@@ -1635,6 +1647,101 @@ public abstract class BaseApplication {
     }
 
     /**
+     * Create the image from the named resource.
+     *
+     * @param resourceName the name of the resource (not null)
+     *
+     * TODO move to a constructor of an ImageResource class analogous with
+     * BufferResource
+     */
+    private static void createTextureImage(String resourceName) {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            BufferedImage image = Utils.loadResourceAsImage(resourceName);
+            /*
+             * Note: loading with AWT instead of STB
+             * (which doesn't handle InputStream input).
+             */
+            int numChannels = 4;
+            int width = image.getWidth();
+            int height = image.getHeight();
+            int numBytes = width * height * numChannels;
+
+            // Create a temporary buffer object for staging:
+            int createUsage = VK10.VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+            int properties = VK10.VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
+                    | VK10.VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+            LongBuffer pBufferHandle = stack.mallocLong(1);
+            LongBuffer pMemoryHandle = stack.mallocLong(1);
+            createBuffer(numBytes, createUsage, properties, pBufferHandle,
+                    pMemoryHandle);
+            long stagingBufferHandle = pBufferHandle.get(0);
+            long stagingMemoryHandle = pMemoryHandle.get(0);
+
+            // Temporarily map the staging buffer's memory:
+            int offset = 0;
+            int flags = 0x0;
+            PointerBuffer pPointer = stack.mallocPointer(1);
+            int retCode = VK10.vkMapMemory(logicalDevice,
+                    stagingMemoryHandle, offset, numBytes, flags, pPointer);
+            Utils.checkForError(retCode, "map staging buffer's memory");
+
+            int index = 0; // the index within pPointer
+            ByteBuffer data = pPointer.getByteBuffer(index, numBytes);
+            /*
+             * Copy pixel-by-pixel to the staging buffer and then unmap the
+             * staging buffer.
+             */
+            for (int x = 0; x < width; ++x) {
+                for (int y = 0; y < height; ++y) {
+                    int sRGB = image.getRGB(x, y);
+                    int red = (sRGB >> 16) & 0xFF;
+                    int green = (sRGB >> 8) & 0xFF;
+                    int blue = sRGB & 0xFF;
+                    int alpha = (sRGB >> 24) & 0xFF;
+                    data.put((byte) red)
+                            .put((byte) green)
+                            .put((byte) blue)
+                            .put((byte) alpha);
+                }
+            }
+            data.flip();
+            VK10.vkUnmapMemory(logicalDevice, stagingMemoryHandle);
+            /*
+             * Create a device-local image that's optimized for being
+             * a copy destination:
+             */
+            createUsage = VK10.VK_IMAGE_USAGE_TRANSFER_DST_BIT
+                    | VK10.VK_IMAGE_USAGE_SAMPLED_BIT;
+            properties = VK10.VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
+            LongBuffer pImageHandle = stack.mallocLong(1);
+            createImage(width, height, VK10.VK_FORMAT_R8G8B8A8_SRGB,
+                    VK10.VK_IMAGE_TILING_OPTIMAL, createUsage, properties,
+                    pImageHandle, pMemoryHandle);
+            long imageHandle = pImageHandle.get(0);
+            transitionImageLayout(imageHandle, VK10.VK_FORMAT_R8G8B8A8_SRGB,
+                    VK10.VK_IMAGE_LAYOUT_UNDEFINED,
+                    VK10.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+
+            // Copy the data from the staging buffer the new image:
+            copyBufferToImage(stagingBufferHandle, imageHandle, width, height);
+
+            // Convert the image to a format optimized for sampling:
+            transitionImageLayout(imageHandle, VK10.VK_FORMAT_R8G8B8A8_SRGB,
+                    VK10.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                    VK10.VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
+            // Destroy the staging buffer and free its memory:
+            VK10.vkDestroyBuffer(
+                    logicalDevice, stagingBufferHandle, defaultAllocator);
+            VK10.vkFreeMemory(
+                    logicalDevice, stagingMemoryHandle, defaultAllocator);
+
+            // Create a view for the new image:
+            textureViewHandle = createImageView(
+                    textureImageHandle, VK10.VK_FORMAT_R8G8B8A8_SRGB);
+        }
+    }
+    /**
      * Create a uniform buffer object (UBO) for each image in the swapchain.
      */
     private static void createUbos() {
@@ -2008,6 +2115,7 @@ public abstract class BaseApplication {
         createCommandPool();
         createIndexBuffer(sampleIndices);
         createVertexBuffer();
+        createTextureImage("/Textures/texture.jpg");
         createDescriptorSetLayout();
 
         createChainResources();
