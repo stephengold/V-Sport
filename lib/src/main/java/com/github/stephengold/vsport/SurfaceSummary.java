@@ -70,7 +70,7 @@ class SurfaceSummary {
      *
      * @param physicalDevice the physical device to be used (not null,
      * unaffected)
-     * @param surfaceHandle the handle of the surface to be analyze
+     * @param surfaceHandle the handle of the surface to be analyzed
      * @param stack for memory allocation (not null)
      */
     SurfaceSummary(VkPhysicalDevice physicalDevice, long surfaceHandle,

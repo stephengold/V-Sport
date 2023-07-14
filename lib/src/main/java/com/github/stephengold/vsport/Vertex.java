@@ -73,7 +73,7 @@ class Vertex {
     /**
      * Generate an attribute-description buffer.
      *
-     * @param stack
+     * @param stack for memory allocation (not null)
      * @return a new temporary buffer
      */
     static VkVertexInputAttributeDescription.Buffer
