@@ -137,7 +137,7 @@ public abstract class BaseApplication {
      * true to enable debugging output and optional runtime checks, or false to
      * disable them
      */
-    final private static boolean enableDebugging = true;
+    final private static boolean enableDebugging = true; // TODO change default
     /**
      * version of the graphics engine
      */
@@ -551,10 +551,10 @@ public abstract class BaseApplication {
     /**
      * Start the application.
      *
-     * @param appName
-     * @param appMajor
-     * @param appMinor
-     * @param appPatch
+     * @param appName the name of the application
+     * @param appMajor the major version number of the application
+     * @param appMinor the minor version number of the application
+     * @param appPatch the patch version number of the application
      */
     public static void start(
             String appName, int appMajor, int appMinor, int appPatch) {

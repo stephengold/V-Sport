@@ -98,7 +98,7 @@ class Vertex {
     /**
      * Generate a binding-description buffer.
      *
-     * @param stack
+     * @param stack for memory allocation (not null)
      * @return a new temporary buffer
      */
     static VkVertexInputBindingDescription.Buffer
@@ -132,7 +132,7 @@ class Vertex {
 
     /**
      * Write the vertex color data to the specified ByteBuffer, starting at the
-     * current buffer position) and advances the buffer position.
+     * current buffer position) and advance the buffer position.
      *
      * @param target the buffer to write to (not null, modified)
      */
@@ -144,7 +144,7 @@ class Vertex {
 
     /**
      * Write the vertex position data to the specified ByteBuffer, starting at
-     * the current buffer position) and advances the buffer position.
+     * the current buffer position) and advance the buffer position.
      *
      * @param target the buffer to write to (not null, modified)
      */
