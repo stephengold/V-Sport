@@ -1303,6 +1303,7 @@ public abstract class BaseApplication {
             // device features:
             VkPhysicalDeviceFeatures deviceFeatures
                     = VkPhysicalDeviceFeatures.calloc(stack);
+            deviceFeatures.samplerAnisotropy(true);
 
             // logical-device creation information:
             VkDeviceCreateInfo createInfo = VkDeviceCreateInfo.calloc(stack);
