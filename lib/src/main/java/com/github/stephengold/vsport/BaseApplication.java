@@ -64,6 +64,7 @@ import org.lwjgl.vulkan.VkAttachmentDescription;
 import org.lwjgl.vulkan.VkAttachmentReference;
 import org.lwjgl.vulkan.VkBufferCopy;
 import org.lwjgl.vulkan.VkBufferCreateInfo;
+import org.lwjgl.vulkan.VkBufferImageCopy;
 import org.lwjgl.vulkan.VkClearValue;
 import org.lwjgl.vulkan.VkCommandBuffer;
 import org.lwjgl.vulkan.VkCommandBufferAllocateInfo;
@@ -83,6 +84,7 @@ import org.lwjgl.vulkan.VkDeviceCreateInfo;
 import org.lwjgl.vulkan.VkDeviceQueueCreateInfo;
 import org.lwjgl.vulkan.VkExtensionProperties;
 import org.lwjgl.vulkan.VkExtent2D;
+import org.lwjgl.vulkan.VkExtent3D;
 import org.lwjgl.vulkan.VkFramebufferCreateInfo;
 import org.lwjgl.vulkan.VkGraphicsPipelineCreateInfo;
 import org.lwjgl.vulkan.VkImageMemoryBarrier;
@@ -422,6 +424,44 @@ public abstract class BaseApplication {
             pRegion.srcOffset(0);
             VK10.vkCmdCopyBuffer(
                     commandBuffer, sourceHandle, destHandle, pRegion);
+
+            endSingleTimeCommands(commandBuffer);
+        }
+    }
+
+    /**
+     * Copy the data from the specified buffer to the specified 2-D image.
+     *
+     * @param bufferHandle the handle of the source buffer
+     * @param imageHandle the handle of the destination image
+     * @param width the width of the image (in pixels)
+     * @param height the height of the image (in pixels)
+     */
+    static void copyBufferToImage(
+            long bufferHandle, long imageHandle, int width, int height) {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            VkCommandBuffer commandBuffer = beginSingleTimeCommands();
+
+            VkExtent3D extent = VkExtent3D.calloc(stack);
+            int depth = 1;
+            extent.set(width, height, depth);
+
+            VkBufferImageCopy.Buffer region
+                    = VkBufferImageCopy.calloc(1, stack);
+            region.bufferImageHeight(0);  // tightly packed
+            region.bufferOffset(0);
+            region.bufferRowLength(0);   // tightly packed
+            region.imageExtent(extent);
+            region.imageOffset().set(0, 0, 0);
+            VkImageSubresourceLayers sub = region.imageSubresource();
+            sub.aspectMask(VK10.VK_IMAGE_ASPECT_COLOR_BIT);
+            sub.baseArrayLayer(0);
+            sub.layerCount(1);
+            sub.mipLevel(0);
+
+            VK10.vkCmdCopyBufferToImage(
+                    commandBuffer, bufferHandle, imageHandle,
+                    VK10.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, region);
 
             endSingleTimeCommands(commandBuffer);
         }
