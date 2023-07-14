@@ -117,6 +117,7 @@ import org.lwjgl.vulkan.VkQueueFamilyProperties;
 import org.lwjgl.vulkan.VkRect2D;
 import org.lwjgl.vulkan.VkRenderPassBeginInfo;
 import org.lwjgl.vulkan.VkRenderPassCreateInfo;
+import org.lwjgl.vulkan.VkSamplerCreateInfo;
 import org.lwjgl.vulkan.VkShaderModuleCreateInfo;
 import org.lwjgl.vulkan.VkSubmitInfo;
 import org.lwjgl.vulkan.VkSubpassDependency;
@@ -276,6 +277,10 @@ public abstract class BaseApplication {
      */
     private static long renderPassHandle = VK10.VK_NULL_HANDLE;
     /**
+     * handle of the texture sampler
+     */
+    private static long samplerHandle = VK10.VK_NULL_HANDLE;
+    /**
      * handle of the surface for the main window
      */
     private static long surfaceHandle = VK10.VK_NULL_HANDLE;
@@ -384,6 +389,13 @@ public abstract class BaseApplication {
 
         destroyVertexBuffers();
         destroyIndexBuffers();
+
+        // Destroy the texture sampler:
+        if (samplerHandle != VK10.VK_NULL_HANDLE) {
+            VK10.vkDestroySampler(
+                    logicalDevice, samplerHandle, defaultAllocator);
+            samplerHandle = VK10.VK_NULL_HANDLE;
+        }
 
         // Destroy the texture image view:
         if (textureViewHandle != VK10.VK_NULL_HANDLE) {
@@ -1741,6 +1753,36 @@ public abstract class BaseApplication {
                     textureImageHandle, VK10.VK_FORMAT_R8G8B8A8_SRGB);
         }
     }
+
+    /**
+     * Create a texture sampler for the current logical device.
+     */
+    private static void createTextureSampler() {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            VkSamplerCreateInfo samplerInfo = VkSamplerCreateInfo.calloc(stack);
+            samplerInfo.sType(VK10.VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO);
+
+            samplerInfo.addressModeU(VK10.VK_SAMPLER_ADDRESS_MODE_REPEAT);
+            samplerInfo.addressModeV(VK10.VK_SAMPLER_ADDRESS_MODE_REPEAT);
+            samplerInfo.addressModeW(VK10.VK_SAMPLER_ADDRESS_MODE_REPEAT);
+            samplerInfo.anisotropyEnable(true);
+            samplerInfo.borderColor(VK10.VK_BORDER_COLOR_INT_OPAQUE_BLACK);
+            samplerInfo.compareEnable(false);
+            samplerInfo.compareOp(VK10.VK_COMPARE_OP_ALWAYS);
+            samplerInfo.magFilter(VK10.VK_FILTER_LINEAR);
+            samplerInfo.maxAnisotropy(16f);
+            samplerInfo.minFilter(VK10.VK_FILTER_LINEAR);
+            samplerInfo.mipmapMode(VK10.VK_SAMPLER_MIPMAP_MODE_LINEAR);
+            samplerInfo.unnormalizedCoordinates(false);
+
+            LongBuffer pTextureSampler = stack.mallocLong(1);
+            int retCode = VK10.vkCreateSampler(logicalDevice, samplerInfo,
+                    defaultAllocator, pTextureSampler);
+            Utils.checkForError(retCode, "create texture sampler");
+            samplerHandle = pTextureSampler.get(0);
+        }
+    }
+
     /**
      * Create a uniform buffer object (UBO) for each image in the swapchain.
      */
@@ -2116,6 +2158,7 @@ public abstract class BaseApplication {
         createIndexBuffer(sampleIndices);
         createVertexBuffer();
         createTextureImage("/Textures/texture.jpg");
+        createTextureSampler();
         createDescriptorSetLayout();
 
         createChainResources();
