@@ -87,6 +87,7 @@ import org.lwjgl.vulkan.VkExtent2D;
 import org.lwjgl.vulkan.VkExtent3D;
 import org.lwjgl.vulkan.VkFramebufferCreateInfo;
 import org.lwjgl.vulkan.VkGraphicsPipelineCreateInfo;
+import org.lwjgl.vulkan.VkImageCreateInfo;
 import org.lwjgl.vulkan.VkImageMemoryBarrier;
 import org.lwjgl.vulkan.VkImageSubresourceLayers;
 import org.lwjgl.vulkan.VkImageSubresourceRange;
@@ -278,6 +279,14 @@ public abstract class BaseApplication {
      */
     private static long surfaceHandle = VK10.VK_NULL_HANDLE;
     /**
+     * handle of the texture image (native type: VkImage)
+     */
+    private static long textureImageHandle = VK10.VK_NULL_HANDLE;
+    /**
+     * handle of the texture-image memory (native type: VkDeviceMemory)
+     */
+    private static long textureMemoryHandle = VK10.VK_NULL_HANDLE;
+    /**
      * GLFW handle of the window used to render geometries
      */
     private static long windowHandle = VK10.VK_NULL_HANDLE;
@@ -370,6 +379,18 @@ public abstract class BaseApplication {
 
         destroyVertexBuffers();
         destroyIndexBuffers();
+
+        // Destroy the texture image:
+        if (textureMemoryHandle != VK10.VK_NULL_HANDLE) {
+            VK10.vkFreeMemory(
+                    logicalDevice, textureMemoryHandle, defaultAllocator);
+            textureMemoryHandle = VK10.VK_NULL_HANDLE;
+        }
+        if (textureImageHandle != VK10.VK_NULL_HANDLE) {
+            VK10.vkDestroyImage(
+                    logicalDevice, textureImageHandle, defaultAllocator);
+            textureImageHandle = VK10.VK_NULL_HANDLE;
+        }
 
         // Destroy the command pool and its buffers:
         commandBuffers = null;
@@ -1067,6 +1088,72 @@ public abstract class BaseApplication {
                 long frameBufferHandle = pHandle.get(0);
                 chainFrameBufferHandles.add(frameBufferHandle);
             }
+        }
+    }
+
+    /**
+     * Create a 2-D image with the specified properties.
+     *
+     * @param width the desired width (in pixels)
+     * @param height the desired height (in pixels)
+     * @param format the desired format
+     * @param tiling the desired tiling
+     * @param usage a bitmask
+     * @param requiredProperties a bitmask
+     * @param pImage to store the handle of the resulting image (not null,
+     * modified)
+     * @param pMemory to store the handle of the image's memory (not null,
+     * modified)
+     */
+    private static void createImage(int width, int height, int format,
+            int tiling, int usage, int requiredProperties,
+            LongBuffer pTextureImage, LongBuffer pTextureMemory) {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            VkImageCreateInfo imageInfo = VkImageCreateInfo.calloc(stack);
+            imageInfo.sType(VK10.VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO);
+
+            imageInfo.arrayLayers(1);
+            imageInfo.extent().depth(1);
+            imageInfo.extent().height(height);
+            imageInfo.extent().width(width);
+            imageInfo.format(format);
+            imageInfo.imageType(VK10.VK_IMAGE_TYPE_2D);
+            imageInfo.initialLayout(VK10.VK_IMAGE_LAYOUT_UNDEFINED);
+            imageInfo.mipLevels(1);
+            imageInfo.samples(VK10.VK_SAMPLE_COUNT_1_BIT);
+            imageInfo.sharingMode(VK10.VK_SHARING_MODE_EXCLUSIVE);
+            imageInfo.tiling(tiling);
+            imageInfo.usage(usage);
+
+            int retCode = VK10.vkCreateImage(
+                    logicalDevice, imageInfo, defaultAllocator, pTextureImage);
+            Utils.checkForError(retCode, "create image");
+            textureImageHandle = pTextureImage.get(0);
+
+            // Query the images's memory requirements:
+            VkMemoryRequirements memRequirements
+                    = VkMemoryRequirements.malloc(stack);
+            VK10.vkGetImageMemoryRequirements(
+                    logicalDevice, textureImageHandle, memRequirements);
+
+            // Allocate memory for the image:
+            VkMemoryAllocateInfo allocInfo = VkMemoryAllocateInfo.calloc(stack);
+            allocInfo.sType(VK10.VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO);
+
+            allocInfo.allocationSize(memRequirements.size());
+            int memoryTypeIndex = findMemoryType(
+                    stack, memRequirements.memoryTypeBits(), requiredProperties);
+            allocInfo.memoryTypeIndex(memoryTypeIndex);
+
+            retCode = VK10.vkAllocateMemory(
+                    logicalDevice, allocInfo, defaultAllocator, pTextureMemory);
+            Utils.checkForError(retCode, "allocate image memory");
+            textureMemoryHandle = pTextureMemory.get(0);
+
+            // Bind the newly allocated memory to the image object:
+            int offset = 0;
+            VK10.vkBindImageMemory(logicalDevice, textureImageHandle,
+                    textureMemoryHandle, offset);
         }
     }
 
