@@ -171,10 +171,22 @@ public abstract class BaseApplication {
      * vertex data for the sample mesh
      */
     final private static Vertex[] sampleVertices = {
-        new Vertex(new Vector2f(-0.5f, -0.5f), new Vector3f(1f, 0f, 0f)),
-        new Vertex(new Vector2f(0.5f, -0.5f), new Vector3f(0f, 1f, 0f)),
-        new Vertex(new Vector2f(0.5f, 0.5f), new Vector3f(0f, 0f, 1f)),
-        new Vertex(new Vector2f(-0.5f, 0.5f), new Vector3f(1f, 1f, 1f))
+        new Vertex(
+        new Vector2f(-0.5f, -0.5f),
+        new Vector3f(1f, 0f, 0f),
+        new Vector2f(0f, 0f)),
+        new Vertex(
+        new Vector2f(0.5f, -0.5f),
+        new Vector3f(0f, 1f, 0f),
+        new Vector2f(1f, 0f)),
+        new Vertex(
+        new Vector2f(0.5f, 0.5f),
+        new Vector3f(0f, 0f, 1f),
+        new Vector2f(1f, 1f)),
+        new Vertex(
+        new Vector2f(-0.5f, 0.5f),
+        new Vector3f(1f, 1f, 1f),
+        new Vector2f(0f, 1f))
     };
     /**
      * use the default allocator for direct buffers
@@ -199,6 +211,10 @@ public abstract class BaseApplication {
      * vertex position buffer
      */
     private static BufferResource positionBuffer;
+    /**
+     * vertex texCoords buffer
+     */
+    private static BufferResource texCoordsBuffer;
     /**
      * print Vulkan debugging information (typically to the console) or null if
      * not created
@@ -1800,15 +1816,15 @@ public abstract class BaseApplication {
     }
 
     /**
-     * Create a 2 vertex buffers for the sample mesh.
+     * Create 3 vertex buffers for the sample mesh.
      */
     private static void createVertexBuffer() {
         int numVertices = sampleVertices.length;
+        int usage = VK10.VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
         boolean staging = true;
 
         int numBytes = numVertices * 2 * Float.BYTES;
-        positionBuffer = new BufferResource(
-                numBytes, VK10.VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, staging) {
+        positionBuffer = new BufferResource(numBytes, usage, staging) {
             @Override
             void fill(ByteBuffer destinationBuffer) {
                 for (Vertex vertex : sampleVertices) {
@@ -1818,12 +1834,21 @@ public abstract class BaseApplication {
         };
 
         numBytes = numVertices * 3 * Float.BYTES;
-        colorBuffer = new BufferResource(
-                numBytes, VK10.VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, staging) {
+        colorBuffer = new BufferResource(numBytes, usage, staging) {
             @Override
             void fill(ByteBuffer destinationBuffer) {
                 for (Vertex vertex : sampleVertices) {
                     vertex.writeColorsTo(destinationBuffer);
+                }
+            }
+        };
+
+        numBytes = numVertices * 2 * Float.BYTES;
+        texCoordsBuffer = new BufferResource(numBytes, usage, staging) {
+            @Override
+            void fill(ByteBuffer destinationBuffer) {
+                for (Vertex vertex : sampleVertices) {
+                    vertex.writeTexCoordsTo(destinationBuffer);
                 }
             }
         };
@@ -2014,6 +2039,9 @@ public abstract class BaseApplication {
      * Destroy all vertex buffers.
      */
     private static void destroyVertexBuffers() {
+        if (texCoordsBuffer != null) {
+            texCoordsBuffer.destroy();
+        }
         if (colorBuffer != null) {
             colorBuffer.destroy();
         }
@@ -2359,12 +2387,14 @@ public abstract class BaseApplication {
 
                 // command to bind the vertex buffers:
                 int firstBinding = 0;
-                LongBuffer vertexBuffers = stack.longs(
-                        positionBuffer.handle(), colorBuffer.handle()
+                LongBuffer vboHandles = stack.longs(
+                        positionBuffer.handle(),
+                        colorBuffer.handle(),
+                        texCoordsBuffer.handle()
                 );
-                LongBuffer offsets = stack.longs(0, 0);
+                LongBuffer offsets = stack.longs(0L, 0L, 0L);
                 VK10.vkCmdBindVertexBuffers(
-                        commandBuffer, firstBinding, vertexBuffers, offsets);
+                        commandBuffer, firstBinding, vboHandles, offsets);
 
                 // command to bind the index buffer:
                 int startOffset = 0;

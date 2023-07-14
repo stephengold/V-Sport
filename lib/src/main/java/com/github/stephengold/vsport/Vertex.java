@@ -50,6 +50,7 @@ class Vertex {
     // fields
 
     final private Vector2fc pos;
+    final private Vector2fc texCoords;
     final private Vector3fc color;
     // *************************************************************************
     // constructors
@@ -59,10 +60,12 @@ class Vertex {
      *
      * @param pos the desired location of the vertex (in model coordinates)
      * @param color the desired color of the vertex
+     * @param texCoords the desired texture coordinates of the vertex
      */
-    Vertex(Vector2fc pos, Vector3fc color) {
+    Vertex(Vector2fc pos, Vector3fc color, Vector2fc texCoords) {
         this.pos = pos;
         this.color = color;
+        this.texCoords = texCoords;
     }
     // *************************************************************************
     // new methods exposed
@@ -76,7 +79,7 @@ class Vertex {
     static VkVertexInputAttributeDescription.Buffer
             createAttributeDescriptions(MemoryStack stack) {
         VkVertexInputAttributeDescription.Buffer result
-                = VkVertexInputAttributeDescription.calloc(2);
+                = VkVertexInputAttributeDescription.calloc(3, stack);
 
         // position attribute (2 signed floats in slot 0)
         VkVertexInputAttributeDescription posDescription = result.get(0);
@@ -92,6 +95,13 @@ class Vertex {
         colorDescription.location(1); // slot 1 (see the vertex shader)
         colorDescription.offset(0); // start offset in bytes
 
+        // texCoords attribute (2 signed floats in slot 2)
+        VkVertexInputAttributeDescription texCoordsDescription = result.get(2);
+        texCoordsDescription.binding(2);
+        texCoordsDescription.format(VK10.VK_FORMAT_R32G32_SFLOAT);
+        texCoordsDescription.location(2); // slot 2 (see the vertex shader)
+        texCoordsDescription.offset(0); // start offset in bytes
+
         return result;
     }
 
@@ -104,7 +114,7 @@ class Vertex {
     static VkVertexInputBindingDescription.Buffer
             createBindingDescription(MemoryStack stack) {
         VkVertexInputBindingDescription.Buffer result
-                = VkVertexInputBindingDescription.calloc(2, stack);
+                = VkVertexInputBindingDescription.calloc(3, stack);
 
         // Describe the first slot:
         VkVertexInputBindingDescription pos = result.get(0);
@@ -118,6 +128,12 @@ class Vertex {
         color.inputRate(VK10.VK_VERTEX_INPUT_RATE_VERTEX);
         color.stride(3 * Float.BYTES);
 
+        // Describe the 3rd slot:
+        VkVertexInputBindingDescription texCoords = result.get(2);
+        texCoords.binding(2);
+        texCoords.inputRate(VK10.VK_VERTEX_INPUT_RATE_VERTEX);
+        texCoords.stride(2 * Float.BYTES);
+
         return result;
     }
 
@@ -126,7 +142,7 @@ class Vertex {
      * @return
      */
     static int numBytes() {
-        int result = (2 + 3) * Float.BYTES;
+        int result = (2 + 3 + 2) * Float.BYTES;
         return result;
     }
 
@@ -151,5 +167,16 @@ class Vertex {
     void writePositionsTo(ByteBuffer target) {
         target.putFloat(pos.x());
         target.putFloat(pos.y());
+    }
+
+    /**
+     * Write the texture coordinate data to the specified ByteBuffer, starting
+     * at the current buffer position) and advances the buffer position.
+     *
+     * @param target the buffer to write to (not null, modified)
+     */
+    void writeTexCoordsTo(ByteBuffer target) {
+        target.putFloat(texCoords.x());
+        target.putFloat(texCoords.y());
     }
 }
