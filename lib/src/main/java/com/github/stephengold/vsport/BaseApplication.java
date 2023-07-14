@@ -318,14 +318,6 @@ public abstract class BaseApplication {
      * presentation queue for the main window
      */
     private static VkQueue presentationQueue;
-    /**
-     * attribute descriptions for the mesh
-     */
-    private static VkVertexInputAttributeDescription.Buffer pAttributeDesc;
-    /**
-     * binding descriptions for the mesh
-     */
-    private static VkVertexInputBindingDescription.Buffer pBindingDesc;
     // *************************************************************************
     // new methods exposed
 
@@ -1307,10 +1299,12 @@ public abstract class BaseApplication {
             visCreateInfo.sType(
                     VK10.VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO);
 
-            pBindingDesc = Vertex.createBindingDescription(stack);
+            VkVertexInputBindingDescription.Buffer pBindingDesc
+                    = Vertex.createBindingDescription(stack);
             visCreateInfo.pVertexBindingDescriptions(pBindingDesc);
 
-            pAttributeDesc = Vertex.createAttributeDescriptions(stack);
+            VkVertexInputAttributeDescription.Buffer pAttributeDesc
+                    = Vertex.createAttributeDescriptions(stack);
             visCreateInfo.pVertexAttributeDescriptions(pAttributeDesc);
 
             // input-assembly state:
@@ -1675,11 +1669,6 @@ public abstract class BaseApplication {
         //
         destroyPipeline();
 
-        if (pAttributeDesc != null) {
-            pAttributeDesc.free();
-            pAttributeDesc = null;
-        }
-
         if (ubos != null) {
             for (BufferResource ubo : ubos) {
                 ubo.destroy();
@@ -1740,11 +1729,6 @@ public abstract class BaseApplication {
             VK10.vkDestroyPipelineLayout(
                     logicalDevice, pipelineLayoutHandle, defaultAllocator);
             pipelineLayoutHandle = VK10.VK_NULL_HANDLE;
-        }
-
-        if (pAttributeDesc != null) {
-            pAttributeDesc.free();
-            pAttributeDesc = null;
         }
     }
 
