@@ -549,6 +549,15 @@ public abstract class BaseApplication {
     }
 
     /**
+     * Start the application (simplified interface).
+     *
+     * @param appName the name of the application
+     */
+    public static void start(String appName) {
+        start(appName, 0, 0, 0);
+    }
+
+    /**
      * Start the application.
      *
      * @param appName the name of the application
@@ -558,8 +567,15 @@ public abstract class BaseApplication {
      */
     public static void start(
             String appName, int appMajor, int appMinor, int appPatch) {
-        String title = String.format(
-                "%s v%d.%d.%d", appName, appMajor, appMinor, appPatch);
+        // Generate the initial text for the window's title bar:
+        String title;
+        if (appMajor == 0 && appMinor == 0 && appPatch == 0) {
+            title = appName;
+        } else {
+            title = String.format(
+                    "%s v%d.%d.%d", appName, appMajor, appMinor, appPatch);
+        }
+
         try {
             initializeGlfw(title);
 

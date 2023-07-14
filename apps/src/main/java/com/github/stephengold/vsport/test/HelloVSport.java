@@ -47,6 +47,6 @@ public class HelloVSport extends BaseApplication {
      */
     public static void main(String[] arguments) {
         String appName = HelloVSport.class.getSimpleName();
-        HelloVSport.start(appName, 1, 0, 0);
+        BaseApplication.start(appName);
     }
 }
