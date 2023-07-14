@@ -174,19 +174,19 @@ public abstract class BaseApplication {
      */
     final private static Vertex[] sampleVertices = {
         new Vertex(
-        new Vector2f(-0.5f, -0.5f),
+        new Vector3f(-0.5f, -0.5f, 0f),
         new Vector3f(1f, 0f, 0f),
         new Vector2f(0f, 0f)),
         new Vertex(
-        new Vector2f(0.5f, -0.5f),
+        new Vector3f(0.5f, -0.5f, 0f),
         new Vector3f(0f, 1f, 0f),
         new Vector2f(1f, 0f)),
         new Vertex(
-        new Vector2f(0.5f, 0.5f),
+        new Vector3f(0.5f, 0.5f, 0f),
         new Vector3f(0f, 0f, 1f),
         new Vector2f(1f, 1f)),
         new Vertex(
-        new Vector2f(-0.5f, 0.5f),
+        new Vector3f(-0.5f, 0.5f, 0f),
         new Vector3f(1f, 1f, 1f),
         new Vector2f(0f, 1f))
     };
@@ -1866,7 +1866,7 @@ public abstract class BaseApplication {
         int usage = VK10.VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
         boolean staging = true;
 
-        int numBytes = numVertices * 2 * Float.BYTES;
+        int numBytes = numVertices * 3 * Float.BYTES;
         positionBuffer = new BufferResource(numBytes, usage, staging) {
             @Override
             void fill(ByteBuffer destinationBuffer) {

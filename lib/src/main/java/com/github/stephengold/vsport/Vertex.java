@@ -49,7 +49,7 @@ class Vertex {
     // *************************************************************************
     // fields
 
-    final private Vector2fc pos;
+    final private Vector3fc pos;
     final private Vector2fc texCoords;
     final private Vector3fc color;
     // *************************************************************************
@@ -62,7 +62,7 @@ class Vertex {
      * @param color the desired color of the vertex
      * @param texCoords the desired texture coordinates of the vertex
      */
-    Vertex(Vector2fc pos, Vector3fc color, Vector2fc texCoords) {
+    Vertex(Vector3fc pos, Vector3fc color, Vector2fc texCoords) {
         this.pos = pos;
         this.color = color;
         this.texCoords = texCoords;
@@ -81,10 +81,10 @@ class Vertex {
         VkVertexInputAttributeDescription.Buffer result
                 = VkVertexInputAttributeDescription.calloc(3, stack);
 
-        // position attribute (2 signed floats in slot 0)
+        // position attribute (3 signed floats in slot 0)
         VkVertexInputAttributeDescription posDescription = result.get(0);
         posDescription.binding(0);
-        posDescription.format(VK10.VK_FORMAT_R32G32_SFLOAT);
+        posDescription.format(VK10.VK_FORMAT_R32G32B32_SFLOAT);
         posDescription.location(0); // slot 0 (see the vertex shader)
         posDescription.offset(0); // start offset in bytes
 
@@ -120,7 +120,7 @@ class Vertex {
         VkVertexInputBindingDescription pos = result.get(0);
         pos.binding(0);
         pos.inputRate(VK10.VK_VERTEX_INPUT_RATE_VERTEX);
-        pos.stride(2 * Float.BYTES);
+        pos.stride(3 * Float.BYTES);
 
         // Describe the 2nd slot:
         VkVertexInputBindingDescription color = result.get(1);
@@ -158,6 +158,7 @@ class Vertex {
     void writePositionsTo(ByteBuffer target) {
         target.putFloat(pos.x());
         target.putFloat(pos.y());
+        target.putFloat(pos.z());
     }
 
     /**

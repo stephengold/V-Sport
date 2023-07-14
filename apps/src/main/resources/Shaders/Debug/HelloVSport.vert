@@ -3,7 +3,7 @@
  */
 #version 450
 
-layout(location = 0) in vec2 inPosition;  // locations from vertex buffer
+layout(location = 0) in vec3 inPosition;  // locations from vertex buffer
 //layout(location = 1) in vec3 inColor;     // colors from vertex buffer
 layout(location = 2) in vec2 inTexCoords; // texture coords from vertex buffer
 
@@ -18,7 +18,7 @@ layout(binding = 0) uniform UniformBufferObject {
 
 void main() {
     // vertex position in clip space
-    gl_Position = ubo.proj * ubo.view * ubo.model * vec4(inPosition, 0.0, 1.0);
+    gl_Position = ubo.proj * ubo.view * ubo.model * vec4(inPosition, 1.0);
 
     // interpolated vertex color
     //vertexColor = inColor;
