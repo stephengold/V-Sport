@@ -1732,7 +1732,6 @@ public abstract class BaseApplication {
                             .put((byte) alpha);
                 }
             }
-            data.flip();
             VK10.vkUnmapMemory(logicalDevice, stagingMemoryHandle);
             /*
              * Create a device-local image that's optimized for being
