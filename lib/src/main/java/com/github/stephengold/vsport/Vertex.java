@@ -138,15 +138,6 @@ class Vertex {
     }
 
     /**
-     *
-     * @return
-     */
-    static int numBytes() {
-        int result = (2 + 3 + 2) * Float.BYTES;
-        return result;
-    }
-
-    /**
      * Write the vertex color data to the specified ByteBuffer, starting at the
      * current buffer position) and advance the buffer position.
      *
