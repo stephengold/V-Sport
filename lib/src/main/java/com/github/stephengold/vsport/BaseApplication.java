@@ -409,16 +409,16 @@ public abstract class BaseApplication {
      *
      * @param sourceHandle the handle of the source buffer object
      * @param destHandle the handle of the destination buffer object
-     * @param size the number of bytes to copy
+     * @param numBytes the number of bytes to copy
      */
-    static void copyBuffer(long sourceHandle, long destHandle, long size) {
+    static void copyBuffer(long sourceHandle, long destHandle, long numBytes) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             VkCommandBuffer commandBuffer = beginSingleTimeCommands();
 
             // command to copy a buffer:
             VkBufferCopy.Buffer pRegion = VkBufferCopy.calloc(1, stack);
             pRegion.dstOffset(0);
-            pRegion.size(size);
+            pRegion.size(numBytes);
             pRegion.srcOffset(0);
             VK10.vkCmdCopyBuffer(
                     commandBuffer, sourceHandle, destHandle, pRegion);
