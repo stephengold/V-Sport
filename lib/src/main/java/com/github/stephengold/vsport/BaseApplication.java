@@ -72,9 +72,11 @@ import org.lwjgl.vulkan.VkCommandBufferAllocateInfo;
 import org.lwjgl.vulkan.VkCommandBufferBeginInfo;
 import org.lwjgl.vulkan.VkCommandPoolCreateInfo;
 import org.lwjgl.vulkan.VkComponentMapping;
+import org.lwjgl.vulkan.VkCopyDescriptorSet;
 import org.lwjgl.vulkan.VkDebugUtilsMessengerCallbackDataEXT;
 import org.lwjgl.vulkan.VkDebugUtilsMessengerCreateInfoEXT;
 import org.lwjgl.vulkan.VkDescriptorBufferInfo;
+import org.lwjgl.vulkan.VkDescriptorImageInfo;
 import org.lwjgl.vulkan.VkDescriptorPoolCreateInfo;
 import org.lwjgl.vulkan.VkDescriptorPoolSize;
 import org.lwjgl.vulkan.VkDescriptorSetAllocateInfo;
@@ -809,25 +811,47 @@ public abstract class BaseApplication {
             bufferInfo.offset(0);
             bufferInfo.range(numBytes);
 
-            // Configure the descriptors in each set:
-            VkWriteDescriptorSet.Buffer pWriteInfo
-                    = VkWriteDescriptorSet.calloc(1, stack);
-            pWriteInfo.sType(VK10.VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET);
+            VkDescriptorImageInfo.Buffer imageInfo
+                    = VkDescriptorImageInfo.calloc(1, stack);
+            imageInfo.imageLayout(
+                    VK10.VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+            imageInfo.imageView(textureViewHandle);
+            imageInfo.sampler(samplerHandle);
 
-            pWriteInfo.descriptorCount(1);
-            pWriteInfo.descriptorType(VK10.VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
-            pWriteInfo.dstArrayElement(0);
-            pWriteInfo.dstBinding(0);
-            pWriteInfo.pBufferInfo(bufferInfo);
+            // Configure the descriptors in each set:
+            VkWriteDescriptorSet.Buffer pWrites
+                    = VkWriteDescriptorSet.calloc(2, stack);
+
+            VkWriteDescriptorSet uboWrite = pWrites.get(0);
+            uboWrite.sType(VK10.VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET);
+            uboWrite.descriptorCount(1);
+            uboWrite.descriptorType(VK10.VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
+
+            uboWrite.dstArrayElement(0);
+            uboWrite.dstBinding(0);
+            uboWrite.pBufferInfo(bufferInfo);
+
+            VkWriteDescriptorSet samplerWrite = pWrites.get(1);
+            samplerWrite.sType(VK10.VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET);
+
+            samplerWrite.descriptorCount(1);
+            samplerWrite.descriptorType(
+                    VK10.VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
+            samplerWrite.dstArrayElement(0);
+            samplerWrite.dstBinding(1);
+            samplerWrite.pImageInfo(imageInfo);
+
+            VkCopyDescriptorSet.Buffer pCopies = null;
 
             for (int setIndex = 0; setIndex < numSets; ++setIndex) {
                 long uboHandle = ubos.get(setIndex).handle();
                 bufferInfo.buffer(uboHandle);
 
                 long setHandle = pSetHandles.get(setIndex);
-                pWriteInfo.dstSet(setHandle);
+                uboWrite.dstSet(setHandle);
+                samplerWrite.dstSet(setHandle);
 
-                VK10.vkUpdateDescriptorSets(logicalDevice, pWriteInfo, null);
+                VK10.vkUpdateDescriptorSets(logicalDevice, pWrites, pCopies);
             }
         }
     }
@@ -1034,17 +1058,24 @@ public abstract class BaseApplication {
     }
 
     /**
-     * Create the (empty) descriptor-set pool for UBOs.
+     * Create the (empty) descriptor-set pools for UBOs and samplers.
      */
     private static void createDescriptorPool() {
-        int numSets = chainImageHandles.size();
+        int numImages = chainImageHandles.size();
 
         try (MemoryStack stack = MemoryStack.stackPush()) {
-            // The pool will contain numSets UBOs and no other set types:
             VkDescriptorPoolSize.Buffer pContents
-                    = VkDescriptorPoolSize.calloc(1, stack);
-            pContents.type(VK10.VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
-            pContents.descriptorCount(numSets);
+                    = VkDescriptorPoolSize.calloc(2, stack);
+
+            // The first pool will contain numImages UBOs:
+            VkDescriptorPoolSize uboPool = pContents.get(0);
+            uboPool.type(VK10.VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
+            uboPool.descriptorCount(numImages);
+
+            // The 2nd pool will contain numImages combined-image samplers:
+            VkDescriptorPoolSize samplerPool = pContents.get(1);
+            samplerPool.type(VK10.VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
+            samplerPool.descriptorCount(numImages);
 
             // Create the descriptor-set pool:
             VkDescriptorPoolCreateInfo createInfo
@@ -1053,7 +1084,7 @@ public abstract class BaseApplication {
                     VK10.VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO);
 
             createInfo.flags(0x0); // descriptor sets are never freed
-            createInfo.maxSets(numSets);
+            createInfo.maxSets(numImages);
             createInfo.pPoolSizes(pContents);
 
             LongBuffer pHandle = stack.mallocLong(1);
@@ -1069,17 +1100,29 @@ public abstract class BaseApplication {
      */
     private static void createDescriptorSetLayout() {
         try (MemoryStack stack = MemoryStack.stackPush()) {
-            // Define the bindings for the first (and only) descriptor set:
             VkDescriptorSetLayoutBinding.Buffer pBindings
-                    = VkDescriptorSetLayoutBinding.calloc(1, stack);
-            pBindings.binding(0);
-            pBindings.descriptorCount(1); // a single UBO
-            pBindings.descriptorType(
-                    VK10.VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
-            pBindings.pImmutableSamplers(null);
+                    = VkDescriptorSetLayoutBinding.calloc(2, stack);
 
-            // The set will be used only by the vertex-shader stage:
-            pBindings.stageFlags(VK10.VK_SHADER_STAGE_VERTEX_BIT);
+            // Define the bindings for the first descriptor set (the UBO):
+            VkDescriptorSetLayoutBinding uboBinding = pBindings.get(0);
+            uboBinding.binding(0);
+            uboBinding.descriptorCount(1); // a single UBO
+            uboBinding.descriptorType(
+                    VK10.VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
+            uboBinding.pImmutableSamplers(null);
+
+            // The UBOs will be used only by the vertex-shader stage:
+            uboBinding.stageFlags(VK10.VK_SHADER_STAGE_VERTEX_BIT);
+
+            VkDescriptorSetLayoutBinding samplerBinding = pBindings.get(1);
+            samplerBinding.binding(1);
+            samplerBinding.descriptorCount(1); // a single sampler
+            samplerBinding.descriptorType(
+                    VK10.VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
+            samplerBinding.pImmutableSamplers(null);
+
+            // The sampler will be used only by the fragment-shader stage:
+            samplerBinding.stageFlags(VK10.VK_SHADER_STAGE_FRAGMENT_BIT);
 
             // Create the descriptor-set layout:
             LongBuffer pHandle = stack.mallocLong(1);
