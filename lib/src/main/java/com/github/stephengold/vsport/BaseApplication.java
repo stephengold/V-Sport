@@ -239,7 +239,7 @@ public abstract class BaseApplication {
      */
     private static Callback debugMessengerCallback;
     /**
-     * format for all images in the main swapchain
+     * format for all color images in the main swapchain
      */
     private static int chainImageFormat;
     /**
@@ -1431,7 +1431,7 @@ public abstract class BaseApplication {
             colorAttachment.stencilStoreOp(
                     VK10.VK_ATTACHMENT_STORE_OP_DONT_CARE);
 
-            // Clear the frame buffer to black before each frame:
+            // Clear the color buffer to black before each frame:
             colorAttachment.loadOp(VK10.VK_ATTACHMENT_LOAD_OP_CLEAR);
             colorAttachment.storeOp(VK10.VK_ATTACHMENT_STORE_OP_STORE);
 
@@ -1812,7 +1812,7 @@ public abstract class BaseApplication {
             // Copy the data from the staging buffer the new image:
             copyBufferToImage(stagingBufferHandle, imageHandle, width, height);
 
-            // Convert the image to a format optimized for sampling:
+            // Convert the image to a layout optimized for sampling:
             transitionImageLayout(imageHandle, VK10.VK_FORMAT_R8G8B8A8_SRGB,
                     VK10.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
                     VK10.VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
@@ -2737,6 +2737,7 @@ public abstract class BaseApplication {
     }
 
     /**
+     * Update the Uniform Buffer Object (UBO) of the indexed image.
      *
      * @param imageIndex index of the target image among the swap-chain images.
      */
