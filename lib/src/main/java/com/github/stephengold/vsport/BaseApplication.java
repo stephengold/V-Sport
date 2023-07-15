@@ -1228,13 +1228,13 @@ public abstract class BaseApplication {
             int retCode = VK10.vkCreateImage(
                     logicalDevice, imageInfo, defaultAllocator, pTextureImage);
             Utils.checkForError(retCode, "create image");
-            textureImageHandle = pTextureImage.get(0);
+            long imageHandle = pTextureImage.get(0);
 
             // Query the images's memory requirements:
             VkMemoryRequirements memRequirements
                     = VkMemoryRequirements.malloc(stack);
             VK10.vkGetImageMemoryRequirements(
-                    logicalDevice, textureImageHandle, memRequirements);
+                    logicalDevice, imageHandle, memRequirements);
 
             // Allocate memory for the image:
             VkMemoryAllocateInfo allocInfo = VkMemoryAllocateInfo.calloc(stack);
@@ -1248,12 +1248,12 @@ public abstract class BaseApplication {
             retCode = VK10.vkAllocateMemory(
                     logicalDevice, allocInfo, defaultAllocator, pTextureMemory);
             Utils.checkForError(retCode, "allocate image memory");
-            textureMemoryHandle = pTextureMemory.get(0);
+            long memoryHandle = pTextureMemory.get(0);
 
             // Bind the newly allocated memory to the image object:
             int offset = 0;
-            VK10.vkBindImageMemory(logicalDevice, textureImageHandle,
-                    textureMemoryHandle, offset);
+            VK10.vkBindImageMemory(
+                    logicalDevice, imageHandle, memoryHandle, offset);
         }
     }
 
@@ -1807,16 +1807,20 @@ public abstract class BaseApplication {
             createImage(width, height, VK10.VK_FORMAT_R8G8B8A8_SRGB,
                     VK10.VK_IMAGE_TILING_OPTIMAL, createUsage, properties,
                     pImageHandle, pMemoryHandle);
-            long imageHandle = pImageHandle.get(0);
-            transitionImageLayout(imageHandle, VK10.VK_FORMAT_R8G8B8A8_SRGB,
+            textureImageHandle = pImageHandle.get(0);
+            textureMemoryHandle = pMemoryHandle.get(0);
+            transitionImageLayout(textureImageHandle,
+                    VK10.VK_FORMAT_R8G8B8A8_SRGB,
                     VK10.VK_IMAGE_LAYOUT_UNDEFINED,
                     VK10.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
             // Copy the data from the staging buffer the new image:
-            copyBufferToImage(stagingBufferHandle, imageHandle, width, height);
+            copyBufferToImage(
+                    stagingBufferHandle, textureImageHandle, width, height);
 
             // Convert the image to a layout optimized for sampling:
-            transitionImageLayout(imageHandle, VK10.VK_FORMAT_R8G8B8A8_SRGB,
+            transitionImageLayout(textureImageHandle,
+                    VK10.VK_FORMAT_R8G8B8A8_SRGB,
                     VK10.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
                     VK10.VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
