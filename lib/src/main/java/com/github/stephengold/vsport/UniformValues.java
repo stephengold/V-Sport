@@ -69,17 +69,6 @@ class UniformValues {
         Vector3fc origin = new Vector3f(0f, 0f, 0f);
         Vector3fc up = new Vector3f(0f, 0f, 1f);  // +Z axis
         view.lookAt(eye, origin, up);
-
-        double fov = Math.toRadians(45.); // in radians
-        float aspectRatio = BaseApplication.aspectRatio();
-        float zNear = 0.1f;
-        float zFar = 10f;
-        boolean zeroToOne = true;
-        proj.perspective((float) fov, aspectRatio, zNear, zFar, zeroToOne);
-
-        // In Vulkan's clip space, the Y axis increases downward, not upward:
-        float m11 = proj.m11();
-        proj.m11(-m11);
     }
     // *************************************************************************
     // new methods exposed
@@ -111,8 +100,20 @@ class UniformValues {
      * @param target the buffer to write to (not null, modified)
      */
     void writeTo(ByteBuffer target) {
-        int mat4Bytes = 16 * Float.BYTES;
+        // Update the projection matrix:
+        double fov = Math.toRadians(45.); // in radians
+        float aspectRatio = BaseApplication.aspectRatio();
+        float zNear = 0.1f;
+        float zFar = 10f;
+        boolean zeroToOne = true;
+        proj.setPerspective((float) fov, aspectRatio, zNear, zFar, zeroToOne);
 
+        // In Vulkan's clip space, the Y axis increases downward, not upward:
+        float m11 = proj.m11();
+        proj.m11(-m11);
+
+        // Store all 3 matrices in the target buffer:
+        int mat4Bytes = 16 * Float.BYTES;
         model.get(0, target);
         view.get(mat4Bytes, target);
         proj.get(2 * mat4Bytes, target);
