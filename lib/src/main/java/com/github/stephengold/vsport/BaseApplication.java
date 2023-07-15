@@ -89,6 +89,7 @@ import org.lwjgl.vulkan.VkDeviceQueueCreateInfo;
 import org.lwjgl.vulkan.VkExtensionProperties;
 import org.lwjgl.vulkan.VkExtent2D;
 import org.lwjgl.vulkan.VkExtent3D;
+import org.lwjgl.vulkan.VkFormatProperties;
 import org.lwjgl.vulkan.VkFramebufferCreateInfo;
 import org.lwjgl.vulkan.VkGraphicsPipelineCreateInfo;
 import org.lwjgl.vulkan.VkImageCreateInfo;
@@ -2152,6 +2153,49 @@ public abstract class BaseApplication {
             VK10.vkFreeCommandBuffers(
                     logicalDevice, commandPoolHandle, commandBuffer);
         }
+    }
+
+    /**
+     * Find the first supported image format (for the specified tiling, with the
+     * specified features) from the specified list.
+     *
+     * @param imageTiling either {@code VK_IMAGE_TILING_LINEAR} or
+     * {@code VK_IMAGE_TILING_OPTIMAL}
+     * @param requiredFeatures a bitmask of required format features
+     * @param candidateFormats the list of image formats to consider, with [0]
+     * being the most preferred format
+     * @return an image format from the list
+     */
+    private static int findSupportedFormat(
+            int imageTiling, int requiredFeatures, int... candidateFormats) {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            VkFormatProperties pFormatProperties
+                    = VkFormatProperties.calloc(stack);
+
+            for (int format : candidateFormats) {
+                VK10.vkGetPhysicalDeviceFormatProperties(
+                        physicalDevice, format, pFormatProperties);
+
+                int features;
+                switch (imageTiling) {
+                    case VK10.VK_IMAGE_TILING_LINEAR:
+                        features = pFormatProperties.linearTilingFeatures();
+                        break;
+                    case VK10.VK_IMAGE_TILING_OPTIMAL:
+                        features = pFormatProperties.optimalTilingFeatures();
+                        break;
+                    default:
+                        throw new IllegalArgumentException(
+                                "imageTiling = " + imageTiling);
+                }
+
+                if ((features & requiredFeatures) == requiredFeatures) {
+                    return format;
+                }
+            }
+        }
+
+        throw new RuntimeException("Failed to find a supported format");
     }
 
     /**
