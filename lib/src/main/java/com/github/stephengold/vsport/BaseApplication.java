@@ -289,7 +289,7 @@ public abstract class BaseApplication {
     /**
      * handle of the command pool for the main window
      */
-    private static long commandPoolHandle;
+    private static long commandPoolHandle = VK10.VK_NULL_HANDLE;
     /**
      * handle of the descriptor-set pool
      */
