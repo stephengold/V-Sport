@@ -160,12 +160,12 @@ class BufferResource {
     void destroy() {
         if (bufferHandle != VK10.VK_NULL_HANDLE) {
             VK10.vkDestroyBuffer(logicalDevice, bufferHandle, allocator);
-            bufferHandle = VK10.VK_NULL_HANDLE;
+            this.bufferHandle = VK10.VK_NULL_HANDLE;
         }
 
         if (memoryHandle != VK10.VK_NULL_HANDLE) {
             VK10.vkFreeMemory(logicalDevice, memoryHandle, allocator);
-            memoryHandle = VK10.VK_NULL_HANDLE;
+            this.memoryHandle = VK10.VK_NULL_HANDLE;
         }
     }
 
