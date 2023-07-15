@@ -66,6 +66,7 @@ import org.lwjgl.vulkan.VkAttachmentReference;
 import org.lwjgl.vulkan.VkBufferCopy;
 import org.lwjgl.vulkan.VkBufferCreateInfo;
 import org.lwjgl.vulkan.VkBufferImageCopy;
+import org.lwjgl.vulkan.VkClearColorValue;
 import org.lwjgl.vulkan.VkClearValue;
 import org.lwjgl.vulkan.VkCommandBuffer;
 import org.lwjgl.vulkan.VkCommandBufferAllocateInfo;
@@ -163,7 +164,7 @@ public abstract class BaseApplication {
      * indices for the sample mesh
      */
     final public static short[] sampleIndices = {
-        0, 1, 2, 2, 3, 0, 4, 5, 6, 6, 7, 4,
+        0, 1, 2, 2, 3, 0, 4, 5, 6, 6, 7, 4
     };
     /**
      * name of the graphics engine
@@ -1164,7 +1165,7 @@ public abstract class BaseApplication {
         chainFrameBufferHandles = new ArrayList<>(numImages);
 
         try (MemoryStack stack = MemoryStack.stackPush()) {
-            LongBuffer pAttachmentHandle = stack.mallocLong(1);
+            LongBuffer pAttachmentHandles = stack.mallocLong(1);
             LongBuffer pHandle = stack.mallocLong(1);
 
             // reusable Struct for frame buffer creation:
@@ -1178,8 +1179,8 @@ public abstract class BaseApplication {
             createInfo.width(frameBufferWidth);
 
             for (long viewHandle : chainViewHandles) {
-                pAttachmentHandle.put(0, viewHandle);
-                createInfo.pAttachments(pAttachmentHandle);
+                pAttachmentHandles.put(0, viewHandle);
+                createInfo.pAttachments(pAttachmentHandles);
 
                 int retCode = VK10.vkCreateFramebuffer(
                         logicalDevice, createInfo, defaultAllocator, pHandle);
@@ -1418,8 +1419,9 @@ public abstract class BaseApplication {
     private static void createPass() {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             // a single color buffer for presentation, without multisampling:
-            VkAttachmentDescription.Buffer colorAttachment
+            VkAttachmentDescription.Buffer pDescriptions
                     = VkAttachmentDescription.calloc(1, stack);
+            VkAttachmentDescription colorAttachment = pDescriptions.get(0);
             colorAttachment.finalLayout(
                     KHRSwapchain.VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
             colorAttachment.format(chainImageFormat);
@@ -1435,8 +1437,9 @@ public abstract class BaseApplication {
             colorAttachment.loadOp(VK10.VK_ATTACHMENT_LOAD_OP_CLEAR);
             colorAttachment.storeOp(VK10.VK_ATTACHMENT_STORE_OP_STORE);
 
-            VkAttachmentReference.Buffer colorAttachmentRef
+            VkAttachmentReference.Buffer pReferences
                     = VkAttachmentReference.calloc(1, stack);
+            VkAttachmentReference colorAttachmentRef = pReferences.get(0);
             colorAttachmentRef.attachment(0);
             colorAttachmentRef.layout(
                     VK10.VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
@@ -1445,36 +1448,36 @@ public abstract class BaseApplication {
             VkSubpassDescription.Buffer subpasses
                     = VkSubpassDescription.calloc(1, stack);
             subpasses.colorAttachmentCount(1);
-            subpasses.pColorAttachments(colorAttachmentRef);
+            subpasses.pColorAttachments(pReferences);
             subpasses.pipelineBindPoint(VK10.VK_PIPELINE_BIND_POINT_GRAPHICS);
 
             // Create a sub-pass dependency:
-            VkSubpassDependency.Buffer dependency
+            VkSubpassDependency.Buffer pDependency
                     = VkSubpassDependency.calloc(1, stack);
-            dependency.dstAccessMask(
+            pDependency.dstAccessMask(
                     VK10.VK_ACCESS_COLOR_ATTACHMENT_READ_BIT
                     | VK10.VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT);
-            dependency.dstStageMask(
+            pDependency.dstStageMask(
                     VK10.VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT);
-            dependency.dstSubpass(0);
-            dependency.srcAccessMask(0);
-            dependency.srcStageMask(
+            pDependency.dstSubpass(0);
+            pDependency.srcAccessMask(0);
+            pDependency.srcStageMask(
                     VK10.VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT);
-            dependency.srcSubpass(VK10.VK_SUBPASS_EXTERNAL);
+            pDependency.srcSubpass(VK10.VK_SUBPASS_EXTERNAL);
 
             // Create the render pass with its dependency:
-            VkRenderPassCreateInfo renderPassInfo
+            VkRenderPassCreateInfo createInfo
                     = VkRenderPassCreateInfo.calloc(stack);
-            renderPassInfo.sType(
+            createInfo.sType(
                     VK10.VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO);
 
-            renderPassInfo.pAttachments(colorAttachment);
-            renderPassInfo.pDependencies(dependency);
-            renderPassInfo.pSubpasses(subpasses);
+            createInfo.pAttachments(pDescriptions);
+            createInfo.pDependencies(pDependency);
+            createInfo.pSubpasses(subpasses);
 
             LongBuffer pHandle = stack.mallocLong(1);
             int retCode = VK10.vkCreateRenderPass(
-                    logicalDevice, renderPassInfo, defaultAllocator, pHandle);
+                    logicalDevice, createInfo, defaultAllocator, pHandle);
             Utils.checkForError(retCode, "create reander pass");
             renderPassHandle = pHandle.get(0);
         }
@@ -2422,9 +2425,10 @@ public abstract class BaseApplication {
             renderArea.extent(frameBufferExtent);
             renderPassInfo.renderArea(renderArea);
 
-            VkClearValue.Buffer clearValues = VkClearValue.calloc(1, stack);
-            clearValues.color().float32(stack.floats(0.0f, 0.0f, 0.0f, 1.0f));
-            renderPassInfo.pClearValues(clearValues);
+            VkClearValue.Buffer pClearValues = VkClearValue.calloc(1, stack);
+            VkClearColorValue colorClearValue = pClearValues.get(0).color();
+            colorClearValue.float32(stack.floats(0f, 0f, 0f, 1f));
+            renderPassInfo.pClearValues(pClearValues);
 
             // Record a command buffer for each image in the main swapchain:
             for (int imageIndex = 0; imageIndex < numImages; ++imageIndex) {
