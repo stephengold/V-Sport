@@ -1262,9 +1262,11 @@ public abstract class BaseApplication {
      *
      * @param imageHandle the handle of the image
      * @param format the desired format for the view
+     * @param aspectMask a bitmask of VK_IMAGE_ASPECT_... values
      * @return the handle of the new image view
      */
-    private static long createImageView(long imageHandle, int format) {
+    private static long createImageView(
+            long imageHandle, int format, int aspectMask) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             VkImageViewCreateInfo createInfo
                     = VkImageViewCreateInfo.calloc(stack);
@@ -1309,7 +1311,8 @@ public abstract class BaseApplication {
         chainViewHandles = new ArrayList<>(numImages);
 
         for (long imageHandle : chainImageHandles) {
-            long viewHandle = createImageView(imageHandle, chainImageFormat);
+            long viewHandle = createImageView(imageHandle, chainImageFormat,
+                    VK10.VK_IMAGE_ASPECT_COLOR_BIT);
             chainViewHandles.add(viewHandle);
         }
     }
@@ -1832,7 +1835,8 @@ public abstract class BaseApplication {
 
             // Create a view for the new image:
             textureViewHandle = createImageView(
-                    textureImageHandle, VK10.VK_FORMAT_R8G8B8A8_SRGB);
+                    textureImageHandle, VK10.VK_FORMAT_R8G8B8A8_SRGB,
+                    VK10.VK_IMAGE_ASPECT_COLOR_BIT);
         }
     }
 
