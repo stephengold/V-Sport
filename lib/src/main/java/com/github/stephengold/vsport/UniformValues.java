@@ -74,7 +74,8 @@ class UniformValues {
         float aspectRatio = BaseApplication.aspectRatio();
         float zNear = 0.1f;
         float zFar = 10f;
-        proj.perspective((float) fov, aspectRatio, zNear, zFar);
+        boolean zeroToOne = true;
+        proj.perspective((float) fov, aspectRatio, zNear, zFar, zeroToOne);
 
         // In Vulkan's clip space, the Y axis increases downward, not upward:
         float m11 = proj.m11();
