@@ -163,7 +163,7 @@ public abstract class BaseApplication {
      * indices for the sample mesh
      */
     final public static short[] sampleIndices = {
-        0, 1, 2, 2, 3, 0
+        0, 1, 2, 2, 3, 0, 4, 5, 6, 6, 7, 4,
     };
     /**
      * name of the graphics engine
@@ -187,6 +187,22 @@ public abstract class BaseApplication {
         new Vector2f(1f, 1f)),
         new Vertex(
         new Vector3f(-0.5f, 0.5f, 0f),
+        new Vector3f(1f, 1f, 1f),
+        new Vector2f(0f, 1f)),
+        new Vertex(
+        new Vector3f(-0.5f, -0.5f, -0.5f),
+        new Vector3f(1f, 0f, 0f),
+        new Vector2f(0f, 0f)),
+        new Vertex(
+        new Vector3f(0.5f, -0.5f, -0.5f),
+        new Vector3f(0f, 1f, 0f),
+        new Vector2f(1f, 0f)),
+        new Vertex(
+        new Vector3f(0.5f, 0.5f, -0.5f),
+        new Vector3f(0f, 0f, 1f),
+        new Vector2f(1f, 1f)),
+        new Vertex(
+        new Vector3f(-0.5f, 0.5f, -0.5f),
         new Vector3f(1f, 1f, 1f),
         new Vector2f(0f, 1f))
     };
