@@ -101,7 +101,7 @@ final class Utils {
      * @param format the buffer format to test
      * @return true if it includes a stencil component, otherwise false
      */
-    boolean hasStencilComponent(int format) {
+    static boolean hasStencilComponent(int format) {
         switch (format) {
             case VK10.VK_FORMAT_D16_UNORM_S8_UINT:
             case VK10.VK_FORMAT_D24_UNORM_S8_UINT:
