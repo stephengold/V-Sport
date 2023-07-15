@@ -1288,7 +1288,7 @@ public abstract class BaseApplication {
              * without any mipmapping.
              */
             VkImageSubresourceRange range = createInfo.subresourceRange();
-            range.aspectMask(VK10.VK_IMAGE_ASPECT_COLOR_BIT);
+            range.aspectMask(aspectMask);
             range.baseArrayLayer(0);
             range.baseMipLevel(0);
             range.layerCount(1);
