@@ -2032,15 +2032,6 @@ public abstract class BaseApplication {
             inFlightFrames = null;
         }
 
-        descriptorSetHandles = null;
-        if (descriptorPoolHandle != VK10.VK_NULL_HANDLE) {
-            VK10.vkDestroyDescriptorPool(
-                    logicalDevice, descriptorPoolHandle, defaultAllocator);
-            descriptorPoolHandle = VK10.VK_NULL_HANDLE;
-        }
-
-        // All command buffers will be freed when the pool gets destroyed.
-        //
         destroyPipeline();
 
         if (ubos != null) {
@@ -2048,6 +2039,13 @@ public abstract class BaseApplication {
                 ubo.destroy();
             }
             ubos = null;
+        }
+
+        descriptorSetHandles = null;
+        if (descriptorPoolHandle != VK10.VK_NULL_HANDLE) {
+            VK10.vkDestroyDescriptorPool(
+                    logicalDevice, descriptorPoolHandle, defaultAllocator);
+            descriptorPoolHandle = VK10.VK_NULL_HANDLE;
         }
 
         if (chainFrameBufferHandles != null) {
