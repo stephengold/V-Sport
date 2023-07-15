@@ -245,6 +245,10 @@ public abstract class BaseApplication {
      */
     private static int chainImageFormat;
     /**
+     * image format for the depth buffer
+     */
+    private static int depthBufferFormat;
+    /**
      * index of the frame being rendered (among the inFlightFrames)
      */
     private static int currentFrameIndex;
@@ -292,6 +296,19 @@ public abstract class BaseApplication {
      * handle of the command pool for the main window
      */
     private static long commandPoolHandle = VK10.VK_NULL_HANDLE;
+    /**
+     * handle of the depth buffer used to render the main window (native type:
+     * VkImage)
+     */
+    private static long depthImageHandle = VK10.VK_NULL_HANDLE;
+    /**
+     * handle of the depth buffer's memory (native type: VkDeviceMemory)
+     */
+    private static long depthMemoryHandle = VK10.VK_NULL_HANDLE;
+    /**
+     * handle of the depth buffer's image view (native type: VkImageView)
+     */
+    private static long depthViewHandle = VK10.VK_NULL_HANDLE;
     /**
      * handle of the descriptor-set pool
      */
@@ -1038,6 +1055,7 @@ public abstract class BaseApplication {
     private static void createChainResources() {
         createChain();
         createImageViews();
+        createDepthResources();
         createPass();
         createFrameBuffers();
         createDescriptorPool();
@@ -1072,6 +1090,38 @@ public abstract class BaseApplication {
                     logicalDevice, createInfo, defaultAllocator, pHandle);
             Utils.checkForError(retCode, "create command-buffer pool");
             commandPoolHandle = pHandle.get(0);
+        }
+    }
+
+    /**
+     * Create the depth buffer and its associated resources.
+     */
+    private static void createDepthResources() {
+        int tiling = VK10.VK_IMAGE_TILING_OPTIMAL;
+        int formatFeatures
+                = VK10.VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT;
+        depthBufferFormat = findSupportedFormat(tiling, formatFeatures,
+                VK10.VK_FORMAT_D32_SFLOAT, VK10.VK_FORMAT_D32_SFLOAT_S8_UINT,
+                VK10.VK_FORMAT_D24_UNORM_S8_UINT);
+
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            LongBuffer pImageHandle = stack.mallocLong(1);
+            LongBuffer pMemoryHandle = stack.mallocLong(1);
+            createImage(frameBufferExtent.width(), frameBufferExtent.height(),
+                    depthBufferFormat, tiling,
+                    VK10.VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
+                    VK10.VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                    pImageHandle, pMemoryHandle);
+            depthImageHandle = pImageHandle.get(0);
+            depthMemoryHandle = pMemoryHandle.get(0);
+
+            depthViewHandle = createImageView(depthImageHandle,
+                    depthBufferFormat, VK10.VK_IMAGE_ASPECT_DEPTH_BIT);
+
+            // Explicitly transition the depth image:
+            transitionImageLayout(depthImageHandle, depthBufferFormat,
+                    VK10.VK_IMAGE_LAYOUT_UNDEFINED,
+                    VK10.VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
         }
     }
 
@@ -2060,6 +2110,22 @@ public abstract class BaseApplication {
             VK10.vkDestroyRenderPass(
                     logicalDevice, renderPassHandle, defaultAllocator);
             renderPassHandle = VK10.VK_NULL_HANDLE;
+        }
+
+        if (depthViewHandle != VK10.VK_NULL_HANDLE) {
+            VK10.vkDestroyImageView(
+                    logicalDevice, depthViewHandle, defaultAllocator);
+            depthViewHandle = VK10.VK_NULL_HANDLE;
+        }
+        if (depthMemoryHandle != VK10.VK_NULL_HANDLE) {
+            VK10.vkFreeMemory(
+                    logicalDevice, depthMemoryHandle, defaultAllocator);
+            depthMemoryHandle = VK10.VK_NULL_HANDLE;
+        }
+        if (depthImageHandle != VK10.VK_NULL_HANDLE) {
+            VK10.vkDestroyImage(
+                    logicalDevice, depthImageHandle, defaultAllocator);
+            depthImageHandle = VK10.VK_NULL_HANDLE;
         }
 
         if (chainViewHandles != null) {
