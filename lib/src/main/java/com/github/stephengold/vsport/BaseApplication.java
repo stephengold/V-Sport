@@ -263,6 +263,10 @@ public abstract class BaseApplication {
      */
     private static int frameBufferWidth = 800;
     /**
+     * image format for the sample texture
+     */
+    private static int textureFormat;
+    /**
      * synchronization objects for frames in flight
      */
     private static Frame[] inFlightFrames;
@@ -1980,16 +1984,17 @@ public abstract class BaseApplication {
              * Create a device-local image that's optimized for being
              * a copy destination:
              */
+            textureFormat = VK10.VK_FORMAT_R8G8B8A8_SRGB;
             createUsage = VK10.VK_IMAGE_USAGE_TRANSFER_DST_BIT
                     | VK10.VK_IMAGE_USAGE_SAMPLED_BIT;
             properties = VK10.VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
             LongBuffer pImageHandle = stack.mallocLong(1);
-            createImage(width, height, VK10.VK_FORMAT_R8G8B8A8_SRGB,
+            createImage(width, height, textureFormat,
                     VK10.VK_IMAGE_TILING_OPTIMAL, createUsage, properties,
                     pImageHandle, pMemoryHandle);
             textureImageHandle = pImageHandle.get(0);
             textureMemoryHandle = pMemoryHandle.get(0);
-            alterImageLayout(textureImageHandle, VK10.VK_FORMAT_R8G8B8A8_SRGB,
+            alterImageLayout(textureImageHandle, textureFormat,
                     VK10.VK_IMAGE_LAYOUT_UNDEFINED,
                     VK10.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
@@ -1998,7 +2003,7 @@ public abstract class BaseApplication {
                     stagingBufferHandle, textureImageHandle, width, height);
 
             // Convert the image to a layout optimized for sampling:
-            alterImageLayout(textureImageHandle, VK10.VK_FORMAT_R8G8B8A8_SRGB,
+            alterImageLayout(textureImageHandle, textureFormat,
                     VK10.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
                     VK10.VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
@@ -2009,9 +2014,8 @@ public abstract class BaseApplication {
                     logicalDevice, stagingMemoryHandle, defaultAllocator);
 
             // Create a view for the new image:
-            textureViewHandle = createImageView(
-                    textureImageHandle, VK10.VK_FORMAT_R8G8B8A8_SRGB,
-                    VK10.VK_IMAGE_ASPECT_COLOR_BIT);
+            textureViewHandle = createImageView(textureImageHandle,
+                    textureFormat, VK10.VK_IMAGE_ASPECT_COLOR_BIT);
         }
     }
 
