@@ -32,7 +32,6 @@ package com.github.stephengold.vsport;
 import java.awt.image.BufferedImage;
 import java.io.PrintStream;
 import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.util.ArrayList;
@@ -85,12 +84,8 @@ import org.lwjgl.vulkan.VkDescriptorSetAllocateInfo;
 import org.lwjgl.vulkan.VkDescriptorSetLayoutBinding;
 import org.lwjgl.vulkan.VkDescriptorSetLayoutCreateInfo;
 import org.lwjgl.vulkan.VkDevice;
-import org.lwjgl.vulkan.VkDeviceCreateInfo;
-import org.lwjgl.vulkan.VkDeviceQueueCreateInfo;
-import org.lwjgl.vulkan.VkExtensionProperties;
 import org.lwjgl.vulkan.VkExtent2D;
 import org.lwjgl.vulkan.VkExtent3D;
-import org.lwjgl.vulkan.VkFormatProperties;
 import org.lwjgl.vulkan.VkFramebufferCreateInfo;
 import org.lwjgl.vulkan.VkGraphicsPipelineCreateInfo;
 import org.lwjgl.vulkan.VkImageCreateInfo;
@@ -104,9 +99,6 @@ import org.lwjgl.vulkan.VkLayerProperties;
 import org.lwjgl.vulkan.VkMemoryAllocateInfo;
 import org.lwjgl.vulkan.VkMemoryRequirements;
 import org.lwjgl.vulkan.VkOffset2D;
-import org.lwjgl.vulkan.VkPhysicalDevice;
-import org.lwjgl.vulkan.VkPhysicalDeviceFeatures;
-import org.lwjgl.vulkan.VkPhysicalDeviceMemoryProperties;
 import org.lwjgl.vulkan.VkPipelineColorBlendAttachmentState;
 import org.lwjgl.vulkan.VkPipelineColorBlendStateCreateInfo;
 import org.lwjgl.vulkan.VkPipelineDepthStencilStateCreateInfo;
@@ -119,7 +111,6 @@ import org.lwjgl.vulkan.VkPipelineVertexInputStateCreateInfo;
 import org.lwjgl.vulkan.VkPipelineViewportStateCreateInfo;
 import org.lwjgl.vulkan.VkPresentInfoKHR;
 import org.lwjgl.vulkan.VkQueue;
-import org.lwjgl.vulkan.VkQueueFamilyProperties;
 import org.lwjgl.vulkan.VkRect2D;
 import org.lwjgl.vulkan.VkRenderPassBeginInfo;
 import org.lwjgl.vulkan.VkRenderPassCreateInfo;
@@ -364,6 +355,10 @@ public abstract class BaseApplication {
      */
     private static Map<Integer, Frame> framesInFlight;
     /**
+     * physical device to display the main window
+     */
+    private static PhysicalDevice physicalDevice;
+    /**
      * names of all device extensions that the application requires
      */
     private static final Set<String> requiredDeviceExtensions = new HashSet<>();
@@ -388,10 +383,6 @@ public abstract class BaseApplication {
      * link this application to the lwjgl-vulkan library
      */
     private static VkInstance vkInstance;
-    /**
-     * physical device to display the main window
-     */
-    private static VkPhysicalDevice physicalDevice;
     /**
      * graphics queue for the main window
      */
@@ -612,8 +603,9 @@ public abstract class BaseApplication {
             long allocationBytes = memRequirements.size();
             allocInfo.allocationSize(allocationBytes);
 
-            int memoryTypeIndex = findMemoryType(stack,
-                    memRequirements.memoryTypeBits(), requiredProperties);
+            int typeFilter = memRequirements.memoryTypeBits();
+            int memoryTypeIndex = physicalDevice.findMemoryType(
+                    typeFilter, requiredProperties);
             allocInfo.memoryTypeIndex(memoryTypeIndex);
 
             retCode = VK10.vkAllocateMemory(
@@ -630,41 +622,30 @@ public abstract class BaseApplication {
     }
 
     /**
-     * Find a memory type with the specified properties.
-     *
-     * @param stack for memory allocation (not null)
-     * @param typeFilter a bitmask of memory types to consider
-     * @param requiredProperties a bitmask of required properties
-     * @return a memory-type index, or null if no match found
-     */
-    static Integer findMemoryType(
-            MemoryStack stack, int typeFilter, int requiredProperties) {
-        // Query the available memory types:
-        VkPhysicalDeviceMemoryProperties memProperties
-                = VkPhysicalDeviceMemoryProperties.malloc(stack);
-        VK10.vkGetPhysicalDeviceMemoryProperties(physicalDevice, memProperties);
-
-        int numTypes = memProperties.memoryTypeCount();
-        for (int i = 0; i < numTypes; ++i) {
-            int bitPosition = 0x1 << i;
-            if ((typeFilter & bitPosition) != 0x0) {
-                int properties = memProperties.memoryTypes(i).propertyFlags();
-                if ((properties & requiredProperties) == requiredProperties) {
-                    return i;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    /**
      * Test whether debugging is enabled.
      *
      * @return true if enabled, otherwise false
      */
     public static boolean isDebuggingEnabled() {
         return enableDebugging;
+    }
+
+    /**
+     * Enumerate all device extensions required by this application.
+     *
+     * @return a new array of extension names (no duplicates, not null)
+     */
+    static String[] listRequiredDeviceExtensions() {
+        int numExtensions = requiredDeviceExtensions.size();
+        String[] result = new String[numExtensions];
+
+        int nameIndex = 0;
+        for (String name : requiredDeviceExtensions) {
+            result[nameIndex] = name;
+            ++nameIndex;
+        }
+
+        return result;
     }
 
     /**
@@ -1066,8 +1047,8 @@ public abstract class BaseApplication {
             createInfo.oldSwapchain(VK10.VK_NULL_HANDLE);
             createInfo.surface(surfaceHandle);
 
-            SurfaceSummary surface = new SurfaceSummary(
-                    physicalDevice, surfaceHandle, stack);
+            SurfaceSummary surface
+                    = physicalDevice.summarizeSurface(surfaceHandle, stack);
 
             VkExtent2D extent = surface.chooseSwapExtent(
                     frameBufferWidth, frameBufferHeight, stack);
@@ -1103,7 +1084,7 @@ public abstract class BaseApplication {
             createInfo.minImageCount(numImages);
 
             QueueFamilySummary queueFamilies
-                    = summarizeFamilies(physicalDevice);
+                    = physicalDevice.summarizeFamilies(surfaceHandle);
             IntBuffer pListDistinct = queueFamilies.pListDistinct(stack);
             int numDistinctFamilies = pListDistinct.capacity();
             if (numDistinctFamilies == 2) {
@@ -1160,7 +1141,8 @@ public abstract class BaseApplication {
      * Create an (empty) command-buffer pool for the main window.
      */
     private static void createCommandPool() {
-        QueueFamilySummary queueFamilies = summarizeFamilies(physicalDevice);
+        QueueFamilySummary queueFamilies
+                = physicalDevice.summarizeFamilies(surfaceHandle);
         int familyIndex = queueFamilies.graphics();
 
         try (MemoryStack stack = MemoryStack.stackPush()) {
@@ -1187,8 +1169,9 @@ public abstract class BaseApplication {
         int tiling = VK10.VK_IMAGE_TILING_OPTIMAL;
         int formatFeatures
                 = VK10.VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT;
-        depthBufferFormat = findSupportedFormat(tiling, formatFeatures,
-                VK10.VK_FORMAT_D32_SFLOAT, VK10.VK_FORMAT_D32_SFLOAT_S8_UINT,
+        depthBufferFormat = physicalDevice.findSupportedFormat(
+                tiling, formatFeatures, VK10.VK_FORMAT_D32_SFLOAT,
+                VK10.VK_FORMAT_D32_SFLOAT_S8_UINT,
                 VK10.VK_FORMAT_D24_UNORM_S8_UINT);
 
         try (MemoryStack stack = MemoryStack.stackPush()) {
@@ -1380,8 +1363,8 @@ public abstract class BaseApplication {
             allocInfo.sType(VK10.VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO);
 
             allocInfo.allocationSize(memRequirements.size());
-            int memoryTypeIndex = findMemoryType(
-                    stack, memRequirements.memoryTypeBits(), requiredProperties);
+            int memoryTypeIndex = physicalDevice.findMemoryType(
+                    memRequirements.memoryTypeBits(), requiredProperties);
             allocInfo.memoryTypeIndex(memoryTypeIndex);
 
             retCode = VK10.vkAllocateMemory(
@@ -1480,62 +1463,14 @@ public abstract class BaseApplication {
      * Create a logical device in the application's main window.
      */
     private static void createLogicalDevice() {
-        QueueFamilySummary queueFamilies = summarizeFamilies(physicalDevice);
+        logicalDevice = physicalDevice.createLogicalDevice(
+                surfaceHandle, enableDebugging);
+        QueueFamilySummary queueFamilies
+                = physicalDevice.summarizeFamilies(surfaceHandle);
 
         try (MemoryStack stack = MemoryStack.stackPush()) {
-            IntBuffer distinctFamilies = queueFamilies.pListDistinct(stack);
-            int numDistinct = distinctFamilies.capacity();
-
-            FloatBuffer priorities = stack.floats(0.5f);
-
-            // queue-creation information:
-            VkDeviceQueueCreateInfo.Buffer queueCreateInfos
-                    = VkDeviceQueueCreateInfo.calloc(numDistinct, stack);
-            for (int queueIndex = 0; queueIndex < numDistinct; ++queueIndex) {
-                VkDeviceQueueCreateInfo createInfo
-                        = queueCreateInfos.get(queueIndex);
-                createInfo.sType(
-                        VK10.VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO);
-
-                int familyIndex = distinctFamilies.get(queueIndex);
-                createInfo.queueFamilyIndex(familyIndex);
-                createInfo.pQueuePriorities(priorities);
-            }
-
-            // device features:
-            VkPhysicalDeviceFeatures deviceFeatures
-                    = VkPhysicalDeviceFeatures.calloc(stack);
-            deviceFeatures.samplerAnisotropy(true);
-
-            // logical-device creation information:
-            VkDeviceCreateInfo createInfo = VkDeviceCreateInfo.calloc(stack);
-            createInfo.sType(VK10.VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO);
-
-            createInfo.pQueueCreateInfos(queueCreateInfos);
-            createInfo.pEnabledFeatures(deviceFeatures);
-
-            PointerBuffer extensionNames = listRequiredDeviceExtensions(stack);
-            createInfo.ppEnabledExtensionNames(extensionNames);
-
-            if (enableDebugging) {
-                /*
-                 * Ensure compatibility with older implementations that
-                 * distinguish device-specific layers from instance layers.
-                 */
-                PointerBuffer layerNames = listRequiredLayers(stack);
-                createInfo.ppEnabledLayerNames(layerNames);
-            }
-
             // Allocate a buffer to receive various pointers:
             PointerBuffer pPointer = stack.mallocPointer(1);
-
-            // Create the logical device:
-            int retCode = VK10.vkCreateDevice(
-                    physicalDevice, createInfo, defaultAllocator, pPointer);
-            Utils.checkForError(retCode, "create logical device");
-            long deviceHandle = pPointer.get(0);
-            logicalDevice
-                    = new VkDevice(deviceHandle, physicalDevice, createInfo);
 
             // Obtain access to the graphics queue:
             int familyIndex = queueFamilies.graphics();
@@ -2348,91 +2283,11 @@ public abstract class BaseApplication {
     }
 
     /**
-     * Find the first supported image format (for the specified tiling, with the
-     * specified features) from the specified list.
-     *
-     * @param imageTiling either {@code VK_IMAGE_TILING_LINEAR} or
-     * {@code VK_IMAGE_TILING_OPTIMAL}
-     * @param requiredFeatures a bitmask of required format features
-     * @param candidateFormats the list of image formats to consider, with [0]
-     * being the most preferred format
-     * @return an image format from the list
-     */
-    private static int findSupportedFormat(
-            int imageTiling, int requiredFeatures, int... candidateFormats) {
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            VkFormatProperties pFormatProperties
-                    = VkFormatProperties.calloc(stack);
-
-            for (int format : candidateFormats) {
-                VK10.vkGetPhysicalDeviceFormatProperties(
-                        physicalDevice, format, pFormatProperties);
-
-                int features;
-                switch (imageTiling) {
-                    case VK10.VK_IMAGE_TILING_LINEAR:
-                        features = pFormatProperties.linearTilingFeatures();
-                        break;
-                    case VK10.VK_IMAGE_TILING_OPTIMAL:
-                        features = pFormatProperties.optimalTilingFeatures();
-                        break;
-                    default:
-                        throw new IllegalArgumentException(
-                                "imageTiling = " + imageTiling);
-                }
-
-                if ((features & requiredFeatures) == requiredFeatures) {
-                    return format;
-                }
-            }
-        }
-
-        throw new RuntimeException("Failed to find a supported format");
-    }
-
-    /**
      * Callback to trigger a resize of the frame buffers.
      */
     private static void frameBufferResizeCallback(
             long window, int width, int height) {
         needsResize = true;
-    }
-
-    /**
-     * Test whether the specified physical device has adequate swap-chain
-     * support.
-     *
-     * @param device the device to test (not null)
-     * @return true if the support is adequate, otherwise false
-     */
-    private static boolean hasAdequateSwapChainSupport(
-            VkPhysicalDevice device) {
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            SurfaceSummary surface
-                    = new SurfaceSummary(device, surfaceHandle, stack);
-            boolean result = surface.hasFormat()
-                    && surface.hasPresentationMode();
-
-            return result;
-        }
-    }
-
-    /**
-     * Test whether the specified device supports anisotropic sampling of
-     * textures.
-     *
-     * @param device the device to test (not null)
-     * @return true if supported, otherwise false
-     */
-    private static boolean hasAnisotropySupport(VkPhysicalDevice device) {
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            VkPhysicalDeviceFeatures supportedFeatures
-                    = VkPhysicalDeviceFeatures.malloc(stack);
-            VK10.vkGetPhysicalDeviceFeatures(device, supportedFeatures);
-            boolean result = supportedFeatures.samplerAnisotropy();
-
-            return result;
-        }
     }
 
     /**
@@ -2500,41 +2355,6 @@ public abstract class BaseApplication {
     }
 
     /**
-     * Enumerate all available extensions for the specified device.
-     *
-     * @param device the physical device to analyze (not null)
-     * @return a new set of extension names (not null)
-     */
-    private static Set<String> listAvailableExtensions(
-            VkPhysicalDevice device) {
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            // Count the available extensions:
-            String layerName = null; // Vk implementation and implicitly enabled
-            IntBuffer pCount = stack.mallocInt(1);
-            int retCode = VK10.vkEnumerateDeviceExtensionProperties(
-                    device, layerName, pCount, null);
-            Utils.checkForError(retCode, "count extensions");
-            int numExtensions = pCount.get(0);
-
-            VkExtensionProperties.Buffer buffer
-                    = VkExtensionProperties.malloc(numExtensions, stack);
-            retCode = VK10.vkEnumerateDeviceExtensionProperties(
-                    device, layerName, pCount, buffer);
-            Utils.checkForError(retCode, "enumerate extensions");
-
-            Set<String> result = new TreeSet<>();
-            for (int extIndex = 0; extIndex < numExtensions; ++extIndex) {
-                VkExtensionProperties properties = buffer.get(extIndex);
-                String extensionName = properties.extensionNameString();
-                //System.out.println("extension name = " + extensionName);
-                result.add(extensionName);
-            }
-
-            return result;
-        }
-    }
-
-    /**
      * Enumerate all available instance validation layers.
      *
      * @return a new set of layer names (not null)
@@ -2564,26 +2384,6 @@ public abstract class BaseApplication {
 
             return result;
         }
-    }
-
-    /**
-     * Enumerate all required device extensions.
-     *
-     * @param stack for memory allocation (not null)
-     * @return a temporary buffer containing the names of all device extensions
-     * required by this application
-     */
-    private static PointerBuffer listRequiredDeviceExtensions(
-            MemoryStack stack) {
-        int numLayers = requiredDeviceExtensions.size();
-        PointerBuffer result = stack.mallocPointer(numLayers);
-        for (String extensionName : requiredDeviceExtensions) {
-            ByteBuffer utf8Name = stack.UTF8(extensionName);
-            result.put(utf8Name);
-        }
-        result.rewind();
-
-        return result;
     }
 
     /**
@@ -2622,7 +2422,7 @@ public abstract class BaseApplication {
      * @param stack for memory allocation (not null)
      * @return the names of the validation layers required by this application
      */
-    private static PointerBuffer listRequiredLayers(MemoryStack stack) {
+    static PointerBuffer listRequiredLayers(MemoryStack stack) {
         int numLayers = requiredLayers.size();
         PointerBuffer result = stack.mallocPointer(numLayers);
         for (String layerName : requiredLayers) {
@@ -2883,12 +2683,11 @@ public abstract class BaseApplication {
             float bestScore = Float.NEGATIVE_INFINITY;
             for (int deviceIndex = 0; deviceIndex < numDevices; ++deviceIndex) {
                 long handle = pPointers.get(deviceIndex);
-                VkPhysicalDevice device
-                        = new VkPhysicalDevice(handle, vkInstance);
-                float score = suitability(device);
+                PhysicalDevice pd = new PhysicalDevice(handle, vkInstance);
+                float score = pd.suitability(surfaceHandle);
                 if (score > bestScore) {
                     bestScore = score;
-                    physicalDevice = device;
+                    physicalDevice = pd;
                 }
             }
 
@@ -2897,93 +2696,6 @@ public abstract class BaseApplication {
                         "Failed to find a suitable device, bestScore = "
                         + bestScore);
             }
-        }
-    }
-
-    /**
-     * Rate the suitability of the specified physical device for the
-     * application.
-     *
-     * @param device the device to evaluate (not null, unaffected)
-     * @return a suitability score (&gt;0, larger is more suitable) or zero if
-     * unsuitable
-     */
-    private static float suitability(VkPhysicalDevice device) {
-        // Does the device support all the required extensions?
-        Set<String> extensions = listAvailableExtensions(device);
-        for (String name : requiredDeviceExtensions) {
-            if (!extensions.contains(name)) {
-                //String hex = Long.toHexString(device.address());
-                //System.out.println(hex + " doesn't support " + name);
-                return 0f;
-            }
-        }
-
-        // Does the device provide adequate swap-chain support?
-        if (!hasAdequateSwapChainSupport(device)) {
-            //String hex = Long.toHexString(device.address());
-            //System.out.println(hex + " doesn't provide swap-chain support");
-            return 0f;
-        }
-
-        // Does the device support the required queue families?
-        QueueFamilySummary queueFamilies = summarizeFamilies(device);
-        if (!queueFamilies.isComplete()) {
-            //String hex = Long.toHexString(device.address());
-            //System.out.println(hex + " doesn't provide both queue families");
-            return 0f;
-        }
-
-        // Does the device support anisotropic sampling of textures?
-        if (!hasAnisotropySupport(device)) {
-            return 0f;
-        }
-
-        return 1f;
-    }
-
-    /**
-     * Summarize the queue families provided by the specified physical device.
-     *
-     * @param physicalDevice the physical device to summarize (not null,
-     * unaffected)
-     * @return a new object (not null)
-     */
-    private static QueueFamilySummary summarizeFamilies(
-            VkPhysicalDevice physicalDevice) {
-        QueueFamilySummary result = new QueueFamilySummary();
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            // Count the available queue families:
-            IntBuffer pCount = stack.mallocInt(1);
-            VK10.vkGetPhysicalDeviceQueueFamilyProperties(
-                    physicalDevice, pCount, null);
-            int numFamilies = pCount.get(0);
-
-            VkQueueFamilyProperties.Buffer pProperties
-                    = VkQueueFamilyProperties.malloc(numFamilies, stack);
-            VK10.vkGetPhysicalDeviceQueueFamilyProperties(
-                    physicalDevice, pCount, pProperties);
-
-            for (int familyI = 0; familyI < numFamilies; ++familyI) {
-                VkQueueFamilyProperties family = pProperties.get(familyI);
-
-                // Does the family provide graphics support?
-                int flags = family.queueFlags();
-                if ((flags & VK10.VK_QUEUE_GRAPHICS_BIT) != 0x0) {
-                    result.setGraphics(familyI);
-                }
-
-                // Does the family provide presentation support?
-                int retCode = KHRSurface.vkGetPhysicalDeviceSurfaceSupportKHR(
-                        physicalDevice, familyI, surfaceHandle, pCount);
-                Utils.checkForError(retCode, "test for presentation support");
-                int supportsPresentation = pCount.get(0);
-                if (supportsPresentation == VK10.VK_TRUE) {
-                    result.setPresentation(familyI);
-                }
-            }
-
-            return result;
         }
     }
 
