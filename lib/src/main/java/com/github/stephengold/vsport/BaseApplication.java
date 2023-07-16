@@ -894,6 +894,87 @@ public abstract class BaseApplication {
     }
 
     /**
+     * Convert the specified image from one layout to another.
+     *
+     * @param imageHandle the handle of the image to convert
+     * @param format the image format
+     * @param oldLayout the pre-existing layout
+     * @param newLayout the desired layout
+     */
+    private static void alterImageLayout(
+            long imageHandle, int format, int oldLayout, int newLayout) {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            VkImageMemoryBarrier.Buffer pBarrier
+                    = VkImageMemoryBarrier.calloc(1, stack);
+            pBarrier.sType(VK10.VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER);
+
+            pBarrier.dstQueueFamilyIndex(VK10.VK_QUEUE_FAMILY_IGNORED);
+            pBarrier.image(imageHandle);
+            pBarrier.newLayout(newLayout);
+            pBarrier.oldLayout(oldLayout);
+            pBarrier.srcQueueFamilyIndex(VK10.VK_QUEUE_FAMILY_IGNORED);
+
+            int aspectMask;
+            if (newLayout == VK10.VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL) {
+                aspectMask = VK10.VK_IMAGE_ASPECT_DEPTH_BIT;
+                if (Utils.hasStencilComponent(format)) {
+                    aspectMask |= VK10.VK_IMAGE_ASPECT_STENCIL_BIT;
+                }
+            } else {
+                aspectMask = VK10.VK_IMAGE_ASPECT_COLOR_BIT;
+            }
+
+            VkImageSubresourceRange range = pBarrier.subresourceRange();
+            range.aspectMask(aspectMask);
+            range.baseArrayLayer(0);
+            range.baseMipLevel(0);
+            range.layerCount(1);
+            range.levelCount(1);
+
+            int sourceStage;
+            int destinationStage;
+
+            if (oldLayout == VK10.VK_IMAGE_LAYOUT_UNDEFINED
+                    && newLayout == VK10.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) {
+                pBarrier.dstAccessMask(VK10.VK_ACCESS_TRANSFER_WRITE_BIT);
+                pBarrier.srcAccessMask(0x0);
+
+                sourceStage = VK10.VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+                destinationStage = VK10.VK_PIPELINE_STAGE_TRANSFER_BIT;
+
+            } else if (oldLayout == VK10.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
+                    && newLayout == VK10.VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
+                pBarrier.srcAccessMask(VK10.VK_ACCESS_TRANSFER_WRITE_BIT);
+                pBarrier.dstAccessMask(VK10.VK_ACCESS_SHADER_READ_BIT);
+
+                sourceStage = VK10.VK_PIPELINE_STAGE_TRANSFER_BIT;
+                destinationStage = VK10.VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+
+            } else if (oldLayout == VK10.VK_IMAGE_LAYOUT_UNDEFINED
+                    && newLayout == VK10.VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL) {
+                pBarrier.dstAccessMask(
+                        VK10.VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT
+                        | VK10.VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT);
+                pBarrier.srcAccessMask(0x0);
+
+                sourceStage = VK10.VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+                destinationStage
+                        = VK10.VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+
+            } else {
+                throw new IllegalArgumentException(
+                        "Unsupported transition, oldLayout=" + oldLayout);
+            }
+
+            VkCommandBuffer commandBuffer = beginSingleTimeCommands();
+            int dependencyFlags = 0x0;
+            VK10.vkCmdPipelineBarrier(commandBuffer, sourceStage,
+                    destinationStage, dependencyFlags, null, null, pBarrier);
+            endSingleTimeCommands(commandBuffer);
+        }
+    }
+
+    /**
      * Begin recording a single-time command sequence.
      *
      * @return a new command buffer, ready to receive commands
@@ -1121,7 +1202,7 @@ public abstract class BaseApplication {
                     depthBufferFormat, VK10.VK_IMAGE_ASPECT_DEPTH_BIT);
 
             // Explicitly transition the depth image:
-            transitionImageLayout(depthImageHandle, depthBufferFormat,
+            alterImageLayout(depthImageHandle, depthBufferFormat,
                     VK10.VK_IMAGE_LAYOUT_UNDEFINED,
                     VK10.VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
         }
@@ -1908,8 +1989,7 @@ public abstract class BaseApplication {
                     pImageHandle, pMemoryHandle);
             textureImageHandle = pImageHandle.get(0);
             textureMemoryHandle = pMemoryHandle.get(0);
-            transitionImageLayout(textureImageHandle,
-                    VK10.VK_FORMAT_R8G8B8A8_SRGB,
+            alterImageLayout(textureImageHandle, VK10.VK_FORMAT_R8G8B8A8_SRGB,
                     VK10.VK_IMAGE_LAYOUT_UNDEFINED,
                     VK10.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
@@ -1918,8 +1998,7 @@ public abstract class BaseApplication {
                     stagingBufferHandle, textureImageHandle, width, height);
 
             // Convert the image to a layout optimized for sampling:
-            transitionImageLayout(textureImageHandle,
-                    VK10.VK_FORMAT_R8G8B8A8_SRGB,
+            alterImageLayout(textureImageHandle, VK10.VK_FORMAT_R8G8B8A8_SRGB,
                     VK10.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
                     VK10.VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
@@ -2918,86 +2997,5 @@ public abstract class BaseApplication {
 
         ByteBuffer byteBuffer = ubos.get(imageIndex).getData();
         uniformValues.writeTo(byteBuffer);
-    }
-
-    /**
-     * Convert the specified image from one layout to another.
-     *
-     * @param imageHandle the handle of the image to convert
-     * @param format the image format
-     * @param oldLayout the pre-existing layout
-     * @param newLayout the desired layout
-     */
-    private static void transitionImageLayout(
-            long imageHandle, int format, int oldLayout, int newLayout) {
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            VkImageMemoryBarrier.Buffer pBarrier
-                    = VkImageMemoryBarrier.calloc(1, stack);
-            pBarrier.sType(VK10.VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER);
-
-            pBarrier.dstQueueFamilyIndex(VK10.VK_QUEUE_FAMILY_IGNORED);
-            pBarrier.image(imageHandle);
-            pBarrier.newLayout(newLayout);
-            pBarrier.oldLayout(oldLayout);
-            pBarrier.srcQueueFamilyIndex(VK10.VK_QUEUE_FAMILY_IGNORED);
-
-            int aspectMask;
-            if (newLayout == VK10.VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL) {
-                aspectMask = VK10.VK_IMAGE_ASPECT_DEPTH_BIT;
-                if (Utils.hasStencilComponent(format)) {
-                    aspectMask |= VK10.VK_IMAGE_ASPECT_STENCIL_BIT;
-                }
-            } else {
-                aspectMask = VK10.VK_IMAGE_ASPECT_COLOR_BIT;
-            }
-
-            VkImageSubresourceRange range = pBarrier.subresourceRange();
-            range.aspectMask(aspectMask);
-            range.baseArrayLayer(0);
-            range.baseMipLevel(0);
-            range.layerCount(1);
-            range.levelCount(1);
-
-            int sourceStage;
-            int destinationStage;
-
-            if (oldLayout == VK10.VK_IMAGE_LAYOUT_UNDEFINED
-                    && newLayout == VK10.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) {
-                pBarrier.dstAccessMask(VK10.VK_ACCESS_TRANSFER_WRITE_BIT);
-                pBarrier.srcAccessMask(0x0);
-
-                sourceStage = VK10.VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
-                destinationStage = VK10.VK_PIPELINE_STAGE_TRANSFER_BIT;
-
-            } else if (oldLayout == VK10.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
-                    && newLayout == VK10.VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
-                pBarrier.srcAccessMask(VK10.VK_ACCESS_TRANSFER_WRITE_BIT);
-                pBarrier.dstAccessMask(VK10.VK_ACCESS_SHADER_READ_BIT);
-
-                sourceStage = VK10.VK_PIPELINE_STAGE_TRANSFER_BIT;
-                destinationStage = VK10.VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-
-            } else if (oldLayout == VK10.VK_IMAGE_LAYOUT_UNDEFINED
-                    && newLayout == VK10.VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL) {
-                pBarrier.dstAccessMask(
-                        VK10.VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT
-                        | VK10.VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT);
-                pBarrier.srcAccessMask(0x0);
-
-                sourceStage = VK10.VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
-                destinationStage
-                        = VK10.VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
-
-            } else {
-                throw new IllegalArgumentException(
-                        "Unsupported transition, oldLayout=" + oldLayout);
-            }
-
-            VkCommandBuffer commandBuffer = beginSingleTimeCommands();
-            int dependencyFlags = 0x0;
-            VK10.vkCmdPipelineBarrier(commandBuffer, sourceStage,
-                    destinationStage, dependencyFlags, null, null, pBarrier);
-            endSingleTimeCommands(commandBuffer);
-        }
     }
 }
