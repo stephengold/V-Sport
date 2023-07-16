@@ -247,13 +247,13 @@ public abstract class BaseApplication {
      */
     private static int chainImageFormat;
     /**
-     * image format for the depth buffer
-     */
-    private static int depthBufferFormat;
-    /**
      * index of the frame being rendered (among the inFlightFrames)
      */
     private static int currentFrameIndex;
+    /**
+     * image format for the depth buffer
+     */
+    private static int depthBufferFormat;
     /**
      * height of the displayed frame buffer (in pixels)
      */
