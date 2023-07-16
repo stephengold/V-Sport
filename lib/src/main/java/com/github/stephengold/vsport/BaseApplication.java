@@ -29,7 +29,6 @@
  */
 package com.github.stephengold.vsport;
 
-import java.awt.image.BufferedImage;
 import java.io.PrintStream;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -254,10 +253,6 @@ public abstract class BaseApplication {
      */
     private static int frameBufferWidth = 800;
     /**
-     * image format for the sample texture
-     */
-    private static int textureFormat;
-    /**
      * synchronization objects for frames in flight
      */
     private static Frame[] inFlightFrames;
@@ -335,18 +330,6 @@ public abstract class BaseApplication {
      */
     private static long surfaceHandle = VK10.VK_NULL_HANDLE;
     /**
-     * handle of the texture image (native type: VkImage)
-     */
-    private static long textureImageHandle = VK10.VK_NULL_HANDLE;
-    /**
-     * handle of the texture-image memory (native type: VkDeviceMemory)
-     */
-    private static long textureMemoryHandle = VK10.VK_NULL_HANDLE;
-    /**
-     * handle of the image view for the texture
-     */
-    private static long textureViewHandle = VK10.VK_NULL_HANDLE;
-    /**
      * GLFW handle of the window used to render geometries
      */
     private static long windowHandle = VK10.VK_NULL_HANDLE;
@@ -366,6 +349,10 @@ public abstract class BaseApplication {
      * names of validation layers to enable during initialization
      */
     final private static Set<String> requiredLayers = new HashSet<>();
+    /**
+     * sample texture for texture mapping
+     */
+    private static Texture sampleTexture;
     /**
      * values to be written to the uniform buffer object
      */
@@ -447,23 +434,10 @@ public abstract class BaseApplication {
             samplerHandle = VK10.VK_NULL_HANDLE;
         }
 
-        // Destroy the texture image view:
-        if (textureViewHandle != VK10.VK_NULL_HANDLE) {
-            VK10.vkDestroyImageView(
-                    logicalDevice, textureViewHandle, defaultAllocator);
-            textureViewHandle = VK10.VK_NULL_HANDLE;
-        }
-
-        // Destroy the texture image:
-        if (textureMemoryHandle != VK10.VK_NULL_HANDLE) {
-            VK10.vkFreeMemory(
-                    logicalDevice, textureMemoryHandle, defaultAllocator);
-            textureMemoryHandle = VK10.VK_NULL_HANDLE;
-        }
-        if (textureImageHandle != VK10.VK_NULL_HANDLE) {
-            VK10.vkDestroyImage(
-                    logicalDevice, textureImageHandle, defaultAllocator);
-            textureImageHandle = VK10.VK_NULL_HANDLE;
+        // Destroy the sample texture:
+        if (sampleTexture != null) {
+            sampleTexture.destroy();
+            sampleTexture = null;
         }
 
         // Destroy the command pool and its buffers:
@@ -837,7 +811,8 @@ public abstract class BaseApplication {
                     = VkDescriptorImageInfo.calloc(1, stack);
             imageInfo.imageLayout(
                     VK10.VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-            imageInfo.imageView(textureViewHandle);
+            long viewHandle = sampleTexture.viewHandle();
+            imageInfo.imageView(viewHandle);
             imageInfo.sampler(samplerHandle);
 
             // Configure the descriptors in each set:
@@ -886,7 +861,7 @@ public abstract class BaseApplication {
      * @param oldLayout the pre-existing layout
      * @param newLayout the desired layout
      */
-    private static void alterImageLayout(
+    static void alterImageLayout(
             long imageHandle, int format, int oldLayout, int newLayout) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             VkImageMemoryBarrier.Buffer pBarrier
@@ -1327,7 +1302,7 @@ public abstract class BaseApplication {
      * @param pMemory to store the handle of the image's memory (not null,
      * modified)
      */
-    private static void createImage(int width, int height, int format,
+    static void createImage(int width, int height, int format,
             int tiling, int usage, int requiredProperties,
             LongBuffer pTextureImage, LongBuffer pTextureMemory) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
@@ -1387,8 +1362,7 @@ public abstract class BaseApplication {
      * @param aspectMask a bitmask of VK_IMAGE_ASPECT_... values
      * @return the handle of the new image view
      */
-    private static long createImageView(
-            long imageHandle, int format, int aspectMask) {
+    static long createImageView(long imageHandle, int format, int aspectMask) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             VkImageViewCreateInfo createInfo
                     = VkImageViewCreateInfo.calloc(stack);
@@ -1857,104 +1831,6 @@ public abstract class BaseApplication {
     }
 
     /**
-     * Create the image from the named resource.
-     *
-     * @param resourceName the name of the resource (not null)
-     *
-     * TODO move to a constructor of an ImageResource class analogous with
-     * BufferResource
-     */
-    private static void createTextureImage(String resourceName) {
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            BufferedImage image = Utils.loadResourceAsImage(resourceName);
-            /*
-             * Note: loading with AWT instead of STB
-             * (which doesn't handle InputStream input).
-             */
-            int numChannels = 4;
-            int width = image.getWidth();
-            int height = image.getHeight();
-            int numBytes = width * height * numChannels;
-
-            // Create a temporary buffer object for staging:
-            int createUsage = VK10.VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
-            int properties = VK10.VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
-                    | VK10.VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
-            LongBuffer pBufferHandle = stack.mallocLong(1);
-            LongBuffer pMemoryHandle = stack.mallocLong(1);
-            createBuffer(numBytes, createUsage, properties, pBufferHandle,
-                    pMemoryHandle);
-            long stagingBufferHandle = pBufferHandle.get(0);
-            long stagingMemoryHandle = pMemoryHandle.get(0);
-
-            // Temporarily map the staging buffer's memory:
-            int offset = 0;
-            int flags = 0x0;
-            PointerBuffer pPointer = stack.mallocPointer(1);
-            int retCode = VK10.vkMapMemory(logicalDevice,
-                    stagingMemoryHandle, offset, numBytes, flags, pPointer);
-            Utils.checkForError(retCode, "map staging buffer's memory");
-
-            int index = 0; // the index within pPointer
-            ByteBuffer data = pPointer.getByteBuffer(index, numBytes);
-            /*
-             * Copy pixel-by-pixel to the staging buffer and then unmap the
-             * staging buffer.
-             */
-            for (int x = 0; x < width; ++x) {
-                for (int y = 0; y < height; ++y) {
-                    int sRGB = image.getRGB(x, y);
-                    int red = (sRGB >> 16) & 0xFF;
-                    int green = (sRGB >> 8) & 0xFF;
-                    int blue = sRGB & 0xFF;
-                    int alpha = (sRGB >> 24) & 0xFF;
-                    data.put((byte) red)
-                            .put((byte) green)
-                            .put((byte) blue)
-                            .put((byte) alpha);
-                }
-            }
-            VK10.vkUnmapMemory(logicalDevice, stagingMemoryHandle);
-            /*
-             * Create a device-local image that's optimized for being
-             * a copy destination:
-             */
-            textureFormat = VK10.VK_FORMAT_R8G8B8A8_SRGB;
-            createUsage = VK10.VK_IMAGE_USAGE_TRANSFER_DST_BIT
-                    | VK10.VK_IMAGE_USAGE_SAMPLED_BIT;
-            properties = VK10.VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
-            LongBuffer pImageHandle = stack.mallocLong(1);
-            createImage(width, height, textureFormat,
-                    VK10.VK_IMAGE_TILING_OPTIMAL, createUsage, properties,
-                    pImageHandle, pMemoryHandle);
-            textureImageHandle = pImageHandle.get(0);
-            textureMemoryHandle = pMemoryHandle.get(0);
-            alterImageLayout(textureImageHandle, textureFormat,
-                    VK10.VK_IMAGE_LAYOUT_UNDEFINED,
-                    VK10.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-
-            // Copy the data from the staging buffer the new image:
-            copyBufferToImage(
-                    stagingBufferHandle, textureImageHandle, width, height);
-
-            // Convert the image to a layout optimized for sampling:
-            alterImageLayout(textureImageHandle, textureFormat,
-                    VK10.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-                    VK10.VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-
-            // Destroy the staging buffer and free its memory:
-            VK10.vkDestroyBuffer(
-                    logicalDevice, stagingBufferHandle, defaultAllocator);
-            VK10.vkFreeMemory(
-                    logicalDevice, stagingMemoryHandle, defaultAllocator);
-
-            // Create a view for the new image:
-            textureViewHandle = createImageView(textureImageHandle,
-                    textureFormat, VK10.VK_IMAGE_ASPECT_COLOR_BIT);
-        }
-    }
-
-    /**
      * Create a texture sampler for the current logical device.
      */
     private static void createTextureSampler() {
@@ -2347,7 +2223,7 @@ public abstract class BaseApplication {
         createCommandPool();
         createIndexBuffer(sampleIndices);
         createVertexBuffer();
-        createTextureImage("/Textures/texture.jpg");
+        sampleTexture = new Texture("/Textures/texture.jpg");
         createTextureSampler();
         createDescriptorSetLayout();
 
