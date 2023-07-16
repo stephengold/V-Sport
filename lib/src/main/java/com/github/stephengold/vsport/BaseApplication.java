@@ -67,6 +67,7 @@ import org.lwjgl.vulkan.VkBufferCopy;
 import org.lwjgl.vulkan.VkBufferCreateInfo;
 import org.lwjgl.vulkan.VkBufferImageCopy;
 import org.lwjgl.vulkan.VkClearColorValue;
+import org.lwjgl.vulkan.VkClearDepthStencilValue;
 import org.lwjgl.vulkan.VkClearValue;
 import org.lwjgl.vulkan.VkCommandBuffer;
 import org.lwjgl.vulkan.VkCommandBufferAllocateInfo;
@@ -108,6 +109,7 @@ import org.lwjgl.vulkan.VkPhysicalDeviceFeatures;
 import org.lwjgl.vulkan.VkPhysicalDeviceMemoryProperties;
 import org.lwjgl.vulkan.VkPipelineColorBlendAttachmentState;
 import org.lwjgl.vulkan.VkPipelineColorBlendStateCreateInfo;
+import org.lwjgl.vulkan.VkPipelineDepthStencilStateCreateInfo;
 import org.lwjgl.vulkan.VkPipelineInputAssemblyStateCreateInfo;
 import org.lwjgl.vulkan.VkPipelineLayoutCreateInfo;
 import org.lwjgl.vulkan.VkPipelineMultisampleStateCreateInfo;
@@ -1216,7 +1218,8 @@ public abstract class BaseApplication {
         chainFrameBufferHandles = new ArrayList<>(numImages);
 
         try (MemoryStack stack = MemoryStack.stackPush()) {
-            LongBuffer pAttachmentHandles = stack.mallocLong(1);
+            LongBuffer pAttachmentHandles
+                    = stack.longs(VK10.VK_NULL_HANDLE, depthViewHandle);
             LongBuffer pHandle = stack.mallocLong(1);
 
             // reusable Struct for frame buffer creation:
@@ -1472,9 +1475,12 @@ public abstract class BaseApplication {
      */
     private static void createPass() {
         try (MemoryStack stack = MemoryStack.stackPush()) {
-            // a single color buffer for presentation, without multisampling:
             VkAttachmentDescription.Buffer pDescriptions
-                    = VkAttachmentDescription.calloc(1, stack);
+                    = VkAttachmentDescription.calloc(2, stack);
+            VkAttachmentReference.Buffer pReferences
+                    = VkAttachmentReference.calloc(2, stack);
+
+            // a single color buffer for presentation, without multisampling:
             VkAttachmentDescription colorAttachment = pDescriptions.get(0);
             colorAttachment.finalLayout(
                     KHRSwapchain.VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
@@ -1491,18 +1497,42 @@ public abstract class BaseApplication {
             colorAttachment.loadOp(VK10.VK_ATTACHMENT_LOAD_OP_CLEAR);
             colorAttachment.storeOp(VK10.VK_ATTACHMENT_STORE_OP_STORE);
 
-            VkAttachmentReference.Buffer pReferences
-                    = VkAttachmentReference.calloc(1, stack);
             VkAttachmentReference colorAttachmentRef = pReferences.get(0);
             colorAttachmentRef.attachment(0);
             colorAttachmentRef.layout(
                     VK10.VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+            VkAttachmentReference.Buffer pColorRefs
+                    = VkAttachmentReference.calloc(1, stack);
+            pColorRefs.put(0, colorAttachmentRef);
+
+            // a single depth buffer:
+            VkAttachmentDescription depthAttachment = pDescriptions.get(1);
+            depthAttachment.finalLayout(
+                    VK10.VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
+            depthAttachment.format(depthBufferFormat);
+            depthAttachment.initialLayout(VK10.VK_IMAGE_LAYOUT_UNDEFINED);
+            depthAttachment.samples(VK10.VK_SAMPLE_COUNT_1_BIT);
+
+            // no stencil operations:
+            depthAttachment.stencilLoadOp(VK10.VK_ATTACHMENT_LOAD_OP_DONT_CARE);
+            depthAttachment.stencilStoreOp(
+                    VK10.VK_ATTACHMENT_STORE_OP_DONT_CARE);
+
+            // Clear the depth buffer before each frame:
+            depthAttachment.loadOp(VK10.VK_ATTACHMENT_LOAD_OP_CLEAR);
+            depthAttachment.storeOp(VK10.VK_ATTACHMENT_STORE_OP_DONT_CARE);
+
+            VkAttachmentReference depthAttachmentRef = pReferences.get(1);
+            depthAttachmentRef.attachment(1);
+            depthAttachmentRef.layout(
+                    VK10.VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
 
             // a single subpass:
             VkSubpassDescription.Buffer subpasses
                     = VkSubpassDescription.calloc(1, stack);
             subpasses.colorAttachmentCount(1);
-            subpasses.pColorAttachments(pReferences);
+            subpasses.pColorAttachments(pColorRefs);
+            subpasses.pDepthStencilAttachment(depthAttachmentRef);
             subpasses.pipelineBindPoint(VK10.VK_PIPELINE_BIND_POINT_GRAPHICS);
 
             // Create a sub-pass dependency:
@@ -1686,6 +1716,20 @@ public abstract class BaseApplication {
             cbsCreateInfo.logicOpEnable(false); // no logic operation blend
             cbsCreateInfo.pAttachments(cbaState);
 
+            // depth-stencil state:
+            VkPipelineDepthStencilStateCreateInfo dssCreateInfo
+                    = VkPipelineDepthStencilStateCreateInfo.calloc(stack);
+            dssCreateInfo.sType(
+                    VK10.VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO);
+
+            dssCreateInfo.depthTestEnable(true);
+            dssCreateInfo.depthWriteEnable(true);
+            dssCreateInfo.depthCompareOp(VK10.VK_COMPARE_OP_LESS);
+            dssCreateInfo.depthBoundsTestEnable(false);
+            dssCreateInfo.minDepthBounds(0f); // Optional
+            dssCreateInfo.maxDepthBounds(1f); // Optional
+            dssCreateInfo.stencilTestEnable(false);
+
             // Create the pipeline layout:
             VkPipelineLayoutCreateInfo plCreateInfo
                     = VkPipelineLayoutCreateInfo.calloc(stack);
@@ -1714,6 +1758,7 @@ public abstract class BaseApplication {
             pCreateInfo.basePipelineIndex(-1);
             pCreateInfo.layout(pipelineLayoutHandle);
             pCreateInfo.pColorBlendState(cbsCreateInfo);
+            pCreateInfo.pDepthStencilState(dssCreateInfo);
             pCreateInfo.pInputAssemblyState(iasCreateInfo);
             pCreateInfo.pMultisampleState(msCreateInfo);
             pCreateInfo.pRasterizationState(rsCreateInfo);
@@ -2541,9 +2586,12 @@ public abstract class BaseApplication {
             renderArea.extent(frameBufferExtent);
             renderPassInfo.renderArea(renderArea);
 
-            VkClearValue.Buffer pClearValues = VkClearValue.calloc(1, stack);
+            VkClearValue.Buffer pClearValues = VkClearValue.calloc(2, stack);
             VkClearColorValue colorClearValue = pClearValues.get(0).color();
             colorClearValue.float32(stack.floats(0f, 0f, 0f, 1f));
+            VkClearDepthStencilValue dsClearValue
+                    = pClearValues.get(1).depthStencil();
+            dsClearValue.set(1f, 0);
             renderPassInfo.pClearValues(pClearValues);
 
             // Record a command buffer for each image in the main swapchain:
