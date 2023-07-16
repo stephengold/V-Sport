@@ -391,6 +391,87 @@ public abstract class BaseApplication {
     }
 
     /**
+     * Convert the specified image from one layout to another.
+     *
+     * @param imageHandle the handle of the image to convert
+     * @param format the image format
+     * @param oldLayout the pre-existing layout
+     * @param newLayout the desired layout
+     */
+    static void alterImageLayout(
+            long imageHandle, int format, int oldLayout, int newLayout) {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            VkImageMemoryBarrier.Buffer pBarrier
+                    = VkImageMemoryBarrier.calloc(1, stack);
+            pBarrier.sType(VK10.VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER);
+
+            pBarrier.dstQueueFamilyIndex(VK10.VK_QUEUE_FAMILY_IGNORED);
+            pBarrier.image(imageHandle);
+            pBarrier.newLayout(newLayout);
+            pBarrier.oldLayout(oldLayout);
+            pBarrier.srcQueueFamilyIndex(VK10.VK_QUEUE_FAMILY_IGNORED);
+
+            int aspectMask;
+            if (newLayout == VK10.VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL) {
+                aspectMask = VK10.VK_IMAGE_ASPECT_DEPTH_BIT;
+                if (Utils.hasStencilComponent(format)) {
+                    aspectMask |= VK10.VK_IMAGE_ASPECT_STENCIL_BIT;
+                }
+            } else {
+                aspectMask = VK10.VK_IMAGE_ASPECT_COLOR_BIT;
+            }
+
+            VkImageSubresourceRange range = pBarrier.subresourceRange();
+            range.aspectMask(aspectMask);
+            range.baseArrayLayer(0);
+            range.baseMipLevel(0);
+            range.layerCount(1);
+            range.levelCount(1);
+
+            int sourceStage;
+            int destinationStage;
+
+            if (oldLayout == VK10.VK_IMAGE_LAYOUT_UNDEFINED
+                    && newLayout == VK10.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) {
+                pBarrier.dstAccessMask(VK10.VK_ACCESS_TRANSFER_WRITE_BIT);
+                pBarrier.srcAccessMask(0x0);
+
+                sourceStage = VK10.VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+                destinationStage = VK10.VK_PIPELINE_STAGE_TRANSFER_BIT;
+
+            } else if (oldLayout == VK10.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
+                    && newLayout == VK10.VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
+                pBarrier.srcAccessMask(VK10.VK_ACCESS_TRANSFER_WRITE_BIT);
+                pBarrier.dstAccessMask(VK10.VK_ACCESS_SHADER_READ_BIT);
+
+                sourceStage = VK10.VK_PIPELINE_STAGE_TRANSFER_BIT;
+                destinationStage = VK10.VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+
+            } else if (oldLayout == VK10.VK_IMAGE_LAYOUT_UNDEFINED
+                    && newLayout == VK10.VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL) {
+                pBarrier.dstAccessMask(
+                        VK10.VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT
+                        | VK10.VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT);
+                pBarrier.srcAccessMask(0x0);
+
+                sourceStage = VK10.VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+                destinationStage
+                        = VK10.VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+
+            } else {
+                throw new IllegalArgumentException(
+                        "Unsupported transition, oldLayout=" + oldLayout);
+            }
+
+            VkCommandBuffer commandBuffer = beginSingleTimeCommands();
+            int dependencyFlags = 0x0;
+            VK10.vkCmdPipelineBarrier(commandBuffer, sourceStage,
+                    destinationStage, dependencyFlags, null, null, pBarrier);
+            endSingleTimeCommands(commandBuffer);
+        }
+    }
+
+    /**
      * Return the aspect ratio of the main frame buffer.
      *
      * @return the width divided by the height (&gt;0)
@@ -596,6 +677,117 @@ public abstract class BaseApplication {
     }
 
     /**
+     * Create a 2-D image with the specified properties.
+     *
+     * @param width the desired width (in pixels)
+     * @param height the desired height (in pixels)
+     * @param format the desired format
+     * @param tiling the desired tiling
+     * @param usage a bitmask
+     * @param requiredProperties a bitmask
+     * @param pImage to store the handle of the resulting image (not null,
+     * modified)
+     * @param pMemory to store the handle of the image's memory (not null,
+     * modified)
+     */
+    static void createImage(int width, int height, int format,
+            int tiling, int usage, int requiredProperties,
+            LongBuffer pTextureImage, LongBuffer pTextureMemory) {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            VkImageCreateInfo imageInfo = VkImageCreateInfo.calloc(stack);
+            imageInfo.sType(VK10.VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO);
+
+            imageInfo.arrayLayers(1);
+            imageInfo.extent().depth(1);
+            imageInfo.extent().height(height);
+            imageInfo.extent().width(width);
+            imageInfo.format(format);
+            imageInfo.imageType(VK10.VK_IMAGE_TYPE_2D);
+            imageInfo.initialLayout(VK10.VK_IMAGE_LAYOUT_UNDEFINED);
+            imageInfo.mipLevels(1);
+            imageInfo.samples(VK10.VK_SAMPLE_COUNT_1_BIT);
+            imageInfo.sharingMode(VK10.VK_SHARING_MODE_EXCLUSIVE);
+            imageInfo.tiling(tiling);
+            imageInfo.usage(usage);
+
+            int retCode = VK10.vkCreateImage(
+                    logicalDevice, imageInfo, defaultAllocator, pTextureImage);
+            Utils.checkForError(retCode, "create image");
+            long imageHandle = pTextureImage.get(0);
+
+            // Query the images's memory requirements:
+            VkMemoryRequirements memRequirements
+                    = VkMemoryRequirements.malloc(stack);
+            VK10.vkGetImageMemoryRequirements(
+                    logicalDevice, imageHandle, memRequirements);
+
+            // Allocate memory for the image:
+            VkMemoryAllocateInfo allocInfo = VkMemoryAllocateInfo.calloc(stack);
+            allocInfo.sType(VK10.VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO);
+
+            allocInfo.allocationSize(memRequirements.size());
+            int memoryTypeIndex = physicalDevice.findMemoryType(
+                    memRequirements.memoryTypeBits(), requiredProperties);
+            allocInfo.memoryTypeIndex(memoryTypeIndex);
+
+            retCode = VK10.vkAllocateMemory(
+                    logicalDevice, allocInfo, defaultAllocator, pTextureMemory);
+            Utils.checkForError(retCode, "allocate image memory");
+            long memoryHandle = pTextureMemory.get(0);
+
+            // Bind the newly allocated memory to the image object:
+            int offset = 0;
+            VK10.vkBindImageMemory(
+                    logicalDevice, imageHandle, memoryHandle, offset);
+        }
+    }
+
+    /**
+     * Create an image view for the specified image.
+     *
+     * @param imageHandle the handle of the image
+     * @param format the desired format for the view
+     * @param aspectMask a bitmask of VK_IMAGE_ASPECT_... values
+     * @return the handle of the new image view
+     */
+    static long createImageView(long imageHandle, int format, int aspectMask) {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            VkImageViewCreateInfo createInfo
+                    = VkImageViewCreateInfo.calloc(stack);
+            createInfo.sType(VK10.VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO);
+
+            createInfo.format(format);
+            createInfo.image(imageHandle);
+            createInfo.viewType(VK10.VK_IMAGE_VIEW_TYPE_2D);
+
+            // Don't swizzle the color channels:
+            VkComponentMapping swizzle = createInfo.components();
+            swizzle.r(VK10.VK_COMPONENT_SWIZZLE_IDENTITY);
+            swizzle.g(VK10.VK_COMPONENT_SWIZZLE_IDENTITY);
+            swizzle.b(VK10.VK_COMPONENT_SWIZZLE_IDENTITY);
+            swizzle.a(VK10.VK_COMPONENT_SWIZZLE_IDENTITY);
+            /*
+             * The image will be used as a single-layer color target
+             * without any mipmapping.
+             */
+            VkImageSubresourceRange range = createInfo.subresourceRange();
+            range.aspectMask(aspectMask);
+            range.baseArrayLayer(0);
+            range.baseMipLevel(0);
+            range.layerCount(1);
+            range.levelCount(1);
+
+            LongBuffer pHandle = stack.mallocLong(1);
+            int retCode = VK10.vkCreateImageView(
+                    logicalDevice, createInfo, defaultAllocator, pHandle);
+            Utils.checkForError(retCode, "create image view");
+            long result = pHandle.get(0);
+
+            return result;
+        }
+    }
+
+    /**
      * Test whether debugging is enabled.
      *
      * @return true if enabled, otherwise false
@@ -618,6 +810,24 @@ public abstract class BaseApplication {
             result[nameIndex] = name;
             ++nameIndex;
         }
+
+        return result;
+    }
+
+    /**
+     * Enumerate all required validation layers.
+     *
+     * @param stack for memory allocation (not null)
+     * @return the names of the validation layers required by this application
+     */
+    static PointerBuffer listRequiredLayers(MemoryStack stack) {
+        int numLayers = requiredLayers.size();
+        PointerBuffer result = stack.mallocPointer(numLayers);
+        for (String layerName : requiredLayers) {
+            ByteBuffer utf8Name = stack.UTF8(layerName);
+            result.put(utf8Name);
+        }
+        result.rewind();
 
         return result;
     }
@@ -850,87 +1060,6 @@ public abstract class BaseApplication {
 
                 VK10.vkUpdateDescriptorSets(logicalDevice, pWrites, pCopies);
             }
-        }
-    }
-
-    /**
-     * Convert the specified image from one layout to another.
-     *
-     * @param imageHandle the handle of the image to convert
-     * @param format the image format
-     * @param oldLayout the pre-existing layout
-     * @param newLayout the desired layout
-     */
-    static void alterImageLayout(
-            long imageHandle, int format, int oldLayout, int newLayout) {
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            VkImageMemoryBarrier.Buffer pBarrier
-                    = VkImageMemoryBarrier.calloc(1, stack);
-            pBarrier.sType(VK10.VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER);
-
-            pBarrier.dstQueueFamilyIndex(VK10.VK_QUEUE_FAMILY_IGNORED);
-            pBarrier.image(imageHandle);
-            pBarrier.newLayout(newLayout);
-            pBarrier.oldLayout(oldLayout);
-            pBarrier.srcQueueFamilyIndex(VK10.VK_QUEUE_FAMILY_IGNORED);
-
-            int aspectMask;
-            if (newLayout == VK10.VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL) {
-                aspectMask = VK10.VK_IMAGE_ASPECT_DEPTH_BIT;
-                if (Utils.hasStencilComponent(format)) {
-                    aspectMask |= VK10.VK_IMAGE_ASPECT_STENCIL_BIT;
-                }
-            } else {
-                aspectMask = VK10.VK_IMAGE_ASPECT_COLOR_BIT;
-            }
-
-            VkImageSubresourceRange range = pBarrier.subresourceRange();
-            range.aspectMask(aspectMask);
-            range.baseArrayLayer(0);
-            range.baseMipLevel(0);
-            range.layerCount(1);
-            range.levelCount(1);
-
-            int sourceStage;
-            int destinationStage;
-
-            if (oldLayout == VK10.VK_IMAGE_LAYOUT_UNDEFINED
-                    && newLayout == VK10.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) {
-                pBarrier.dstAccessMask(VK10.VK_ACCESS_TRANSFER_WRITE_BIT);
-                pBarrier.srcAccessMask(0x0);
-
-                sourceStage = VK10.VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
-                destinationStage = VK10.VK_PIPELINE_STAGE_TRANSFER_BIT;
-
-            } else if (oldLayout == VK10.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
-                    && newLayout == VK10.VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
-                pBarrier.srcAccessMask(VK10.VK_ACCESS_TRANSFER_WRITE_BIT);
-                pBarrier.dstAccessMask(VK10.VK_ACCESS_SHADER_READ_BIT);
-
-                sourceStage = VK10.VK_PIPELINE_STAGE_TRANSFER_BIT;
-                destinationStage = VK10.VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-
-            } else if (oldLayout == VK10.VK_IMAGE_LAYOUT_UNDEFINED
-                    && newLayout == VK10.VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL) {
-                pBarrier.dstAccessMask(
-                        VK10.VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT
-                        | VK10.VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT);
-                pBarrier.srcAccessMask(0x0);
-
-                sourceStage = VK10.VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
-                destinationStage
-                        = VK10.VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
-
-            } else {
-                throw new IllegalArgumentException(
-                        "Unsupported transition, oldLayout=" + oldLayout);
-            }
-
-            VkCommandBuffer commandBuffer = beginSingleTimeCommands();
-            int dependencyFlags = 0x0;
-            VK10.vkCmdPipelineBarrier(commandBuffer, sourceStage,
-                    destinationStage, dependencyFlags, null, null, pBarrier);
-            endSingleTimeCommands(commandBuffer);
         }
     }
 
@@ -1285,117 +1414,6 @@ public abstract class BaseApplication {
                 long frameBufferHandle = pHandle.get(0);
                 chainFrameBufferHandles.add(frameBufferHandle);
             }
-        }
-    }
-
-    /**
-     * Create a 2-D image with the specified properties.
-     *
-     * @param width the desired width (in pixels)
-     * @param height the desired height (in pixels)
-     * @param format the desired format
-     * @param tiling the desired tiling
-     * @param usage a bitmask
-     * @param requiredProperties a bitmask
-     * @param pImage to store the handle of the resulting image (not null,
-     * modified)
-     * @param pMemory to store the handle of the image's memory (not null,
-     * modified)
-     */
-    static void createImage(int width, int height, int format,
-            int tiling, int usage, int requiredProperties,
-            LongBuffer pTextureImage, LongBuffer pTextureMemory) {
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            VkImageCreateInfo imageInfo = VkImageCreateInfo.calloc(stack);
-            imageInfo.sType(VK10.VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO);
-
-            imageInfo.arrayLayers(1);
-            imageInfo.extent().depth(1);
-            imageInfo.extent().height(height);
-            imageInfo.extent().width(width);
-            imageInfo.format(format);
-            imageInfo.imageType(VK10.VK_IMAGE_TYPE_2D);
-            imageInfo.initialLayout(VK10.VK_IMAGE_LAYOUT_UNDEFINED);
-            imageInfo.mipLevels(1);
-            imageInfo.samples(VK10.VK_SAMPLE_COUNT_1_BIT);
-            imageInfo.sharingMode(VK10.VK_SHARING_MODE_EXCLUSIVE);
-            imageInfo.tiling(tiling);
-            imageInfo.usage(usage);
-
-            int retCode = VK10.vkCreateImage(
-                    logicalDevice, imageInfo, defaultAllocator, pTextureImage);
-            Utils.checkForError(retCode, "create image");
-            long imageHandle = pTextureImage.get(0);
-
-            // Query the images's memory requirements:
-            VkMemoryRequirements memRequirements
-                    = VkMemoryRequirements.malloc(stack);
-            VK10.vkGetImageMemoryRequirements(
-                    logicalDevice, imageHandle, memRequirements);
-
-            // Allocate memory for the image:
-            VkMemoryAllocateInfo allocInfo = VkMemoryAllocateInfo.calloc(stack);
-            allocInfo.sType(VK10.VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO);
-
-            allocInfo.allocationSize(memRequirements.size());
-            int memoryTypeIndex = physicalDevice.findMemoryType(
-                    memRequirements.memoryTypeBits(), requiredProperties);
-            allocInfo.memoryTypeIndex(memoryTypeIndex);
-
-            retCode = VK10.vkAllocateMemory(
-                    logicalDevice, allocInfo, defaultAllocator, pTextureMemory);
-            Utils.checkForError(retCode, "allocate image memory");
-            long memoryHandle = pTextureMemory.get(0);
-
-            // Bind the newly allocated memory to the image object:
-            int offset = 0;
-            VK10.vkBindImageMemory(
-                    logicalDevice, imageHandle, memoryHandle, offset);
-        }
-    }
-
-    /**
-     * Create an image view for the specified image.
-     *
-     * @param imageHandle the handle of the image
-     * @param format the desired format for the view
-     * @param aspectMask a bitmask of VK_IMAGE_ASPECT_... values
-     * @return the handle of the new image view
-     */
-    static long createImageView(long imageHandle, int format, int aspectMask) {
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            VkImageViewCreateInfo createInfo
-                    = VkImageViewCreateInfo.calloc(stack);
-            createInfo.sType(VK10.VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO);
-
-            createInfo.format(format);
-            createInfo.image(imageHandle);
-            createInfo.viewType(VK10.VK_IMAGE_VIEW_TYPE_2D);
-
-            // Don't swizzle the color channels:
-            VkComponentMapping swizzle = createInfo.components();
-            swizzle.r(VK10.VK_COMPONENT_SWIZZLE_IDENTITY);
-            swizzle.g(VK10.VK_COMPONENT_SWIZZLE_IDENTITY);
-            swizzle.b(VK10.VK_COMPONENT_SWIZZLE_IDENTITY);
-            swizzle.a(VK10.VK_COMPONENT_SWIZZLE_IDENTITY);
-            /*
-             * The image will be used as a single-layer color target
-             * without any mipmapping.
-             */
-            VkImageSubresourceRange range = createInfo.subresourceRange();
-            range.aspectMask(aspectMask);
-            range.baseArrayLayer(0);
-            range.baseMipLevel(0);
-            range.layerCount(1);
-            range.levelCount(1);
-
-            LongBuffer pHandle = stack.mallocLong(1);
-            int retCode = VK10.vkCreateImageView(
-                    logicalDevice, createInfo, defaultAllocator, pHandle);
-            Utils.checkForError(retCode, "create image view");
-            long result = pHandle.get(0);
-
-            return result;
         }
     }
 
@@ -2288,24 +2306,6 @@ public abstract class BaseApplication {
         } else {
             result = glfwRequirements;
         }
-
-        return result;
-    }
-
-    /**
-     * Enumerate all required validation layers.
-     *
-     * @param stack for memory allocation (not null)
-     * @return the names of the validation layers required by this application
-     */
-    static PointerBuffer listRequiredLayers(MemoryStack stack) {
-        int numLayers = requiredLayers.size();
-        PointerBuffer result = stack.mallocPointer(numLayers);
-        for (String layerName : requiredLayers) {
-            ByteBuffer utf8Name = stack.UTF8(layerName);
-            result.put(utf8Name);
-        }
-        result.rewind();
 
         return result;
     }
