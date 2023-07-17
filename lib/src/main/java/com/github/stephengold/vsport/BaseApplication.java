@@ -140,7 +140,7 @@ public abstract class BaseApplication {
      * true to enable debugging output and optional runtime checks, or false to
      * disable them
      */
-    final private static boolean enableDebugging = true; // TODO change default
+    final private static boolean enableDebugging = false;
     /**
      * version of the graphics engine
      */
