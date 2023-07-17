@@ -1292,7 +1292,7 @@ public abstract class BaseApplication {
             depthViewHandle = createImageView(depthImageHandle,
                     depthBufferFormat, VK10.VK_IMAGE_ASPECT_DEPTH_BIT);
 
-            // Explicitly transition the depth image:
+            // Transition the image to optimal layout:
             alterImageLayout(depthImageHandle, depthBufferFormat,
                     VK10.VK_IMAGE_LAYOUT_UNDEFINED,
                     VK10.VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
@@ -1300,7 +1300,7 @@ public abstract class BaseApplication {
     }
 
     /**
-     * Create the (empty) descriptor-set pools for UBOs and samplers.
+     * Create the (empty) descriptor-set pool for UBOs and samplers.
      */
     private static void createDescriptorPool() {
         int numImages = chainImageHandles.size();
@@ -1309,12 +1309,12 @@ public abstract class BaseApplication {
             VkDescriptorPoolSize.Buffer pContents
                     = VkDescriptorPoolSize.calloc(2, stack);
 
-            // The first pool will contain numImages UBOs:
+            // The pool will contain numImages UBOs:
             VkDescriptorPoolSize uboPool = pContents.get(0);
             uboPool.type(VK10.VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
             uboPool.descriptorCount(numImages);
 
-            // The 2nd pool will contain numImages combined-image samplers:
+            // The pool will contain numImages combined-image samplers:
             VkDescriptorPoolSize samplerPool = pContents.get(1);
             samplerPool.type(VK10.VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
             samplerPool.descriptorCount(numImages);
@@ -1887,8 +1887,8 @@ public abstract class BaseApplication {
         int numBytes = UniformValues.numBytes();
         boolean staging = false;
         for (int i = 0; i < numUbos; ++i) {
-            BufferResource ubo = new BufferResource(numBytes,
-                    VK10.VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, staging);
+            BufferResource ubo = new BufferResource(
+                    numBytes, VK10.VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, staging);
             ubos.add(ubo);
         }
     }
@@ -1969,7 +1969,8 @@ public abstract class BaseApplication {
             createInfo.pApplicationInfo(appInfo);
 
             // Specify the required extensions:
-            PointerBuffer extensionNames = listRequiredInstanceExtensions(stack);
+            PointerBuffer extensionNames
+                    = listRequiredInstanceExtensions(stack);
             createInfo.ppEnabledExtensionNames(extensionNames);
 
             if (enableDebugging) {
@@ -2540,8 +2541,8 @@ public abstract class BaseApplication {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             // Count the available devices:
             IntBuffer pCount = stack.mallocInt(1);
-            int retCode = VK10.vkEnumeratePhysicalDevices(
-                    vkInstance, pCount, null);
+            int retCode
+                    = VK10.vkEnumeratePhysicalDevices(vkInstance, pCount, null);
             Utils.checkForError(retCode, "count physical devices");
             int numDevices = pCount.get(0);
             if (numDevices == 0) {
