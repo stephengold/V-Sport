@@ -939,9 +939,10 @@ public abstract class BaseApplication {
 
     /**
      * Allocate a command buffer for each image in the main swapchain.
+     *
+     * @param numBuffersNeeded the number of command buffers to create
      */
-    private static void allocateCommandBuffers() {
-        int numBuffersNeeded = chainImageHandles.size();
+    private static void allocateCommandBuffers(int numBuffersNeeded) {
         if (commandBuffers == null) {
             commandBuffers = new ArrayList<>(numBuffersNeeded);
         } else {
@@ -979,11 +980,11 @@ public abstract class BaseApplication {
 
     /**
      * Allocate a descriptor set for each frame in flight.
+     *
+     * @param numSets the number of descriptor sets to allocate
      */
-    private static void allocateDescriptorSets() {
+    private static void allocateDescriptorSets(int numSets) {
         int numBytes = UniformValues.numBytes();
-
-        int numSets = chainImageHandles.size();
         descriptorSetHandles = new ArrayList<>(numSets);
 
         try (MemoryStack stack = MemoryStack.stackPush()) {
@@ -1128,8 +1129,10 @@ public abstract class BaseApplication {
 
     /**
      * Create the swapchain for the main window.
+     *
+     * @return the number of images in the swapchain
      */
-    private static void createChain() {
+    private static int createChain() {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             // swap-chain creation information:
             VkSwapchainCreateInfoKHR createInfo
@@ -1218,6 +1221,8 @@ public abstract class BaseApplication {
                 long imageHandle = pHandles.get(imageIndex);
                 chainImageHandles.add(imageHandle);
             }
+
+            return numImages;
         }
     }
 
@@ -1225,20 +1230,21 @@ public abstract class BaseApplication {
      * Create the main swapchain and all resources that depend on it.
      */
     private static void createChainResources() {
-        createChain();
-        createImageViews();
+        int numImages = createChain();
+
+        createImageViews(numImages);
         createDepthResources();
         createPass();
-        createFrameBuffers();
-        createDescriptorPool();
-        createUbos();
-        allocateDescriptorSets();
+        createFrameBuffers(numImages);
+        createDescriptorPool(numImages);
+        createUbos(numImages);
+        allocateDescriptorSets(numImages);
         createPipeline();
 
-        allocateCommandBuffers();
-        recordCommandBuffers();
+        allocateCommandBuffers(numImages);
+        recordCommandBuffers(numImages);
 
-        createSyncObjects();
+        createSyncObjects(numImages);
     }
 
     /**
@@ -1301,10 +1307,10 @@ public abstract class BaseApplication {
 
     /**
      * Create the (empty) descriptor-set pool for UBOs and samplers.
+     *
+     * @param numImages the number of images in the swap chain
      */
-    private static void createDescriptorPool() {
-        int numImages = chainImageHandles.size();
-
+    private static void createDescriptorPool(int numImages) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             VkDescriptorPoolSize.Buffer pContents
                     = VkDescriptorPoolSize.calloc(2, stack);
@@ -1384,9 +1390,10 @@ public abstract class BaseApplication {
 
     /**
      * Create a frame buffer for each image in the swapchain.
+     *
+     * @param numImages the number of images in the swap chain
      */
-    private static void createFrameBuffers() {
-        int numImages = chainImageHandles.size();
+    private static void createFrameBuffers(int numImages) {
         chainFrameBufferHandles = new ArrayList<>(numImages);
 
         try (MemoryStack stack = MemoryStack.stackPush()) {
@@ -1419,9 +1426,10 @@ public abstract class BaseApplication {
 
     /**
      * Create a view for each image in the swapchain.
+     *
+     * @param numImages the number of images in the swap chain
      */
-    private static void createImageViews() {
-        int numImages = chainImageHandles.size();
+    private static void createImageViews(int numImages) {
         chainViewHandles = new ArrayList<>(numImages);
 
         for (long imageHandle : chainImageHandles) {
@@ -1836,11 +1844,11 @@ public abstract class BaseApplication {
 
     /**
      * Create synchronization objects for each image in the swapchain.
+     *
+     * @param numImages the number of images in the swap chain
      */
-    private static void createSyncObjects() {
+    private static void createSyncObjects(int numImages) {
         inFlightFrames = new Frame[maxFramesInFlight];
-
-        int numImages = chainImageHandles.size();
         framesInFlight = new HashMap<>(numImages);
 
         for (int i = 0; i < maxFramesInFlight; ++i) {
@@ -1879,9 +1887,10 @@ public abstract class BaseApplication {
 
     /**
      * Create a uniform buffer object (UBO) for each image in the swapchain.
+     *
+     * @param numUbos the number of UBOs to create
      */
-    private static void createUbos() {
-        int numUbos = chainImageHandles.size();
+    private static void createUbos(int numUbos) {
         ubos = new ArrayList<>(numUbos);
 
         int numBytes = UniformValues.numBytes();
@@ -2325,10 +2334,10 @@ public abstract class BaseApplication {
 
     /**
      * Record a command buffer for each image in the main swapchain.
+     *
+     * @param numImages the number of images in the swap chain
      */
-    private static void recordCommandBuffers() {
-        int numImages = chainImageHandles.size();
-
+    private static void recordCommandBuffers(int numImages) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             // Begin recording:
             VkCommandBufferBeginInfo beginInfo
