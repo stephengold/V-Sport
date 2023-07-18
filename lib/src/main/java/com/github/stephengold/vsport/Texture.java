@@ -29,8 +29,6 @@
  */
 package com.github.stephengold.vsport;
 
-import static com.github.stephengold.vsport.BaseApplication.copyBufferToImage;
-import static com.github.stephengold.vsport.BaseApplication.createBuffer;
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 import java.nio.LongBuffer;
@@ -58,7 +56,7 @@ class Texture {
      */
     private long textureMemoryHandle = VK10.VK_NULL_HANDLE;
     /**
-     * handle of the image view
+     * handle of the image view (native type: VkImageView)
      */
     private long textureViewHandle = VK10.VK_NULL_HANDLE;
     /**
@@ -73,7 +71,7 @@ class Texture {
     // constructors
 
     /**
-     * Instantiate a texture.
+     * Instantiate and load a texture from the named class-path resource.
      *
      * @param resourceName the name of the resource (not null)
      */
@@ -98,8 +96,8 @@ class Texture {
                     | VK10.VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
             LongBuffer pBufferHandle = stack.mallocLong(1);
             LongBuffer pMemoryHandle = stack.mallocLong(1);
-            createBuffer(numBytes, createUsage, properties, pBufferHandle,
-                    pMemoryHandle);
+            BaseApplication.createBuffer(numBytes, createUsage, properties,
+                    pBufferHandle, pMemoryHandle);
             long stagingBufferHandle = pBufferHandle.get(0);
             long stagingMemoryHandle = pMemoryHandle.get(0);
 
@@ -150,7 +148,7 @@ class Texture {
                     VK10.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
             // Copy the data from the staging buffer the new image:
-            copyBufferToImage(
+            BaseApplication.copyBufferToImage(
                     stagingBufferHandle, textureImageHandle, width, height);
 
             // Convert the image to a layout optimized for sampling:
@@ -189,7 +187,7 @@ class Texture {
         if (textureImageHandle != VK10.VK_NULL_HANDLE) {
             VK10.vkDestroyImage(
                     logicalDevice, textureImageHandle, allocator);
-            textureImageHandle = VK10.VK_NULL_HANDLE;
+            this.textureImageHandle = VK10.VK_NULL_HANDLE;
         }
     }
 
