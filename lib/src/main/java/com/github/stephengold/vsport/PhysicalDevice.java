@@ -222,6 +222,7 @@ class PhysicalDevice {
     /**
      * Rate the suitability of the device for graphics applications.
      *
+     * @param surfaceHandle the surface for graphics display
      * @return a suitability score (&gt;0, larger is more suitable) or zero if
      * unsuitable
      */
@@ -238,14 +239,14 @@ class PhysicalDevice {
             }
         }
 
-        // Does the device provide adequate swap-chain support?
+        // Does the surface provide adequate swap-chain support?
         if (!hasAdequateSwapChainSupport(surfaceHandle)) {
             //String hex = Long.toHexString(device.address());
             //System.out.println(hex + " doesn't provide swap-chain support");
             return 0f;
         }
 
-        // Does the device support the required queue families?
+        // Does the surface support the required queue families?
         QueueFamilySummary queueFamilies = summarizeFamilies(surfaceHandle);
         if (!queueFamilies.isComplete()) {
             //String hex = Long.toHexString(device.address());

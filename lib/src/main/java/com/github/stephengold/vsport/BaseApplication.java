@@ -142,7 +142,7 @@ public abstract class BaseApplication {
      */
     final private static boolean enableDebugging = false;
     /**
-     * version of the graphics engine
+     * version of the V-Sport graphics engine
      */
     final private static int engineVersion = VK10.VK_MAKE_VERSION(0, 1, 0);
     /**
@@ -2544,7 +2544,7 @@ public abstract class BaseApplication {
     }
 
     /**
-     * Select the physical device best suited to displaying the main window.
+     * Select the physical device best suited to displaying the main surface.
      */
     private static void selectPhysicalDevice() {
         try (MemoryStack stack = MemoryStack.stackPush()) {
