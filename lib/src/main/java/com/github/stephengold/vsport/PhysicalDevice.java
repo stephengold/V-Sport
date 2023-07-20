@@ -223,39 +223,54 @@ class PhysicalDevice {
      * Rate the suitability of the device for graphics applications.
      *
      * @param surfaceHandle the surface for graphics display
+     * @param diagnose true to print diagnostic messages, otherwise false
      * @return a suitability score (&gt;0, larger is more suitable) or zero if
      * unsuitable
      */
-    float suitability(long surfaceHandle) {
+    float suitability(long surfaceHandle, boolean diagnose) {
+        if (diagnose) {
+            System.out.printf("Rating suitability of device %s, surface %s%n:",
+                    Long.toHexString(vkPhysicalDevice.address()),
+                    Long.toHexString(surfaceHandle));
+        }
+
         // Does the device support all required extensions?
         Set<String> extensions = listAvailableExtensions();
         String[] requiredExtensions
                 = BaseApplication.listRequiredDeviceExtensions();
         for (String name : requiredExtensions) {
             if (!extensions.contains(name)) {
-                //String hex = Long.toHexString(device.address());
-                //System.out.println(hex + " doesn't support " + name);
+                if (diagnose) {
+                    System.out.println("  doesn't support extension " + name);
+                }
                 return 0f;
             }
         }
 
         // Does the surface provide adequate swap-chain support?
         if (!hasAdequateSwapChainSupport(surfaceHandle)) {
-            //String hex = Long.toHexString(device.address());
-            //System.out.println(hex + " doesn't provide swap-chain support");
+            if (diagnose) {
+                System.out.println(
+                        "  doesn't provide adequate swap-chain support");
+            }
             return 0f;
         }
 
         // Does the surface support the required queue families?
         QueueFamilySummary queueFamilies = summarizeFamilies(surfaceHandle);
         if (!queueFamilies.isComplete()) {
-            //String hex = Long.toHexString(device.address());
-            //System.out.println(hex + " doesn't provide both queue families");
+            if (diagnose) {
+                System.out.println("  doesn't provide both queue families");
+            }
             return 0f;
         }
 
         // Does the device support anisotropic sampling of textures?
         if (!hasAnisotropySupport()) {
+            if (diagnose) {
+                System.out.println(
+                        "  doesn't support anisotropic sampling of textures");
+            }
             return 0f;
         }
 

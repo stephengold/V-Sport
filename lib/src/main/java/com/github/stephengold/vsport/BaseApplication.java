@@ -2570,7 +2570,8 @@ public abstract class BaseApplication {
             for (int deviceIndex = 0; deviceIndex < numDevices; ++deviceIndex) {
                 long handle = pPointers.get(deviceIndex);
                 PhysicalDevice pd = new PhysicalDevice(handle, vkInstance);
-                float score = pd.suitability(surfaceHandle);
+                boolean diagnose = false;
+                float score = pd.suitability(surfaceHandle, diagnose);
                 if (score > bestScore) {
                     bestScore = score;
                     physicalDevice = pd;
@@ -2578,9 +2579,16 @@ public abstract class BaseApplication {
             }
 
             if (bestScore <= 0f) {
+                for (int deviceI = 0; deviceI < numDevices; ++deviceI) {
+                    long handle = pPointers.get(deviceI);
+                    PhysicalDevice pd = new PhysicalDevice(handle, vkInstance);
+                    boolean diagnose = true;
+                    float score = pd.suitability(surfaceHandle, diagnose);
+                    System.out.printf("    suitability score = %f%n", score);
+                }
                 throw new RuntimeException(
-                        "Failed to find a suitable device, bestScore = "
-                        + bestScore);
+                        "Failed to find a suitable device, numDevices = "
+                        + numDevices + ", bestScore = " + bestScore);
             }
         }
     }
