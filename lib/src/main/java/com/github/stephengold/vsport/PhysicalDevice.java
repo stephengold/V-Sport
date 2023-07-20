@@ -34,6 +34,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.Set;
 import java.util.TreeSet;
+import jme3utilities.MyString;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.vulkan.KHRSurface;
@@ -49,6 +50,7 @@ import org.lwjgl.vulkan.VkMemoryType;
 import org.lwjgl.vulkan.VkPhysicalDevice;
 import org.lwjgl.vulkan.VkPhysicalDeviceFeatures;
 import org.lwjgl.vulkan.VkPhysicalDeviceMemoryProperties;
+import org.lwjgl.vulkan.VkPhysicalDeviceProperties;
 import org.lwjgl.vulkan.VkQueueFamilyProperties;
 
 /**
@@ -229,9 +231,7 @@ class PhysicalDevice {
      */
     float suitability(long surfaceHandle, boolean diagnose) {
         if (diagnose) {
-            System.out.printf("Rating suitability of device %s, surface %s%n:",
-                    Long.toHexString(vkPhysicalDevice.address()),
-                    Long.toHexString(surfaceHandle));
+            System.out.println("Rating suitability of device " + this + ":");
         }
 
         // Does the device support all required extensions?
@@ -248,11 +248,7 @@ class PhysicalDevice {
         }
 
         // Does the surface provide adequate swap-chain support?
-        if (!hasAdequateSwapChainSupport(surfaceHandle)) {
-            if (diagnose) {
-                System.out.println(
-                        "  doesn't provide adequate swap-chain support");
-            }
+        if (!hasAdequateSwapChainSupport(surfaceHandle, diagnose)) {
             return 0f;
         }
 
@@ -332,6 +328,24 @@ class PhysicalDevice {
                 vkPhysicalDevice, surfaceHandle, stack);
         return result;
     }
+
+    /**
+     * Represent this instance as a text string.
+     *
+     * @return descriptive string of text (not null)
+     */
+    @Override
+    public String toString() {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            VkPhysicalDeviceProperties properties
+                    = VkPhysicalDeviceProperties.calloc(stack);
+            VK10.vkGetPhysicalDeviceProperties(vkPhysicalDevice, properties);
+            String name = properties.deviceNameString();
+            String result = MyString.quote(name);
+
+            return result;
+        }
+    }
     // *************************************************************************
     // private methods
 
@@ -339,12 +353,22 @@ class PhysicalDevice {
      * Test whether the device has adequate swap-chain support.
      *
      * @param device the device to test (not null)
+     * @param diagnose true to print diagnostic messages, otherwise false
      * @return true if the support is adequate, otherwise false
      */
-    private boolean hasAdequateSwapChainSupport(long surfaceHandle) {
+    private boolean hasAdequateSwapChainSupport(
+            long surfaceHandle, boolean diagnose) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
-            SurfaceSummary surface
-                    = new SurfaceSummary(vkPhysicalDevice, surfaceHandle, stack);
+            SurfaceSummary surface = new SurfaceSummary(
+                    vkPhysicalDevice, surfaceHandle, stack);
+            if (diagnose && !surface.hasFormat()) {
+                System.out.println(
+                        "  doesn't have any formats available");
+            }
+            if (diagnose && !surface.hasPresentationMode()) {
+                System.out.println(
+                        "  doesn't have any present modes avilable");
+            }
             boolean result = surface.hasFormat()
                     && surface.hasPresentationMode();
 

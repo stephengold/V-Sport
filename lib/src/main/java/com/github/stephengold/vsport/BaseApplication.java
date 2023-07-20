@@ -1338,7 +1338,7 @@ public abstract class BaseApplication {
             LongBuffer pHandle = stack.mallocLong(1);
             int retCode = VK10.vkCreateDescriptorPool(
                     logicalDevice, createInfo, defaultAllocator, pHandle);
-            Utils.checkForError(retCode, "create descriptor pool");
+            Utils.checkForError(retCode, "create descriptor-set pool");
             descriptorPoolHandle = pHandle.get(0);
         }
     }
@@ -2584,7 +2584,8 @@ public abstract class BaseApplication {
                     PhysicalDevice pd = new PhysicalDevice(handle, vkInstance);
                     boolean diagnose = true;
                     float score = pd.suitability(surfaceHandle, diagnose);
-                    System.out.printf("    suitability score = %f%n", score);
+                    System.out.printf("    suitability score = %s%n", score);
+                    System.out.flush();
                 }
                 throw new RuntimeException(
                         "Failed to find a suitable device, numDevices = "
