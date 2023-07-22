@@ -29,9 +29,11 @@
  */
 package com.github.stephengold.vsport;
 
+import com.jme3.util.BufferUtils;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 import javax.imageio.ImageIO;
@@ -113,7 +115,69 @@ final class Utils {
     }
 
     /**
-     * Load a BufferedImage from the named resource.
+     * Load raw bytes from the named classpath resource.
+     *
+     * @param resourceName the name of the resource (not null)
+     * @return a new array
+     */
+    public static ByteBuffer loadResourceAsBytes(String resourceName) {
+        // Read the resource to determine its size in bytes:
+        InputStream inputStream = Utils.class.getResourceAsStream(resourceName);
+        if (inputStream == null) {
+            String q = MyString.quote(resourceName);
+            throw new RuntimeException("resource not found:  " + q);
+        }
+        int totalBytes = 0;
+        byte[] tmpArray = new byte[4096];
+        try {
+            while (true) {
+                int numBytesRead = inputStream.read(tmpArray);
+                if (numBytesRead < 0) {
+                    break;
+                }
+                totalBytes += numBytesRead;
+            }
+            inputStream.close();
+
+        } catch (IOException exception) {
+            String q = MyString.quote(resourceName);
+            throw new RuntimeException("failed to read resource " + q);
+        }
+        ByteBuffer result = BufferUtils.createByteBuffer(totalBytes);
+
+        // Read the resource again to fill the buffer with data:
+        inputStream = Utils.class.getResourceAsStream(resourceName);
+        if (inputStream == null) {
+            String q = MyString.quote(resourceName);
+            throw new RuntimeException("resource not found:  " + q);
+        }
+        try {
+            while (true) {
+                int numBytesRead = inputStream.read(tmpArray);
+                if (numBytesRead == tmpArray.length) {
+                    result.put(tmpArray);
+                } else {
+                    assert numBytesRead >= 0 : numBytesRead;
+                    for (int i = 0; i < numBytesRead; ++i) {
+                        byte b = tmpArray[i];
+                        result.put(b);
+                    }
+                    break;
+                }
+            }
+            inputStream.close();
+
+        } catch (IOException exception) {
+            String q = MyString.quote(resourceName);
+            throw new RuntimeException("failed to read resource " + q);
+        }
+
+        result.flip();
+        return result;
+    }
+
+    /**
+     * Load an AWT BufferedImage from the named classpath resource.
      *
      * @param resourceName the name of the resource (not null)
      * @return a new instance
