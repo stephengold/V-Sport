@@ -2585,17 +2585,19 @@ public abstract class BaseApplication {
             }
 
             if (bestScore <= 0f) {
+                System.out.println(
+                        "Failed to find a suitable Vulkan device, numDevices = "
+                        + numDevices + ", bestScore = " + bestScore);
                 for (int deviceI = 0; deviceI < numDevices; ++deviceI) {
                     long handle = pPointers.get(deviceI);
                     PhysicalDevice pd = new PhysicalDevice(handle, vkInstance);
                     boolean diagnose = true;
                     float score = pd.suitability(surfaceHandle, diagnose);
                     System.out.printf("    suitability score = %s%n", score);
-                    System.out.flush();
                 }
-                throw new RuntimeException(
-                        "Failed to find a suitable device, numDevices = "
-                        + numDevices + ", bestScore = " + bestScore);
+                System.out.flush();
+                cleanup();
+                System.exit(0);
             }
         }
     }
