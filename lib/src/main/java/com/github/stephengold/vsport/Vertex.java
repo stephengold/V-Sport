@@ -50,10 +50,6 @@ class Vertex {
     // fields
 
     /**
-     * vertex position (3 floats)
-     */
-    final private Vector3fc pos;
-    /**
      * texture coordinates (2 floats) or null if not present
      */
     final private Vector2fc texCoords;
@@ -61,6 +57,10 @@ class Vertex {
      * vertex colors (3 floats) or null if not present
      */
     final private Vector3fc color;
+    /**
+     * vertex position in mesh coordinates (3 floats)
+     */
+    final private Vector3fc position;
     // *************************************************************************
     // constructors
 
@@ -74,7 +74,7 @@ class Vertex {
      * created if not null)
      */
     Vertex(Vector3fc pos, Vector3fc color, Vector2fc texCoords) {
-        this.pos = pos;
+        this.position = pos;
         this.color = color;
         this.texCoords = texCoords;
     }
@@ -167,9 +167,9 @@ class Vertex {
      * @param target the buffer to write to (not null, modified)
      */
     void writePositionsTo(ByteBuffer target) {
-        target.putFloat(pos.x());
-        target.putFloat(pos.y());
-        target.putFloat(pos.z());
+        target.putFloat(position.x());
+        target.putFloat(position.y());
+        target.putFloat(position.z());
     }
 
     /**
