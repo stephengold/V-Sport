@@ -412,7 +412,8 @@ public abstract class BaseApplication {
             pBarrier.srcQueueFamilyIndex(VK10.VK_QUEUE_FAMILY_IGNORED);
 
             int aspectMask;
-            if (newLayout == VK10.VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL) {
+            if (newLayout
+                    == VK10.VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL) {
                 aspectMask = VK10.VK_IMAGE_ASPECT_DEPTH_BIT;
                 if (Utils.hasStencilComponent(format)) {
                     aspectMask |= VK10.VK_IMAGE_ASPECT_STENCIL_BIT;
@@ -440,7 +441,8 @@ public abstract class BaseApplication {
                 destinationStage = VK10.VK_PIPELINE_STAGE_TRANSFER_BIT;
 
             } else if (oldLayout == VK10.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
-                    && newLayout == VK10.VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
+                    && newLayout
+                    == VK10.VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
                 pBarrier.srcAccessMask(VK10.VK_ACCESS_TRANSFER_WRITE_BIT);
                 pBarrier.dstAccessMask(VK10.VK_ACCESS_SHADER_READ_BIT);
 
@@ -448,7 +450,8 @@ public abstract class BaseApplication {
                 destinationStage = VK10.VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
 
             } else if (oldLayout == VK10.VK_IMAGE_LAYOUT_UNDEFINED
-                    && newLayout == VK10.VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL) {
+                    && newLayout
+                    == VK10.VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL) {
                 pBarrier.dstAccessMask(
                         VK10.VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT
                         | VK10.VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT);

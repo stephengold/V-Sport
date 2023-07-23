@@ -389,7 +389,8 @@ class PhysicalDevice {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             VkPhysicalDeviceFeatures supportedFeatures
                     = VkPhysicalDeviceFeatures.malloc(stack);
-            VK10.vkGetPhysicalDeviceFeatures(vkPhysicalDevice, supportedFeatures);
+            VK10.vkGetPhysicalDeviceFeatures(
+                    vkPhysicalDevice, supportedFeatures);
             boolean result = supportedFeatures.samplerAnisotropy();
 
             return result;
