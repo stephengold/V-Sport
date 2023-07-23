@@ -154,7 +154,7 @@ class Vertex {
      *
      * @param target the buffer to write to (not null, modified)
      */
-    void writeColorsTo(ByteBuffer target) {
+    void writeColorTo(ByteBuffer target) {
         target.putFloat(color.x());
         target.putFloat(color.y());
         target.putFloat(color.z());
@@ -166,7 +166,7 @@ class Vertex {
      *
      * @param target the buffer to write to (not null, modified)
      */
-    void writePositionsTo(ByteBuffer target) {
+    void writePositionTo(ByteBuffer target) {
         target.putFloat(position.x());
         target.putFloat(position.y());
         target.putFloat(position.z());

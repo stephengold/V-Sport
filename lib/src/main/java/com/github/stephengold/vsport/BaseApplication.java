@@ -1918,7 +1918,7 @@ public abstract class BaseApplication {
             @Override
             void fill(ByteBuffer destinationBuffer) {
                 for (Vertex vertex : sampleVertices) {
-                    vertex.writePositionsTo(destinationBuffer);
+                    vertex.writePositionTo(destinationBuffer);
                 }
             }
         };
@@ -1928,7 +1928,7 @@ public abstract class BaseApplication {
             @Override
             void fill(ByteBuffer destinationBuffer) {
                 for (Vertex vertex : sampleVertices) {
-                    vertex.writeColorsTo(destinationBuffer);
+                    vertex.writeColorTo(destinationBuffer);
                 }
             }
         };
