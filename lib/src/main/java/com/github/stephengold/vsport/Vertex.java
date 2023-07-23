@@ -157,12 +157,38 @@ class Vertex {
     }
 
     /**
+     * Text whether the color attribute is present.
+     *
+     * @return true if present, otherwise false
+     */
+    boolean hasColor() {
+        if (color == null) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
      * Text whether the normal attribute is present.
      *
      * @return true if present, otherwise false
      */
     boolean hasNormal() {
         if (normal == null) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * Test whether texture coordinates are present.
+     *
+     * @return true if present, otherwise false
+     */
+    boolean hasTexCoords() {
+        if (texCoords == null) {
             return false;
         } else {
             return true;
