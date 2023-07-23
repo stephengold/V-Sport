@@ -4,8 +4,6 @@ plugins {
     id 'application' // to support building a Java application
 }
 
-java.toolchain.languageVersion = null // to build using any version of Java
-
 // tasks to run specific apps:
 
 tasks.register('HelloVSport', JavaExec) {

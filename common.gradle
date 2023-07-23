@@ -31,10 +31,3 @@ dependencies {
     implementation 'org.lwjgl:lwjgl-shaderc' // to compile GLSL into SPIR-V 
     implementation 'org.lwjgl:lwjgl-vulkan'
 }
-
-// Apply a specific Java toolchain to ease working on different environments.
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
-    }
-}
