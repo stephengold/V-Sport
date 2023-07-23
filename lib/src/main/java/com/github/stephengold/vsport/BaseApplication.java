@@ -169,35 +169,35 @@ public abstract class BaseApplication {
     final private static Vertex[] sampleVertices = {
         new Vertex(
         new Vector3f(-0.5f, -0.5f, 0f),
-        new Vector3f(1f, 0f, 0f),
+        new Vector3f(1f, 0f, 0f), null,
         new Vector2f(0f, 0f)),
         new Vertex(
         new Vector3f(0.5f, -0.5f, 0f),
-        new Vector3f(0f, 1f, 0f),
+        new Vector3f(0f, 1f, 0f), null,
         new Vector2f(1f, 0f)),
         new Vertex(
         new Vector3f(0.5f, 0.5f, 0f),
-        new Vector3f(0f, 0f, 1f),
+        new Vector3f(0f, 0f, 1f), null,
         new Vector2f(1f, 1f)),
         new Vertex(
         new Vector3f(-0.5f, 0.5f, 0f),
-        new Vector3f(1f, 1f, 1f),
+        new Vector3f(1f, 1f, 1f), null,
         new Vector2f(0f, 1f)),
         new Vertex(
         new Vector3f(-0.5f, -0.5f, -0.5f),
-        new Vector3f(1f, 0f, 0f),
+        new Vector3f(1f, 0f, 0f), null,
         new Vector2f(0f, 0f)),
         new Vertex(
         new Vector3f(0.5f, -0.5f, -0.5f),
-        new Vector3f(0f, 1f, 0f),
+        new Vector3f(0f, 1f, 0f), null,
         new Vector2f(1f, 0f)),
         new Vertex(
         new Vector3f(0.5f, 0.5f, -0.5f),
-        new Vector3f(0f, 0f, 1f),
+        new Vector3f(0f, 0f, 1f), null,
         new Vector2f(1f, 1f)),
         new Vertex(
         new Vector3f(-0.5f, 0.5f, -0.5f),
-        new Vector3f(1f, 1f, 1f),
+        new Vector3f(1f, 1f, 1f), null,
         new Vector2f(0f, 1f))
     };
     /**

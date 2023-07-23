@@ -58,6 +58,10 @@ class Vertex {
      */
     final private Vector3fc color;
     /**
+     * vertex normal in mesh coordinates (3 floats)
+     */
+    final private Vector3fc normal;
+    /**
      * vertex position in mesh coordinates (3 floats)
      */
     final private Vector3fc position;
@@ -70,12 +74,16 @@ class Vertex {
      * @param pos the desired location of the vertex (in model coordinates, not
      * null, alias created)
      * @param color the desired color of the vertex (alias created if not null))
+     * @param normal the desired normal direction at the vertex (alias created
+     * if not null))
      * @param texCoords the desired texture coordinates of the vertex (alias
      * created if not null)
      */
-    Vertex(Vector3fc pos, Vector3fc color, Vector2fc texCoords) {
+    Vertex(Vector3fc pos, Vector3fc color, Vector3fc normal,
+            Vector2fc texCoords) {
         this.position = pos;
         this.color = color;
+        this.normal = normal;
         this.texCoords = texCoords;
     }
     // *************************************************************************
@@ -149,6 +157,19 @@ class Vertex {
     }
 
     /**
+     * Text whether the normal attribute is present.
+     *
+     * @return true if present, otherwise false
+     */
+    boolean hasNormal() {
+        if (normal == null) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
      * Write the vertex color data to the specified ByteBuffer, starting at the
      * current buffer position) and advance the buffer position.
      *
@@ -158,6 +179,18 @@ class Vertex {
         target.putFloat(color.x());
         target.putFloat(color.y());
         target.putFloat(color.z());
+    }
+
+    /**
+     * Write the vertex normal data to the specified ByteBuffer, starting at the
+     * current buffer position) and advance the buffer position.
+     *
+     * @param target the buffer to write to (not null, modified)
+     */
+    void writeNormalTo(ByteBuffer target) {
+        target.putFloat(normal.x());
+        target.putFloat(normal.y());
+        target.putFloat(normal.z());
     }
 
     /**
