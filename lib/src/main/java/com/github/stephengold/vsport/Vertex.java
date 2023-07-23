@@ -30,6 +30,7 @@
 package com.github.stephengold.vsport;
 
 import java.nio.ByteBuffer;
+import jme3utilities.Validate;
 import org.joml.Vector2fc;
 import org.joml.Vector3fc;
 import org.lwjgl.system.MemoryStack;
@@ -81,6 +82,8 @@ class Vertex {
      */
     Vertex(Vector3fc position, Vector3fc color, Vector3fc normal,
             Vector2fc texCoords) {
+        Validate.nonNull(position, "position");
+
         this.position = position;
         this.color = color;
         this.normal = normal;
