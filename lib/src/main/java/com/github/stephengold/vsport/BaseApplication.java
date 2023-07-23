@@ -2390,14 +2390,14 @@ public abstract class BaseApplication {
 
                 // command to bind the vertex buffers:
                 int firstBinding = 0;
-                LongBuffer vboHandles = stack.longs(
+                LongBuffer pBufferHandles = stack.longs(
                         positionBuffer.handle(),
                         colorBuffer.handle(),
                         texCoordsBuffer.handle()
                 );
-                LongBuffer offsets = stack.longs(0L, 0L, 0L);
+                LongBuffer pOffsets = stack.longs(0L, 0L, 0L);
                 VK10.vkCmdBindVertexBuffers(
-                        commandBuffer, firstBinding, vboHandles, offsets);
+                        commandBuffer, firstBinding, pBufferHandles, pOffsets);
 
                 // command to bind the index buffer:
                 int startOffset = 0;
