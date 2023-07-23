@@ -78,7 +78,9 @@ class QueueFamilySummary {
     /**
      * Enumerate the distinct queue families used by the application.
      *
-     * @return a new buffer of queue-family indices (not null, not empty)
+     * @param stack for memory allocation (not null)
+     * @return a new temporary buffer of queue-family indices (not null, not
+     * empty)
      */
     IntBuffer pListDistinct(MemoryStack stack) {
         assert isComplete();

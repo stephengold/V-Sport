@@ -82,7 +82,7 @@ final class Utils {
      * @param min the lower limit of the clamp
      * @param max the upper limit of the clamp
      * @return the value between {@code min} and {@code max} inclusive that is
-     * closest to {@code input{
+     * closest to {@code input}
      */
     public static int clamp(int input, int min, int max) {
         int result;

@@ -1807,7 +1807,7 @@ public abstract class BaseApplication {
     /**
      * Create a shader module from the specified SPIR-V bytecodes.
      *
-     * @param spirvCode
+     * @param spirvCode the bytecodes to use
      * @return the handle of the new module
      */
     private static long createShaderModule(ByteBuffer spirvCode) {
@@ -2006,8 +2006,7 @@ public abstract class BaseApplication {
      * Handle a single debug callback. The callback must not invoke any Vulkan
      * APIs.
      *
-     * @param messageSeverity the severity of the occurrence that triggered the
-     * callback
+     * @param severity the severity of the event that triggered the callback
      * @param messageType the event type(s) that triggered the callback
      * @param pCallbackData the address of any callback-specific data
      * @param pUserData the address of any user data provided when the
@@ -2188,6 +2187,10 @@ public abstract class BaseApplication {
 
     /**
      * Callback to trigger a resize of the frame buffers.
+     *
+     * @param window the affected window
+     * @param width the new framebuffer width
+     * @param height the new framebuffer height
      */
     private static void frameBufferResizeCallback(
             long window, int width, int height) {

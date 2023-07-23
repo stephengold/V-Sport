@@ -49,8 +49,17 @@ class Vertex {
     // *************************************************************************
     // fields
 
+    /**
+     * vertex position (3 floats)
+     */
     final private Vector3fc pos;
+    /**
+     * texture coordinates (2 floats) or null if not present
+     */
     final private Vector2fc texCoords;
+    /**
+     * vertex colors (3 floats) or null if not present
+     */
     final private Vector3fc color;
     // *************************************************************************
     // constructors
@@ -58,9 +67,11 @@ class Vertex {
     /**
      * Instantiate a mesh vertex from attribute values.
      *
-     * @param pos the desired location of the vertex (in model coordinates)
-     * @param color the desired color of the vertex
-     * @param texCoords the desired texture coordinates of the vertex
+     * @param pos the desired location of the vertex (in model coordinates, not
+     * null, alias created)
+     * @param color the desired color of the vertex (alias created if not null))
+     * @param texCoords the desired texture coordinates of the vertex (alias
+     * created if not null)
      */
     Vertex(Vector3fc pos, Vector3fc color, Vector2fc texCoords) {
         this.pos = pos;

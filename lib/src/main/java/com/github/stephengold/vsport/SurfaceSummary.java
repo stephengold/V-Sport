@@ -154,9 +154,10 @@ class SurfaceSummary {
     /**
      * Choose an extent for the swap chain of the main window.
      *
-     * @param availableModes the available presentation modes (not null,
-     * capacity &ge; 1, unaffected)
-     * @return the selected mode
+     * @param frameBufferWidth the width of the frame buffer
+     * @param frameBufferHeight the height of the frame buffer
+     * @param stack for memory allocation (not null)
+     * @return a new instance (may be temporary)
      */
     VkExtent2D chooseSwapExtent(
             int frameBufferWidth, int frameBufferHeight, MemoryStack stack) {

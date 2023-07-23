@@ -155,7 +155,7 @@ class BufferResource {
     // new methods exposed
 
     /**
-     *
+     * Destroy the buffer, if it has been created.
      */
     void destroy() {
         if (bufferHandle != VK10.VK_NULL_HANDLE) {

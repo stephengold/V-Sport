@@ -84,7 +84,11 @@ class PhysicalDevice {
     // new methods exposed
 
     /**
-     * Create a logical device from this physical device.
+     * Create a logical device based on this physical device.
+     *
+     * @param surfaceHandle the handle of the surface to use
+     * @param enableDebugging true to produce debug output, false to suppress it
+     * @return a new instance
      */
     VkDevice createLogicalDevice(long surfaceHandle, boolean enableDebugging) {
         QueueFamilySummary queueFamilies = summarizeFamilies(surfaceHandle);
@@ -352,7 +356,7 @@ class PhysicalDevice {
     /**
      * Test whether the device has adequate swap-chain support.
      *
-     * @param device the device to test (not null)
+     * @param surfaceHandle the surface to test against (not null)
      * @param diagnose true to print diagnostic messages, otherwise false
      * @return true if the support is adequate, otherwise false
      */
