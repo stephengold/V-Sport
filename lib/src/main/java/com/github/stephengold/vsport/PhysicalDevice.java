@@ -235,7 +235,7 @@ class PhysicalDevice {
      */
     float suitability(long surfaceHandle, boolean diagnose) {
         if (diagnose) {
-            System.out.println("Rating suitability of device " + this + ":");
+            System.out.println(" Rating suitability of device " + this + ":");
         }
 
         // Does the device support all required extensions?
