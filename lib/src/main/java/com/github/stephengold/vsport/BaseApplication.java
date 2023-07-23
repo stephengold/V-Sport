@@ -233,6 +233,10 @@ public abstract class BaseApplication {
      */
     private static Callback debugMessengerCallback;
     /**
+     * synchronization objects for frames in flight
+     */
+    private static Frame[] inFlightFrames;
+    /**
      * format for all color images in the main swapchain
      */
     private static int chainImageFormat;
@@ -252,10 +256,6 @@ public abstract class BaseApplication {
      * width of the displayed frame buffer (in pixels)
      */
     private static int frameBufferWidth = 800;
-    /**
-     * synchronization objects for frames in flight
-     */
-    private static Frame[] inFlightFrames;
     /**
      * all uniform buffer objects
      */
