@@ -148,6 +148,7 @@ class BufferResource {
 
                 int index = 0;
                 this.data = pPointer.getByteBuffer(index, numBytes);
+                fill(data);
             }
         }
     }
