@@ -135,13 +135,13 @@ class SurfaceSummary {
      */
     VkSurfaceFormatKHR chooseSurfaceFormat() {
         int numFormats = formats.capacity();
-        int sRGBSpace = KHRSurface.VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
+        int srgbSpace = KHRSurface.VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
 
         // Choose a 32-bit sRGB format, if available:
         for (int i = 0; i < numFormats; ++i) {
             VkSurfaceFormatKHR format = formats.get(i);
             if (format.format() == VK10.VK_FORMAT_B8G8R8A8_SRGB
-                    && format.colorSpace() == sRGBSpace) {
+                    && format.colorSpace() == srgbSpace) {
                 return format;
             }
         }

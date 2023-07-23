@@ -117,11 +117,11 @@ class Texture {
              */
             for (int x = 0; x < width; ++x) {
                 for (int y = 0; y < height; ++y) {
-                    int sRGB = image.getRGB(x, y);
-                    int red = (sRGB >> 16) & 0xFF;
-                    int green = (sRGB >> 8) & 0xFF;
-                    int blue = sRGB & 0xFF;
-                    int alpha = (sRGB >> 24) & 0xFF;
+                    int argb = image.getRGB(x, y);
+                    int red = (argb >> 16) & 0xFF;
+                    int green = (argb >> 8) & 0xFF;
+                    int blue = argb & 0xFF;
+                    int alpha = (argb >> 24) & 0xFF;
                     data.put((byte) red)
                             .put((byte) green)
                             .put((byte) blue)
