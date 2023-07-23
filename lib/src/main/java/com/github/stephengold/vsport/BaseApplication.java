@@ -695,7 +695,7 @@ public abstract class BaseApplication {
      */
     static void createImage(int width, int height, int format,
             int tiling, int usage, int requiredProperties,
-            LongBuffer pTextureImage, LongBuffer pTextureMemory) {
+            LongBuffer pImage, LongBuffer pMemory) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             VkImageCreateInfo imageInfo = VkImageCreateInfo.calloc(stack);
             imageInfo.sType(VK10.VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO);
@@ -714,9 +714,9 @@ public abstract class BaseApplication {
             imageInfo.usage(usage);
 
             int retCode = VK10.vkCreateImage(
-                    logicalDevice, imageInfo, defaultAllocator, pTextureImage);
+                    logicalDevice, imageInfo, defaultAllocator, pImage);
             Utils.checkForError(retCode, "create image");
-            long imageHandle = pTextureImage.get(0);
+            long imageHandle = pImage.get(0);
 
             // Query the images's memory requirements:
             VkMemoryRequirements memRequirements
@@ -734,9 +734,9 @@ public abstract class BaseApplication {
             allocInfo.memoryTypeIndex(memoryTypeIndex);
 
             retCode = VK10.vkAllocateMemory(
-                    logicalDevice, allocInfo, defaultAllocator, pTextureMemory);
+                    logicalDevice, allocInfo, defaultAllocator, pMemory);
             Utils.checkForError(retCode, "allocate image memory");
-            long memoryHandle = pTextureMemory.get(0);
+            long memoryHandle = pMemory.get(0);
 
             // Bind the newly allocated memory to the image object:
             int offset = 0;
