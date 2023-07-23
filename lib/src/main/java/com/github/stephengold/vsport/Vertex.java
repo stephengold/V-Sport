@@ -71,17 +71,17 @@ class Vertex {
     /**
      * Instantiate a mesh vertex from attribute values.
      *
-     * @param pos the desired location of the vertex (in model coordinates, not
-     * null, alias created)
+     * @param position the desired location of the vertex (in model coordinates,
+     * not null, alias created)
      * @param color the desired color of the vertex (alias created if not null))
      * @param normal the desired normal direction at the vertex (alias created
      * if not null))
      * @param texCoords the desired texture coordinates of the vertex (alias
      * created if not null)
      */
-    Vertex(Vector3fc pos, Vector3fc color, Vector3fc normal,
+    Vertex(Vector3fc position, Vector3fc color, Vector3fc normal,
             Vector2fc texCoords) {
-        this.position = pos;
+        this.position = position;
         this.color = color;
         this.normal = normal;
         this.texCoords = texCoords;
