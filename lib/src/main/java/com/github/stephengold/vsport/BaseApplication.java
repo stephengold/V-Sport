@@ -2608,12 +2608,6 @@ public abstract class BaseApplication {
      * @param imageIndex index of the target image among the swap-chain images.
      */
     private static void updateUniformBuffer(int imageIndex) {
-        double time = GLFW.glfwGetTime(); // in seconds
-        double rate = Math.toRadians(90); // in radians per second
-        double angle = rate * time; // in radians
-
-        uniformValues.setZRotation((float) angle);
-
         ByteBuffer byteBuffer = ubos.get(imageIndex).getData();
         uniformValues.writeTo(byteBuffer);
     }
