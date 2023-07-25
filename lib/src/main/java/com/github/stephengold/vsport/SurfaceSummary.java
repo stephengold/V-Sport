@@ -30,6 +30,7 @@
 package com.github.stephengold.vsport;
 
 import java.nio.IntBuffer;
+import jme3utilities.math.MyMath;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.vulkan.KHRSurface;
 import org.lwjgl.vulkan.VK10;
@@ -168,9 +169,9 @@ class SurfaceSummary {
         VkExtent2D minExtent = capabilities.minImageExtent();
         VkExtent2D maxExtent = capabilities.maxImageExtent();
 
-        int clampedWidth = Utils.clamp(
+        int clampedWidth = MyMath.clamp(
                 frameBufferWidth, minExtent.width(), maxExtent.width());
-        int clampedHeight = Utils.clamp(
+        int clampedHeight = MyMath.clamp(
                 frameBufferHeight, minExtent.height(), maxExtent.height());
 
         VkExtent2D result = VkExtent2D.malloc(stack);

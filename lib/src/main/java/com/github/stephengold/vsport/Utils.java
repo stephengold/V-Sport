@@ -76,28 +76,6 @@ final class Utils {
     }
 
     /**
-     * Clamp an int value between 2 limits. TODO use MyMath
-     *
-     * @param input the input value to be clamped
-     * @param min the lower limit of the clamp
-     * @param max the upper limit of the clamp
-     * @return the value between {@code min} and {@code max} inclusive that is
-     * closest to {@code input}
-     */
-    public static int clamp(int input, int min, int max) {
-        int result;
-        if (input < min) {
-            result = min;
-        } else if (input > max) {
-            result = max;
-        } else {
-            result = input;
-        }
-
-        return result;
-    }
-
-    /**
      * Test whether the specified buffer format includes a stencil component.
      *
      * @param format the buffer format to test
