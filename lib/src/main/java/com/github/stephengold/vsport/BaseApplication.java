@@ -34,6 +34,7 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -156,7 +157,7 @@ public abstract class BaseApplication {
     /**
      * indices for the sample mesh
      */
-    final public static short[] sampleIndices = {
+    final public static Integer[] sampleIndices = {
         0, 1, 2, 2, 3, 0, 4, 5, 6, 6, 7, 4
     };
     /**
@@ -169,35 +170,35 @@ public abstract class BaseApplication {
     final private static Vertex[] sampleVertices = {
         new Vertex(
         new Vector3f(-0.5f, -0.5f, 0f),
-        new Vector3f(1f, 0f, 0f), null,
+        null, null,
         new Vector2f(0f, 0f)),
         new Vertex(
         new Vector3f(0.5f, -0.5f, 0f),
-        new Vector3f(0f, 1f, 0f), null,
+        null, null,
         new Vector2f(1f, 0f)),
         new Vertex(
         new Vector3f(0.5f, 0.5f, 0f),
-        new Vector3f(0f, 0f, 1f), null,
+        null, null,
         new Vector2f(1f, 1f)),
         new Vertex(
         new Vector3f(-0.5f, 0.5f, 0f),
-        new Vector3f(1f, 1f, 1f), null,
+        null, null,
         new Vector2f(0f, 1f)),
         new Vertex(
         new Vector3f(-0.5f, -0.5f, -0.5f),
-        new Vector3f(1f, 0f, 0f), null,
+        null, null,
         new Vector2f(0f, 0f)),
         new Vertex(
         new Vector3f(0.5f, -0.5f, -0.5f),
-        new Vector3f(0f, 1f, 0f), null,
+        null, null,
         new Vector2f(1f, 0f)),
         new Vertex(
         new Vector3f(0.5f, 0.5f, -0.5f),
-        new Vector3f(0f, 0f, 1f), null,
+        null, null,
         new Vector2f(1f, 1f)),
         new Vertex(
         new Vector3f(-0.5f, 0.5f, -0.5f),
-        new Vector3f(1f, 1f, 1f), null,
+        null, null,
         new Vector2f(0f, 1f))
     };
     /**
@@ -211,18 +212,6 @@ public abstract class BaseApplication {
      * true if the frame buffer needs to be resized
      */
     private static boolean needsResize = false;
-    /**
-     * index buffer
-     */
-    private static BufferResource indexBuffer;
-    /**
-     * vertex position buffer
-     */
-    private static BufferResource positionBuffer;
-    /**
-     * vertex texCoords buffer
-     */
-    private static BufferResource texCoordsBuffer;
     /**
      * print Vulkan debugging information (typically to the console) or null if
      * not created
@@ -333,6 +322,10 @@ public abstract class BaseApplication {
      * map indices to frames
      */
     private static Map<Integer, Frame> framesInFlight;
+    /**
+     * mesh of triangles to be rendered
+     */
+    private static Mesh sampleMesh;
     /**
      * physical device to display the main window
      */
@@ -504,8 +497,9 @@ public abstract class BaseApplication {
             descriptorSetLayoutHandle = VK10.VK_NULL_HANDLE;
         }
 
-        destroyVertexBuffers();
-        destroyIndexBuffers();
+        if (sampleMesh != null) {
+            sampleMesh.destroy();
+        }
 
         // Destroy the texture sampler:
         if (samplerHandle != VK10.VK_NULL_HANDLE) {
@@ -1439,26 +1433,6 @@ public abstract class BaseApplication {
     }
 
     /**
-     * Create an index buffer from an array of indices.
-     *
-     * @param indices the desired indices (not null)
-     */
-    private static void createIndexBuffer(short[] indices) {
-        int numIndices = indices.length;
-        int numBytes = numIndices * Short.BYTES;
-        boolean staging = true;
-        indexBuffer = new BufferResource(
-                numBytes, VK10.VK_BUFFER_USAGE_INDEX_BUFFER_BIT, staging) {
-            @Override
-            void fill(ByteBuffer destinationBuffer) {
-                for (short vIndex : indices) {
-                    destinationBuffer.putShort(vIndex);
-                }
-            }
-        };
-    }
-
-    /**
      * Create a logical device in the application's main window.
      */
     private static void createLogicalDevice() {
@@ -1635,11 +1609,11 @@ public abstract class BaseApplication {
                     VK10.VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO);
 
             VkVertexInputBindingDescription.Buffer pBindingDesc
-                    = Vertex.createBindingDescription(stack);
+                    = sampleMesh.generateBindingDescription(stack);
             visCreateInfo.pVertexBindingDescriptions(pBindingDesc);
 
             VkVertexInputAttributeDescription.Buffer pAttributeDesc
-                    = Vertex.createAttributeDescriptions(stack);
+                    = sampleMesh.generateAttributeDescriptions(stack);
             visCreateInfo.pVertexAttributeDescriptions(pAttributeDesc);
 
             // input-assembly state:
@@ -1902,35 +1876,6 @@ public abstract class BaseApplication {
     }
 
     /**
-     * Create 3 vertex buffers for the sample mesh.
-     */
-    private static void createVertexBuffer() {
-        int numVertices = sampleVertices.length;
-        int usage = VK10.VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-        boolean staging = true;
-
-        int numBytes = numVertices * 3 * Float.BYTES;
-        positionBuffer = new BufferResource(numBytes, usage, staging) {
-            @Override
-            void fill(ByteBuffer destinationBuffer) {
-                for (Vertex vertex : sampleVertices) {
-                    vertex.writePositionTo(destinationBuffer);
-                }
-            }
-        };
-
-        numBytes = numVertices * 2 * Float.BYTES;
-        texCoordsBuffer = new BufferResource(numBytes, usage, staging) {
-            @Override
-            void fill(ByteBuffer destinationBuffer) {
-                for (Vertex vertex : sampleVertices) {
-                    vertex.writeTexCoordsTo(destinationBuffer);
-                }
-            }
-        };
-    }
-
-    /**
      * Create a Vulkan instance to provide the application with access to the
      * Vulkan API.
      *
@@ -2100,15 +2045,6 @@ public abstract class BaseApplication {
     }
 
     /**
-     * Destroy all index buffers.
-     */
-    private static void destroyIndexBuffers() {
-        if (indexBuffer != null) {
-            indexBuffer.destroy();
-        }
-    }
-
-    /**
      * Destroy the graphics pipeline for the main window.
      */
     private static void destroyPipeline() {
@@ -2122,18 +2058,6 @@ public abstract class BaseApplication {
             VK10.vkDestroyPipelineLayout(
                     logicalDevice, pipelineLayoutHandle, defaultAllocator);
             pipelineLayoutHandle = VK10.VK_NULL_HANDLE;
-        }
-    }
-
-    /**
-     * Destroy all vertex buffers.
-     */
-    private static void destroyVertexBuffers() {
-        if (texCoordsBuffer != null) {
-            texCoordsBuffer.destroy();
-        }
-        if (positionBuffer != null) {
-            positionBuffer.destroy();
         }
     }
 
@@ -2238,8 +2162,11 @@ public abstract class BaseApplication {
         selectPhysicalDevice();
         createLogicalDevice();
         createCommandPool();
-        createIndexBuffer(sampleIndices);
-        createVertexBuffer();
+
+        List<Integer> indices = Arrays.asList(sampleIndices);
+        List<Vertex> vertices = Arrays.asList(sampleVertices);
+        sampleMesh = new Mesh(indices, vertices);
+
         sampleTexture = new Texture("/Textures/texture.jpg");
         createTextureSampler();
         createDescriptorSetLayout();
@@ -2373,18 +2300,21 @@ public abstract class BaseApplication {
 
                 // command to bind the vertex buffers:
                 int firstBinding = 0;
-                LongBuffer pBufferHandles = stack.longs(
-                        positionBuffer.handle(),
-                        texCoordsBuffer.handle()
-                );
-                LongBuffer pOffsets = stack.longs(0L, 0L);
+                int numAttributes = sampleMesh.countAttributes();
+                LongBuffer pBufferHandles
+                        = sampleMesh.generateBufferHandles(stack);
+                LongBuffer pOffsets = stack.callocLong(numAttributes);
                 VK10.vkCmdBindVertexBuffers(
                         commandBuffer, firstBinding, pBufferHandles, pOffsets);
 
-                // command to bind the index buffer:
-                int startOffset = 0;
-                VK10.vkCmdBindIndexBuffer(commandBuffer, indexBuffer.handle(),
-                        startOffset, VK10.VK_INDEX_TYPE_UINT16);
+                if (sampleMesh.isIndexed()) {
+                    // command to bind the index buffer:
+                    IndexBuffer indexBuffer = sampleMesh.getIndexBuffer();
+                    int startOffset = 0;
+                    VK10.vkCmdBindIndexBuffer(
+                            commandBuffer, indexBuffer.handle(), startOffset,
+                            indexBuffer.elementType());
+                }
 
                 // command to bind the uniforms:
                 long descriptorSet = descriptorSetHandles.get(imageIndex);
@@ -2394,13 +2324,21 @@ public abstract class BaseApplication {
                         pipelineLayoutHandle, 0, pDescriptorSets, null);
 
                 // draw command:
-                int indexCount = sampleIndices.length;
-                int instanceCount = 1;
-                int firstIndex = 0;
                 int firstVertex = 0;
                 int firstInstance = 0;
-                VK10.vkCmdDrawIndexed(commandBuffer, indexCount, instanceCount,
-                        firstIndex, firstVertex, firstInstance);
+                int instanceCount = 1;
+                if (sampleMesh.isIndexed()) { // indexed draw:
+                    int numIndices = sampleMesh.countIndexedVertices();
+                    int firstIndex = 0;
+                    VK10.vkCmdDrawIndexed(
+                            commandBuffer, numIndices, instanceCount,
+                            firstIndex, firstVertex, firstInstance);
+
+                } else { // non-indexed draw:
+                    int numVertices = sampleMesh.countIndexedVertices();
+                    VK10.vkCmdDraw(commandBuffer, numVertices, instanceCount,
+                            firstVertex, firstInstance);
+                }
 
                 // command to end the render pass:
                 VK10.vkCmdEndRenderPass(commandBuffer);
