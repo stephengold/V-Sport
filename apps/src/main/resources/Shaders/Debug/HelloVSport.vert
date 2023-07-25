@@ -4,10 +4,8 @@
 #version 450
 
 layout(location = 0) in vec3 inPosition;  // locations from vertex buffer
-//layout(location = 1) in vec3 inColor;     // colors from vertex buffer
-layout(location = 2) in vec2 inTexCoords; // texture coords from vertex buffer
+layout(location = 1) in vec2 inTexCoords; // texture coords from vertex buffer
 
-//layout(location = 0) out vec3 vertexColor;  // colors to the frag shader
 layout(location = 1) out vec2 texCoords;    // texture coords to the frag shader
 
 layout(binding = 0) uniform UniformBufferObject {

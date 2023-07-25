@@ -101,7 +101,7 @@ class Vertex {
     static VkVertexInputAttributeDescription.Buffer
             createAttributeDescriptions(MemoryStack stack) {
         VkVertexInputAttributeDescription.Buffer result
-                = VkVertexInputAttributeDescription.calloc(3, stack);
+                = VkVertexInputAttributeDescription.calloc(2, stack);
 
         // position attribute (3 signed floats in slot 0)
         VkVertexInputAttributeDescription posDescription = result.get(0);
@@ -110,18 +110,11 @@ class Vertex {
         posDescription.location(0); // slot 0 (see the vertex shader)
         posDescription.offset(0); // start offset in bytes
 
-        // color attribute (3 signed floats in slot 1)
-        VkVertexInputAttributeDescription colorDescription = result.get(1);
-        colorDescription.binding(1);
-        colorDescription.format(VK10.VK_FORMAT_R32G32B32_SFLOAT);
-        colorDescription.location(1); // slot 1 (see the vertex shader)
-        colorDescription.offset(0); // start offset in bytes
-
-        // texCoords attribute (2 signed floats in slot 2)
-        VkVertexInputAttributeDescription texCoordsDescription = result.get(2);
-        texCoordsDescription.binding(2);
+        // texCoords attribute (2 signed floats in slot 1)
+        VkVertexInputAttributeDescription texCoordsDescription = result.get(1);
+        texCoordsDescription.binding(1);
         texCoordsDescription.format(VK10.VK_FORMAT_R32G32_SFLOAT);
-        texCoordsDescription.location(2); // slot 2 (see the vertex shader)
+        texCoordsDescription.location(1); // slot 1 (see the vertex shader)
         texCoordsDescription.offset(0); // start offset in bytes
 
         return result;
@@ -136,7 +129,7 @@ class Vertex {
     static VkVertexInputBindingDescription.Buffer
             createBindingDescription(MemoryStack stack) {
         VkVertexInputBindingDescription.Buffer result
-                = VkVertexInputBindingDescription.calloc(3, stack);
+                = VkVertexInputBindingDescription.calloc(2, stack);
 
         // Describe the first slot:
         VkVertexInputBindingDescription pos = result.get(0);
@@ -145,14 +138,8 @@ class Vertex {
         pos.stride(3 * Float.BYTES);
 
         // Describe the 2nd slot:
-        VkVertexInputBindingDescription color = result.get(1);
-        color.binding(1);
-        color.inputRate(VK10.VK_VERTEX_INPUT_RATE_VERTEX);
-        color.stride(3 * Float.BYTES);
-
-        // Describe the 3rd slot:
-        VkVertexInputBindingDescription texCoords = result.get(2);
-        texCoords.binding(2);
+        VkVertexInputBindingDescription texCoords = result.get(1);
+        texCoords.binding(1);
         texCoords.inputRate(VK10.VK_VERTEX_INPUT_RATE_VERTEX);
         texCoords.stride(2 * Float.BYTES);
 

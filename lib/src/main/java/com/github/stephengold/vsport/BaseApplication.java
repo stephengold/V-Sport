@@ -212,10 +212,6 @@ public abstract class BaseApplication {
      */
     private static boolean needsResize = false;
     /**
-     * vertex color buffer
-     */
-    private static BufferResource colorBuffer;
-    /**
      * index buffer
      */
     private static BufferResource indexBuffer;
@@ -1923,16 +1919,6 @@ public abstract class BaseApplication {
             }
         };
 
-        numBytes = numVertices * 3 * Float.BYTES;
-        colorBuffer = new BufferResource(numBytes, usage, staging) {
-            @Override
-            void fill(ByteBuffer destinationBuffer) {
-                for (Vertex vertex : sampleVertices) {
-                    vertex.writeColorTo(destinationBuffer);
-                }
-            }
-        };
-
         numBytes = numVertices * 2 * Float.BYTES;
         texCoordsBuffer = new BufferResource(numBytes, usage, staging) {
             @Override
@@ -2145,9 +2131,6 @@ public abstract class BaseApplication {
     private static void destroyVertexBuffers() {
         if (texCoordsBuffer != null) {
             texCoordsBuffer.destroy();
-        }
-        if (colorBuffer != null) {
-            colorBuffer.destroy();
         }
         if (positionBuffer != null) {
             positionBuffer.destroy();
@@ -2392,10 +2375,9 @@ public abstract class BaseApplication {
                 int firstBinding = 0;
                 LongBuffer pBufferHandles = stack.longs(
                         positionBuffer.handle(),
-                        colorBuffer.handle(),
                         texCoordsBuffer.handle()
                 );
-                LongBuffer pOffsets = stack.longs(0L, 0L, 0L);
+                LongBuffer pOffsets = stack.longs(0L, 0L);
                 VK10.vkCmdBindVertexBuffers(
                         commandBuffer, firstBinding, pBufferHandles, pOffsets);
 
