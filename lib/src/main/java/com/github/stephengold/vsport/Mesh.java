@@ -151,8 +151,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
         boolean hasTexCoords = representativeVertex.hasTexCoords();
         if (hasTexCoords) {
             numBytes = vertexCount * 2 * Float.BYTES;
-            this.texCoordsBuffer
-                    = new BufferResource(numBytes, usage, staging) {
+            this.texCoordsBuffer = new BufferResource(numBytes, usage, staging) {
                 @Override
                 void fill(ByteBuffer destinationBuffer) {
                     for (Vertex vertex : vertices) {
