@@ -33,10 +33,6 @@ import java.nio.ByteBuffer;
 import jme3utilities.Validate;
 import org.joml.Vector2fc;
 import org.joml.Vector3fc;
-import org.lwjgl.system.MemoryStack;
-import org.lwjgl.vulkan.VK10;
-import org.lwjgl.vulkan.VkVertexInputAttributeDescription;
-import org.lwjgl.vulkan.VkVertexInputBindingDescription;
 
 /**
  * The attributes of a single vertex in a mesh.
@@ -91,60 +87,6 @@ class Vertex {
     }
     // *************************************************************************
     // new methods exposed
-
-    /**
-     * Generate an attribute-description buffer.
-     *
-     * @param stack for memory allocation (not null)
-     * @return a new temporary buffer
-     */
-    static VkVertexInputAttributeDescription.Buffer
-            createAttributeDescriptions(MemoryStack stack) {
-        VkVertexInputAttributeDescription.Buffer result
-                = VkVertexInputAttributeDescription.calloc(2, stack);
-
-        // position attribute (3 signed floats in slot 0)
-        VkVertexInputAttributeDescription posDescription = result.get(0);
-        posDescription.binding(0);
-        posDescription.format(VK10.VK_FORMAT_R32G32B32_SFLOAT);
-        posDescription.location(0); // slot 0 (see the vertex shader)
-        posDescription.offset(0); // start offset in bytes
-
-        // texCoords attribute (2 signed floats in slot 1)
-        VkVertexInputAttributeDescription texCoordsDescription = result.get(1);
-        texCoordsDescription.binding(1);
-        texCoordsDescription.format(VK10.VK_FORMAT_R32G32_SFLOAT);
-        texCoordsDescription.location(1); // slot 1 (see the vertex shader)
-        texCoordsDescription.offset(0); // start offset in bytes
-
-        return result;
-    }
-
-    /**
-     * Generate a binding-description buffer.
-     *
-     * @param stack for memory allocation (not null)
-     * @return a new temporary buffer
-     */
-    static VkVertexInputBindingDescription.Buffer
-            createBindingDescription(MemoryStack stack) {
-        VkVertexInputBindingDescription.Buffer result
-                = VkVertexInputBindingDescription.calloc(2, stack);
-
-        // Describe the first slot:
-        VkVertexInputBindingDescription pos = result.get(0);
-        pos.binding(0);
-        pos.inputRate(VK10.VK_VERTEX_INPUT_RATE_VERTEX);
-        pos.stride(3 * Float.BYTES);
-
-        // Describe the 2nd slot:
-        VkVertexInputBindingDescription texCoords = result.get(1);
-        texCoords.binding(1);
-        texCoords.inputRate(VK10.VK_VERTEX_INPUT_RATE_VERTEX);
-        texCoords.stride(2 * Float.BYTES);
-
-        return result;
-    }
 
     /**
      * Text whether the color attribute is present.
