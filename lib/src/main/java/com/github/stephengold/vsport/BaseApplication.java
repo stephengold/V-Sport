@@ -34,7 +34,6 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -42,9 +41,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import org.joml.Vector2f;
-import org.joml.Vector3f;
 import org.lwjgl.PointerBuffer;
+import org.lwjgl.assimp.Assimp;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWFramebufferSizeCallback;
@@ -155,52 +153,9 @@ public abstract class BaseApplication {
      */
     final public static long noTimeout = 0xFFFFFFFFFFFFFFFFL;
     /**
-     * indices for the sample mesh
-     */
-    final public static Integer[] sampleIndices = {
-        0, 1, 2, 2, 3, 0, 4, 5, 6, 6, 7, 4
-    };
-    /**
      * name of the graphics engine
      */
     final private static String engineName = "V-Sport";
-    /**
-     * vertex data for the sample mesh
-     */
-    final private static Vertex[] sampleVertices = {
-        new Vertex(
-        new Vector3f(-0.5f, -0.5f, 0f),
-        null, null,
-        new Vector2f(0f, 0f)),
-        new Vertex(
-        new Vector3f(0.5f, -0.5f, 0f),
-        null, null,
-        new Vector2f(1f, 0f)),
-        new Vertex(
-        new Vector3f(0.5f, 0.5f, 0f),
-        null, null,
-        new Vector2f(1f, 1f)),
-        new Vertex(
-        new Vector3f(-0.5f, 0.5f, 0f),
-        null, null,
-        new Vector2f(0f, 1f)),
-        new Vertex(
-        new Vector3f(-0.5f, -0.5f, -0.5f),
-        null, null,
-        new Vector2f(0f, 0f)),
-        new Vertex(
-        new Vector3f(0.5f, -0.5f, -0.5f),
-        null, null,
-        new Vector2f(1f, 0f)),
-        new Vertex(
-        new Vector3f(0.5f, 0.5f, -0.5f),
-        null, null,
-        new Vector2f(1f, 1f)),
-        new Vertex(
-        new Vector3f(-0.5f, 0.5f, -0.5f),
-        null, null,
-        new Vector2f(0f, 1f))
-    };
     /**
      * use the default allocator for direct buffers
      */
@@ -2163,11 +2118,14 @@ public abstract class BaseApplication {
         createLogicalDevice();
         createCommandPool();
 
-        List<Integer> indices = Arrays.asList(sampleIndices);
-        List<Vertex> vertices = Arrays.asList(sampleVertices);
+        String resourceName = "/Models/viking_room/viking_room.obj";
+        int flags = Assimp.aiProcess_DropNormals | Assimp.aiProcess_FlipUVs;
+        List<Integer> indices = new ArrayList<>();
+        List<Vertex> vertices = new ArrayList<>();
+        AssimpUtils.extractTriangles(resourceName, flags, indices, vertices);
         sampleMesh = new Mesh(indices, vertices);
 
-        sampleTexture = new Texture("/Textures/texture.jpg");
+        sampleTexture = new Texture("/Models/viking_room/viking_room.png");
         createTextureSampler();
         createDescriptorSetLayout();
 
