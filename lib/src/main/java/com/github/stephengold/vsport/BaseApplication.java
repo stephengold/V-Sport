@@ -242,6 +242,10 @@ public abstract class BaseApplication {
      */
     private static long descriptorSetLayoutHandle = VK10.VK_NULL_HANDLE;
     /**
+     * handle of the VkShaderModule for the fragment shader
+     */
+    private static long fragModuleHandle = VK10.VK_NULL_HANDLE;
+    /**
      * handle of the graphics pipeline
      */
     private static long pipelineHandle = VK10.VK_NULL_HANDLE;
@@ -261,6 +265,10 @@ public abstract class BaseApplication {
      * handle of the surface for the main window
      */
     private static long surfaceHandle = VK10.VK_NULL_HANDLE;
+    /**
+     * handle of the VkShaderModule for the vertex shader
+     */
+    private static long vertModuleHandle = VK10.VK_NULL_HANDLE;
     /**
      * GLFW handle of the window used to render geometries
      */
@@ -436,6 +444,18 @@ public abstract class BaseApplication {
          * starting with the swapchain resources:
          */
         destroyChainResources();
+
+        // Destroy the shader modules:
+        if (vertModuleHandle != VK10.VK_NULL_HANDLE) {
+            VK10.vkDestroyShaderModule(
+                    logicalDevice, vertModuleHandle, defaultAllocator);
+            vertModuleHandle = VK10.VK_NULL_HANDLE;
+        }
+        if (fragModuleHandle != VK10.VK_NULL_HANDLE) {
+            VK10.vkDestroyShaderModule(
+                    logicalDevice, fragModuleHandle, defaultAllocator);
+            fragModuleHandle = VK10.VK_NULL_HANDLE;
+        }
 
         // Destroy the descriptor-set layout that's used to configure pipelines:
         if (descriptorSetLayoutHandle != VK10.VK_NULL_HANDLE) {
@@ -2097,6 +2117,19 @@ public abstract class BaseApplication {
         sampleTexture = new Texture("/Models/viking_room/viking_room.png");
         createTextureSampler(); // depends on the logical device
         createDescriptorSetLayout(); // depends on the logical device
+
+        // Compile both GLSL shaders into SPIR-V using the Shaderc library:
+        long fragSpirvHandle = SpirvUtils.compileShaderFromClasspath(
+                "/Shaders/Debug/HelloVSport.frag",
+                Shaderc.shaderc_glsl_fragment_shader);
+        ByteBuffer byteCode = Shaderc.shaderc_result_get_bytes(fragSpirvHandle);
+        fragModuleHandle = BaseApplication.createShaderModule(byteCode);
+
+        long vertSpirvHandle = SpirvUtils.compileShaderFromClasspath(
+                "/Shaders/Debug/HelloVSport.vert",
+                Shaderc.shaderc_glsl_vertex_shader);
+        byteCode = Shaderc.shaderc_result_get_bytes(vertSpirvHandle);
+        vertModuleHandle = BaseApplication.createShaderModule(byteCode);
 
         createChainResources();
     }
