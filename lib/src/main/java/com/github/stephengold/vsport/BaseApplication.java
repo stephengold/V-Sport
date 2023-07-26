@@ -254,7 +254,7 @@ public abstract class BaseApplication {
      */
     private static long pipelineHandle = VK10.VK_NULL_HANDLE;
     /**
-     * handle of the graphics-pipeline layour
+     * handle of the graphics-pipeline layout
      */
     private static long pipelineLayoutHandle = VK10.VK_NULL_HANDLE;
     /**
@@ -696,7 +696,7 @@ public abstract class BaseApplication {
      * @param imageHandle the handle of the image
      * @param format the desired format for the view
      * @param aspectMask a bitmask of VK_IMAGE_ASPECT_... values
-     * @return the handle of the new image view
+     * @return the handle of the new VkImageView
      */
     static long createImageView(long imageHandle, int format, int aspectMask) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
@@ -2126,8 +2126,8 @@ public abstract class BaseApplication {
         sampleMesh = new Mesh(indices, vertices);
 
         sampleTexture = new Texture("/Models/viking_room/viking_room.png");
-        createTextureSampler();
-        createDescriptorSetLayout();
+        createTextureSampler(); // depends on the logical device
+        createDescriptorSetLayout(); // depends on the logical device
 
         createChainResources();
     }

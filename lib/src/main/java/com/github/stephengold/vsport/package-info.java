@@ -28,6 +28,6 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 /**
- * Core functionality of the V-SPORT graphics engine.
+ * Core functionality of the V-Sport graphics engine.
  */
 package com.github.stephengold.vsport;

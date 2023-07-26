@@ -40,7 +40,7 @@ import org.lwjgl.vulkan.VkSurfaceCapabilitiesKHR;
 import org.lwjgl.vulkan.VkSurfaceFormatKHR;
 
 /**
- * Summarize the swap-chain features of a physical device.
+ * Summarize the features of a particular VkSurfaceKHR.
  *
  * @author Stephen Gold sgold@sonic.net
  *
@@ -76,6 +76,7 @@ class SurfaceSummary {
      */
     SurfaceSummary(VkPhysicalDevice physicalDevice, long surfaceHandle,
             MemoryStack stack) {
+        // Obtain the capabilities of the VkSurfaceKHR:
         this.capabilities = VkSurfaceCapabilitiesKHR.malloc(stack);
         KHRSurface.vkGetPhysicalDeviceSurfaceCapabilitiesKHR(
                 physicalDevice, surfaceHandle, capabilities);
@@ -87,6 +88,7 @@ class SurfaceSummary {
         Utils.checkForError(retCode, "count surface formats");
         int numFormats = storeInt.get(0);
 
+        // Enumerate the available surface formats:
         this.formats = VkSurfaceFormatKHR.malloc(numFormats, stack);
         if (numFormats > 0) {
             KHRSurface.vkGetPhysicalDeviceSurfaceFormatsKHR(
@@ -99,6 +101,7 @@ class SurfaceSummary {
         Utils.checkForError(retCode, "count presentation modes");
         int numModes = storeInt.get(0);
 
+        // Enumerate the available surface-presentation modes:
         this.presentationModes = stack.mallocInt(numModes);
         if (numModes > 0) {
             retCode = KHRSurface.vkGetPhysicalDeviceSurfacePresentModesKHR(
@@ -155,8 +158,8 @@ class SurfaceSummary {
     /**
      * Choose an extent for the swap chain of the main window.
      *
-     * @param frameBufferWidth the width of the frame buffer
-     * @param frameBufferHeight the height of the frame buffer
+     * @param frameBufferWidth the desired width of the frame buffer
+     * @param frameBufferHeight the desired height of the frame buffer
      * @param stack for memory allocation (not null)
      * @return a new instance (may be temporary)
      */
@@ -192,21 +195,41 @@ class SurfaceSummary {
         return result;
     }
 
+    /**
+     * Test whether the surface has one or more surface formats available.
+     *
+     * @return true if formats are available, otherwise false
+     */
     boolean hasFormat() {
         boolean result = formats.hasRemaining();
         return result;
     }
 
+    /**
+     * Test whether the surface has one or more presentation modes available.
+     *
+     * @return true if modes are available, otherwise false
+     */
     boolean hasPresentationMode() {
         boolean result = presentationModes.hasRemaining();
         return result;
     }
 
+    /**
+     * Return the maximum number of swapchain images supported.
+     *
+     * @return the count (&gt;1), or zero for no limit
+     */
     int maxImageCount() {
         int result = capabilities.maxImageCount();
         return result;
     }
 
+    /**
+     * Return the minimum number of swapchain images supported.
+     *
+     * @return the count (&ge;1)
+     */
     int minImageCount() {
         int result = capabilities.minImageCount();
         return result;

@@ -36,7 +36,7 @@ import java.util.List;
 import org.lwjgl.vulkan.VK10;
 
 /**
- * Wrapper class for the index buffer of a V-SPORT mesh, including its
+ * Wrapper class for the index buffer of a V-Sport mesh, including its
  * BufferResource.
  *
  * @author Stephen Gold sgold@sonic.net
