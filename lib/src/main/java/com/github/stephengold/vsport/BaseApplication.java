@@ -51,7 +51,6 @@ import org.lwjgl.system.Callback;
 import org.lwjgl.system.Configuration;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
-import org.lwjgl.util.shaderc.Shaderc;
 import org.lwjgl.vulkan.EXTDebugUtils;
 import org.lwjgl.vulkan.KHRSurface;
 import org.lwjgl.vulkan.KHRSwapchain;
@@ -93,7 +92,6 @@ import org.lwjgl.vulkan.VkQueue;
 import org.lwjgl.vulkan.VkRect2D;
 import org.lwjgl.vulkan.VkRenderPassBeginInfo;
 import org.lwjgl.vulkan.VkSamplerCreateInfo;
-import org.lwjgl.vulkan.VkShaderModuleCreateInfo;
 import org.lwjgl.vulkan.VkSubmitInfo;
 
 /**
@@ -182,10 +180,6 @@ public abstract class BaseApplication {
      */
     private static long descriptorSetLayoutHandle = VK10.VK_NULL_HANDLE;
     /**
-     * handle of the VkShaderModule for the fragment shader
-     */
-    private static long fragModuleHandle = VK10.VK_NULL_HANDLE;
-    /**
      * handle of the graphics-pipeline layout
      */
     private static long pipelineLayoutHandle = VK10.VK_NULL_HANDLE;
@@ -197,10 +191,6 @@ public abstract class BaseApplication {
      * handle of the surface for the main window
      */
     private static long surfaceHandle = VK10.VK_NULL_HANDLE;
-    /**
-     * handle of the VkShaderModule for the vertex shader
-     */
-    private static long vertModuleHandle = VK10.VK_NULL_HANDLE;
     /**
      * GLFW handle of the window used to render geometries
      */
@@ -225,6 +215,10 @@ public abstract class BaseApplication {
      * names of validation layers to enable during initialization
      */
     final private static Set<String> requiredLayers = new HashSet<>();
+    /**
+     * shader modules for rendering
+     */
+    private static ShaderProgram shaderProgram;
     /**
      * sample texture for texture mapping
      */
@@ -371,18 +365,7 @@ public abstract class BaseApplication {
          * starting with the chain resources:
          */
         destroyChainResources();
-
-        // Destroy the shader modules:
-        if (vertModuleHandle != VK10.VK_NULL_HANDLE) {
-            VK10.vkDestroyShaderModule(
-                    logicalDevice, vertModuleHandle, defaultAllocator);
-            vertModuleHandle = VK10.VK_NULL_HANDLE;
-        }
-        if (fragModuleHandle != VK10.VK_NULL_HANDLE) {
-            VK10.vkDestroyShaderModule(
-                    logicalDevice, fragModuleHandle, defaultAllocator);
-            fragModuleHandle = VK10.VK_NULL_HANDLE;
-        }
+        shaderProgram.destroy();
 
         // Destroy the pipeline layout:
         if (pipelineLayoutHandle != VK10.VK_NULL_HANDLE) {
@@ -946,7 +929,7 @@ public abstract class BaseApplication {
                     physicalDevice, frameBufferWidth, frameBufferHeight,
                     depthBufferFormat, samplerHandle,
                     pipelineLayoutHandle, sampleMesh,
-                    fragModuleHandle, vertModuleHandle, sampleTexture);
+                    shaderProgram, sampleTexture);
             frameBufferHeight = chainResources.framebufferHeight();
             frameBufferWidth = chainResources.framebufferWidth();
         }
@@ -1099,29 +1082,6 @@ public abstract class BaseApplication {
             int retCode = VK10.vkCreatePipelineLayout(
                     logicalDevice, plCreateInfo, defaultAllocator, pHandle);
             Utils.checkForError(retCode, "create pipeline layout");
-            long result = pHandle.get(0);
-
-            return result;
-        }
-    }
-
-    /**
-     * Create a shader module from the specified SPIR-V bytecodes.
-     *
-     * @param spirvCode the bytecodes to use
-     * @return the handle of the new module
-     */
-    private static long createShaderModule(ByteBuffer spirvCode) {
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            VkShaderModuleCreateInfo createInfo
-                    = VkShaderModuleCreateInfo.calloc(stack);
-            createInfo.sType(VK10.VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO);
-            createInfo.pCode(spirvCode);
-
-            LongBuffer pHandle = stack.mallocLong(1);
-            int retCode = VK10.vkCreateShaderModule(
-                    logicalDevice, createInfo, defaultAllocator, pHandle);
-            Utils.checkForError(retCode, "create shader module");
             long result = pHandle.get(0);
 
             return result;
@@ -1411,18 +1371,7 @@ public abstract class BaseApplication {
         createDescriptorSetLayout(); // depends on the logical device
         pipelineLayoutHandle = createPipelineLayout();
 
-        // Compile both GLSL shaders into SPIR-V using the Shaderc library:
-        long fragSpirvHandle = SpirvUtils.compileShaderFromClasspath(
-                "/Shaders/Debug/HelloVSport.frag",
-                Shaderc.shaderc_glsl_fragment_shader);
-        ByteBuffer byteCode = Shaderc.shaderc_result_get_bytes(fragSpirvHandle);
-        fragModuleHandle = BaseApplication.createShaderModule(byteCode);
-
-        long vertSpirvHandle = SpirvUtils.compileShaderFromClasspath(
-                "/Shaders/Debug/HelloVSport.vert",
-                Shaderc.shaderc_glsl_vertex_shader);
-        byteCode = Shaderc.shaderc_result_get_bytes(vertSpirvHandle);
-        vertModuleHandle = BaseApplication.createShaderModule(byteCode);
+        shaderProgram = new ShaderProgram("Debug/HelloVSport");
 
         createChainResources();
     }

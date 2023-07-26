@@ -151,15 +151,13 @@ class ChainResources {
      * @param samplerHandle the handle of the VkSampler for textures
      * @param pipelineLayoutHandle the handle of the graphics-pipeline layout
      * @param mesh the mesh to render (not null)
-     * @param fragModuleHandle the handle of the frag VkShaderModule
-     * @param vertModuleHandle the handle of the vert VkShaderModule
+     * @param shaderProgram the shader program to use (not null)
      * @param texture the texture to be used in rendering (not null)
      */
     ChainResources(SurfaceSummary surface, long descriptorSetLayoutHandle,
             PhysicalDevice physicalDevice, int desiredWidth, int desiredHeight,
             int depthFormat, long samplerHandle, long pipelineLayoutHandle,
-            Mesh mesh, long fragModuleHandle, long vertModuleHandle,
-            Texture texture) {
+            Mesh mesh, ShaderProgram shaderProgram, Texture texture) {
         this.numImages = chooseNumImages(surface);
         addUbos(numImages, ubos);
 
@@ -192,9 +190,8 @@ class ChainResources {
         this.framebufferHandles = createFramebuffers(
                 viewHandles, depthViewHandle, passHandle, framebufferExtent);
 
-        this.pipelineHandle = createPipeline(
-                pipelineLayoutHandle, framebufferExtent, passHandle,
-                mesh, fragModuleHandle, vertModuleHandle);
+        this.pipelineHandle = createPipeline(pipelineLayoutHandle,
+                framebufferExtent, passHandle, mesh, shaderProgram);
 
         updateDescriptorSets(
                 texture, samplerHandle, ubos, descriptorSetHandles);
@@ -707,13 +704,12 @@ class ChainResources {
      * @param framebufferExtent the framebuffer dimensions (not null)
      * @param passHandle the handle of the VkRenderPass to use
      * @param mesh the mesh to be rendered (not null)
-     * @param fragModuleHandle the handle of the frag VkShaderModule
-     * @param vertModuleHandle the handle of the vert VkShaderModule
+     * @param shaderProgram the shader program to use (not null)
      * @return the handle of the new VkPipeline
      */
     private static long createPipeline(long pipelineLayoutHandle,
             VkExtent2D framebufferExtent, long passHandle, Mesh mesh,
-            long fragModuleHandle, long vertModuleHandle) {
+            ShaderProgram shaderProgram) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             // color-blend attachment state - per attached frame buffer:
             VkPipelineColorBlendAttachmentState.Buffer cbaState
@@ -810,6 +806,7 @@ class ChainResources {
 
             ByteBuffer entryPoint = stack.UTF8("main");
 
+            long vertModuleHandle = shaderProgram.vertModuleHandle();
             vertCreateInfo.module(vertModuleHandle);
             vertCreateInfo.pName(entryPoint);
             vertCreateInfo.stage(VK10.VK_SHADER_STAGE_VERTEX_BIT);
@@ -820,6 +817,7 @@ class ChainResources {
             fragCreateInfo.sType(
                     VK10.VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO);
 
+            long fragModuleHandle = shaderProgram.fragModuleHandle();
             fragCreateInfo.module(fragModuleHandle);
             fragCreateInfo.pName(entryPoint);
             fragCreateInfo.stage(VK10.VK_SHADER_STAGE_FRAGMENT_BIT);
