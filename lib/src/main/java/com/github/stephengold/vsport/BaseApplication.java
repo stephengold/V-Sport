@@ -1726,14 +1726,6 @@ public abstract class BaseApplication {
                     pipelineCache, pCreateInfo, defaultAllocator, pHandle);
             Utils.checkForError(retCode, "create graphics pipeline");
             pipelineHandle = pHandle.get(0);
-
-            // clean up
-            VK10.vkDestroyShaderModule(
-                    logicalDevice, vertModuleHandle, defaultAllocator);
-            VK10.vkDestroyShaderModule(
-                    logicalDevice, fragModuleHandle, defaultAllocator);
-            Shaderc.shaderc_result_release(vertSpirvHandle);
-            Shaderc.shaderc_result_release(fragSpirvHandle);
         }
     }
 
