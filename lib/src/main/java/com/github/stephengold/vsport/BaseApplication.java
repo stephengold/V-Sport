@@ -1835,23 +1835,6 @@ public abstract class BaseApplication {
     }
 
     /**
-     * Create a uniform buffer object (UBO) for each image in the swapchain.
-     *
-     * @param numUbos the number of UBOs to create
-     */
-    private static void createUbos(int numUbos) {
-        ubos = new ArrayList<>(numUbos);
-
-        int numBytes = UniformValues.numBytes();
-        boolean staging = false;
-        for (int i = 0; i < numUbos; ++i) {
-            BufferResource ubo = new BufferResource(
-                    numBytes, VK10.VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, staging);
-            ubos.add(ubo);
-        }
-    }
-
-    /**
      * Create a Vulkan instance to provide the application with access to the
      * Vulkan API.
      *
