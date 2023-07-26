@@ -27,6 +27,3 @@ tasks.register('HelloVSport') {
     dependsOn ':apps:HelloVSport'
     description 'Runs the HelloVSport tutorial app.'
 }
-
-
-

@@ -1547,8 +1547,8 @@ public abstract class BaseApplication {
                 long descriptorSet
                         = chainResources.descriptorSetHandle(imageIndex);
                 LongBuffer pDescriptorSets = stack.longs(descriptorSet);
-                VK10.vkCmdBindDescriptorSets(commandBuffer,
-                        VK10.VK_PIPELINE_BIND_POINT_GRAPHICS,
+                VK10.vkCmdBindDescriptorSets(
+                        commandBuffer, VK10.VK_PIPELINE_BIND_POINT_GRAPHICS,
                         pipelineLayoutHandle, 0, pDescriptorSets, null);
 
                 // draw command:
