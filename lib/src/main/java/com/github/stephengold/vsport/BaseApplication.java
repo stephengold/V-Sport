@@ -199,7 +199,7 @@ public abstract class BaseApplication {
     /**
      * all uniform buffer objects
      */
-    private static List<BufferResource> ubos;
+    final private static List<BufferResource> ubos = new ArrayList<>(4);
     /**
      * handles of all frame buffers for the main swapchain
      */
@@ -219,7 +219,8 @@ public abstract class BaseApplication {
     /**
      * command buffers
      */
-    private static List<VkCommandBuffer> commandBuffers;
+    final private static List<VkCommandBuffer> commandBuffers
+            = new ArrayList<>(4);
     /**
      * handle of the swapchain for the main window
      */
@@ -470,7 +471,7 @@ public abstract class BaseApplication {
         }
 
         // Destroy the command pool and its buffers:
-        commandBuffers = null;
+        commandBuffers.clear();
         if (commandPoolHandle != VK10.VK_NULL_HANDLE) {
             VK10.vkDestroyCommandPool(
                     logicalDevice, commandPoolHandle, defaultAllocator);
@@ -886,18 +887,17 @@ public abstract class BaseApplication {
     }
 
     /**
-     * Allocate a command buffer for each image in the main swapchain.
+     * Allocate a command buffer as needed.
      *
-     * @param numBuffersNeeded the number of command buffers to create
+     * @param numBuffersNeeded the number of command buffers needed
+     * @param addBuffers storage for allocated command buffers (not null, added
+     * to)
      */
-    private static void allocateCommandBuffers(int numBuffersNeeded) {
-        if (commandBuffers == null) {
-            commandBuffers = new ArrayList<>(numBuffersNeeded);
-        } else {
-            numBuffersNeeded -= commandBuffers.size();
-            if (numBuffersNeeded <= 0) {
-                return;
-            }
+    static void addCommandBuffers(
+            int numBuffersNeeded, List<VkCommandBuffer> addBuffers) {
+        numBuffersNeeded -= addBuffers.size();
+        if (numBuffersNeeded <= 0) {
+            return;
         }
 
         try (MemoryStack stack = MemoryStack.stackPush()) {
@@ -921,8 +921,29 @@ public abstract class BaseApplication {
                 long pointer = pPointers.get(i);
                 VkCommandBuffer commandBuffer
                         = new VkCommandBuffer(pointer, logicalDevice);
-                commandBuffers.add(commandBuffer);
+                addBuffers.add(commandBuffer);
             }
+        }
+    }
+
+    /**
+     * Allocate uniform buffer objects (UBO) as needed.
+     *
+     * @param numUbosNeeded the number of UBOs needed
+     * @param addUbos storage for allocated UBOs (not null, added to)
+     */
+    static void addUbos(int numUbosNeeded, List<BufferResource> addUbos) {
+        numUbosNeeded -= addUbos.size();
+        if (numUbosNeeded <= 0) {
+            return;
+        }
+
+        int numBytes = UniformValues.numBytes();
+        boolean staging = false;
+        for (int i = 0; i < numUbosNeeded; ++i) {
+            BufferResource ubo = new BufferResource(
+                    numBytes, VK10.VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, staging);
+            addUbos.add(ubo);
         }
     }
 
@@ -1179,17 +1200,17 @@ public abstract class BaseApplication {
      */
     private static void createChainResources() {
         int numImages = createChain();
+        addCommandBuffers(numImages, commandBuffers);
+        addUbos(numImages, ubos);
 
         createImageViews(numImages);
         createDepthResources();
         createPass();
         createFrameBuffers(numImages);
         createDescriptorPool(numImages);
-        createUbos(numImages);
         allocateDescriptorSets(numImages);
         createPipeline();
 
-        allocateCommandBuffers(numImages);
         recordCommandBuffers(numImages);
 
         createSyncObjects(numImages);
@@ -1939,12 +1960,10 @@ public abstract class BaseApplication {
 
         destroyPipeline();
 
-        if (ubos != null) {
-            for (BufferResource ubo : ubos) {
-                ubo.destroy();
-            }
-            ubos = null;
+        for (BufferResource ubo : ubos) {
+            ubo.destroy();
         }
+        ubos.clear();
 
         descriptorSetHandles = null;
         if (descriptorPoolHandle != VK10.VK_NULL_HANDLE) {
