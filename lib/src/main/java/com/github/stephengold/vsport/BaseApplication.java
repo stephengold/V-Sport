@@ -173,6 +173,10 @@ public abstract class BaseApplication {
      */
     private static Callback debugMessengerCallback;
     /**
+     * depth-buffer resources
+     */
+    private static DepthResources depthResources;
+    /**
      * synchronization objects for frames in flight
      */
     private static Frame[] inFlightFrames;
@@ -229,19 +233,6 @@ public abstract class BaseApplication {
      * handle of the command pool for the main window
      */
     private static long commandPoolHandle = VK10.VK_NULL_HANDLE;
-    /**
-     * handle of the depth buffer used to render the main window (native type:
-     * VkImage)
-     */
-    private static long depthImageHandle = VK10.VK_NULL_HANDLE;
-    /**
-     * handle of the depth buffer's memory (native type: VkDeviceMemory)
-     */
-    private static long depthMemoryHandle = VK10.VK_NULL_HANDLE;
-    /**
-     * handle of the depth buffer's image view (native type: VkImageView)
-     */
-    private static long depthViewHandle = VK10.VK_NULL_HANDLE;
     /**
      * handle of the descriptor-set pool
      */
@@ -1204,7 +1195,8 @@ public abstract class BaseApplication {
         addUbos(numImages, ubos);
 
         createImageViews(numImages);
-        createDepthResources();
+        depthResources
+                = new DepthResources(depthBufferFormat, frameBufferExtent);
         createPass();
         createFrameBuffers(numImages);
         createDescriptorPool(numImages);
@@ -1242,36 +1234,20 @@ public abstract class BaseApplication {
     }
 
     /**
-     * Create the depth buffer and its associated resources.
+     * Select an image format for the depth buffer.
+     *
+     * @return a supported image format
      */
-    private static void createDepthResources() {
+    private static int chooseDepthBufferFormat() {
         int tiling = VK10.VK_IMAGE_TILING_OPTIMAL;
         int formatFeatures
                 = VK10.VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT;
-        depthBufferFormat = physicalDevice.findSupportedFormat(
-                tiling, formatFeatures, VK10.VK_FORMAT_D32_SFLOAT,
+        int result = physicalDevice.findSupportedFormat(tiling, formatFeatures,
+                VK10.VK_FORMAT_D32_SFLOAT,
                 VK10.VK_FORMAT_D32_SFLOAT_S8_UINT,
                 VK10.VK_FORMAT_D24_UNORM_S8_UINT);
 
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            LongBuffer pImageHandle = stack.mallocLong(1);
-            LongBuffer pMemoryHandle = stack.mallocLong(1);
-            createImage(frameBufferExtent.width(), frameBufferExtent.height(),
-                    depthBufferFormat, tiling,
-                    VK10.VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
-                    VK10.VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-                    pImageHandle, pMemoryHandle);
-            depthImageHandle = pImageHandle.get(0);
-            depthMemoryHandle = pMemoryHandle.get(0);
-
-            depthViewHandle = createImageView(depthImageHandle,
-                    depthBufferFormat, VK10.VK_IMAGE_ASPECT_DEPTH_BIT);
-
-            // Transition the image to optimal layout:
-            alterImageLayout(depthImageHandle, depthBufferFormat,
-                    VK10.VK_IMAGE_LAYOUT_UNDEFINED,
-                    VK10.VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
-        }
+        return result;
     }
 
     /**
@@ -1366,6 +1342,7 @@ public abstract class BaseApplication {
         chainFrameBufferHandles = new ArrayList<>(numImages);
 
         try (MemoryStack stack = MemoryStack.stackPush()) {
+            long depthViewHandle = depthResources.viewHandle();
             LongBuffer pAttachmentHandles
                     = stack.longs(VK10.VK_NULL_HANDLE, depthViewHandle);
             LongBuffer pHandle = stack.mallocLong(1);
@@ -1969,20 +1946,9 @@ public abstract class BaseApplication {
             renderPassHandle = VK10.VK_NULL_HANDLE;
         }
 
-        if (depthViewHandle != VK10.VK_NULL_HANDLE) {
-            VK10.vkDestroyImageView(
-                    logicalDevice, depthViewHandle, defaultAllocator);
-            depthViewHandle = VK10.VK_NULL_HANDLE;
-        }
-        if (depthMemoryHandle != VK10.VK_NULL_HANDLE) {
-            VK10.vkFreeMemory(
-                    logicalDevice, depthMemoryHandle, defaultAllocator);
-            depthMemoryHandle = VK10.VK_NULL_HANDLE;
-        }
-        if (depthImageHandle != VK10.VK_NULL_HANDLE) {
-            VK10.vkDestroyImage(
-                    logicalDevice, depthImageHandle, defaultAllocator);
-            depthImageHandle = VK10.VK_NULL_HANDLE;
+        if (depthResources != null) {
+            depthResources.destroy();
+            depthResources = null;
         }
 
         if (chainViewHandles != null) {
@@ -2117,6 +2083,7 @@ public abstract class BaseApplication {
         createVkInstance(appName, appVersion);
         createSurface();
         selectPhysicalDevice();
+        depthBufferFormat = chooseDepthBufferFormat();
         createLogicalDevice();
         createCommandPool();
 
