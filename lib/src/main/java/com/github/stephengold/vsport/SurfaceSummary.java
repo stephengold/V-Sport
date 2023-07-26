@@ -56,6 +56,10 @@ class SurfaceSummary {
      */
     final private IntBuffer presentationModes;
     /**
+     * handle of the VkSurfaceKHR being analyzed
+     */
+    final private long surfaceHandle;
+    /**
      * available surface capabilities
      */
     final private VkSurfaceCapabilitiesKHR capabilities;
@@ -76,6 +80,8 @@ class SurfaceSummary {
      */
     SurfaceSummary(VkPhysicalDevice physicalDevice, long surfaceHandle,
             MemoryStack stack) {
+        this.surfaceHandle = surfaceHandle;
+
         // Obtain the capabilities of the VkSurfaceKHR:
         this.capabilities = VkSurfaceCapabilitiesKHR.malloc(stack);
         int retCode = KHRSurface.vkGetPhysicalDeviceSurfaceCapabilitiesKHR(
@@ -195,6 +201,15 @@ class SurfaceSummary {
     int currentTransform() {
         int result = capabilities.currentTransform();
         return result;
+    }
+
+    /**
+     * Return the handle of the VkSurfaceKH being analyzed.
+     *
+     * @return the handle
+     */
+    long handle() {
+        return surfaceHandle;
     }
 
     /**
