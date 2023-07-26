@@ -843,7 +843,7 @@ public abstract class BaseApplication {
      * @param addBuffers storage for allocated command buffers (not null, added
      * to)
      */
-    static void addCommandBuffers(
+    private static void addCommandBuffers(
             int numBuffersNeeded, List<VkCommandBuffer> addBuffers) {
         numBuffersNeeded -= addBuffers.size();
         if (numBuffersNeeded <= 0) {
