@@ -121,6 +121,37 @@ class SurfaceSummary {
     // new methods exposed
 
     /**
+     * Choose an extent for framebuffers on this surface.
+     *
+     * @param preferredWidth the preferred width of the frame buffer (in pixels)
+     * @param preferredHeight the preferred height of the frame buffer (in
+     * pixels)
+     * @param storeResult storage for the result (not null, modified)
+     */
+    void chooseFramebufferExtent(
+            int preferredWidth, int preferredHeight, VkExtent2D storeResult) {
+        VkExtent2D current = capabilities.currentExtent();
+        int maxUint = 0xffffffff;
+        if (current.width() != maxUint || current.height() != maxUint) {
+            // The framebuffer must have the same resolution as the surface:
+            storeResult.set(current);
+            return;
+        }
+
+        // The surface supports a range of framebuffer resolutions:
+        VkExtent2D minExtent = capabilities.minImageExtent();
+        VkExtent2D maxExtent = capabilities.maxImageExtent();
+
+        int clampedWidth = MyMath.clamp(
+                preferredWidth, minExtent.width(), maxExtent.width());
+        int clampedHeight = MyMath.clamp(
+                preferredHeight, minExtent.height(), maxExtent.height());
+
+        storeResult.width(clampedWidth);
+        storeResult.height(clampedHeight);
+    }
+
+    /**
      * Choose a presentation mode for the swap chain of the main window.
      *
      * @return the selected mode
@@ -160,35 +191,6 @@ class SurfaceSummary {
 
         // Otherwise settle for the first available surface format.
         VkSurfaceFormatKHR result = formats.get(0);
-        return result;
-    }
-
-    /**
-     * Choose an extent for the swap chain of the main window.
-     *
-     * @param frameBufferWidth the desired width of the frame buffer
-     * @param frameBufferHeight the desired height of the frame buffer
-     * @param stack for memory allocation (not null)
-     * @return a new instance (may be temporary)
-     */
-    VkExtent2D chooseSwapExtent(
-            int frameBufferWidth, int frameBufferHeight, MemoryStack stack) {
-        if (capabilities.currentExtent().width() != 0xffffffffL) {
-            return capabilities.currentExtent();
-        }
-
-        VkExtent2D minExtent = capabilities.minImageExtent();
-        VkExtent2D maxExtent = capabilities.maxImageExtent();
-
-        int clampedWidth = MyMath.clamp(
-                frameBufferWidth, minExtent.width(), maxExtent.width());
-        int clampedHeight = MyMath.clamp(
-                frameBufferHeight, minExtent.height(), maxExtent.height());
-
-        VkExtent2D result = VkExtent2D.malloc(stack);
-        result.width(clampedWidth);
-        result.height(clampedHeight);
-
         return result;
     }
 

@@ -173,11 +173,8 @@ class ChainResources {
         QueueFamilySummary queueFamilies
                 = physicalDevice.summarizeFamilies(surfaceHandle);
 
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            VkExtent2D extent = surface.chooseSwapExtent(
-                    desiredWidth, desiredHeight, stack);
-            framebufferExtent.set(extent); // copy temporary data to Java heap
-        }
+        surface.chooseFramebufferExtent(
+                desiredWidth, desiredHeight, framebufferExtent);
         this.depthResources
                 = new DepthResources(depthFormat, framebufferExtent);
 
