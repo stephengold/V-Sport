@@ -78,12 +78,13 @@ class SurfaceSummary {
             MemoryStack stack) {
         // Obtain the capabilities of the VkSurfaceKHR:
         this.capabilities = VkSurfaceCapabilitiesKHR.malloc(stack);
-        KHRSurface.vkGetPhysicalDeviceSurfaceCapabilitiesKHR(
+        int retCode = KHRSurface.vkGetPhysicalDeviceSurfaceCapabilitiesKHR(
                 physicalDevice, surfaceHandle, capabilities);
+        Utils.checkForError(retCode, "obtain surface capabilities");
 
         // Count the available surface formats:
         IntBuffer storeInt = stack.mallocInt(1);
-        int retCode = KHRSurface.vkGetPhysicalDeviceSurfaceFormatsKHR(
+        retCode = KHRSurface.vkGetPhysicalDeviceSurfaceFormatsKHR(
                 physicalDevice, surfaceHandle, storeInt, null);
         Utils.checkForError(retCode, "count surface formats");
         int numFormats = storeInt.get(0);
@@ -91,8 +92,9 @@ class SurfaceSummary {
         // Enumerate the available surface formats:
         this.formats = VkSurfaceFormatKHR.malloc(numFormats, stack);
         if (numFormats > 0) {
-            KHRSurface.vkGetPhysicalDeviceSurfaceFormatsKHR(
+            retCode = KHRSurface.vkGetPhysicalDeviceSurfaceFormatsKHR(
                     physicalDevice, surfaceHandle, storeInt, formats);
+            Utils.checkForError(retCode, "enumerate surface formats");
         }
 
         // Count the available surface-presentation modes:
@@ -222,6 +224,8 @@ class SurfaceSummary {
      */
     int maxImageCount() {
         int result = capabilities.maxImageCount();
+
+        assert result >= 0 : result;
         return result;
     }
 
@@ -232,6 +236,8 @@ class SurfaceSummary {
      */
     int minImageCount() {
         int result = capabilities.minImageCount();
+
+        assert result >= 1 : result;
         return result;
     }
 }
