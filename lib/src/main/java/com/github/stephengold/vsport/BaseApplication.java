@@ -457,6 +457,13 @@ public abstract class BaseApplication {
             fragModuleHandle = VK10.VK_NULL_HANDLE;
         }
 
+        // Destroy the pipeline layout:
+        if (pipelineLayoutHandle != VK10.VK_NULL_HANDLE) {
+            VK10.vkDestroyPipelineLayout(
+                    logicalDevice, pipelineLayoutHandle, defaultAllocator);
+            pipelineLayoutHandle = VK10.VK_NULL_HANDLE;
+        }
+
         // Destroy the descriptor-set layout that's used to configure pipelines:
         if (descriptorSetLayoutHandle != VK10.VK_NULL_HANDLE) {
             VK10.vkDestroyDescriptorSetLayout(
@@ -1683,24 +1690,6 @@ public abstract class BaseApplication {
             dssCreateInfo.maxDepthBounds(1f); // Optional
             dssCreateInfo.stencilTestEnable(false);
 
-            // Create the pipeline layout:
-            VkPipelineLayoutCreateInfo plCreateInfo
-                    = VkPipelineLayoutCreateInfo.calloc(stack);
-            plCreateInfo.sType(
-                    VK10.VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO);
-
-            plCreateInfo.pPushConstantRanges(null);
-
-            LongBuffer pSetLayouts = stack.longs(descriptorSetLayoutHandle);
-            plCreateInfo.pSetLayouts(pSetLayouts);
-            plCreateInfo.setLayoutCount(1);
-
-            LongBuffer pHandle = stack.mallocLong(1);
-            int retCode = VK10.vkCreatePipelineLayout(
-                    logicalDevice, plCreateInfo, defaultAllocator, pHandle);
-            Utils.checkForError(retCode, "create pipeline layout");
-            pipelineLayoutHandle = pHandle.get(0);
-
             // Create the pipeline:
             VkGraphicsPipelineCreateInfo.Buffer pCreateInfo
                     = VkGraphicsPipelineCreateInfo.calloc(1, stack);
@@ -1722,10 +1711,40 @@ public abstract class BaseApplication {
             pCreateInfo.subpass(0);
 
             long pipelineCache = VK10.VK_NULL_HANDLE; // disable cacheing
-            retCode = VK10.vkCreateGraphicsPipelines(logicalDevice,
+            LongBuffer pHandle = stack.mallocLong(1);
+            int retCode = VK10.vkCreateGraphicsPipelines(logicalDevice,
                     pipelineCache, pCreateInfo, defaultAllocator, pHandle);
             Utils.checkForError(retCode, "create graphics pipeline");
             pipelineHandle = pHandle.get(0);
+        }
+    }
+
+    /**
+     * Create the graphics pipeline layout.
+     *
+     * @return the handle of the new layout
+     */
+    private static long createPipelineLayout() {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            // Create the pipeline layout:
+            VkPipelineLayoutCreateInfo plCreateInfo
+                    = VkPipelineLayoutCreateInfo.calloc(stack);
+            plCreateInfo.sType(
+                    VK10.VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO);
+
+            plCreateInfo.pPushConstantRanges(null);
+
+            LongBuffer pSetLayouts = stack.longs(descriptorSetLayoutHandle);
+            plCreateInfo.pSetLayouts(pSetLayouts);
+            plCreateInfo.setLayoutCount(1);
+
+            LongBuffer pHandle = stack.mallocLong(1);
+            int retCode = VK10.vkCreatePipelineLayout(
+                    logicalDevice, plCreateInfo, defaultAllocator, pHandle);
+            Utils.checkForError(retCode, "create pipeline layout");
+            long result = pHandle.get(0);
+
+            return result;
         }
     }
 
@@ -1975,12 +1994,6 @@ public abstract class BaseApplication {
                     logicalDevice, pipelineHandle, defaultAllocator);
             pipelineHandle = VK10.VK_NULL_HANDLE;
         }
-
-        if (pipelineLayoutHandle != VK10.VK_NULL_HANDLE) {
-            VK10.vkDestroyPipelineLayout(
-                    logicalDevice, pipelineLayoutHandle, defaultAllocator);
-            pipelineLayoutHandle = VK10.VK_NULL_HANDLE;
-        }
     }
 
     /**
@@ -2096,6 +2109,7 @@ public abstract class BaseApplication {
         sampleTexture = new Texture("/Models/viking_room/viking_room.png");
         createTextureSampler(); // depends on the logical device
         createDescriptorSetLayout(); // depends on the logical device
+        pipelineLayoutHandle = createPipelineLayout();
 
         // Compile both GLSL shaders into SPIR-V using the Shaderc library:
         long fragSpirvHandle = SpirvUtils.compileShaderFromClasspath(
