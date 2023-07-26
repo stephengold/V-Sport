@@ -1537,19 +1537,6 @@ public abstract class BaseApplication {
      * Create the graphics pipeline for the main window.
      */
     private static void createPipeline() {
-        // Compile both GLSL shaders into SPIR-V using the Shaderc library:
-        long fragSpirvHandle = SpirvUtils.compileShaderFromClasspath(
-                "/Shaders/Debug/HelloVSport.frag",
-                Shaderc.shaderc_glsl_fragment_shader);
-        ByteBuffer byteCode = Shaderc.shaderc_result_get_bytes(fragSpirvHandle);
-        long fragModuleHandle = createShaderModule(byteCode);
-
-        long vertSpirvHandle = SpirvUtils.compileShaderFromClasspath(
-                "/Shaders/Debug/HelloVSport.vert",
-                Shaderc.shaderc_glsl_vertex_shader);
-        byteCode = Shaderc.shaderc_result_get_bytes(vertSpirvHandle);
-        long vertModuleHandle = createShaderModule(byteCode);
-
         try (MemoryStack stack = MemoryStack.stackPush()) {
             ByteBuffer entryPoint = stack.UTF8("main");
             VkPipelineShaderStageCreateInfo.Buffer stageCreateInfos
