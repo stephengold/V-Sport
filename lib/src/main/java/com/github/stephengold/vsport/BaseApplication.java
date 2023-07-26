@@ -221,7 +221,7 @@ public abstract class BaseApplication {
      */
     private static List<Long> descriptorSetHandles;
     /**
-     * command buffers
+     * command buffers (at least one per image in the chain)
      */
     final private static List<VkCommandBuffer> commandBuffers
             = new ArrayList<>(4);
@@ -258,7 +258,7 @@ public abstract class BaseApplication {
      */
     private static long renderPassHandle = VK10.VK_NULL_HANDLE;
     /**
-     * handle of the texture sampler
+     * handle of the VkSampler for textures
      */
     private static long samplerHandle = VK10.VK_NULL_HANDLE;
     /**
@@ -441,7 +441,7 @@ public abstract class BaseApplication {
         }
         /*
          * Destroy resources in the reverse of the order they were created,
-         * starting with the swapchain resources:
+         * starting with the chain resources:
          */
         destroyChainResources();
 
@@ -938,7 +938,7 @@ public abstract class BaseApplication {
     }
 
     /**
-     * Allocate uniform buffer objects (UBO) as needed.
+     * Allocate uniform buffer objects (UBOs) as needed.
      *
      * @param numUbosNeeded the number of UBOs needed
      * @param addUbos storage for allocated UBOs (not null, added to)
@@ -1761,7 +1761,7 @@ public abstract class BaseApplication {
     }
 
     /**
-     * Create a window surface in the application's main window.
+     * Create a display surface in the application's main window.
      */
     private static void createSurface() {
         try (MemoryStack stack = MemoryStack.stackPush()) {
@@ -2385,7 +2385,7 @@ public abstract class BaseApplication {
             pWaitSemaphores.put(0, imageAvailableSemaphoreHandle);
             submitInfo.pWaitSemaphores(pWaitSemaphores);
 
-            // Reset fence and submit pre-recorded command to graphics queue:
+            // Reset fence and submit pre-recorded commands to graphics queue:
             VK10.vkResetFences(logicalDevice, fenceHandle);
             retCode = VK10.vkQueueSubmit(
                     graphicsQueue, submitInfo, fenceHandle);
