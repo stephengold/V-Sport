@@ -58,8 +58,6 @@ import org.lwjgl.vulkan.KHRSwapchain;
 import org.lwjgl.vulkan.VK10;
 import org.lwjgl.vulkan.VkAllocationCallbacks;
 import org.lwjgl.vulkan.VkApplicationInfo;
-import org.lwjgl.vulkan.VkAttachmentDescription;
-import org.lwjgl.vulkan.VkAttachmentReference;
 import org.lwjgl.vulkan.VkBufferCopy;
 import org.lwjgl.vulkan.VkBufferCreateInfo;
 import org.lwjgl.vulkan.VkBufferImageCopy;
@@ -71,21 +69,13 @@ import org.lwjgl.vulkan.VkCommandBufferAllocateInfo;
 import org.lwjgl.vulkan.VkCommandBufferBeginInfo;
 import org.lwjgl.vulkan.VkCommandPoolCreateInfo;
 import org.lwjgl.vulkan.VkComponentMapping;
-import org.lwjgl.vulkan.VkCopyDescriptorSet;
 import org.lwjgl.vulkan.VkDebugUtilsMessengerCallbackDataEXT;
 import org.lwjgl.vulkan.VkDebugUtilsMessengerCreateInfoEXT;
-import org.lwjgl.vulkan.VkDescriptorBufferInfo;
-import org.lwjgl.vulkan.VkDescriptorImageInfo;
-import org.lwjgl.vulkan.VkDescriptorPoolCreateInfo;
-import org.lwjgl.vulkan.VkDescriptorPoolSize;
-import org.lwjgl.vulkan.VkDescriptorSetAllocateInfo;
 import org.lwjgl.vulkan.VkDescriptorSetLayoutBinding;
 import org.lwjgl.vulkan.VkDescriptorSetLayoutCreateInfo;
 import org.lwjgl.vulkan.VkDevice;
 import org.lwjgl.vulkan.VkExtent2D;
 import org.lwjgl.vulkan.VkExtent3D;
-import org.lwjgl.vulkan.VkFramebufferCreateInfo;
-import org.lwjgl.vulkan.VkGraphicsPipelineCreateInfo;
 import org.lwjgl.vulkan.VkImageCreateInfo;
 import org.lwjgl.vulkan.VkImageMemoryBarrier;
 import org.lwjgl.vulkan.VkImageSubresourceLayers;
@@ -97,32 +87,14 @@ import org.lwjgl.vulkan.VkLayerProperties;
 import org.lwjgl.vulkan.VkMemoryAllocateInfo;
 import org.lwjgl.vulkan.VkMemoryRequirements;
 import org.lwjgl.vulkan.VkOffset2D;
-import org.lwjgl.vulkan.VkPipelineColorBlendAttachmentState;
-import org.lwjgl.vulkan.VkPipelineColorBlendStateCreateInfo;
-import org.lwjgl.vulkan.VkPipelineDepthStencilStateCreateInfo;
-import org.lwjgl.vulkan.VkPipelineInputAssemblyStateCreateInfo;
 import org.lwjgl.vulkan.VkPipelineLayoutCreateInfo;
-import org.lwjgl.vulkan.VkPipelineMultisampleStateCreateInfo;
-import org.lwjgl.vulkan.VkPipelineRasterizationStateCreateInfo;
-import org.lwjgl.vulkan.VkPipelineShaderStageCreateInfo;
-import org.lwjgl.vulkan.VkPipelineVertexInputStateCreateInfo;
-import org.lwjgl.vulkan.VkPipelineViewportStateCreateInfo;
 import org.lwjgl.vulkan.VkPresentInfoKHR;
 import org.lwjgl.vulkan.VkQueue;
 import org.lwjgl.vulkan.VkRect2D;
 import org.lwjgl.vulkan.VkRenderPassBeginInfo;
-import org.lwjgl.vulkan.VkRenderPassCreateInfo;
 import org.lwjgl.vulkan.VkSamplerCreateInfo;
 import org.lwjgl.vulkan.VkShaderModuleCreateInfo;
 import org.lwjgl.vulkan.VkSubmitInfo;
-import org.lwjgl.vulkan.VkSubpassDependency;
-import org.lwjgl.vulkan.VkSubpassDescription;
-import org.lwjgl.vulkan.VkSurfaceFormatKHR;
-import org.lwjgl.vulkan.VkSwapchainCreateInfoKHR;
-import org.lwjgl.vulkan.VkVertexInputAttributeDescription;
-import org.lwjgl.vulkan.VkVertexInputBindingDescription;
-import org.lwjgl.vulkan.VkViewport;
-import org.lwjgl.vulkan.VkWriteDescriptorSet;
 
 /**
  * A single-window, 3-D visualization application using LWJGL and Vulkan.
@@ -173,17 +145,13 @@ public abstract class BaseApplication {
      */
     private static Callback debugMessengerCallback;
     /**
-     * depth-buffer resources
+     * resources that depend on the swap chain
      */
-    private static DepthResources depthResources;
+    private static ChainResources chainResources;
     /**
      * synchronization objects for frames in flight
      */
     private static Frame[] inFlightFrames;
-    /**
-     * format for all color images in the main swapchain
-     */
-    private static int chainImageFormat;
     /**
      * index of the frame being rendered (among the inFlightFrames)
      */
@@ -201,42 +169,14 @@ public abstract class BaseApplication {
      */
     private static int frameBufferWidth = 800;
     /**
-     * all uniform buffer objects
-     */
-    final private static List<BufferResource> ubos = new ArrayList<>(4);
-    /**
-     * handles of all frame buffers for the main swapchain
-     */
-    private static List<Long> chainFrameBufferHandles;
-    /**
-     * handles of all images in the main swapchain
-     */
-    private static List<Long> chainImageHandles;
-    /**
-     * handles of all views in the main swapchain
-     */
-    private static List<Long> chainViewHandles;
-    /**
-     * handles of all descriptor sets
-     */
-    private static List<Long> descriptorSetHandles;
-    /**
      * command buffers (at least one per image in the chain)
      */
     final private static List<VkCommandBuffer> commandBuffers
             = new ArrayList<>(4);
     /**
-     * handle of the swapchain for the main window
-     */
-    private static long chainHandle = VK10.VK_NULL_HANDLE;
-    /**
      * handle of the command pool for the main window
      */
     private static long commandPoolHandle = VK10.VK_NULL_HANDLE;
-    /**
-     * handle of the descriptor-set pool
-     */
-    private static long descriptorPoolHandle = VK10.VK_NULL_HANDLE;
     /**
      * handle of the descriptor-set layout for the UBO
      */
@@ -246,17 +186,9 @@ public abstract class BaseApplication {
      */
     private static long fragModuleHandle = VK10.VK_NULL_HANDLE;
     /**
-     * handle of the graphics pipeline
-     */
-    private static long pipelineHandle = VK10.VK_NULL_HANDLE;
-    /**
      * handle of the graphics-pipeline layout
      */
     private static long pipelineLayoutHandle = VK10.VK_NULL_HANDLE;
-    /**
-     * handle of the render-pass object
-     */
-    private static long renderPassHandle = VK10.VK_NULL_HANDLE;
     /**
      * handle of the VkSampler for textures
      */
@@ -305,11 +237,6 @@ public abstract class BaseApplication {
      * logical device to display the main window
      */
     private static VkDevice logicalDevice;
-    /**
-     * dimensions shared by all images in the swapchain - keep consistent with
-     * {@code frameBufferWidth} and {@code frameBufferHeight}
-     */
-    private static VkExtent2D frameBufferExtent;
     /**
      * link this application to the lwjgl-vulkan library
      */
@@ -945,113 +872,6 @@ public abstract class BaseApplication {
     }
 
     /**
-     * Allocate uniform buffer objects (UBOs) as needed.
-     *
-     * @param numUbosNeeded the number of UBOs needed
-     * @param addUbos storage for allocated UBOs (not null, added to)
-     */
-    static void addUbos(int numUbosNeeded, List<BufferResource> addUbos) {
-        numUbosNeeded -= addUbos.size();
-        if (numUbosNeeded <= 0) {
-            return;
-        }
-
-        int numBytes = UniformValues.numBytes();
-        boolean staging = false;
-        for (int i = 0; i < numUbosNeeded; ++i) {
-            BufferResource ubo = new BufferResource(
-                    numBytes, VK10.VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, staging);
-            addUbos.add(ubo);
-        }
-    }
-
-    /**
-     * Allocate a descriptor set for each frame in flight.
-     *
-     * @param numSets the number of descriptor sets to allocate
-     */
-    private static void allocateDescriptorSets(int numSets) {
-        int numBytes = UniformValues.numBytes();
-        descriptorSetHandles = new ArrayList<>(numSets);
-
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            // All sets with have the same layout:
-            LongBuffer pLayoutHandles = stack.mallocLong(numSets);
-            for (int setIndex = 0; setIndex < numSets; ++setIndex) {
-                pLayoutHandles.put(setIndex, descriptorSetLayoutHandle);
-            }
-
-            VkDescriptorSetAllocateInfo allocInfo
-                    = VkDescriptorSetAllocateInfo.calloc(stack);
-            allocInfo.sType(
-                    VK10.VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO);
-
-            allocInfo.descriptorPool(descriptorPoolHandle);
-            allocInfo.pSetLayouts(pLayoutHandles);
-
-            LongBuffer pSetHandles = stack.mallocLong(numSets);
-            int retCode = VK10.vkAllocateDescriptorSets(
-                    logicalDevice, allocInfo, pSetHandles);
-            Utils.checkForError(retCode, "allocate descriptor sets");
-
-            // Collect the descriptor-set handles in a list:
-            for (int setIndex = 0; setIndex < numSets; ++setIndex) {
-                long setHandle = pSetHandles.get(setIndex);
-                descriptorSetHandles.add(setHandle);
-            }
-
-            VkDescriptorBufferInfo.Buffer bufferInfo
-                    = VkDescriptorBufferInfo.calloc(1, stack);
-            bufferInfo.offset(0);
-            bufferInfo.range(numBytes);
-
-            VkDescriptorImageInfo.Buffer imageInfo
-                    = VkDescriptorImageInfo.calloc(1, stack);
-            imageInfo.imageLayout(
-                    VK10.VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-            long viewHandle = sampleTexture.viewHandle();
-            imageInfo.imageView(viewHandle);
-            imageInfo.sampler(samplerHandle);
-
-            // Configure the descriptors in each set:
-            VkWriteDescriptorSet.Buffer pWrites
-                    = VkWriteDescriptorSet.calloc(2, stack);
-
-            VkWriteDescriptorSet uboWrite = pWrites.get(0);
-            uboWrite.sType(VK10.VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET);
-            uboWrite.descriptorCount(1);
-            uboWrite.descriptorType(VK10.VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
-
-            uboWrite.dstArrayElement(0);
-            uboWrite.dstBinding(0);
-            uboWrite.pBufferInfo(bufferInfo);
-
-            VkWriteDescriptorSet samplerWrite = pWrites.get(1);
-            samplerWrite.sType(VK10.VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET);
-
-            samplerWrite.descriptorCount(1);
-            samplerWrite.descriptorType(
-                    VK10.VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-            samplerWrite.dstArrayElement(0);
-            samplerWrite.dstBinding(1);
-            samplerWrite.pImageInfo(imageInfo);
-
-            VkCopyDescriptorSet.Buffer pCopies = null;
-
-            for (int setIndex = 0; setIndex < numSets; ++setIndex) {
-                long uboHandle = ubos.get(setIndex).handle();
-                bufferInfo.buffer(uboHandle);
-
-                long setHandle = pSetHandles.get(setIndex);
-                uboWrite.dstSet(setHandle);
-                samplerWrite.dstSet(setHandle);
-
-                VK10.vkUpdateDescriptorSets(logicalDevice, pWrites, pCopies);
-            }
-        }
-    }
-
-    /**
      * Begin recording a single-time command sequence.
      *
      * @return a new command buffer, ready to receive commands
@@ -1115,124 +935,27 @@ public abstract class BaseApplication {
     }
 
     /**
-     * Create the swapchain for the main window.
-     *
-     * @return the number of images in the swapchain
-     */
-    private static int createChain() {
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            // swap-chain creation information:
-            VkSwapchainCreateInfoKHR createInfo
-                    = VkSwapchainCreateInfoKHR.calloc(stack);
-            createInfo.sType(
-                    KHRSwapchain.VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR);
-
-            createInfo.clipped(true); // Don't color obscured pixels.
-
-            // Ignore the alpha channel when blending with other windows:
-            createInfo.compositeAlpha(
-                    KHRSurface.VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR);
-
-            createInfo.imageArrayLayers(1);
-
-            // The app will render directly to images in the swapchain:
-            createInfo.imageUsage(VK10.VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT);
-
-            createInfo.oldSwapchain(VK10.VK_NULL_HANDLE);
-            createInfo.surface(surfaceHandle);
-
-            SurfaceSummary surface
-                    = physicalDevice.summarizeSurface(surfaceHandle, stack);
-
-            VkExtent2D extent = surface.chooseSwapExtent(
-                    frameBufferWidth, frameBufferHeight, stack);
-            frameBufferExtent = VkExtent2D.create().set(extent); // heap copy
-            frameBufferHeight = frameBufferExtent.height();
-            frameBufferWidth = frameBufferExtent.width();
-
-            createInfo.imageExtent(frameBufferExtent);
-
-            int transform = surface.currentTransform();
-            createInfo.preTransform(transform);
-
-            VkSurfaceFormatKHR surfaceFormat = surface.chooseSurfaceFormat();
-            int colorSpace = surfaceFormat.colorSpace();
-            createInfo.imageColorSpace(colorSpace);
-
-            chainImageFormat = surfaceFormat.format();
-            createInfo.imageFormat(chainImageFormat);
-            /*
-             * Minimizing the number of images in the swapchain would
-             * sometimes cause the application to wait on the driver
-             * when acquiring an image to render to.  To avoid waiting,
-             * request one more than the minimum number.
-             */
-            int minImageCount = surface.minImageCount();
-            int numImages = minImageCount + 1;
-
-            // If there's an upper limit on images, don't exceed it:
-            int maxImageCount = surface.maxImageCount();
-            if (maxImageCount > 0 && numImages > maxImageCount) {
-                numImages = maxImageCount;
-            }
-            createInfo.minImageCount(numImages);
-
-            QueueFamilySummary queueFamilies
-                    = physicalDevice.summarizeFamilies(surfaceHandle);
-            IntBuffer pListDistinct = queueFamilies.pListDistinct(stack);
-            int numDistinctFamilies = pListDistinct.capacity();
-            if (numDistinctFamilies == 2) {
-                createInfo.imageSharingMode(VK10.VK_SHARING_MODE_CONCURRENT);
-                createInfo.pQueueFamilyIndices(pListDistinct);
-            } else {
-                createInfo.imageSharingMode(VK10.VK_SHARING_MODE_EXCLUSIVE);
-            }
-
-            int presentMode = surface.choosePresentationMode();
-            createInfo.presentMode(presentMode);
-
-            LongBuffer pHandle = stack.mallocLong(1);
-            int retCode = KHRSwapchain.vkCreateSwapchainKHR(
-                    logicalDevice, createInfo, defaultAllocator, pHandle);
-            Utils.checkForError(retCode, "create a swapchain");
-            chainHandle = pHandle.get(0);
-
-            // Collect all the swap-chain images into a List:
-            IntBuffer pCount = stack.ints(numImages);
-            LongBuffer pHandles = stack.mallocLong(numImages);
-            retCode = KHRSwapchain.vkGetSwapchainImagesKHR(
-                    logicalDevice, chainHandle, pCount, pHandles);
-            Utils.checkForError(retCode, "enumerate swap-chain images");
-            chainImageHandles = new ArrayList<>(numImages);
-            for (int imageIndex = 0; imageIndex < numImages; ++imageIndex) {
-                long imageHandle = pHandles.get(imageIndex);
-                chainImageHandles.add(imageHandle);
-            }
-
-            return numImages;
-        }
-    }
-
-    /**
      * Create the main swapchain and all resources that depend on it.
      */
     private static void createChainResources() {
-        int numImages = createChain();
-        addCommandBuffers(numImages, commandBuffers);
-        addUbos(numImages, ubos);
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            SurfaceSummary surface
+                    = physicalDevice.summarizeSurface(surfaceHandle, stack);
+            chainResources = new ChainResources(
+                    surface, descriptorSetLayoutHandle,
+                    physicalDevice, frameBufferWidth, frameBufferHeight,
+                    depthBufferFormat, samplerHandle,
+                    pipelineLayoutHandle, sampleMesh,
+                    fragModuleHandle, vertModuleHandle, sampleTexture);
+            frameBufferHeight = chainResources.framebufferHeight();
+            frameBufferWidth = chainResources.framebufferWidth();
+        }
 
-        createImageViews(numImages);
-        depthResources
-                = new DepthResources(depthBufferFormat, frameBufferExtent);
-        createPass();
-        createFrameBuffers(numImages);
-        createDescriptorPool(numImages);
-        allocateDescriptorSets(numImages);
-        createPipeline();
-
-        recordCommandBuffers(numImages);
-
+        int numImages = chainResources.countImages();
         createSyncObjects(numImages);
+
+        addCommandBuffers(numImages, commandBuffers);
+        recordCommandBuffers(numImages);
     }
 
     /**
@@ -1275,44 +998,6 @@ public abstract class BaseApplication {
                 VK10.VK_FORMAT_D24_UNORM_S8_UINT);
 
         return result;
-    }
-
-    /**
-     * Create the (empty) descriptor-set pool for UBOs and samplers.
-     *
-     * @param numImages the number of images in the swap chain
-     */
-    private static void createDescriptorPool(int numImages) {
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            VkDescriptorPoolSize.Buffer pContents
-                    = VkDescriptorPoolSize.calloc(2, stack);
-
-            // The pool will contain numImages UBOs:
-            VkDescriptorPoolSize uboPool = pContents.get(0);
-            uboPool.type(VK10.VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
-            uboPool.descriptorCount(numImages);
-
-            // The pool will contain numImages combined-image samplers:
-            VkDescriptorPoolSize samplerPool = pContents.get(1);
-            samplerPool.type(VK10.VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-            samplerPool.descriptorCount(numImages);
-
-            // Create the descriptor-set pool:
-            VkDescriptorPoolCreateInfo createInfo
-                    = VkDescriptorPoolCreateInfo.calloc(stack);
-            createInfo.sType(
-                    VK10.VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO);
-
-            createInfo.flags(0x0); // descriptor sets are never freed
-            createInfo.maxSets(numImages);
-            createInfo.pPoolSizes(pContents);
-
-            LongBuffer pHandle = stack.mallocLong(1);
-            int retCode = VK10.vkCreateDescriptorPool(
-                    logicalDevice, createInfo, defaultAllocator, pHandle);
-            Utils.checkForError(retCode, "create descriptor-set pool");
-            descriptorPoolHandle = pHandle.get(0);
-        }
     }
 
     /**
@@ -1361,58 +1046,6 @@ public abstract class BaseApplication {
     }
 
     /**
-     * Create a frame buffer for each image in the swapchain.
-     *
-     * @param numImages the number of images in the swap chain
-     */
-    private static void createFrameBuffers(int numImages) {
-        chainFrameBufferHandles = new ArrayList<>(numImages);
-
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            long depthViewHandle = depthResources.viewHandle();
-            LongBuffer pAttachmentHandles
-                    = stack.longs(VK10.VK_NULL_HANDLE, depthViewHandle);
-            LongBuffer pHandle = stack.mallocLong(1);
-
-            // reusable Struct for frame buffer creation:
-            VkFramebufferCreateInfo createInfo
-                    = VkFramebufferCreateInfo.calloc(stack);
-            createInfo.sType(VK10.VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO);
-
-            createInfo.height(frameBufferHeight);
-            createInfo.layers(1);
-            createInfo.renderPass(renderPassHandle);
-            createInfo.width(frameBufferWidth);
-
-            for (long viewHandle : chainViewHandles) {
-                pAttachmentHandles.put(0, viewHandle);
-                createInfo.pAttachments(pAttachmentHandles);
-
-                int retCode = VK10.vkCreateFramebuffer(
-                        logicalDevice, createInfo, defaultAllocator, pHandle);
-                Utils.checkForError(retCode, "create frame buffer");
-                long frameBufferHandle = pHandle.get(0);
-                chainFrameBufferHandles.add(frameBufferHandle);
-            }
-        }
-    }
-
-    /**
-     * Create a view for each image in the swapchain.
-     *
-     * @param numImages the number of images in the swap chain
-     */
-    private static void createImageViews(int numImages) {
-        chainViewHandles = new ArrayList<>(numImages);
-
-        for (long imageHandle : chainImageHandles) {
-            long viewHandle = createImageView(imageHandle, chainImageFormat,
-                    VK10.VK_IMAGE_ASPECT_COLOR_BIT);
-            chainViewHandles.add(viewHandle);
-        }
-    }
-
-    /**
      * Create a logical device in the application's main window.
      */
     private static void createLogicalDevice() {
@@ -1440,282 +1073,6 @@ public abstract class BaseApplication {
                     logicalDevice, familyIndex, queueIndex, pPointer);
             queueHandle = pPointer.get(0);
             presentationQueue = new VkQueue(queueHandle, logicalDevice);
-        }
-    }
-
-    /**
-     * Create a render-pass object.
-     */
-    private static void createPass() {
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            VkAttachmentDescription.Buffer pDescriptions
-                    = VkAttachmentDescription.calloc(2, stack);
-            VkAttachmentReference.Buffer pReferences
-                    = VkAttachmentReference.calloc(2, stack);
-
-            // a single color buffer for presentation, without multisampling:
-            VkAttachmentDescription colorAttachment = pDescriptions.get(0);
-            colorAttachment.finalLayout(
-                    KHRSwapchain.VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
-            colorAttachment.format(chainImageFormat);
-            colorAttachment.initialLayout(VK10.VK_IMAGE_LAYOUT_UNDEFINED);
-            colorAttachment.samples(VK10.VK_SAMPLE_COUNT_1_BIT);
-
-            // no stencil operations:
-            colorAttachment.stencilLoadOp(VK10.VK_ATTACHMENT_LOAD_OP_DONT_CARE);
-            colorAttachment.stencilStoreOp(
-                    VK10.VK_ATTACHMENT_STORE_OP_DONT_CARE);
-
-            // Clear the color buffer to black before each frame:
-            colorAttachment.loadOp(VK10.VK_ATTACHMENT_LOAD_OP_CLEAR);
-            colorAttachment.storeOp(VK10.VK_ATTACHMENT_STORE_OP_STORE);
-
-            VkAttachmentReference colorAttachmentRef = pReferences.get(0);
-            colorAttachmentRef.attachment(0);
-            colorAttachmentRef.layout(
-                    VK10.VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
-            VkAttachmentReference.Buffer pColorRefs
-                    = VkAttachmentReference.calloc(1, stack);
-            pColorRefs.put(0, colorAttachmentRef);
-
-            // a single depth buffer:
-            VkAttachmentDescription depthAttachment = pDescriptions.get(1);
-            depthAttachment.finalLayout(
-                    VK10.VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
-            depthAttachment.format(depthBufferFormat);
-            depthAttachment.initialLayout(VK10.VK_IMAGE_LAYOUT_UNDEFINED);
-            depthAttachment.samples(VK10.VK_SAMPLE_COUNT_1_BIT);
-
-            // no stencil operations:
-            depthAttachment.stencilLoadOp(VK10.VK_ATTACHMENT_LOAD_OP_DONT_CARE);
-            depthAttachment.stencilStoreOp(
-                    VK10.VK_ATTACHMENT_STORE_OP_DONT_CARE);
-
-            // Clear the depth buffer before each frame:
-            depthAttachment.loadOp(VK10.VK_ATTACHMENT_LOAD_OP_CLEAR);
-            depthAttachment.storeOp(VK10.VK_ATTACHMENT_STORE_OP_DONT_CARE);
-
-            VkAttachmentReference depthAttachmentRef = pReferences.get(1);
-            depthAttachmentRef.attachment(1);
-            depthAttachmentRef.layout(
-                    VK10.VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
-
-            // a single subpass:
-            VkSubpassDescription.Buffer subpasses
-                    = VkSubpassDescription.calloc(1, stack);
-            subpasses.colorAttachmentCount(1);
-            subpasses.pColorAttachments(pColorRefs);
-            subpasses.pDepthStencilAttachment(depthAttachmentRef);
-            subpasses.pipelineBindPoint(VK10.VK_PIPELINE_BIND_POINT_GRAPHICS);
-
-            // Create a sub-pass dependency:
-            VkSubpassDependency.Buffer pDependency
-                    = VkSubpassDependency.calloc(1, stack);
-            pDependency.dstAccessMask(
-                    VK10.VK_ACCESS_COLOR_ATTACHMENT_READ_BIT
-                    | VK10.VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT);
-            pDependency.dstStageMask(
-                    VK10.VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT);
-            pDependency.dstSubpass(0);
-            pDependency.srcAccessMask(0);
-            pDependency.srcStageMask(
-                    VK10.VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT);
-            pDependency.srcSubpass(VK10.VK_SUBPASS_EXTERNAL);
-
-            // Create the render pass with its dependency:
-            VkRenderPassCreateInfo createInfo
-                    = VkRenderPassCreateInfo.calloc(stack);
-            createInfo.sType(
-                    VK10.VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO);
-
-            createInfo.pAttachments(pDescriptions);
-            createInfo.pDependencies(pDependency);
-            createInfo.pSubpasses(subpasses);
-
-            LongBuffer pHandle = stack.mallocLong(1);
-            int retCode = VK10.vkCreateRenderPass(
-                    logicalDevice, createInfo, defaultAllocator, pHandle);
-            Utils.checkForError(retCode, "create reander pass");
-            renderPassHandle = pHandle.get(0);
-        }
-    }
-
-    /**
-     * Create the graphics pipeline for the main window.
-     */
-    private static void createPipeline() {
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            ByteBuffer entryPoint = stack.UTF8("main");
-            VkPipelineShaderStageCreateInfo.Buffer stageCreateInfos
-                    = VkPipelineShaderStageCreateInfo.calloc(2, stack);
-
-            // shader stage 0 - vertex shader:
-            VkPipelineShaderStageCreateInfo vertCreateInfo
-                    = stageCreateInfos.get(0);
-            vertCreateInfo.sType(
-                    VK10.VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO);
-
-            vertCreateInfo.module(vertModuleHandle);
-            vertCreateInfo.pName(entryPoint);
-            vertCreateInfo.stage(VK10.VK_SHADER_STAGE_VERTEX_BIT);
-
-            // shader stage 1 - fragment shader:
-            VkPipelineShaderStageCreateInfo fragCreateInfo
-                    = stageCreateInfos.get(1);
-            fragCreateInfo.sType(
-                    VK10.VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO);
-
-            fragCreateInfo.module(fragModuleHandle);
-            fragCreateInfo.pName(entryPoint);
-            fragCreateInfo.stage(VK10.VK_SHADER_STAGE_FRAGMENT_BIT);
-
-            // vertex-input state - describes format of vertex data:
-            VkPipelineVertexInputStateCreateInfo visCreateInfo
-                    = VkPipelineVertexInputStateCreateInfo.calloc(stack);
-            visCreateInfo.sType(
-                    VK10.VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO);
-
-            VkVertexInputBindingDescription.Buffer pBindingDesc
-                    = sampleMesh.generateBindingDescription(stack);
-            visCreateInfo.pVertexBindingDescriptions(pBindingDesc);
-
-            VkVertexInputAttributeDescription.Buffer pAttributeDesc
-                    = sampleMesh.generateAttributeDescriptions(stack);
-            visCreateInfo.pVertexAttributeDescriptions(pAttributeDesc);
-
-            // input-assembly state:
-            //    1. what kind of mesh to build (mesh mode/topology)
-            //    2. whether primitive restart should be enabled
-            VkPipelineInputAssemblyStateCreateInfo iasCreateInfo
-                    = VkPipelineInputAssemblyStateCreateInfo.calloc(stack);
-            iasCreateInfo.sType(
-                    VK10.VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO);
-
-            iasCreateInfo.primitiveRestartEnable(false);
-            iasCreateInfo.topology(VK10.VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
-
-            // viewport location and dimensions:
-            VkViewport.Buffer viewport = VkViewport.calloc(1, stack);
-            viewport.height(frameBufferHeight);
-            viewport.maxDepth(1f);
-            viewport.minDepth(0f);
-            viewport.width(frameBufferWidth);
-            viewport.x(0f);
-            viewport.y(0f);
-
-            // scissor - region of the frame buffer where pixels are written:
-            VkRect2D.Buffer scissor = VkRect2D.calloc(1, stack);
-            scissor.offset(VkOffset2D.calloc(stack).set(0, 0));
-            scissor.extent(frameBufferExtent);
-
-            // viewport state:
-            VkPipelineViewportStateCreateInfo vsCreateInfo
-                    = VkPipelineViewportStateCreateInfo.calloc(stack);
-            vsCreateInfo.sType(
-                    VK10.VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO);
-
-            vsCreateInfo.pViewports(viewport);
-            vsCreateInfo.pScissors(scissor);
-
-            // rasterization state:
-            //    1. turns mesh primitives into fragments
-            //    2. performs depth testing, face culling, and the scissor test
-            //    3. fills polygons and/or edges (wireframe)
-            //    4. determines front/back faces of polygons (winding)
-            VkPipelineRasterizationStateCreateInfo rsCreateInfo
-                    = VkPipelineRasterizationStateCreateInfo.calloc(stack);
-            rsCreateInfo.sType(
-                    VK10.VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO);
-
-            rsCreateInfo.cullMode(VK10.VK_CULL_MODE_BACK_BIT);
-            rsCreateInfo.depthBiasEnable(false);
-            rsCreateInfo.depthClampEnable(false);
-            rsCreateInfo.frontFace(VK10.VK_FRONT_FACE_COUNTER_CLOCKWISE);
-            rsCreateInfo.lineWidth(1f); // in fragments
-            rsCreateInfo.polygonMode(VK10.VK_POLYGON_MODE_FILL);
-            rsCreateInfo.rasterizerDiscardEnable(false);
-
-            // multisample state:
-            VkPipelineMultisampleStateCreateInfo msCreateInfo
-                    = VkPipelineMultisampleStateCreateInfo.calloc(stack);
-            msCreateInfo.sType(
-                    VK10.VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO);
-
-            msCreateInfo.alphaToCoverageEnable(false);
-            msCreateInfo.alphaToOneEnable(false);
-            msCreateInfo.minSampleShading(1f);
-            msCreateInfo.pSampleMask(0);
-            msCreateInfo.rasterizationSamples(VK10.VK_SAMPLE_COUNT_1_BIT);
-            msCreateInfo.sampleShadingEnable(false);
-
-            // color-blend attachment state - per attached frame buffer:
-            VkPipelineColorBlendAttachmentState.Buffer cbaState
-                    = VkPipelineColorBlendAttachmentState.calloc(1, stack);
-            cbaState.alphaBlendOp(VK10.VK_BLEND_OP_ADD);
-            cbaState.blendEnable(false); // no linear blend
-            cbaState.colorWriteMask(
-                    VK10.VK_COLOR_COMPONENT_R_BIT
-                    | VK10.VK_COLOR_COMPONENT_G_BIT
-                    | VK10.VK_COLOR_COMPONENT_B_BIT
-                    | VK10.VK_COLOR_COMPONENT_A_BIT);
-            cbaState.colorBlendOp(VK10.VK_BLEND_OP_ADD);
-            cbaState.dstAlphaBlendFactor(VK10.VK_BLEND_FACTOR_ZERO);
-            cbaState.dstColorBlendFactor(VK10.VK_BLEND_FACTOR_ZERO);
-            cbaState.srcAlphaBlendFactor(VK10.VK_BLEND_FACTOR_ONE);
-            cbaState.srcColorBlendFactor(VK10.VK_BLEND_FACTOR_ONE);
-
-            // color-blend state - affects all attached frame buffers:
-            //   combine frag shader output color with color in the frame buffer
-            VkPipelineColorBlendStateCreateInfo cbsCreateInfo
-                    = VkPipelineColorBlendStateCreateInfo.calloc(stack);
-            cbsCreateInfo.sType(
-                    VK10.VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO);
-
-            cbsCreateInfo.blendConstants(stack.floats(0f, 0f, 0f, 0f));
-            cbsCreateInfo.logicOp(VK10.VK_LOGIC_OP_COPY);
-            cbsCreateInfo.logicOpEnable(false); // no logic operation blend
-            cbsCreateInfo.pAttachments(cbaState);
-
-            // depth-stencil state:
-            VkPipelineDepthStencilStateCreateInfo dssCreateInfo
-                    = VkPipelineDepthStencilStateCreateInfo.calloc(stack);
-            dssCreateInfo.sType(
-                    VK10.VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO);
-
-            dssCreateInfo.depthTestEnable(true);
-            dssCreateInfo.depthWriteEnable(true);
-            dssCreateInfo.depthCompareOp(VK10.VK_COMPARE_OP_LESS);
-            dssCreateInfo.depthBoundsTestEnable(false);
-            dssCreateInfo.minDepthBounds(0f); // Optional
-            dssCreateInfo.maxDepthBounds(1f); // Optional
-            dssCreateInfo.stencilTestEnable(false);
-
-            // Create the pipeline:
-            VkGraphicsPipelineCreateInfo.Buffer pCreateInfo
-                    = VkGraphicsPipelineCreateInfo.calloc(1, stack);
-            pCreateInfo.sType(
-                    VK10.VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO);
-
-            pCreateInfo.basePipelineHandle(VK10.VK_NULL_HANDLE);
-            pCreateInfo.basePipelineIndex(-1);
-            pCreateInfo.layout(pipelineLayoutHandle);
-            pCreateInfo.pColorBlendState(cbsCreateInfo);
-            pCreateInfo.pDepthStencilState(dssCreateInfo);
-            pCreateInfo.pInputAssemblyState(iasCreateInfo);
-            pCreateInfo.pMultisampleState(msCreateInfo);
-            pCreateInfo.pRasterizationState(rsCreateInfo);
-            pCreateInfo.pStages(stageCreateInfos);
-            pCreateInfo.pVertexInputState(visCreateInfo);
-            pCreateInfo.pViewportState(vsCreateInfo);
-            pCreateInfo.renderPass(renderPassHandle);
-            pCreateInfo.subpass(0);
-
-            long pipelineCache = VK10.VK_NULL_HANDLE; // disable cacheing
-            LongBuffer pHandle = stack.mallocLong(1);
-            int retCode = VK10.vkCreateGraphicsPipelines(logicalDevice,
-                    pipelineCache, pCreateInfo, defaultAllocator, pHandle);
-            Utils.checkForError(retCode, "create graphics pipeline");
-            pipelineHandle = pHandle.get(0);
         }
     }
 
@@ -1936,64 +1293,7 @@ public abstract class BaseApplication {
             inFlightFrames = null;
         }
 
-        destroyPipeline();
-
-        for (BufferResource ubo : ubos) {
-            ubo.destroy();
-        }
-        ubos.clear();
-
-        descriptorSetHandles = null;
-        if (descriptorPoolHandle != VK10.VK_NULL_HANDLE) {
-            VK10.vkDestroyDescriptorPool(
-                    logicalDevice, descriptorPoolHandle, defaultAllocator);
-            descriptorPoolHandle = VK10.VK_NULL_HANDLE;
-        }
-
-        if (chainFrameBufferHandles != null) {
-            for (long handle : chainFrameBufferHandles) {
-                VK10.vkDestroyFramebuffer(
-                        logicalDevice, handle, defaultAllocator);
-            }
-            chainFrameBufferHandles = null;
-        }
-
-        if (renderPassHandle != VK10.VK_NULL_HANDLE) {
-            VK10.vkDestroyRenderPass(
-                    logicalDevice, renderPassHandle, defaultAllocator);
-            renderPassHandle = VK10.VK_NULL_HANDLE;
-        }
-
-        if (depthResources != null) {
-            depthResources.destroy();
-            depthResources = null;
-        }
-
-        if (chainViewHandles != null) {
-            for (Long handle : chainViewHandles) {
-                VK10.vkDestroyImageView(
-                        logicalDevice, handle, defaultAllocator);
-            }
-            chainViewHandles = null;
-        }
-
-        // Finally, destroy the swapchain itself:
-        if (chainHandle != VK10.VK_NULL_HANDLE) {
-            KHRSwapchain.vkDestroySwapchainKHR(
-                    logicalDevice, chainHandle, defaultAllocator);
-            chainHandle = VK10.VK_NULL_HANDLE;
-        }
-    }
-
-    /**
-     * Destroy the graphics pipeline for the main window.
-     */
-    private static void destroyPipeline() {
-        if (pipelineHandle != VK10.VK_NULL_HANDLE) {
-            VK10.vkDestroyPipeline(
-                    logicalDevice, pipelineHandle, defaultAllocator);
-            pipelineHandle = VK10.VK_NULL_HANDLE;
-        }
+        chainResources.destroy();
     }
 
     /**
@@ -2217,10 +1517,12 @@ public abstract class BaseApplication {
                     = VkRenderPassBeginInfo.calloc(stack);
             renderPassInfo.sType(VK10.VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO);
 
+            long renderPassHandle = chainResources.passHandle();
             renderPassInfo.renderPass(renderPassHandle);
 
             VkRect2D renderArea = VkRect2D.calloc(stack);
             renderArea.offset(VkOffset2D.calloc(stack).set(0, 0));
+            VkExtent2D frameBufferExtent = chainResources.framebufferExtent(stack);
             renderArea.extent(frameBufferExtent);
             renderPassInfo.renderArea(renderArea);
 
@@ -2242,12 +1544,13 @@ public abstract class BaseApplication {
 
                 // command to begin a render pass on the corresponding image:
                 long frameBufferHandle
-                        = chainFrameBufferHandles.get(imageIndex);
+                        = chainResources.framebufferHandle(imageIndex);
                 renderPassInfo.framebuffer(frameBufferHandle);
                 VK10.vkCmdBeginRenderPass(commandBuffer, renderPassInfo,
                         VK10.VK_SUBPASS_CONTENTS_INLINE);
 
                 // command to bind the graphics pipeline:
+                long pipelineHandle = chainResources.pipelineHandle();
                 VK10.vkCmdBindPipeline(commandBuffer,
                         VK10.VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineHandle);
 
@@ -2270,7 +1573,8 @@ public abstract class BaseApplication {
                 }
 
                 // command to bind the uniforms:
-                long descriptorSet = descriptorSetHandles.get(imageIndex);
+                long descriptorSet
+                        = chainResources.descriptorSetHandle(imageIndex);
                 LongBuffer pDescriptorSets = stack.longs(descriptorSet);
                 VK10.vkCmdBindDescriptorSets(commandBuffer,
                         VK10.VK_PIPELINE_BIND_POINT_GRAPHICS,
@@ -2334,6 +1638,7 @@ public abstract class BaseApplication {
      * @param frame the frame to render (not null)
      */
     private static void renderFrame(Frame frame) {
+        long chainHandle = chainResources.chainHandle();
         long fenceHandle = frame.fenceHandle();
         long imageAvailableSemaphoreHandle
                 = frame.imageAvailableSemaphoreHandle();
@@ -2481,7 +1786,7 @@ public abstract class BaseApplication {
      * @param imageIndex index of the target image among the swap-chain images.
      */
     private static void updateUniformBuffer(int imageIndex) {
-        ByteBuffer byteBuffer = ubos.get(imageIndex).getData();
+        ByteBuffer byteBuffer = chainResources.getUbo(imageIndex).getData();
         uniformValues.writeTo(byteBuffer);
     }
 }
