@@ -200,6 +200,11 @@ public abstract class BaseApplication {
      */
     private static Map<Integer, Frame> framesInFlight;
     /**
+     * map program names to programs
+     */
+    final private static Map<String, ShaderProgram> programMap
+            = new HashMap<>(16);
+    /**
      * mesh of triangles to be rendered
      */
     private static Mesh sampleMesh;
@@ -662,6 +667,23 @@ public abstract class BaseApplication {
 
             return result;
         }
+    }
+
+    /**
+     * Return the named ShaderProgram.
+     *
+     * @param name (not null)
+     * @return a valid program (not null)
+     */
+    static ShaderProgram getProgram(String name) {
+        if (!programMap.containsKey(name)) {
+            ShaderProgram program = new ShaderProgram(name);
+            programMap.put(name, program);
+        }
+
+        ShaderProgram result = programMap.get(name);
+        assert result != null;
+        return result;
     }
 
     /**
@@ -1371,7 +1393,7 @@ public abstract class BaseApplication {
         createDescriptorSetLayout(); // depends on the logical device
         pipelineLayoutHandle = createPipelineLayout();
 
-        shaderProgram = new ShaderProgram("Debug/HelloVSport");
+        shaderProgram = getProgram("Debug/HelloVSport");
 
         createChainResources();
     }
