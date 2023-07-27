@@ -1280,6 +1280,7 @@ public abstract class BaseApplication {
 
         if (chainResources != null) {
             chainResources.destroy();
+            chainResources = null;
         }
     }
 
