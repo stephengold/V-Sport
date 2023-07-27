@@ -1275,7 +1275,9 @@ public abstract class BaseApplication {
             inFlightFrames = null;
         }
 
-        chainResources.destroy();
+        if (chainResources != null) {
+            chainResources.destroy();
+        }
     }
 
     /**
