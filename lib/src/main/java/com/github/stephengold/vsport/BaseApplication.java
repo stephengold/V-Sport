@@ -370,7 +370,10 @@ public abstract class BaseApplication {
          * starting with the chain resources:
          */
         destroyChainResources();
-        shaderProgram.destroy();
+        if (shaderProgram != null) {
+            shaderProgram.destroy();
+            shaderProgram = null;
+        }
 
         // Destroy the pipeline layout:
         if (pipelineLayoutHandle != VK10.VK_NULL_HANDLE) {
