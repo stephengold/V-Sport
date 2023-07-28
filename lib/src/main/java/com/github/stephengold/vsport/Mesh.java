@@ -140,7 +140,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
         boolean hasNormal = representativeVertex.hasNormal();
         if (hasNormal) {
             numBytes = vertexCount * numAxes * Float.BYTES;
-            normalBuffer = new BufferResource(numBytes, usage, staging) {
+            this.normalBuffer = new BufferResource(numBytes, usage, staging) {
                 @Override
                 void fill(ByteBuffer destinationBuffer) {
                     for (Vertex vertex : vertices) {
@@ -185,7 +185,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
         boolean hasColor = representativeVertex.hasColor();
         if (hasColor) {
             numBytes = vertexCount * 3 * Float.BYTES;
-            colorBuffer = new BufferResource(numBytes, usage, staging) {
+            this.colorBuffer = new BufferResource(numBytes, usage, staging) {
                 @Override
                 void fill(ByteBuffer destinationBuffer) {
                     for (Vertex vertex : vertices) {
