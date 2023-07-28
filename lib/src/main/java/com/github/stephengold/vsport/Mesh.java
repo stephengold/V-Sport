@@ -32,7 +32,10 @@ package com.github.stephengold.vsport;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.LongBuffer;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.vulkan.VK10;
 import org.lwjgl.vulkan.VkVertexInputAttributeDescription;
@@ -467,6 +470,34 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     @Override
     public boolean isPureTriangles() {
         return true;
+    }
+
+    /**
+     * Create a mesh by de-duplicating a sequence of vertices.
+     *
+     * @param vertices the vertex data to use (not null, unaffected)
+     * @return a new instance
+     */
+    static Mesh newInstance(List<Vertex> vertices) {
+        int count = vertices.size();
+        List<Integer> tempIndices = new ArrayList<>(count);
+        List<Vertex> tempVertices = new ArrayList<>(count);
+        Map<Vertex, Integer> tempMap = new HashMap<>(count);
+
+        for (Vertex vertex : vertices) {
+            Integer index = tempMap.get(vertex);
+            if (index == null) {
+                int nextIndex = tempVertices.size();
+                tempIndices.add(nextIndex);
+                tempVertices.add(vertex);
+                tempMap.put(vertex, nextIndex);
+            } else { // reuse a vertex we've already seen
+                tempIndices.add(index);
+            }
+        }
+
+        Mesh result = new Mesh(tempIndices, tempVertices);
+        return result;
     }
 
     /**

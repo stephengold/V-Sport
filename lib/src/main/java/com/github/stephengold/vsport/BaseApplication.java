@@ -1389,10 +1389,10 @@ public abstract class BaseApplication {
 
         String resourceName = "/Models/viking_room/viking_room.obj";
         int flags = Assimp.aiProcess_DropNormals | Assimp.aiProcess_FlipUVs;
-        List<Integer> indices = new ArrayList<>();
+        List<Integer> indices = null;
         List<Vertex> vertices = new ArrayList<>();
         AssimpUtils.extractTriangles(resourceName, flags, indices, vertices);
-        sampleMesh = new Mesh(indices, vertices);
+        sampleMesh = Mesh.newInstance(vertices);
 
         sampleTexture = new Texture("/Models/viking_room/viking_room.png");
         createTextureSampler(); // depends on the logical device
