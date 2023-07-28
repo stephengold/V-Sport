@@ -74,6 +74,10 @@ public class Mesh implements jme3utilities.lbj.Mesh {
      */
     private BufferResource texCoordsBuffer;
     /**
+     * vertex colors (3 floats per vertex) or null if none
+     */
+    private FloatBuffer colorFloats;
+    /**
      * vertex normals (3 floats per vertex) or null if none
      */
     private FloatBuffer normalFloats;
@@ -81,6 +85,10 @@ public class Mesh implements jme3utilities.lbj.Mesh {
      * vertex positions (3 floats per vertex)
      */
     private FloatBuffer positionFloats;
+    /**
+     * vertex texture coordinates (2 floats per vertex) or null if none
+     */
+    private FloatBuffer texCoordsFloats;
     /**
      * vertex indices, or null if none
      */
@@ -159,8 +167,14 @@ public class Mesh implements jme3utilities.lbj.Mesh {
                     }
                 }
             };
+
+            byteBuffer = texCoordsBuffer.getData();
+            byteBuffer.flip();
+            this.texCoordsFloats = byteBuffer.asFloatBuffer();
+
         } else {
             this.texCoordsBuffer = null;
+            this.texCoordsFloats = null;
         }
 
         // color buffer:
@@ -175,8 +189,14 @@ public class Mesh implements jme3utilities.lbj.Mesh {
                     }
                 }
             };
+
+            byteBuffer = colorBuffer.getData();
+            byteBuffer.flip();
+            this.colorFloats = byteBuffer.asFloatBuffer();
+
         } else {
             this.colorBuffer = null;
+            this.colorFloats = null;
         }
     }
     // *************************************************************************
@@ -219,10 +239,12 @@ public class Mesh implements jme3utilities.lbj.Mesh {
         if (colorBuffer != null) {
             colorBuffer.destroy();
             this.colorBuffer = null;
+            this.colorFloats = null;
         }
         if (texCoordsBuffer != null) {
             texCoordsBuffer.destroy();
             this.texCoordsBuffer = null;
+            this.texCoordsFloats = null;
         }
         if (normalBuffer != null) {
             normalBuffer.destroy();
