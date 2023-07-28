@@ -215,7 +215,7 @@ public abstract class BaseApplication {
     /**
      * names of all device extensions that the application requires
      */
-    private static final Set<String> requiredDeviceExtensions = new HashSet<>();
+    final private static Set<String> requiredDeviceExtensions = new HashSet<>();
     /**
      * names of validation layers to enable during initialization
      */

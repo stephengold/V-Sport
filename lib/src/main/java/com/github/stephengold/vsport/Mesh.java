@@ -52,11 +52,11 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     /**
      * number of axes in a vector
      */
-    private static final int numAxes = 3;
+    final private static int numAxes = 3;
     /**
      * number of vertices per triangle
      */
-    static final int vpt = 3;
+    final static int vpt = 3;
     // *************************************************************************
     // fields
 
@@ -99,7 +99,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     /**
      * number of vertices (based on buffer sizes, unmodified by indexing)
      */
-    private final int vertexCount;
+    final private int vertexCount;
     // *************************************************************************
     // constructors
 
