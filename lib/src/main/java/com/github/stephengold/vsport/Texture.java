@@ -50,15 +50,15 @@ class Texture {
     /**
      * handle of the image resource (native type: VkImage)
      */
-    private long textureImageHandle = VK10.VK_NULL_HANDLE;
+    private long imageHandle = VK10.VK_NULL_HANDLE;
     /**
      * handle of the image's memory (native type: VkDeviceMemory)
      */
-    private long textureMemoryHandle = VK10.VK_NULL_HANDLE;
+    private long memoryHandle = VK10.VK_NULL_HANDLE;
     /**
      * handle of the image view (native type: VkImageView)
      */
-    private long textureViewHandle = VK10.VK_NULL_HANDLE;
+    private long viewHandle = VK10.VK_NULL_HANDLE;
     /**
      * allocator for direct buffers, or null to use the default allocator
      */
@@ -141,18 +141,18 @@ class Texture {
             BaseApplication.createImage(width, height, textureFormat,
                     VK10.VK_IMAGE_TILING_OPTIMAL, createUsage, properties,
                     pImageHandle, pMemoryHandle);
-            textureImageHandle = pImageHandle.get(0);
-            textureMemoryHandle = pMemoryHandle.get(0);
-            BaseApplication.alterImageLayout(textureImageHandle, textureFormat,
+            this.imageHandle = pImageHandle.get(0);
+            this.memoryHandle = pMemoryHandle.get(0);
+            BaseApplication.alterImageLayout(imageHandle, textureFormat,
                     VK10.VK_IMAGE_LAYOUT_UNDEFINED,
                     VK10.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
             // Copy the data from the staging buffer the new image:
             BaseApplication.copyBufferToImage(
-                    stagingBufferHandle, textureImageHandle, width, height);
+                    stagingBufferHandle, imageHandle, width, height);
 
             // Convert the image to a layout optimized for sampling:
-            BaseApplication.alterImageLayout(textureImageHandle, textureFormat,
+            BaseApplication.alterImageLayout(imageHandle, textureFormat,
                     VK10.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
                     VK10.VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
@@ -162,8 +162,8 @@ class Texture {
             VK10.vkFreeMemory(logicalDevice, stagingMemoryHandle, allocator);
 
             // Create a view for the new image:
-            textureViewHandle = BaseApplication.createImageView(
-                    textureImageHandle, textureFormat,
+            this.viewHandle = BaseApplication.createImageView(
+                    imageHandle, textureFormat,
                     VK10.VK_IMAGE_ASPECT_COLOR_BIT);
         }
     }
@@ -174,20 +174,20 @@ class Texture {
      * Destroy the LWJGL resources and free the associated memory.
      */
     void destroy() {
-        if (textureViewHandle != VK10.VK_NULL_HANDLE) {
+        if (viewHandle != VK10.VK_NULL_HANDLE) {
             VK10.vkDestroyImageView(
-                    logicalDevice, textureViewHandle, allocator);
-            this.textureViewHandle = VK10.VK_NULL_HANDLE;
+                    logicalDevice, viewHandle, allocator);
+            this.viewHandle = VK10.VK_NULL_HANDLE;
         }
-        if (textureMemoryHandle != VK10.VK_NULL_HANDLE) {
+        if (memoryHandle != VK10.VK_NULL_HANDLE) {
             VK10.vkFreeMemory(
-                    logicalDevice, textureMemoryHandle, allocator);
-            this.textureMemoryHandle = VK10.VK_NULL_HANDLE;
+                    logicalDevice, memoryHandle, allocator);
+            this.memoryHandle = VK10.VK_NULL_HANDLE;
         }
-        if (textureImageHandle != VK10.VK_NULL_HANDLE) {
+        if (imageHandle != VK10.VK_NULL_HANDLE) {
             VK10.vkDestroyImage(
-                    logicalDevice, textureImageHandle, allocator);
-            this.textureImageHandle = VK10.VK_NULL_HANDLE;
+                    logicalDevice, imageHandle, allocator);
+            this.imageHandle = VK10.VK_NULL_HANDLE;
         }
     }
 
@@ -197,6 +197,6 @@ class Texture {
      * @return the handle
      */
     final long viewHandle() {
-        return textureViewHandle;
+        return viewHandle;
     }
 }
