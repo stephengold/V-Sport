@@ -345,7 +345,7 @@ public abstract class BaseApplication {
     }
 
     /**
-     * Return the aspect ratio of the main frame buffer.
+     * Return the aspect ratio of the displayed frame buffer.
      *
      * @return the width divided by the height (&gt;0)
      */
@@ -765,7 +765,7 @@ public abstract class BaseApplication {
     /**
      * Start the application.
      *
-     * @param appName the name of the application
+     * @param appName the name of the application (not null)
      * @param appMajor the major version number of the application
      * @param appMinor the minor version number of the application
      * @param appPatch the patch version number of the application

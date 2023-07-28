@@ -42,8 +42,8 @@ import org.lwjgl.vulkan.VkVertexInputAttributeDescription;
 import org.lwjgl.vulkan.VkVertexInputBindingDescription;
 
 /**
- * A mesh composed of triangles, with optional indices, normals, texture
- * coordinates, and vertex colors.
+ * A mesh composed of triangles, with optional indices, vertex colors, normals,
+ * and texture coordinates.
  */
 public class Mesh implements jme3utilities.lbj.Mesh {
     // *************************************************************************
@@ -106,8 +106,8 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     /**
      * Instantiate a mesh from vertices and optional indices.
      *
-     * @param indices the vertex indices to use, or null if none
-     * @param vertices the vertex data to use
+     * @param indices the vertex indices to use (unaffected) or null if none
+     * @param vertices the vertex data to use (not null, unaffected)
      */
     Mesh(List<Integer> indices, List<Vertex> vertices) {
         if (indices == null) {
