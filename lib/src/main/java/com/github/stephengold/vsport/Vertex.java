@@ -173,4 +173,63 @@ class Vertex {
         target.putFloat(texCoords.x());
         target.putFloat(texCoords.y());
     }
+    // *************************************************************************
+    // Object methods
+
+    /**
+     * Test for exact equivalence with another Object.
+     *
+     * @param otherObject the object to compare (may be null, unaffected)
+     * @return true if {@code this} and {@code otherObject} have identical
+     * values, otherwise false
+     */
+    @Override
+    public boolean equals(Object otherObject) {
+        boolean result;
+        if (otherObject == this) {
+            result = true;
+
+        } else if (otherObject != null
+                && otherObject.getClass() == getClass()) {
+            Vertex otherVertex = (Vertex) otherObject;
+            result = otherVertex.position.equals(position);
+            if (result && color != otherVertex.color) {
+                result = (color != null && color.equals(otherVertex.color));
+            }
+            if (result && normal != otherVertex.normal) {
+                result = (normal != null && color.equals(otherVertex.normal));
+            }
+            if (result && texCoords != otherVertex.texCoords) {
+                result = (texCoords != null
+                        && texCoords.equals(otherVertex.texCoords));
+            }
+
+        } else {
+            result = false;
+        }
+
+        return result;
+    }
+
+    /**
+     * Generate the hash code for this Vertex.
+     *
+     * @return a 32-bit value for use in hashing
+     */
+    @Override
+    public int hashCode() {
+        int result = 707;
+        result = 29 * result + position.hashCode();
+        if (color != null) {
+            result = 29 * result + color.hashCode();
+        }
+        if (normal != null) {
+            result = 31 * result + normal.hashCode();
+        }
+        if (texCoords != null) {
+            result = 37 * result + texCoords.hashCode();
+        }
+
+        return result;
+    }
 }
