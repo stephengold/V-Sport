@@ -162,7 +162,8 @@ public class Mesh implements jme3utilities.lbj.Mesh {
         boolean hasTexCoords = representativeVertex.hasTexCoords();
         if (hasTexCoords) {
             numBytes = vertexCount * 2 * Float.BYTES;
-            this.texCoordsBuffer = new BufferResource(numBytes, usage, staging) {
+            this.texCoordsBuffer = new BufferResource(
+                    numBytes, usage, staging) {
                 @Override
                 void fill(ByteBuffer destinationBuffer) {
                     for (Vertex vertex : vertices) {
@@ -283,7 +284,8 @@ public class Mesh implements jme3utilities.lbj.Mesh {
         int offset = 0;
 
         // position attribute (3 signed floats in slot 0)
-        VkVertexInputAttributeDescription posDescription = result.get(slotIndex);
+        VkVertexInputAttributeDescription posDescription
+                = result.get(slotIndex);
         posDescription.binding(slotIndex);
         posDescription.format(VK10.VK_FORMAT_R32G32B32_SFLOAT);
         posDescription.location(slotIndex); // slot 0 (see the vertex shader)

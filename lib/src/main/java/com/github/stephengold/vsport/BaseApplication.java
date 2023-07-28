@@ -819,7 +819,8 @@ public abstract class BaseApplication {
         VkDebugUtilsMessengerCreateInfoEXT messengerCreateInfo
                 = VkDebugUtilsMessengerCreateInfoEXT.calloc(stack);
         messengerCreateInfo.sType(
-                EXTDebugUtils.VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT);
+                EXTDebugUtils.VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT
+        );
 
         messengerCreateInfo.messageSeverity(
                 EXTDebugUtils.VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT
@@ -1499,7 +1500,8 @@ public abstract class BaseApplication {
 
             VkRect2D renderArea = VkRect2D.calloc(stack);
             renderArea.offset(VkOffset2D.calloc(stack).set(0, 0));
-            VkExtent2D frameBufferExtent = chainResources.framebufferExtent(stack);
+            VkExtent2D frameBufferExtent
+                    = chainResources.framebufferExtent(stack);
             renderArea.extent(frameBufferExtent);
             renderPassInfo.renderArea(renderArea);
 
