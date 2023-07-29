@@ -760,6 +760,16 @@ public abstract class BaseApplication {
     }
 
     /**
+     * Return the physical device for rendering.
+     *
+     * @return the pre-existing instance (not null)
+     */
+    static PhysicalDevice getPhysicalDevice() {
+        assert physicalDevice != null;
+        return physicalDevice;
+    }
+
+    /**
      * Return the named ShaderProgram.
      *
      * @param name (not null)
