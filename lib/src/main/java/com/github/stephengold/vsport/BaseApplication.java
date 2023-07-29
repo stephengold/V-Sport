@@ -885,7 +885,7 @@ public abstract class BaseApplication {
      *
      * @return a new command buffer, ready to receive commands
      */
-    private static VkCommandBuffer beginSingleTimeCommands() {
+    static VkCommandBuffer beginSingleTimeCommands() {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             // Allocate a temporary command buffer:
             // TODO a pool of short-lived command buffers - see copyBuffer()
@@ -1291,7 +1291,7 @@ public abstract class BaseApplication {
      *
      * @param commandBuffer a command buffer containing commands
      */
-    private static void endSingleTimeCommands(VkCommandBuffer commandBuffer) {
+    static void endSingleTimeCommands(VkCommandBuffer commandBuffer) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             VK10.vkEndCommandBuffer(commandBuffer);
 
