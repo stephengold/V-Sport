@@ -38,6 +38,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 import javax.imageio.ImageIO;
 import jme3utilities.MyString;
+import jme3utilities.Validate;
 import org.lwjgl.vulkan.KHRSwapchain;
 import org.lwjgl.vulkan.VK10;
 
@@ -196,6 +197,19 @@ final class Utils {
                 = new Scanner(inputStream, StandardCharsets.UTF_8.name());
         String result = scanner.useDelimiter("\\A").next();
 
+        return result;
+    }
+
+    /**
+     * Calculate the floor of the base-2 logarithm of the input value.
+     *
+     * @param iValue the input value (&gt;0)
+     * @return the largest integer N &le 30 for which {@code (1 << N) <= iValue}
+     * (&ge;0, &le;30)
+     */
+    static int log2(int iValue) {
+        Validate.positive(iValue, "input value");
+        int result = 31 - Integer.numberOfLeadingZeros(iValue);
         return result;
     }
 }
