@@ -36,7 +36,6 @@ import org.lwjgl.PointerBuffer;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.vulkan.VK10;
 import org.lwjgl.vulkan.VkAllocationCallbacks;
-import org.lwjgl.vulkan.VkCommandBuffer;
 import org.lwjgl.vulkan.VkDevice;
 import org.lwjgl.vulkan.VkImageBlit;
 import org.lwjgl.vulkan.VkImageMemoryBarrier;
@@ -257,10 +256,7 @@ class Texture {
             barrierRange.layerCount(layerCount);
             barrierRange.levelCount(1);
 
-            VkCommandBuffer commandBuffer
-                    = BaseApplication.beginSingleTimeCommands();
-
-            int dependencyFlags = 0x0;
+            Commands commands = new Commands();
             int destinationStage;
             int sourceStage;
 
@@ -282,9 +278,7 @@ class Texture {
 
                 sourceStage = VK10.VK_PIPELINE_STAGE_TRANSFER_BIT;
                 destinationStage = VK10.VK_PIPELINE_STAGE_TRANSFER_BIT;
-                VK10.vkCmdPipelineBarrier(commandBuffer, sourceStage,
-                        destinationStage, dependencyFlags, null, null,
-                        pBarrier);
+                commands.addBarrier(sourceStage, destinationStage, pBarrier);
 
                 // Command to blit from the source level to the next level:
                 VkImageBlit.Buffer blit = VkImageBlit.calloc(1, stack);
@@ -305,10 +299,7 @@ class Texture {
                 srcRange.layerCount(layerCount);
                 srcRange.mipLevel(srcLevel);
 
-                VK10.vkCmdBlitImage(commandBuffer,
-                        imageHandle, VK10.VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-                        imageHandle, VK10.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-                        blit, VK10.VK_FILTER_LINEAR);
+                commands.addBlit(imageHandle, blit);
                 /*
                  * Command to wait until the blit is finished and then optimize
                  * the source level for being read by fragment shaders:
@@ -322,9 +313,7 @@ class Texture {
 
                 sourceStage = VK10.VK_PIPELINE_STAGE_TRANSFER_BIT;
                 destinationStage = VK10.VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-                VK10.vkCmdPipelineBarrier(commandBuffer, sourceStage,
-                        destinationStage, dependencyFlags, null, null,
-                        pBarrier);
+                commands.addBarrier(sourceStage, destinationStage, pBarrier);
 
                 // The current destination level becomes the next source level:
                 srcWidth = dstWidth;
@@ -342,10 +331,9 @@ class Texture {
 
             sourceStage = VK10.VK_PIPELINE_STAGE_TRANSFER_BIT;
             destinationStage = VK10.VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-            VK10.vkCmdPipelineBarrier(commandBuffer, sourceStage,
-                    destinationStage, dependencyFlags, null, null, pBarrier);
+            commands.addBarrier(sourceStage, destinationStage, pBarrier);
 
-            BaseApplication.endSingleTimeCommands(commandBuffer);
+            commands.submitToGraphicsQueue();
         }
     }
 }
