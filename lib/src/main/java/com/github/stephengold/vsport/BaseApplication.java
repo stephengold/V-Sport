@@ -988,8 +988,7 @@ public abstract class BaseApplication {
             VkDescriptorSetLayoutBinding uboBinding = pBindings.get(0);
             uboBinding.binding(0);
             uboBinding.descriptorCount(1); // a single UBO
-            uboBinding.descriptorType(
-                    VK10.VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
+            uboBinding.descriptorType(VK10.VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
             uboBinding.pImmutableSamplers(null);
 
             // The UBOs will be used only by the vertex-shader stage:

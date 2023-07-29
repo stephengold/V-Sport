@@ -172,8 +172,8 @@ class Texture {
                     VK10.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, numMipLevels);
 
             // Copy the data from the staging buffer the new image:
-            BaseApplication.copyBufferToImage(stagingBufferHandle, imageHandle,
-                    width, height);
+            BaseApplication.copyBufferToImage(
+                    stagingBufferHandle, imageHandle, width, height);
 
             generateMipLevels();
 
