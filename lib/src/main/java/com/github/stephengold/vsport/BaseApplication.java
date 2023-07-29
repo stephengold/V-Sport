@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import jme3utilities.Validate;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.Assimp;
 import org.lwjgl.glfw.GLFW;
@@ -267,9 +268,13 @@ public abstract class BaseApplication {
      * @param format the image format
      * @param oldLayout the pre-existing layout
      * @param newLayout the desired layout
+     * @param numMipLevels the desired number of MIP levels (including the
+     * original image, &ge;1, &le;31)
      */
-    static void alterImageLayout(
-            long imageHandle, int format, int oldLayout, int newLayout) {
+    static void alterImageLayout(long imageHandle, int format, int oldLayout,
+            int newLayout, int numMipLevels) {
+        Validate.inRange(numMipLevels, "number of MIP levels", 1, 31);
+
         try (MemoryStack stack = MemoryStack.stackPush()) {
             VkImageMemoryBarrier.Buffer pBarrier
                     = VkImageMemoryBarrier.calloc(1, stack);
@@ -297,7 +302,7 @@ public abstract class BaseApplication {
             range.baseArrayLayer(0);
             range.baseMipLevel(0);
             range.layerCount(1);
-            range.levelCount(1);
+            range.levelCount(numMipLevels);
 
             int sourceStage;
             int destinationStage;
@@ -605,6 +610,8 @@ public abstract class BaseApplication {
      *
      * @param width the desired width (in pixels)
      * @param height the desired height (in pixels)
+     * @param numMipLevels the desired number of mip levels (including the
+     * original image, &ge;1, &le;31)
      * @param format the desired format
      * @param tiling the desired tiling
      * @param usage a bitmask
@@ -614,9 +621,11 @@ public abstract class BaseApplication {
      * @param pMemory to store the handle of the image's memory (not null,
      * modified)
      */
-    static void createImage(int width, int height, int format,
+    static void createImage(int width, int height, int numMipLevels, int format,
             int tiling, int usage, int requiredProperties,
             LongBuffer pImage, LongBuffer pMemory) {
+        Validate.inRange(numMipLevels, "number of MIP levels", 1, 31);
+
         try (MemoryStack stack = MemoryStack.stackPush()) {
             VkImageCreateInfo imageInfo = VkImageCreateInfo.calloc(stack);
             imageInfo.sType(VK10.VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO);
@@ -628,7 +637,7 @@ public abstract class BaseApplication {
             imageInfo.format(format);
             imageInfo.imageType(VK10.VK_IMAGE_TYPE_2D);
             imageInfo.initialLayout(VK10.VK_IMAGE_LAYOUT_UNDEFINED);
-            imageInfo.mipLevels(1);
+            imageInfo.mipLevels(numMipLevels);
             imageInfo.samples(VK10.VK_SAMPLE_COUNT_1_BIT);
             imageInfo.sharingMode(VK10.VK_SHARING_MODE_EXCLUSIVE);
             imageInfo.tiling(tiling);
@@ -672,9 +681,14 @@ public abstract class BaseApplication {
      * @param imageHandle the handle of the image
      * @param format the desired format for the view
      * @param aspectMask a bitmask of VK_IMAGE_ASPECT_... values
+     * @param numMipLevels the desired number of MIP levels (including the
+     * original image, &ge;1, &le;31)
      * @return the handle of the new VkImageView
      */
-    static long createImageView(long imageHandle, int format, int aspectMask) {
+    static long createImageView(
+            long imageHandle, int format, int aspectMask, int numMipLevels) {
+        Validate.inRange(numMipLevels, "number of MIP levels", 1, 31);
+
         try (MemoryStack stack = MemoryStack.stackPush()) {
             VkImageViewCreateInfo createInfo
                     = VkImageViewCreateInfo.calloc(stack);
@@ -699,7 +713,7 @@ public abstract class BaseApplication {
             range.baseArrayLayer(0);
             range.baseMipLevel(0);
             range.layerCount(1);
-            range.levelCount(1);
+            range.levelCount(numMipLevels);
 
             LongBuffer pHandle = stack.mallocLong(1);
             int retCode = VK10.vkCreateImageView(
