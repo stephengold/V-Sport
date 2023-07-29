@@ -334,6 +334,30 @@ class PhysicalDevice {
     }
 
     /**
+     * Test whether the device supports blitting with linear interpolation on
+     * images with optimal tiling in the specified image format.
+     *
+     * @param imageFormat the image format to test
+     */
+    boolean supportsLinearBlit(int imageFormat) {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            VkFormatProperties pFormatProperties
+                    = VkFormatProperties.calloc(stack);
+            VK10.vkGetPhysicalDeviceFormatProperties(
+                    vkPhysicalDevice, imageFormat, pFormatProperties);
+            int features = pFormatProperties.optimalTilingFeatures();
+            int required
+                    = VK10.VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT;
+
+            if ((features & required) == required) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+
+    /**
      * Represent this instance as a text string.
      *
      * @return descriptive string of text (not null)
