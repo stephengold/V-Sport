@@ -1218,7 +1218,10 @@ public abstract class BaseApplication {
             samplerInfo.compareOp(VK10.VK_COMPARE_OP_ALWAYS);
             samplerInfo.magFilter(VK10.VK_FILTER_LINEAR);
             samplerInfo.maxAnisotropy(16f);
+            samplerInfo.maxLod(31f);
             samplerInfo.minFilter(VK10.VK_FILTER_LINEAR);
+            samplerInfo.minLod(0f);
+            samplerInfo.mipLodBias(0f);
             samplerInfo.mipmapMode(VK10.VK_SAMPLER_MIPMAP_MODE_LINEAR);
             samplerInfo.unnormalizedCoordinates(false);
 
