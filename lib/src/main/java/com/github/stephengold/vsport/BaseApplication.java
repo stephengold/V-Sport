@@ -706,7 +706,7 @@ public abstract class BaseApplication {
             swizzle.a(VK10.VK_COMPONENT_SWIZZLE_IDENTITY);
             /*
              * The image will be used as a single-layer color target
-             * without any mipmapping.
+             * without any MIP mapping.
              */
             VkImageSubresourceRange range = createInfo.subresourceRange();
             range.aspectMask(aspectMask);
@@ -905,7 +905,7 @@ public abstract class BaseApplication {
     // private methods
 
     /**
-     * Allocate a command buffer as needed.
+     * Allocate command buffers as needed.
      *
      * @param numBuffersNeeded the number of command buffers needed
      * @param addBuffers storage for allocated command buffers (not null, added

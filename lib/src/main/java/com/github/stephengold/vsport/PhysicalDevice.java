@@ -338,6 +338,7 @@ class PhysicalDevice {
      * images with optimal tiling in the specified image format.
      *
      * @param imageFormat the image format to test
+     * @return true if supported, otherwise false
      */
     boolean supportsLinearBlit(int imageFormat) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
@@ -356,6 +357,8 @@ class PhysicalDevice {
             }
         }
     }
+    // *************************************************************************
+    // Object methods
 
     /**
      * Represent this instance as a text string.
