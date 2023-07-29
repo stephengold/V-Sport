@@ -57,6 +57,10 @@ class Texture {
      */
     final private int height;
     /**
+     * format of the image, currently hard-coded TODO
+     */
+    final private int imageFormat = VK10.VK_FORMAT_R8G8B8A8_SRGB;
+    /**
      * number of MIP levels in the image (including the original image)
      */
     final private int numMipLevels;
@@ -153,20 +157,19 @@ class Texture {
              * Create a device-local image that's optimized for being
              * both a source and destination for data transfers:
              */
-            int textureFormat = VK10.VK_FORMAT_R8G8B8A8_SRGB;
             createUsage = VK10.VK_IMAGE_USAGE_TRANSFER_DST_BIT
                     | VK10.VK_IMAGE_USAGE_TRANSFER_SRC_BIT
                     | VK10.VK_IMAGE_USAGE_SAMPLED_BIT;
             properties = VK10.VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
             LongBuffer pImageHandle = stack.mallocLong(1);
             BaseApplication.createImage(
-                    width, height, numMipLevels, textureFormat,
+                    width, height, numMipLevels, imageFormat,
                     VK10.VK_IMAGE_TILING_OPTIMAL, createUsage, properties,
                     pImageHandle, pMemoryHandle);
             this.imageHandle = pImageHandle.get(0);
             this.memoryHandle = pMemoryHandle.get(0);
             BaseApplication.alterImageLayout(
-                    imageHandle, textureFormat, VK10.VK_IMAGE_LAYOUT_UNDEFINED,
+                    imageHandle, imageFormat, VK10.VK_IMAGE_LAYOUT_UNDEFINED,
                     VK10.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, numMipLevels);
 
             // Copy the data from the staging buffer the new image:
@@ -182,7 +185,7 @@ class Texture {
 
             // Create a view for the new image:
             this.viewHandle = BaseApplication.createImageView(
-                    imageHandle, textureFormat, VK10.VK_IMAGE_ASPECT_COLOR_BIT,
+                    imageHandle, imageFormat, VK10.VK_IMAGE_ASPECT_COLOR_BIT,
                     numMipLevels);
         }
     }
