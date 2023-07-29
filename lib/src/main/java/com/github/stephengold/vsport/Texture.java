@@ -230,6 +230,12 @@ class Texture {
      * of the image will be left in SHADER_READ_ONLY layout.
      */
     private void generateMipLevels() {
+        PhysicalDevice physicalDevice = BaseApplication.getPhysicalDevice();
+        if (!physicalDevice.supportsLinearBlit(imageFormat)) {
+            throw new RuntimeException(
+                    "Texture image format does not support linear blitting.");
+        }
+
         int aspectMask = VK10.VK_IMAGE_ASPECT_COLOR_BIT;
         int baseLayer = 0;
         int lastLevel = numMipLevels - 1;
