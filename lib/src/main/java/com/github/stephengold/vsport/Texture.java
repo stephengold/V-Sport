@@ -36,7 +36,12 @@ import org.lwjgl.PointerBuffer;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.vulkan.VK10;
 import org.lwjgl.vulkan.VkAllocationCallbacks;
+import org.lwjgl.vulkan.VkCommandBuffer;
 import org.lwjgl.vulkan.VkDevice;
+import org.lwjgl.vulkan.VkImageBlit;
+import org.lwjgl.vulkan.VkImageMemoryBarrier;
+import org.lwjgl.vulkan.VkImageSubresourceLayers;
+import org.lwjgl.vulkan.VkImageSubresourceRange;
 
 /**
  * Encapsulate the handles of a Vulkan texture.
@@ -51,6 +56,10 @@ class Texture {
      * height of the original image (in pixels)
      */
     final private int height;
+    /**
+     * number of MIP levels in the image (including the original image)
+     */
+    final private int numMipLevels;
     /**
      * width of the original image (in pixels)
      */
@@ -98,6 +107,9 @@ class Texture {
             this.height = image.getHeight();
             int numBytes = width * height * numChannels;
 
+            int maxDimension = Math.max(width, width);
+            this.numMipLevels = 1 + Utils.log2(maxDimension); // 1 .. 31
+
             // Create a temporary buffer object for staging:
             int createUsage = VK10.VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
             int properties = VK10.VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
@@ -139,30 +151,29 @@ class Texture {
             VK10.vkUnmapMemory(logicalDevice, stagingMemoryHandle);
             /*
              * Create a device-local image that's optimized for being
-             * a copy destination:
+             * both a source and destination for data transfers:
              */
             int textureFormat = VK10.VK_FORMAT_R8G8B8A8_SRGB;
             createUsage = VK10.VK_IMAGE_USAGE_TRANSFER_DST_BIT
+                    | VK10.VK_IMAGE_USAGE_TRANSFER_SRC_BIT
                     | VK10.VK_IMAGE_USAGE_SAMPLED_BIT;
             properties = VK10.VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
             LongBuffer pImageHandle = stack.mallocLong(1);
-            BaseApplication.createImage(width, height, textureFormat,
+            BaseApplication.createImage(
+                    width, height, numMipLevels, textureFormat,
                     VK10.VK_IMAGE_TILING_OPTIMAL, createUsage, properties,
                     pImageHandle, pMemoryHandle);
             this.imageHandle = pImageHandle.get(0);
             this.memoryHandle = pMemoryHandle.get(0);
-            BaseApplication.alterImageLayout(imageHandle, textureFormat,
-                    VK10.VK_IMAGE_LAYOUT_UNDEFINED,
-                    VK10.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+            BaseApplication.alterImageLayout(
+                    imageHandle, textureFormat, VK10.VK_IMAGE_LAYOUT_UNDEFINED,
+                    VK10.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, numMipLevels);
 
             // Copy the data from the staging buffer the new image:
-            BaseApplication.copyBufferToImage(
-                    stagingBufferHandle, imageHandle, width, height);
+            BaseApplication.copyBufferToImage(stagingBufferHandle, imageHandle,
+                    width, height);
 
-            // Convert the image to a layout optimized for sampling:
-            BaseApplication.alterImageLayout(imageHandle, textureFormat,
-                    VK10.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-                    VK10.VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+            generateMipLevels();
 
             // Destroy the staging buffer and free its memory:
             VK10.vkDestroyBuffer(
@@ -171,8 +182,8 @@ class Texture {
 
             // Create a view for the new image:
             this.viewHandle = BaseApplication.createImageView(
-                    imageHandle, textureFormat,
-                    VK10.VK_IMAGE_ASPECT_COLOR_BIT);
+                    imageHandle, textureFormat, VK10.VK_IMAGE_ASPECT_COLOR_BIT,
+                    numMipLevels);
         }
     }
     // *************************************************************************
@@ -206,5 +217,126 @@ class Texture {
      */
     final long viewHandle() {
         return viewHandle;
+    }
+    // *************************************************************************
+    // private methods
+
+    /**
+     * Add MIP levels to a newly loaded texture image. On entry, the original
+     * image is assumed to be in TRANSFER_DST layout. If successful, all levels
+     * of the image will be left in SHADER_READ_ONLY layout.
+     */
+    private void generateMipLevels() {
+        int aspectMask = VK10.VK_IMAGE_ASPECT_COLOR_BIT;
+        int baseLayer = 0;
+        int lastLevel = numMipLevels - 1;
+        int layerCount = 1;
+
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            // A single image-memory barrier is re-used throughout:
+            VkImageMemoryBarrier.Buffer pBarrier
+                    = VkImageMemoryBarrier.calloc(1, stack);
+            pBarrier.sType(VK10.VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER);
+
+            pBarrier.dstQueueFamilyIndex(VK10.VK_QUEUE_FAMILY_IGNORED);
+            pBarrier.image(imageHandle);
+            pBarrier.srcQueueFamilyIndex(VK10.VK_QUEUE_FAMILY_IGNORED);
+
+            VkImageSubresourceRange barrierRange = pBarrier.subresourceRange();
+            barrierRange.aspectMask(aspectMask);
+            barrierRange.baseArrayLayer(baseLayer);
+            barrierRange.layerCount(layerCount);
+            barrierRange.levelCount(1);
+
+            VkCommandBuffer commandBuffer
+                    = BaseApplication.beginSingleTimeCommands();
+
+            int dependencyFlags = 0x0;
+            int destinationStage;
+            int sourceStage;
+
+            int srcWidth = width;
+            int srcHeight = height;
+            for (int srcLevel = 0; srcLevel < lastLevel; ++srcLevel) {
+                int dstLevel = srcLevel + 1;
+                int dstWidth = (srcWidth > 1) ? srcWidth / 2 : 1;
+                int dstHeight = (srcHeight > 1) ? srcHeight / 2 : 1;
+                /*
+                 * Command to wait until the source level is filled with data
+                 * and then opimize its layout for being a blit source.
+                 */
+                pBarrier.dstAccessMask(VK10.VK_ACCESS_TRANSFER_READ_BIT);
+                pBarrier.newLayout(VK10.VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+                pBarrier.oldLayout(VK10.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+                pBarrier.srcAccessMask(VK10.VK_ACCESS_TRANSFER_WRITE_BIT);
+                barrierRange.baseMipLevel(srcLevel);
+
+                sourceStage = VK10.VK_PIPELINE_STAGE_TRANSFER_BIT;
+                destinationStage = VK10.VK_PIPELINE_STAGE_TRANSFER_BIT;
+                VK10.vkCmdPipelineBarrier(commandBuffer, sourceStage,
+                        destinationStage, dependencyFlags, null, null,
+                        pBarrier);
+
+                // Command to blit from the source level to the next level:
+                VkImageBlit.Buffer blit = VkImageBlit.calloc(1, stack);
+                blit.dstOffsets(0).set(0, 0, 0);
+                blit.dstOffsets(1).set(dstWidth, dstHeight, 1);
+                blit.srcOffsets(0).set(0, 0, 0);
+                blit.srcOffsets(1).set(srcWidth, srcHeight, 1);
+
+                VkImageSubresourceLayers dstRange = blit.dstSubresource();
+                dstRange.aspectMask(aspectMask);
+                dstRange.baseArrayLayer(baseLayer);
+                dstRange.layerCount(layerCount);
+                dstRange.mipLevel(dstLevel);
+
+                VkImageSubresourceLayers srcRange = blit.srcSubresource();
+                srcRange.aspectMask(aspectMask);
+                srcRange.baseArrayLayer(baseLayer);
+                srcRange.layerCount(layerCount);
+                srcRange.mipLevel(srcLevel);
+
+                VK10.vkCmdBlitImage(commandBuffer,
+                        imageHandle, VK10.VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+                        imageHandle, VK10.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                        blit, VK10.VK_FILTER_LINEAR);
+                /*
+                 * Command to wait until the blit is finished and then optimize
+                 * the source level for being read by fragment shaders:
+                 */
+                pBarrier.dstAccessMask(VK10.VK_ACCESS_SHADER_READ_BIT);
+                pBarrier.newLayout(
+                        VK10.VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+                pBarrier.oldLayout(VK10.VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+                pBarrier.srcAccessMask(VK10.VK_ACCESS_TRANSFER_READ_BIT);
+                barrierRange.baseMipLevel(srcLevel);
+
+                sourceStage = VK10.VK_PIPELINE_STAGE_TRANSFER_BIT;
+                destinationStage = VK10.VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+                VK10.vkCmdPipelineBarrier(commandBuffer, sourceStage,
+                        destinationStage, dependencyFlags, null, null,
+                        pBarrier);
+
+                // The current destination level becomes the next source level:
+                srcWidth = dstWidth;
+                srcHeight = dstHeight;
+            }
+            /*
+             * Command to optimize last MIP level for being read
+             * by fragment shaders:
+             */
+            pBarrier.dstAccessMask(VK10.VK_ACCESS_SHADER_READ_BIT);
+            pBarrier.oldLayout(VK10.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+            pBarrier.newLayout(VK10.VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+            pBarrier.srcAccessMask(VK10.VK_ACCESS_TRANSFER_WRITE_BIT);
+            barrierRange.baseMipLevel(lastLevel);
+
+            sourceStage = VK10.VK_PIPELINE_STAGE_TRANSFER_BIT;
+            destinationStage = VK10.VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+            VK10.vkCmdPipelineBarrier(commandBuffer, sourceStage,
+                    destinationStage, dependencyFlags, null, null, pBarrier);
+
+            BaseApplication.endSingleTimeCommands(commandBuffer);
+        }
     }
 }

@@ -72,24 +72,26 @@ class DepthResources {
         int tiling = VK10.VK_IMAGE_TILING_OPTIMAL;
         int width = extent.width();
         int height = extent.height();
+        int numMipLevels = 1;
 
         try (MemoryStack stack = MemoryStack.stackPush()) {
             LongBuffer pImageHandle = stack.mallocLong(1);
             LongBuffer pMemoryHandle = stack.mallocLong(1);
-            BaseApplication.createImage(width, height, format, tiling,
-                    VK10.VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
+            BaseApplication.createImage(width, height, numMipLevels, format,
+                    tiling, VK10.VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
                     VK10.VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
                     pImageHandle, pMemoryHandle);
             this.imageHandle = pImageHandle.get(0);
             this.memoryHandle = pMemoryHandle.get(0);
 
-            this.viewHandle = BaseApplication.createImageView(
-                    imageHandle, format, VK10.VK_IMAGE_ASPECT_DEPTH_BIT);
+            this.viewHandle = BaseApplication.createImageView(imageHandle,
+                    format, VK10.VK_IMAGE_ASPECT_DEPTH_BIT, numMipLevels);
 
             // Immediately transition the image to optimal layout:
             BaseApplication.alterImageLayout(
                     imageHandle, format, VK10.VK_IMAGE_LAYOUT_UNDEFINED,
-                    VK10.VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
+                    VK10.VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+                    numMipLevels);
         }
     }
     // *************************************************************************

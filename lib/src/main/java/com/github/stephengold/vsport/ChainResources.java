@@ -577,10 +577,11 @@ class ChainResources {
     private static List<Long> createImageViews(
             List<Long> imageHandles, int imageFormat) {
         int numImages = imageHandles.size();
+        int numMipLevels = 1;
         List<Long> result = new ArrayList<>(numImages);
         for (long imageHandle : imageHandles) {
-            long viewHandle = BaseApplication.createImageView(
-                    imageHandle, imageFormat, VK10.VK_IMAGE_ASPECT_COLOR_BIT);
+            long viewHandle = BaseApplication.createImageView(imageHandle,
+                    imageFormat, VK10.VK_IMAGE_ASPECT_COLOR_BIT, numMipLevels);
             result.add(viewHandle);
         }
 
