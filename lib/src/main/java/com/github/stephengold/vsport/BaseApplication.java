@@ -486,6 +486,16 @@ public abstract class BaseApplication {
     }
 
     /**
+     * Return the handle of the main command pool.
+     *
+     * @return the handle (not null)
+     */
+    static long commandPoolHandle() {
+        assert commandPoolHandle != VK10.VK_NULL_HANDLE;
+        return commandPoolHandle;
+    }
+
+    /**
      * Copy the contents of one buffer object to another.
      *
      * @param sourceHandle the handle of the source buffer object
@@ -757,6 +767,16 @@ public abstract class BaseApplication {
             VK10.vkFreeCommandBuffers(
                     logicalDevice, commandPoolHandle, commandBuffer);
         }
+    }
+
+    /**
+     * Access the graphics queue for commands.
+     *
+     * @return the pre-existing instance (not null)
+     */
+    static VkQueue getGraphicsQueue() {
+        assert graphicsQueue != null;
+        return graphicsQueue;
     }
 
     /**
