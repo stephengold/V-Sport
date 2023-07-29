@@ -48,6 +48,14 @@ class Texture {
     // fields
 
     /**
+     * height of the original image (in pixels)
+     */
+    final private int height;
+    /**
+     * width of the original image (in pixels)
+     */
+    final private int width;
+    /**
      * handle of the image resource (native type: VkImage)
      */
     private long imageHandle = VK10.VK_NULL_HANDLE;
@@ -86,8 +94,8 @@ class Texture {
              * (which doesn't handle InputStream input).
              */
             int numChannels = 4;
-            int width = image.getWidth();
-            int height = image.getHeight();
+            this.width = image.getWidth();
+            this.height = image.getHeight();
             int numBytes = width * height * numChannels;
 
             // Create a temporary buffer object for staging:
