@@ -357,45 +357,6 @@ public abstract class BaseApplication {
     }
 
     /**
-     * Begin recording a single-time command sequence.
-     *
-     * @return a new command buffer, ready to receive commands
-     */
-    static VkCommandBuffer beginSingleTimeCommands() {
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            // Allocate a temporary command buffer:
-            // TODO a pool of short-lived command buffers - see copyBuffer()
-            VkCommandBufferAllocateInfo allocInfo
-                    = VkCommandBufferAllocateInfo.calloc(stack);
-            allocInfo.sType(
-                    VK10.VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO);
-
-            allocInfo.commandBufferCount(1);
-            allocInfo.commandPool(commandPoolHandle);
-            allocInfo.level(VK10.VK_COMMAND_BUFFER_LEVEL_PRIMARY);
-
-            PointerBuffer pPointer = stack.mallocPointer(1);
-            int retCode = VK10.vkAllocateCommandBuffers(
-                    logicalDevice, allocInfo, pPointer);
-            Utils.checkForError(retCode, "allocate command buffer");
-            long pointer = pPointer.get(0);
-            VkCommandBuffer result
-                    = new VkCommandBuffer(pointer, logicalDevice);
-
-            VkCommandBufferBeginInfo beginInfo
-                    = VkCommandBufferBeginInfo.calloc(stack);
-            beginInfo.sType(VK10.VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO);
-
-            beginInfo.flags(VK10.VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
-
-            retCode = VK10.vkBeginCommandBuffer(result, beginInfo);
-            Utils.checkForError(retCode, "begin recording commands");
-
-            return result;
-        }
-    }
-
-    /**
      * Cleanly terminate the application after the main window closes for any
      * reason.
      */
@@ -712,40 +673,6 @@ public abstract class BaseApplication {
     }
 
     /**
-     * Finish recording a single-time command sequence and submit it to the
-     * graphics queue.
-     *
-     * @param commandBuffer a command buffer containing commands
-     */
-    static void endSingleTimeCommands(VkCommandBuffer commandBuffer) {
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            VK10.vkEndCommandBuffer(commandBuffer);
-
-            // info to submit a command buffer to the graphics queue:
-            VkSubmitInfo.Buffer pSubmitInfo = VkSubmitInfo.calloc(1, stack);
-            pSubmitInfo.sType(VK10.VK_STRUCTURE_TYPE_SUBMIT_INFO);
-
-            PointerBuffer pCommandBuffer = stack.pointers(commandBuffer);
-            pSubmitInfo.pCommandBuffers(pCommandBuffer);
-
-            // Submit the command buffer to the graphics queue:
-            long fenceHandle = VK10.VK_NULL_HANDLE;
-            int retCode = VK10.vkQueueSubmit(
-                    graphicsQueue, pSubmitInfo, fenceHandle);
-            Utils.checkForError(retCode, "submit buffer-copy command");
-
-            // Wait until the graphics queue is idle:
-            // TODO use a fence to submit multiple command sequences in parallel
-            retCode = VK10.vkQueueWaitIdle(graphicsQueue);
-            Utils.checkForError(retCode, "wait for queue to be idle");
-
-            // Free the command buffer:
-            VK10.vkFreeCommandBuffers(
-                    logicalDevice, commandPoolHandle, commandBuffer);
-        }
-    }
-
-    /**
      * Return the named ShaderProgram.
      *
      * @param name (not null)
@@ -881,6 +808,39 @@ public abstract class BaseApplication {
     // private methods
 
     /**
+     * Add debug-messenger information to the specified VkInstanceCreateInfo.
+     *
+     * @param createInfo the info to modify (not null, modified)
+     * @param stack for memory allocation (not null)
+     */
+    private static void addDebugMessengerCreateInfo(
+            VkInstanceCreateInfo createInfo, MemoryStack stack) {
+        // Create the debug-messenger creation information:
+        VkDebugUtilsMessengerCreateInfoEXT messengerCreateInfo
+                = VkDebugUtilsMessengerCreateInfoEXT.calloc(stack);
+        messengerCreateInfo.sType(
+                EXTDebugUtils.VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT
+        );
+
+        messengerCreateInfo.messageSeverity(
+                EXTDebugUtils.VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT
+                | EXTDebugUtils.VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT
+                | EXTDebugUtils.VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT
+                | EXTDebugUtils.VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT);
+        messengerCreateInfo.messageType(
+                EXTDebugUtils.VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT
+                | EXTDebugUtils.VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT
+                | EXTDebugUtils.VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT);
+        messengerCreateInfo.pfnUserCallback(BaseApplication::debugCallback);
+
+        // Save a reference to the Callback, for use during cleanup():
+        debugMessengerCallback = messengerCreateInfo.pfnUserCallback();
+
+        long address = messengerCreateInfo.address();
+        createInfo.pNext(address);
+    }
+
+    /**
      * Allocate a command buffer as needed.
      *
      * @param numBuffersNeeded the number of command buffers needed
@@ -921,53 +881,42 @@ public abstract class BaseApplication {
     }
 
     /**
-     * Add debug-messenger information to the specified VkInstanceCreateInfo.
+     * Begin recording a single-time command sequence.
      *
-     * @param createInfo the info to modify (not null, modified)
-     * @param stack for memory allocation (not null)
+     * @return a new command buffer, ready to receive commands
      */
-    private static void addDebugMessengerCreateInfo(
-            VkInstanceCreateInfo createInfo, MemoryStack stack) {
-        // Create the debug-messenger creation information:
-        VkDebugUtilsMessengerCreateInfoEXT messengerCreateInfo
-                = VkDebugUtilsMessengerCreateInfoEXT.calloc(stack);
-        messengerCreateInfo.sType(
-                EXTDebugUtils.VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT
-        );
+    static VkCommandBuffer beginSingleTimeCommands() {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            // Allocate a temporary command buffer:
+            // TODO a pool of short-lived command buffers - see copyBuffer()
+            VkCommandBufferAllocateInfo allocInfo
+                    = VkCommandBufferAllocateInfo.calloc(stack);
+            allocInfo.sType(
+                    VK10.VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO);
 
-        messengerCreateInfo.messageSeverity(
-                EXTDebugUtils.VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT
-                | EXTDebugUtils.VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT
-                | EXTDebugUtils.VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT
-                | EXTDebugUtils.VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT);
-        messengerCreateInfo.messageType(
-                EXTDebugUtils.VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT
-                | EXTDebugUtils.VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT
-                | EXTDebugUtils.VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT);
-        messengerCreateInfo.pfnUserCallback(BaseApplication::debugCallback);
+            allocInfo.commandBufferCount(1);
+            allocInfo.commandPool(commandPoolHandle);
+            allocInfo.level(VK10.VK_COMMAND_BUFFER_LEVEL_PRIMARY);
 
-        // Save a reference to the Callback, for use during cleanup():
-        debugMessengerCallback = messengerCreateInfo.pfnUserCallback();
+            PointerBuffer pPointer = stack.mallocPointer(1);
+            int retCode = VK10.vkAllocateCommandBuffers(
+                    logicalDevice, allocInfo, pPointer);
+            Utils.checkForError(retCode, "allocate command buffer");
+            long pointer = pPointer.get(0);
+            VkCommandBuffer result
+                    = new VkCommandBuffer(pointer, logicalDevice);
 
-        long address = messengerCreateInfo.address();
-        createInfo.pNext(address);
-    }
+            VkCommandBufferBeginInfo beginInfo
+                    = VkCommandBufferBeginInfo.calloc(stack);
+            beginInfo.sType(VK10.VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO);
 
-    /**
-     * Select an image format for the depth buffer.
-     *
-     * @return a supported image format
-     */
-    private static int chooseDepthBufferFormat() {
-        int tiling = VK10.VK_IMAGE_TILING_OPTIMAL;
-        int formatFeatures
-                = VK10.VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT;
-        int result = physicalDevice.findSupportedFormat(tiling, formatFeatures,
-                VK10.VK_FORMAT_D32_SFLOAT,
-                VK10.VK_FORMAT_D32_SFLOAT_S8_UINT,
-                VK10.VK_FORMAT_D24_UNORM_S8_UINT);
+            beginInfo.flags(VK10.VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
-        return result;
+            retCode = VK10.vkBeginCommandBuffer(result, beginInfo);
+            Utils.checkForError(retCode, "begin recording commands");
+
+            return result;
+        }
     }
 
     /**
@@ -1041,6 +990,23 @@ public abstract class BaseApplication {
             Utils.checkForError(retCode, "create command-buffer pool");
             commandPoolHandle = pHandle.get(0);
         }
+    }
+
+    /**
+     * Select an image format for the depth buffer.
+     *
+     * @return a supported image format
+     */
+    private static int chooseDepthBufferFormat() {
+        int tiling = VK10.VK_IMAGE_TILING_OPTIMAL;
+        int formatFeatures
+                = VK10.VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT;
+        int result = physicalDevice.findSupportedFormat(tiling, formatFeatures,
+                VK10.VK_FORMAT_D32_SFLOAT,
+                VK10.VK_FORMAT_D32_SFLOAT_S8_UINT,
+                VK10.VK_FORMAT_D24_UNORM_S8_UINT);
+
+        return result;
     }
 
     /**
@@ -1316,6 +1282,40 @@ public abstract class BaseApplication {
         if (chainResources != null) {
             chainResources.destroy();
             chainResources = null;
+        }
+    }
+
+    /**
+     * Finish recording a single-time command sequence and submit it to the
+     * graphics queue.
+     *
+     * @param commandBuffer a command buffer containing commands
+     */
+    static void endSingleTimeCommands(VkCommandBuffer commandBuffer) {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            VK10.vkEndCommandBuffer(commandBuffer);
+
+            // info to submit a command buffer to the graphics queue:
+            VkSubmitInfo.Buffer pSubmitInfo = VkSubmitInfo.calloc(1, stack);
+            pSubmitInfo.sType(VK10.VK_STRUCTURE_TYPE_SUBMIT_INFO);
+
+            PointerBuffer pCommandBuffer = stack.pointers(commandBuffer);
+            pSubmitInfo.pCommandBuffers(pCommandBuffer);
+
+            // Submit the command buffer to the graphics queue:
+            long fenceHandle = VK10.VK_NULL_HANDLE;
+            int retCode = VK10.vkQueueSubmit(
+                    graphicsQueue, pSubmitInfo, fenceHandle);
+            Utils.checkForError(retCode, "submit buffer-copy command");
+
+            // Wait until the graphics queue is idle:
+            // TODO use a fence to submit multiple command sequences in parallel
+            retCode = VK10.vkQueueWaitIdle(graphicsQueue);
+            Utils.checkForError(retCode, "wait for queue to be idle");
+
+            // Free the command buffer:
+            VK10.vkFreeCommandBuffers(
+                    logicalDevice, commandPoolHandle, commandBuffer);
         }
     }
 
