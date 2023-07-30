@@ -730,7 +730,8 @@ class ChainResources {
             VkPipelineColorBlendStateCreateInfo cbsCreateInfo
                     = VkPipelineColorBlendStateCreateInfo.calloc(stack);
             cbsCreateInfo.sType(
-                    VK10.VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO);
+                    VK10.VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO
+            );
 
             cbsCreateInfo.blendConstants(stack.floats(0f, 0f, 0f, 0f));
             cbsCreateInfo.logicOp(VK10.VK_LOGIC_OP_COPY);
@@ -741,7 +742,8 @@ class ChainResources {
             VkPipelineDepthStencilStateCreateInfo dssCreateInfo
                     = VkPipelineDepthStencilStateCreateInfo.calloc(stack);
             dssCreateInfo.sType(
-                    VK10.VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO);
+                    VK10.VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO
+            );
 
             dssCreateInfo.depthTestEnable(true);
             dssCreateInfo.depthWriteEnable(true);
@@ -757,7 +759,8 @@ class ChainResources {
             VkPipelineInputAssemblyStateCreateInfo iasCreateInfo
                     = VkPipelineInputAssemblyStateCreateInfo.calloc(stack);
             iasCreateInfo.sType(
-                    VK10.VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO);
+                    VK10.VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO
+            );
 
             iasCreateInfo.primitiveRestartEnable(false);
             iasCreateInfo.topology(VK10.VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
@@ -766,7 +769,8 @@ class ChainResources {
             VkPipelineMultisampleStateCreateInfo msCreateInfo
                     = VkPipelineMultisampleStateCreateInfo.calloc(stack);
             msCreateInfo.sType(
-                    VK10.VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO);
+                    VK10.VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO
+            );
 
             msCreateInfo.alphaToCoverageEnable(false);
             msCreateInfo.alphaToOneEnable(false);
@@ -824,7 +828,8 @@ class ChainResources {
             VkPipelineVertexInputStateCreateInfo visCreateInfo
                     = VkPipelineVertexInputStateCreateInfo.calloc(stack);
             visCreateInfo.sType(
-                    VK10.VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO);
+                    VK10.VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO
+            );
 
             VkVertexInputBindingDescription.Buffer pBindingDesc
                     = mesh.generateBindingDescription(stack);
