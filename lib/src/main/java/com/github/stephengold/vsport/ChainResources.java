@@ -175,7 +175,7 @@ class ChainResources {
         surface.chooseFramebufferExtent(
                 desiredWidth, desiredHeight, framebufferExtent);
         this.depthAttachment = new Attachment(depthFormat, framebufferExtent,
-                VK10.VK_IMAGE_ASPECT_COLOR_BIT, VK10.VK_SAMPLE_COUNT_1_BIT);
+                VK10.VK_IMAGE_ASPECT_DEPTH_BIT, VK10.VK_SAMPLE_COUNT_1_BIT);
 
         this.chainHandle = createChain(framebufferExtent, imageFormat,
                 numImages, surface, surfaceFormat, queueFamilies);
