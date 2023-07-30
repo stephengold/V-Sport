@@ -164,7 +164,8 @@ public abstract class BaseApplication {
      */
     private static int frameBufferWidth = 800;
     /**
-     * command buffers (at least one per image in the chain)
+     * command buffers (at least one per image in the chain) TODO move to
+     * ChainResources
      */
     final private static List<VkCommandBuffer> commandBuffers
             = new ArrayList<>(4);

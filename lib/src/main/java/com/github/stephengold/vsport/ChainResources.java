@@ -139,7 +139,7 @@ class ChainResources {
     // constructors
 
     /**
-     * Instantiate resources for the specified surface.
+     * Instantiate resources for the specified configuration.
      *
      * @param surface the features of the active VkSurfaceKHR (not null)
      * @param descriptorSetLayoutHandle the handle of the descriptor-set layout
@@ -542,6 +542,7 @@ class ChainResources {
         VkAllocationCallbacks allocator = BaseApplication.allocator();
 
         try (MemoryStack stack = MemoryStack.stackPush()) {
+            // order of attachments must match that in createPass() below!
             LongBuffer pAttachmentHandles
                     = stack.longs(VK10.VK_NULL_HANDLE, depthViewHandle);
             LongBuffer pHandle = stack.mallocLong(1);
