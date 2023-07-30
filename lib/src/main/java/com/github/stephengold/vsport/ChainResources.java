@@ -551,12 +551,12 @@ class ChainResources {
 
             createInfo.height(height);
             createInfo.layers(1);
+            createInfo.pAttachments(pAttachmentHandles);
             createInfo.renderPass(renderPassHandle);
             createInfo.width(width);
 
             for (long viewHandle : viewHandles) {
                 pAttachmentHandles.put(0, viewHandle);
-                createInfo.pAttachments(pAttachmentHandles); // TODO before loop
 
                 int retCode = VK10.vkCreateFramebuffer(
                         logicalDevice, createInfo, allocator, pHandle);
