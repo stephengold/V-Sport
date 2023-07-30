@@ -252,6 +252,10 @@ class ChainResources {
             }
             this.framebufferHandles = null;
         }
+        if (passHandle != VK10.VK_NULL_HANDLE) {
+            VK10.vkDestroyRenderPass(logicalDevice, passHandle, allocator);
+            this.passHandle = VK10.VK_NULL_HANDLE;
+        }
 
         if (viewHandles != null) {
             for (Long handle : viewHandles) {
@@ -273,11 +277,6 @@ class ChainResources {
         if (colorAttachment != null) {
             colorAttachment.destroy();
             this.colorAttachment = null;
-        }
-
-        if (passHandle != VK10.VK_NULL_HANDLE) {
-            VK10.vkDestroyRenderPass(logicalDevice, passHandle, allocator);
-            this.passHandle = VK10.VK_NULL_HANDLE;
         }
 
         descriptorSetHandles = null;
