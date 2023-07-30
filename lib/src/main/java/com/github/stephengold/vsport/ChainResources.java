@@ -84,6 +84,10 @@ class ChainResources {
     // fields
 
     /**
+     * transient color attachment for framebuffers (may be null)
+     */
+    private Attachment colorAttachment;
+    /**
      * depth attachment for framebuffers
      */
     private Attachment depthAttachment;
@@ -174,6 +178,7 @@ class ChainResources {
 
         surface.chooseFramebufferExtent(
                 desiredWidth, desiredHeight, framebufferExtent);
+        this.colorAttachment = null;
         this.depthAttachment = new Attachment(depthFormat, framebufferExtent,
                 VK10.VK_IMAGE_ASPECT_DEPTH_BIT, VK10.VK_SAMPLE_COUNT_1_BIT);
 
@@ -182,9 +187,11 @@ class ChainResources {
         this.imageHandles = listImages(chainHandle);
         this.viewHandles = createImageViews(imageHandles, imageFormat);
 
-        this.passHandle = createPass(imageFormat, depthAttachment);
+        this.passHandle = createPass(
+                imageFormat, colorAttachment, depthAttachment);
         this.framebufferHandles = createFramebuffers(
-                viewHandles, depthAttachment, passHandle, framebufferExtent);
+                viewHandles, colorAttachment, depthAttachment, passHandle,
+                framebufferExtent);
 
         this.pipelineHandle = createPipeline(pipelineLayoutHandle,
                 framebufferExtent, passHandle, mesh, shaderProgram);
@@ -262,6 +269,10 @@ class ChainResources {
         if (depthAttachment != null) {
             depthAttachment.destroy();
             this.depthAttachment = null;
+        }
+        if (colorAttachment != null) {
+            colorAttachment.destroy();
+            this.colorAttachment = null;
         }
 
         if (passHandle != VK10.VK_NULL_HANDLE) {
@@ -522,15 +533,17 @@ class ChainResources {
     /**
      * Create a framebuffer for each image in the chain.
      *
-     * @param viewHandles the list of VkImageView handles for color buffers (not
+     * @param viewHandles the list of VkImageView handles for presentation (not
      * null)
+     * @param color the (transient) color attachment for each framebuffer (may
+     * be null)
      * @param depth the depth attachment for each framebuffer (not null)
      * @param renderPassHandle the handle of the VkRenderPass to use
      * @param extent the desired dimensions (in pixels, not null)
      * @return a new list of VkFramebuffer handles
      */
     private static List<Long> createFramebuffers(List<Long> viewHandles,
-            Attachment depth,
+            Attachment color, Attachment depth,
             long renderPassHandle, VkExtent2D extent) {
         int numImages = viewHandles.size();
         List<Long> result = new ArrayList<>(numImages);
@@ -597,10 +610,12 @@ class ChainResources {
      * Create a VkRenderPass for the specified formats.
      *
      * @param imageFormat the format of images in the swap chain
+     * @param color the (transient) color attachment for each framebuffer
      * @param depth the depth attachment for each framebuffer (not null)
      * @return the handle of the new VkRenderPass
      */
-    private static long createPass(int imageFormat, Attachment depth) {
+    private static long createPass(
+            int imageFormat, Attachment color, Attachment depth) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             VkAttachmentDescription.Buffer pDescriptions
                     = VkAttachmentDescription.calloc(2, stack);
