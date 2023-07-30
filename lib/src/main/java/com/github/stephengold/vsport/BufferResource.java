@@ -80,7 +80,7 @@ class BufferResource {
      * method, false for a persistent mapping and no staging buffer
      */
     BufferResource(int numBytes, int usage, boolean staging) {
-        this.logicalDevice = BaseApplication.logicalDevice();
+        this.logicalDevice = BaseApplication.getLogicalDevice();
         this.allocator = BaseApplication.allocator();
 
         try (MemoryStack stack = MemoryStack.stackPush()) {

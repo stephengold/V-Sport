@@ -96,7 +96,7 @@ class Texture {
      * @param resourceName the name of the resource (not null)
      */
     Texture(String resourceName) {
-        this.logicalDevice = BaseApplication.logicalDevice();
+        this.logicalDevice = BaseApplication.getLogicalDevice();
         this.allocator = BaseApplication.allocator();
 
         try (MemoryStack stack = MemoryStack.stackPush()) {

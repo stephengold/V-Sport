@@ -681,6 +681,16 @@ public abstract class BaseApplication {
     }
 
     /**
+     * Access the logical device for rendering.
+     *
+     * @return the pre-existing instance (not null)
+     */
+    static VkDevice getLogicalDevice() {
+        assert logicalDevice != null;
+        return logicalDevice;
+    }
+
+    /**
      * Access the physical device for rendering.
      *
      * @return the pre-existing instance (not null)
@@ -750,16 +760,6 @@ public abstract class BaseApplication {
         result.rewind();
 
         return result;
-    }
-
-    /**
-     * Access the logical device for rendering. TODO rename getLogicalDevice()
-     *
-     * @return the pre-existing instance (not null)
-     */
-    static VkDevice logicalDevice() {
-        assert logicalDevice != null;
-        return logicalDevice;
     }
 
     /**

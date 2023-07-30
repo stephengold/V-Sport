@@ -77,7 +77,7 @@ class Frame {
      * Instantiate a group of synchronization objects.
      */
     Frame() {
-        this.logicalDevice = BaseApplication.logicalDevice();
+        this.logicalDevice = BaseApplication.getLogicalDevice();
         this.allocator = BaseApplication.allocator();
 
         try (MemoryStack stack = MemoryStack.stackPush()) {

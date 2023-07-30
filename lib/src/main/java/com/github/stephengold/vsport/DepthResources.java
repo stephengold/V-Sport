@@ -101,7 +101,7 @@ class DepthResources {
      * Destroy all owned resources.
      */
     void destroy() {
-        VkDevice logicalDevice = BaseApplication.logicalDevice();
+        VkDevice logicalDevice = BaseApplication.getLogicalDevice();
         VkAllocationCallbacks allocator = BaseApplication.allocator();
         /*
          * Destroy resources in the reverse of the order they were created,
