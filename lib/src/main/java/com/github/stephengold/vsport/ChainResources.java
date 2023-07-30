@@ -178,9 +178,18 @@ class ChainResources {
 
         surface.chooseFramebufferExtent(
                 desiredWidth, desiredHeight, framebufferExtent);
-        this.colorAttachment = null;
+
+        int numSamples = BaseApplication.numMsaaSamples();
+        if (numSamples == 1) { // render directly to a presentation image:
+            this.colorAttachment = null;
+        } else {
+            // render to transient color buffer, then resolve for presentation:
+            this.colorAttachment
+                    = new Attachment(imageFormat, framebufferExtent,
+                            VK10.VK_IMAGE_ASPECT_COLOR_BIT, numSamples);
+        }
         this.depthAttachment = new Attachment(depthFormat, framebufferExtent,
-                VK10.VK_IMAGE_ASPECT_DEPTH_BIT, VK10.VK_SAMPLE_COUNT_1_BIT);
+                VK10.VK_IMAGE_ASPECT_DEPTH_BIT, numSamples);
 
         this.chainHandle = createChain(framebufferExtent, imageFormat,
                 numImages, surface, surfaceFormat, queueFamilies);
@@ -555,8 +564,19 @@ class ChainResources {
 
         try (MemoryStack stack = MemoryStack.stackPush()) {
             // order of attachments must match that in createPass() below!
-            LongBuffer pAttachmentHandles
-                    = stack.longs(VK10.VK_NULL_HANDLE, depthViewHandle);
+            int presentAttachIndex;
+            LongBuffer pAttachmentHandles;
+            if (color == null) {
+                presentAttachIndex = 0;
+                pAttachmentHandles
+                        = stack.longs(VK10.VK_NULL_HANDLE, depthViewHandle);
+            } else {
+                presentAttachIndex = 2;
+                long colorViewHandle = color.viewHandle();
+                pAttachmentHandles = stack.longs(
+                        colorViewHandle, depthViewHandle, VK10.VK_NULL_HANDLE);
+            }
+
             LongBuffer pHandle = stack.mallocLong(1);
 
             // reusable Struct for framebuffer creation:
@@ -571,7 +591,7 @@ class ChainResources {
             createInfo.width(width);
 
             for (long viewHandle : viewHandles) {
-                pAttachmentHandles.put(0, viewHandle);
+                pAttachmentHandles.put(presentAttachIndex, viewHandle);
 
                 int retCode = VK10.vkCreateFramebuffer(
                         logicalDevice, createInfo, allocator, pHandle);
@@ -616,27 +636,39 @@ class ChainResources {
     private static long createPass(
             int imageFormat, Attachment color, Attachment depth) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
+            int numAttachments;
+            if (color == null) {
+                numAttachments = 2;
+            } else {
+                numAttachments = 3;
+            }
             VkAttachmentDescription.Buffer pDescriptions
-                    = VkAttachmentDescription.calloc(2, stack);
+                    = VkAttachmentDescription.calloc(numAttachments, stack);
             VkAttachmentReference.Buffer pReferences
-                    = VkAttachmentReference.calloc(2, stack);
+                    = VkAttachmentReference.calloc(numAttachments, stack);
 
-            // a single color buffer for presentation, without multisampling:
             VkAttachmentDescription colorAttachment = pDescriptions.get(0);
-            colorAttachment.finalLayout(
-                    KHRSwapchain.VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
-            colorAttachment.format(imageFormat);
-            colorAttachment.initialLayout(VK10.VK_IMAGE_LAYOUT_UNDEFINED);
-            colorAttachment.samples(VK10.VK_SAMPLE_COUNT_1_BIT);
+            if (color == null) {
+                // [0] a single color buffer for presentation, no multisampling:
+                colorAttachment.finalLayout(
+                        KHRSwapchain.VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
+                colorAttachment.format(imageFormat);
+                colorAttachment.initialLayout(VK10.VK_IMAGE_LAYOUT_UNDEFINED);
+                colorAttachment.samples(VK10.VK_SAMPLE_COUNT_1_BIT);
 
-            // no stencil operations:
-            colorAttachment.stencilLoadOp(VK10.VK_ATTACHMENT_LOAD_OP_DONT_CARE);
-            colorAttachment.stencilStoreOp(
-                    VK10.VK_ATTACHMENT_STORE_OP_DONT_CARE);
+                // no stencil operations:
+                colorAttachment.stencilLoadOp(
+                        VK10.VK_ATTACHMENT_LOAD_OP_DONT_CARE);
+                colorAttachment.stencilStoreOp(
+                        VK10.VK_ATTACHMENT_STORE_OP_DONT_CARE);
 
-            // Clear the color buffer to black before each frame:
-            colorAttachment.loadOp(VK10.VK_ATTACHMENT_LOAD_OP_CLEAR);
-            colorAttachment.storeOp(VK10.VK_ATTACHMENT_STORE_OP_STORE);
+                // Clear the color buffer to black before each frame:
+                colorAttachment.loadOp(VK10.VK_ATTACHMENT_LOAD_OP_CLEAR);
+                colorAttachment.storeOp(VK10.VK_ATTACHMENT_STORE_OP_STORE);
+            } else {
+                // [0] a color buffer with multisampling:
+                color.describe(colorAttachment);
+            }
 
             VkAttachmentReference colorAttachmentRef = pReferences.get(0);
             colorAttachmentRef.attachment(0);
@@ -654,12 +686,41 @@ class ChainResources {
             depthAttachmentRef.layout(
                     VK10.VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
 
+            VkAttachmentReference.Buffer pResolveRefs = null;
+            if (color != null) {
+                // [2] Resolve the multisampled color buffer for presentation:
+                VkAttachmentDescription resolveAttachment
+                        = pDescriptions.get(2);
+                resolveAttachment.finalLayout(
+                        KHRSwapchain.VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
+                resolveAttachment.format(imageFormat);
+                resolveAttachment.initialLayout(VK10.VK_IMAGE_LAYOUT_UNDEFINED);
+                resolveAttachment.samples(VK10.VK_SAMPLE_COUNT_1_BIT);
+
+                resolveAttachment.loadOp(VK10.VK_ATTACHMENT_LOAD_OP_DONT_CARE);
+                resolveAttachment.storeOp(VK10.VK_ATTACHMENT_STORE_OP_STORE);
+
+                // no stencil operations:
+                resolveAttachment.stencilLoadOp(
+                        VK10.VK_ATTACHMENT_LOAD_OP_DONT_CARE);
+                resolveAttachment.stencilStoreOp(
+                        VK10.VK_ATTACHMENT_STORE_OP_DONT_CARE);
+
+                VkAttachmentReference resolveAttachmentRef = pReferences.get(2);
+                resolveAttachmentRef.attachment(2);
+                resolveAttachmentRef.layout(
+                        VK10.VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+                pResolveRefs = VkAttachmentReference.calloc(1, stack);
+                pResolveRefs.put(0, resolveAttachmentRef);
+            }
+
             // a single subpass:
             VkSubpassDescription.Buffer subpasses
                     = VkSubpassDescription.calloc(1, stack);
             subpasses.colorAttachmentCount(1);
             subpasses.pColorAttachments(pColorRefs);
             subpasses.pDepthStencilAttachment(depthAttachmentRef);
+            subpasses.pResolveAttachments(pResolveRefs);
             subpasses.pipelineBindPoint(VK10.VK_PIPELINE_BIND_POINT_GRAPHICS);
 
             // Create a sub-pass dependency:
@@ -780,8 +841,10 @@ class ChainResources {
             msCreateInfo.alphaToOneEnable(false);
             msCreateInfo.minSampleShading(1f);
             msCreateInfo.pSampleMask(0);
-            msCreateInfo.rasterizationSamples(VK10.VK_SAMPLE_COUNT_1_BIT);
             msCreateInfo.sampleShadingEnable(false);
+
+            int numSamples = BaseApplication.numMsaaSamples();
+            msCreateInfo.rasterizationSamples(numSamples);
 
             // rasterization state:
             //    1. turns mesh primitives into fragments

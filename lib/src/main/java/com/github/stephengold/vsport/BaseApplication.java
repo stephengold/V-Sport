@@ -164,6 +164,10 @@ public abstract class BaseApplication {
      */
     private static int frameBufferWidth = 800;
     /**
+     * samples per framebuffer pixel for multi-sample anti-aliasing (MSAA)
+     */
+    private static int numMsaaSamples;
+    /**
      * command buffers (at least one per image in the chain) TODO move to
      * ChainResources
      */
@@ -766,6 +770,16 @@ public abstract class BaseApplication {
     }
 
     /**
+     * Return the number of samples per framebuffer pixel for multi-sample
+     * anti-aliasing (MSAA).
+     *
+     * @return the count (a power of 2, &ge;1, &le;64)
+     */
+    static int numMsaaSamples() {
+        return numMsaaSamples;
+    }
+
+    /**
      * Alter the title of the main window.
      *
      * @param text the desired text (in UTF-8 encoding)
@@ -1337,6 +1351,9 @@ public abstract class BaseApplication {
 
         selectPhysicalDevice();
         depthBufferFormat = chooseDepthBufferFormat();
+        numMsaaSamples = physicalDevice.maxNumSamples();
+        System.out.println("numSamples = " + numMsaaSamples);
+
         createLogicalDevice();
         createCommandPool();
 
