@@ -562,7 +562,8 @@ public abstract class BaseApplication {
      * @param height the desired height (in pixels)
      * @param numMipLevels the desired number of MIP levels (including the
      * original image, &ge;1, &le;31)
-     * @param numSamples the desired number of samples per pixel (&ge;1, &le;64)
+     * @param numSamples the desired number of samples per pixel (a power of 2,
+     * &ge;1, &le;64)
      * @param format the desired format
      * @param tiling the desired tiling
      * @param usage a bitmask

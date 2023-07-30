@@ -84,7 +84,7 @@ class ChainResources {
     // fields
 
     /**
-     * transient color attachment for framebuffers (may be null)
+     * transient color attachment for framebuffers
      */
     private Attachment colorAttachment;
     /**
@@ -272,7 +272,7 @@ class ChainResources {
             }
             this.viewHandles = null;
         }
-
+        // imageHandles are owned by the KHRSwapchain
         if (chainHandle != VK10.VK_NULL_HANDLE) {
             KHRSwapchain.vkDestroySwapchainKHR(
                     logicalDevice, chainHandle, allocator);
@@ -629,7 +629,8 @@ class ChainResources {
      * Create a VkRenderPass for the specified formats.
      *
      * @param imageFormat the format of images in the swap chain
-     * @param color the (transient) color attachment for each framebuffer
+     * @param color the (transient) color attachment for each framebuffer (may
+     * be null)
      * @param depth the depth attachment for each framebuffer (not null)
      * @return the handle of the new VkRenderPass
      */
