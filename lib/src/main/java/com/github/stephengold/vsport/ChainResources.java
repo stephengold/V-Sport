@@ -339,18 +339,20 @@ class ChainResources {
     /**
      * Return the render-pass handle.
      *
-     * @return the handle of the pre-existing VkRenderPass
+     * @return the handle of the pre-existing VkRenderPass (not VK_NULL_HANDLE)
      */
     long passHandle() {
+        assert passHandle != VK10.VK_NULL_HANDLE;
         return passHandle;
     }
 
     /**
      * Return the graphics pipeline handle.
      *
-     * @return the handle of the pre-existing VkPipeline
+     * @return the handle of the pre-existing VkPipeline (not VK_NULL_HANDLE)
      */
     long pipelineHandle() {
+        assert pipelineHandle != VK10.VK_NULL_HANDLE;
         return pipelineHandle;
     }
     // *************************************************************************
