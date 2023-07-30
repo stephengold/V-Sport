@@ -86,7 +86,7 @@ class ChainResources {
     /**
      * depth attachment for framebuffers
      */
-    private Attachment depthResources;
+    private Attachment depthAttachment;
     /**
      * image format (shared by all images in the chain)
      */
@@ -175,7 +175,7 @@ class ChainResources {
 
         surface.chooseFramebufferExtent(
                 desiredWidth, desiredHeight, framebufferExtent);
-        this.depthResources = new Attachment(depthFormat, framebufferExtent,
+        this.depthAttachment = new Attachment(depthFormat, framebufferExtent,
                 VK10.VK_IMAGE_ASPECT_COLOR_BIT, VK10.VK_SAMPLE_COUNT_1_BIT);
 
         this.chainHandle = createChain(framebufferExtent, imageFormat,
@@ -183,7 +183,7 @@ class ChainResources {
         this.imageHandles = listImages(chainHandle);
         this.viewHandles = createImageViews(imageHandles, imageFormat);
 
-        long depthViewHandle = depthResources.viewHandle();
+        long depthViewHandle = depthAttachment.viewHandle();
         this.framebufferHandles = createFramebuffers(
                 viewHandles, depthViewHandle, passHandle, framebufferExtent);
 
@@ -260,9 +260,9 @@ class ChainResources {
             this.chainHandle = VK10.VK_NULL_HANDLE;
         }
 
-        if (depthResources != null) {
-            depthResources.destroy();
-            this.depthResources = null;
+        if (depthAttachment != null) {
+            depthAttachment.destroy();
+            this.depthAttachment = null;
         }
 
         if (passHandle != VK10.VK_NULL_HANDLE) {
