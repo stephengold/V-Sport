@@ -777,7 +777,8 @@ class ChainResources {
             VkPipelineRasterizationStateCreateInfo rsCreateInfo
                     = VkPipelineRasterizationStateCreateInfo.calloc(stack);
             rsCreateInfo.sType(
-                    VK10.VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO);
+                    VK10.VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO
+            );
 
             rsCreateInfo.cullMode(VK10.VK_CULL_MODE_BACK_BIT);
             rsCreateInfo.depthBiasEnable(false);

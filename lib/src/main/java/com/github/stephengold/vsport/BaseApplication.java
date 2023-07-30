@@ -1334,6 +1334,7 @@ public abstract class BaseApplication {
     private static void initializeVulkan(String appName, int appVersion) {
         createVkInstance(appName, appVersion);
         createSurface();
+
         selectPhysicalDevice();
         depthBufferFormat = chooseDepthBufferFormat();
         createLogicalDevice();
