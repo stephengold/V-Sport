@@ -124,7 +124,7 @@ class DepthResources {
     /**
      * Return the handle of the VkImageView.
      *
-     * @return the handle
+     * @return the handle (not null)
      */
     long viewHandle() {
         return viewHandle;

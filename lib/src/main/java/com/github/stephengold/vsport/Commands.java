@@ -203,8 +203,8 @@ public class Commands {
     }
 
     /**
-     * Terminate the command sequence, submit it to the graphics queue, wait for
-     * it to complete, and free the command buffer.
+     * Terminate the sequence, submit it to a queue with graphics capabilities,
+     * wait for it to complete, and free the command buffer.
      */
     void submitToGraphicsQueue() {
         try (MemoryStack stack = MemoryStack.stackPush()) {

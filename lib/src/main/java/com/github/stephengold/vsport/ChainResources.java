@@ -144,7 +144,7 @@ class ChainResources {
      * @param surface the features of the active VkSurfaceKHR (not null)
      * @param descriptorSetLayoutHandle the handle of the descriptor-set layout
      * for the UBO
-     * @param physicalDevice the device displaying the surface (not null)
+     * @param physicalDevice the device displaying the surface (not null) TODO
      * @param desiredWidth the desired framebuffer width (in pixels)
      * @param desiredHeight the desired framebuffer height (in pixels)
      * @param depthFormat the depth-buffer format
@@ -296,7 +296,7 @@ class ChainResources {
     }
 
     /**
-     * Return the indexed framebuffer handle.
+     * Return the handle of the indexed framebuffer.
      *
      * @param imageIndex the index of the desired framebuffer
      * @return the handle of the pre-existing VkFramebuffer
@@ -554,7 +554,7 @@ class ChainResources {
 
             for (long viewHandle : viewHandles) {
                 pAttachmentHandles.put(0, viewHandle);
-                createInfo.pAttachments(pAttachmentHandles);
+                createInfo.pAttachments(pAttachmentHandles); // TODO before loop
 
                 int retCode = VK10.vkCreateFramebuffer(
                         logicalDevice, createInfo, allocator, pHandle);
@@ -695,7 +695,7 @@ class ChainResources {
     }
 
     /**
-     * Create the graphics pipeline.
+     * Create a graphics pipeline.
      *
      * @param pipelineLayoutHandle the handle of the graphics-pipeline layout to
      * use

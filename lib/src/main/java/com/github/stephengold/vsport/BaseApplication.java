@@ -555,7 +555,7 @@ public abstract class BaseApplication {
      *
      * @param width the desired width (in pixels)
      * @param height the desired height (in pixels)
-     * @param numMipLevels the desired number of mip levels (including the
+     * @param numMipLevels the desired number of MIP levels (including the
      * original image, &ge;1, &le;31)
      * @param format the desired format
      * @param tiling the desired tiling
@@ -681,7 +681,7 @@ public abstract class BaseApplication {
     }
 
     /**
-     * Return the physical device for rendering.
+     * Access the physical device for rendering.
      *
      * @return the pre-existing instance (not null)
      */
@@ -691,7 +691,7 @@ public abstract class BaseApplication {
     }
 
     /**
-     * Return the named ShaderProgram.
+     * Access the named ShaderProgram, returning a cached result if possible.
      *
      * @param name (not null)
      * @return a valid program (not null)
@@ -753,7 +753,7 @@ public abstract class BaseApplication {
     }
 
     /**
-     * Return the logical device for rendering.
+     * Access the logical device for rendering. TODO rename getLogicalDevice()
      *
      * @return the pre-existing instance (not null)
      */
