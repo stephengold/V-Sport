@@ -86,7 +86,7 @@ public class Commands {
             PointerBuffer pPointer = stack.mallocPointer(1);
             int retCode = VK10.vkAllocateCommandBuffers(
                     logicalDevice, allocInfo, pPointer);
-            Utils.checkForError(retCode, "allocate command buffer");
+            Utils.checkForError(retCode, "allocate a command buffer");
             long pointer = pPointer.get(0);
             this.commandBuffer = new VkCommandBuffer(pointer, logicalDevice);
 
@@ -209,7 +209,7 @@ public class Commands {
     void submitToGraphicsQueue() {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             int retCode = VK10.vkEndCommandBuffer(commandBuffer);
-            Utils.checkForError(retCode, "terminate command sequence");
+            Utils.checkForError(retCode, "terminate a command sequence");
 
             // info to submit a command buffer to the graphics queue:
             VkSubmitInfo.Buffer pSubmitInfo = VkSubmitInfo.calloc(1, stack);
@@ -222,12 +222,12 @@ public class Commands {
             VkQueue queue = BaseApplication.getGraphicsQueue();
             long fenceHandle = VK10.VK_NULL_HANDLE;
             retCode = VK10.vkQueueSubmit(queue, pSubmitInfo, fenceHandle);
-            Utils.checkForError(retCode, "submit single-time command");
+            Utils.checkForError(retCode, "submit a command sequence");
 
             // Wait until the graphics queue is idle:
             // TODO use a fence to submit multiple command sequences in parallel
             retCode = VK10.vkQueueWaitIdle(queue);
-            Utils.checkForError(retCode, "wait for queue to be idle");
+            Utils.checkForError(retCode, "wait for a queue to be idle");
 
             // Free the command buffer:
             VkDevice logicalDevice = BaseApplication.logicalDevice();
