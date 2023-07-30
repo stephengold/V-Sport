@@ -657,7 +657,7 @@ class ChainResources {
             pDependency.dstStageMask(
                     VK10.VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT);
             pDependency.dstSubpass(0);
-            pDependency.srcAccessMask(0);
+            pDependency.srcAccessMask(0x0);
             pDependency.srcStageMask(
                     VK10.VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT);
             pDependency.srcSubpass(VK10.VK_SUBPASS_EXTERNAL);
