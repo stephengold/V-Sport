@@ -33,20 +33,33 @@ import java.nio.LongBuffer;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.vulkan.VK10;
 import org.lwjgl.vulkan.VkAllocationCallbacks;
+import org.lwjgl.vulkan.VkAttachmentDescription;
 import org.lwjgl.vulkan.VkDevice;
 import org.lwjgl.vulkan.VkExtent2D;
 
 /**
- * Encapsulate depth-buffer resources in the V-Sport graphics engine.
+ * Encapsulate a framebuffer attachment in the V-Sport graphics engine.
  *
  * @author Stephen Gold sgold@sonic.net
  *
  * Derived from Cristian Herrera's Vulkan-Tutorial-Java project.
  */
-class DepthResources {
+class Attachment {
     // *************************************************************************
     // fields
 
+    /**
+     * final image layout
+     */
+    final int finalLayout;
+    /**
+     * image format code
+     */
+    final int format;
+    /**
+     * number of samples per pixel (&ge;1)
+     */
+    final int numSamples;
     /**
      * handle of the VkImage
      */
@@ -63,41 +76,79 @@ class DepthResources {
     // constructors
 
     /**
-     * Instantiate depth-buffer resources.
+     * Instantiate an attachment for a depth buffer or transient color buffer.
      *
      * @param format the desired image format
      * @param extent the desired extent (in pixels, not null, unaffected)
+     * @param aspectMask the desired aspect (a VK10.VK_IMAGE_ASPECT_... bit)
+     * @param numSamples the desired number of samples per pixel (&ge;1)
      */
-    DepthResources(int format, VkExtent2D extent) {
-        int tiling = VK10.VK_IMAGE_TILING_OPTIMAL;
+    Attachment(int format, VkExtent2D extent, int aspectMask, int numSamples) {
+        this.format = format;
+        this.numSamples = numSamples;
+
         int width = extent.width();
         int height = extent.height();
         int numMipLevels = 1;
-        int numSamples = VK10.VK_SAMPLE_COUNT_1_BIT;
+        int tiling = VK10.VK_IMAGE_TILING_OPTIMAL;
+
+        int usage;
+        if (aspectMask == VK10.VK_IMAGE_ASPECT_COLOR_BIT) {
+            // transient color buffer
+            this.finalLayout = VK10.VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+            usage = VK10.VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT
+                    | VK10.VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+
+        } else if (aspectMask == VK10.VK_IMAGE_ASPECT_DEPTH_BIT) {
+            // depth buffer
+            this.finalLayout
+                    = VK10.VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+            usage = VK10.VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+
+        } else {
+            throw new IllegalArgumentException("aspect = " + aspectMask);
+        }
 
         try (MemoryStack stack = MemoryStack.stackPush()) {
             LongBuffer pImageHandle = stack.mallocLong(1);
             LongBuffer pMemoryHandle = stack.mallocLong(1);
             BaseApplication.createImage(
-                    width, height, numMipLevels, numSamples, format,
-                    tiling, VK10.VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
-                    VK10.VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                    width, height, numMipLevels, numSamples, format, tiling,
+                    usage, VK10.VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
                     pImageHandle, pMemoryHandle);
             this.imageHandle = pImageHandle.get(0);
             this.memoryHandle = pMemoryHandle.get(0);
 
-            this.viewHandle = BaseApplication.createImageView(imageHandle,
-                    format, VK10.VK_IMAGE_ASPECT_DEPTH_BIT, numMipLevels);
+            this.viewHandle = BaseApplication.createImageView(
+                    imageHandle, format, aspectMask, numMipLevels);
 
-            // Immediately transition the image to optimal layout:
-            BaseApplication.alterImageLayout(
-                    imageHandle, format, VK10.VK_IMAGE_LAYOUT_UNDEFINED,
-                    VK10.VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
-                    numMipLevels);
+            // Immediately transition the image to an optimal layout:
+            BaseApplication.alterImageLayout(imageHandle, format,
+                    VK10.VK_IMAGE_LAYOUT_UNDEFINED, finalLayout, numMipLevels);
         }
     }
     // *************************************************************************
     // new methods exposed
+
+    /**
+     * Describe the attachment when creating a render pass.
+     *
+     * @param description (not null, modified)
+     */
+    void describe(VkAttachmentDescription description) {
+        description.finalLayout(finalLayout);
+        description.format(format);
+        description.initialLayout(VK10.VK_IMAGE_LAYOUT_UNDEFINED);
+        description.samples(numSamples);
+
+        // no stencil operations:
+        description.stencilLoadOp(VK10.VK_ATTACHMENT_LOAD_OP_DONT_CARE);
+        description.stencilStoreOp(VK10.VK_ATTACHMENT_STORE_OP_DONT_CARE);
+
+        // Clear the buffer before each frame:
+        description.loadOp(VK10.VK_ATTACHMENT_LOAD_OP_CLEAR);
+        description.storeOp(VK10.VK_ATTACHMENT_STORE_OP_DONT_CARE);
+    }
 
     /**
      * Destroy all owned resources.
@@ -124,11 +175,21 @@ class DepthResources {
     }
 
     /**
+     * Return the image format.
+     *
+     * @return the format code
+     */
+    int imageFormat() {
+        return format;
+    }
+
+    /**
      * Return the handle of the VkImageView.
      *
      * @return the handle (not null)
      */
     long viewHandle() {
+        assert viewHandle != VK10.VK_NULL_HANDLE;
         return viewHandle;
     }
 }
