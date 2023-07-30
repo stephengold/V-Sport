@@ -182,10 +182,9 @@ class ChainResources {
         this.imageHandles = listImages(chainHandle);
         this.viewHandles = createImageViews(imageHandles, imageFormat);
 
-        this.passHandle = createPass(imageFormat, depthFormat);
-        long depthViewHandle = depthAttachment.viewHandle();
+        this.passHandle = createPass(imageFormat, depthAttachment);
         this.framebufferHandles = createFramebuffers(
-                viewHandles, depthViewHandle, passHandle, framebufferExtent);
+                viewHandles, depthAttachment, passHandle, framebufferExtent);
 
         this.pipelineHandle = createPipeline(pipelineLayoutHandle,
                 framebufferExtent, passHandle, mesh, shaderProgram);
@@ -523,15 +522,18 @@ class ChainResources {
      *
      * @param viewHandles the list of VkImageView handles for color buffers (not
      * null)
-     * @param depthViewHandle the VkImageView handle for the depth buffer
+     * @param depth the depth attachment for each framebuffer (not null)
      * @param renderPassHandle the handle of the VkRenderPass to use
      * @param extent the desired dimensions (in pixels, not null)
      * @return a new list of VkFramebuffer handles
      */
     private static List<Long> createFramebuffers(List<Long> viewHandles,
-            long depthViewHandle, long renderPassHandle, VkExtent2D extent) {
+            Attachment depth,
+            long renderPassHandle, VkExtent2D extent) {
         int numImages = viewHandles.size();
         List<Long> result = new ArrayList<>(numImages);
+
+        long depthViewHandle = depth.viewHandle();
         int width = extent.width();
         int height = extent.height();
         VkDevice logicalDevice = BaseApplication.getLogicalDevice();
@@ -592,11 +594,10 @@ class ChainResources {
      * Create a VkRenderPass for the specified formats.
      *
      * @param imageFormat the format of images in the swap chain
-     * @param depthBufferFormat the format of the depth buffer
+     * @param depth the depth attachment for each framebuffer (not null)
      * @return the handle of the new VkRenderPass
      */
-    private static long createPass(
-            int imageFormat, int depthBufferFormat) {
+    private static long createPass(int imageFormat, Attachment depth) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             VkAttachmentDescription.Buffer pDescriptions
                     = VkAttachmentDescription.calloc(2, stack);
@@ -628,23 +629,9 @@ class ChainResources {
                     = VkAttachmentReference.calloc(1, stack);
             pColorRefs.put(0, colorAttachmentRef);
 
-            // a single depth buffer:
+            // [1] a single depth buffer:
             VkAttachmentDescription depthAttachment = pDescriptions.get(1);
-            depthAttachment.finalLayout(
-                    VK10.VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
-            depthAttachment.format(depthBufferFormat);
-            depthAttachment.initialLayout(VK10.VK_IMAGE_LAYOUT_UNDEFINED);
-            depthAttachment.samples(VK10.VK_SAMPLE_COUNT_1_BIT);
-
-            // no stencil operations:
-            depthAttachment.stencilLoadOp(VK10.VK_ATTACHMENT_LOAD_OP_DONT_CARE);
-            depthAttachment.stencilStoreOp(
-                    VK10.VK_ATTACHMENT_STORE_OP_DONT_CARE);
-
-            // Clear the depth buffer before each frame:
-            depthAttachment.loadOp(VK10.VK_ATTACHMENT_LOAD_OP_CLEAR);
-            depthAttachment.storeOp(VK10.VK_ATTACHMENT_STORE_OP_DONT_CARE);
-
+            depth.describe(depthAttachment);
             VkAttachmentReference depthAttachmentRef = pReferences.get(1);
             depthAttachmentRef.attachment(1);
             depthAttachmentRef.layout(
