@@ -563,7 +563,7 @@ class ChainResources {
 
                 int retCode = VK10.vkCreateFramebuffer(
                         logicalDevice, createInfo, allocator, pHandle);
-                Utils.checkForError(retCode, "create framebuffer");
+                Utils.checkForError(retCode, "create a framebuffer");
                 long frameBufferHandle = pHandle.get(0);
                 result.add(frameBufferHandle);
             }
