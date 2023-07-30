@@ -166,7 +166,6 @@ class ChainResources {
 
         VkSurfaceFormatKHR surfaceFormat = surface.chooseSurfaceFormat();
         this.imageFormat = surfaceFormat.format();
-        this.passHandle = createPass(imageFormat, depthFormat);
 
         PhysicalDevice physicalDevice = BaseApplication.getPhysicalDevice();
         long surfaceHandle = surface.handle();
@@ -183,6 +182,7 @@ class ChainResources {
         this.imageHandles = listImages(chainHandle);
         this.viewHandles = createImageViews(imageHandles, imageFormat);
 
+        this.passHandle = createPass(imageFormat, depthFormat);
         long depthViewHandle = depthAttachment.viewHandle();
         this.framebufferHandles = createFramebuffers(
                 viewHandles, depthViewHandle, passHandle, framebufferExtent);
