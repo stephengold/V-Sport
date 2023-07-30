@@ -948,7 +948,7 @@ public abstract class BaseApplication {
                     = physicalDevice.summarizeSurface(surfaceHandle, stack);
             chainResources = new ChainResources(
                     surface, descriptorSetLayoutHandle,
-                    physicalDevice, frameBufferWidth, frameBufferHeight,
+                    frameBufferWidth, frameBufferHeight,
                     depthBufferFormat, samplerHandle,
                     pipelineLayoutHandle, sampleMesh,
                     shaderProgram, sampleTexture);

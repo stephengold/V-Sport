@@ -144,7 +144,6 @@ class ChainResources {
      * @param surface the features of the active VkSurfaceKHR (not null)
      * @param descriptorSetLayoutHandle the handle of the descriptor-set layout
      * for the UBO
-     * @param physicalDevice the device displaying the surface (not null) TODO
      * @param desiredWidth the desired framebuffer width (in pixels)
      * @param desiredHeight the desired framebuffer height (in pixels)
      * @param depthFormat the depth-buffer format
@@ -155,7 +154,7 @@ class ChainResources {
      * @param texture the texture to be used in rendering (not null)
      */
     ChainResources(SurfaceSummary surface, long descriptorSetLayoutHandle,
-            PhysicalDevice physicalDevice, int desiredWidth, int desiredHeight,
+            int desiredWidth, int desiredHeight,
             int depthFormat, long samplerHandle, long pipelineLayoutHandle,
             Mesh mesh, ShaderProgram shaderProgram, Texture texture) {
         this.numImages = chooseNumImages(surface);
@@ -169,6 +168,7 @@ class ChainResources {
         this.imageFormat = surfaceFormat.format();
         this.passHandle = createPass(imageFormat, depthFormat);
 
+        PhysicalDevice physicalDevice = BaseApplication.getPhysicalDevice();
         long surfaceHandle = surface.handle();
         QueueFamilySummary queueFamilies
                 = physicalDevice.summarizeFamilies(surfaceHandle);
