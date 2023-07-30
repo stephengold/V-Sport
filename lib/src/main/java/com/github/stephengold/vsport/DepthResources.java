@@ -73,11 +73,13 @@ class DepthResources {
         int width = extent.width();
         int height = extent.height();
         int numMipLevels = 1;
+        int numSamples = VK10.VK_SAMPLE_COUNT_1_BIT;
 
         try (MemoryStack stack = MemoryStack.stackPush()) {
             LongBuffer pImageHandle = stack.mallocLong(1);
             LongBuffer pMemoryHandle = stack.mallocLong(1);
-            BaseApplication.createImage(width, height, numMipLevels, format,
+            BaseApplication.createImage(
+                    width, height, numMipLevels, numSamples, format,
                     tiling, VK10.VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
                     VK10.VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
                     pImageHandle, pMemoryHandle);

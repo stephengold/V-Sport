@@ -557,6 +557,7 @@ public abstract class BaseApplication {
      * @param height the desired height (in pixels)
      * @param numMipLevels the desired number of MIP levels (including the
      * original image, &ge;1, &le;31)
+     * @param numSamples the desired number of samples per pixel (&ge;1, &le;64)
      * @param format the desired format
      * @param tiling the desired tiling
      * @param usage a bitmask
@@ -566,10 +567,11 @@ public abstract class BaseApplication {
      * @param pMemory to store the handle of the image's memory (not null,
      * modified)
      */
-    static void createImage(int width, int height, int numMipLevels, int format,
-            int tiling, int usage, int requiredProperties,
-            LongBuffer pImage, LongBuffer pMemory) {
+    static void createImage(int width, int height, int numMipLevels,
+            int numSamples, int format, int tiling, int usage,
+            int requiredProperties, LongBuffer pImage, LongBuffer pMemory) {
         Validate.inRange(numMipLevels, "number of MIP levels", 1, 31);
+        Validate.inRange(numSamples, "number of samples per pixel", 1, 64);
 
         try (MemoryStack stack = MemoryStack.stackPush()) {
             VkImageCreateInfo imageInfo = VkImageCreateInfo.calloc(stack);
@@ -583,7 +585,7 @@ public abstract class BaseApplication {
             imageInfo.imageType(VK10.VK_IMAGE_TYPE_2D);
             imageInfo.initialLayout(VK10.VK_IMAGE_LAYOUT_UNDEFINED);
             imageInfo.mipLevels(numMipLevels);
-            imageInfo.samples(VK10.VK_SAMPLE_COUNT_1_BIT);
+            imageInfo.samples(numSamples);
             imageInfo.sharingMode(VK10.VK_SHARING_MODE_EXCLUSIVE);
             imageInfo.tiling(tiling);
             imageInfo.usage(usage);

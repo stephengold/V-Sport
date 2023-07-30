@@ -156,13 +156,14 @@ class Texture {
              * Create a device-local image that's optimized for being
              * both a source and destination for data transfers:
              */
+            int numSamples = VK10.VK_SAMPLE_COUNT_1_BIT;
             createUsage = VK10.VK_IMAGE_USAGE_TRANSFER_DST_BIT
                     | VK10.VK_IMAGE_USAGE_TRANSFER_SRC_BIT
                     | VK10.VK_IMAGE_USAGE_SAMPLED_BIT;
             properties = VK10.VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
             LongBuffer pImageHandle = stack.mallocLong(1);
             BaseApplication.createImage(
-                    width, height, numMipLevels, imageFormat,
+                    width, height, numMipLevels, numSamples, imageFormat,
                     VK10.VK_IMAGE_TILING_OPTIMAL, createUsage, properties,
                     pImageHandle, pMemoryHandle);
             this.imageHandle = pImageHandle.get(0);
