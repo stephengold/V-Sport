@@ -1228,8 +1228,9 @@ public abstract class BaseApplication {
     private static int debugCallback(int severity, int messageType,
             long pCallbackData, long pUserData) {
         PrintStream stream;
-        int war = EXTDebugUtils.VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT;
-        if (severity > war) {
+        int warning
+                = EXTDebugUtils.VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT;
+        if (severity > warning) {
             stream = System.err; // warnings and severe error messages
         } else {
             //stream = System.out; // verbose or info-level diagnostic messages
