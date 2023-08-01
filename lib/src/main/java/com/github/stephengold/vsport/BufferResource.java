@@ -59,14 +59,6 @@ class BufferResource {
      * handle of the buffer's memory
      */
     private long memoryHandle = VK10.VK_NULL_HANDLE;
-    /**
-     * allocator for direct buffers, or null to use the default allocator
-     */
-    final private VkAllocationCallbacks allocator;
-    /**
-     * logical device that owns this instance
-     */
-    final private VkDevice logicalDevice;
     // *************************************************************************
     // constructors
 
@@ -80,8 +72,7 @@ class BufferResource {
      * method, false for a persistent mapping and no staging buffer
      */
     BufferResource(int numBytes, int usage, boolean staging) {
-        this.logicalDevice = BaseApplication.getLogicalDevice();
-        this.allocator = BaseApplication.allocator();
+        VkDevice logicalDevice = BaseApplication.getLogicalDevice();
 
         try (MemoryStack stack = MemoryStack.stackPush()) {
             LongBuffer pBufferHandle = stack.mallocLong(1);
@@ -126,6 +117,7 @@ class BufferResource {
                         stagingBufferHandle, bufferHandle, numBytes);
 
                 // Destroy the staging buffer and free its memory:
+                VkAllocationCallbacks allocator = BaseApplication.allocator();
                 VK10.vkDestroyBuffer(
                         logicalDevice, stagingBufferHandle, allocator);
                 VK10.vkFreeMemory(
@@ -159,6 +151,9 @@ class BufferResource {
      * Destroy the buffer, if it has been created.
      */
     void destroy() {
+        VkDevice logicalDevice = BaseApplication.getLogicalDevice();
+        VkAllocationCallbacks allocator = BaseApplication.allocator();
+
         if (bufferHandle != VK10.VK_NULL_HANDLE) {
             VK10.vkDestroyBuffer(logicalDevice, bufferHandle, allocator);
             this.bufferHandle = VK10.VK_NULL_HANDLE;
