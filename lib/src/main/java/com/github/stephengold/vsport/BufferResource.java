@@ -95,7 +95,7 @@ class BufferResource {
                 int flags = 0x0;
                 int retCode = VK10.vkMapMemory(logicalDevice,
                         stagingMemoryHandle, offset, numBytes, flags, pPointer);
-                Utils.checkForError(retCode, "map staging buffer's memory");
+                Utils.checkForError(retCode, "map a staging buffer's memory");
 
                 int index = 0; // the index within pPointer
                 this.data = pPointer.getByteBuffer(index, numBytes);
@@ -136,7 +136,8 @@ class BufferResource {
                 int flags = 0x0;
                 int retCode = VK10.vkMapMemory(logicalDevice, memoryHandle,
                         offset, numBytes, flags, pPointer);
-                Utils.checkForError(retCode, "map buffer's memory");
+                Utils.checkForError(
+                        retCode, "map the memory of a persistent buffer");
 
                 int index = 0;
                 this.data = pPointer.getByteBuffer(index, numBytes);
