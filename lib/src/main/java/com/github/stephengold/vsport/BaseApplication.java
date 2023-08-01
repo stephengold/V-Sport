@@ -1420,7 +1420,7 @@ public abstract class BaseApplication {
         createDescriptorSetLayout(); // depends on the logical device
         pipelineLayoutHandle = createPipelineLayout();
 
-        shaderProgram = getProgram("Debug/HelloVSport");
+        shaderProgram = getProgram("Unshaded/Texture");
 
         createChainResources();
     }
