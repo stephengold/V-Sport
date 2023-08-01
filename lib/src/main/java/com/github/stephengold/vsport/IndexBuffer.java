@@ -130,7 +130,7 @@ final class IndexBuffer extends jme3utilities.lbj.IndexBuffer {
             resource = new BufferResource(
                     numBytes, VK10.VK_BUFFER_USAGE_INDEX_BUFFER_BIT, staging) {
                 @Override
-                void fill(ByteBuffer destinationBuffer) {
+                protected void fill(ByteBuffer destinationBuffer) {
                     for (int vIndex : indices) {
                         destinationBuffer.putInt(vIndex);
                     }
@@ -146,7 +146,7 @@ final class IndexBuffer extends jme3utilities.lbj.IndexBuffer {
             resource = new BufferResource(
                     numBytes, VK10.VK_BUFFER_USAGE_INDEX_BUFFER_BIT, staging) {
                 @Override
-                void fill(ByteBuffer destinationBuffer) {
+                protected void fill(ByteBuffer destinationBuffer) {
                     for (int vIndex : indices) {
                         destinationBuffer.putShort((short) vIndex);
                     }

@@ -124,7 +124,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
         int numBytes = vertexCount * numAxes * Float.BYTES;
         this.positionBuffer = new BufferResource(numBytes, usage, staging) {
             @Override
-            void fill(ByteBuffer destinationBuffer) {
+            protected void fill(ByteBuffer destinationBuffer) {
                 for (Vertex vertex : vertices) {
                     vertex.writePositionTo(destinationBuffer);
                 }
@@ -142,7 +142,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
             numBytes = vertexCount * numAxes * Float.BYTES;
             this.normalBuffer = new BufferResource(numBytes, usage, staging) {
                 @Override
-                void fill(ByteBuffer destinationBuffer) {
+                protected void fill(ByteBuffer destinationBuffer) {
                     for (Vertex vertex : vertices) {
                         vertex.writeNormalTo(destinationBuffer);
                     }
@@ -165,7 +165,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
             this.texCoordsBuffer = new BufferResource(
                     numBytes, usage, staging) {
                 @Override
-                void fill(ByteBuffer destinationBuffer) {
+                protected void fill(ByteBuffer destinationBuffer) {
                     for (Vertex vertex : vertices) {
                         vertex.writeTexCoordsTo(destinationBuffer);
                     }
@@ -187,7 +187,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
             numBytes = vertexCount * 3 * Float.BYTES;
             this.colorBuffer = new BufferResource(numBytes, usage, staging) {
                 @Override
-                void fill(ByteBuffer destinationBuffer) {
+                protected void fill(ByteBuffer destinationBuffer) {
                     for (Vertex vertex : vertices) {
                         vertex.writeColorTo(destinationBuffer);
                     }

@@ -171,16 +171,6 @@ class BufferResource {
     }
 
     /**
-     * Fill the buffer's memory with data during instantiation with
-     * {@code staging=true}. Meant to be overridden.
-     *
-     * @param destinationBuffer the pre-existing mapped data buffer
-     */
-    void fill(ByteBuffer destinationBuffer) {
-        // do nothing
-    }
-
-    /**
      * Access the data buffer.
      *
      * @return the pre-existing buffer, or null if not persistent
@@ -196,5 +186,17 @@ class BufferResource {
      */
     final long handle() {
         return bufferHandle;
+    }
+    // *************************************************************************
+    // new protected methods
+
+    /**
+     * Fill the buffer's memory with data during instantiation with
+     * {@code staging=true}. Meant to be overridden.
+     *
+     * @param destinationBuffer the pre-existing mapped data buffer
+     */
+    protected void fill(ByteBuffer destinationBuffer) {
+        // do nothing
     }
 }
