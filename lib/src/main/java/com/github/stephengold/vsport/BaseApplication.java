@@ -207,6 +207,11 @@ public abstract class BaseApplication {
     final private static Map<String, ShaderProgram> programMap
             = new HashMap<>(16);
     /**
+     * map texture keys to cached textures
+     */
+    final private static Map<TextureKey, Texture> textureMap
+            = new HashMap<>(16);
+    /**
      * mesh of triangles to be rendered
      */
     private static Mesh sampleMesh;
@@ -621,6 +626,23 @@ public abstract class BaseApplication {
     static PhysicalDevice getPhysicalDevice() {
         assert physicalDevice != null;
         return physicalDevice;
+    }
+
+    /**
+     * Return the Texture for the specified key.
+     *
+     * @param key (not null)
+     * @return a valid texture (not null)
+     */
+    static Texture getTexture(TextureKey key) {
+        if (!textureMap.containsKey(key)) {
+            Texture texture = key.load();
+            textureMap.put(key, texture);
+        }
+
+        Texture result = textureMap.get(key);
+        assert result != null;
+        return result;
     }
 
     /**
@@ -1392,7 +1414,7 @@ public abstract class BaseApplication {
 
         TextureKey key = new TextureKey(
                 "classpath:/Models/viking_room/viking_room.png");
-        sampleTexture = key.load();
+        sampleTexture = getTexture(key);
         createTextureSampler(); // depends on the logical device
         createDescriptorSetLayout(); // depends on the logical device
         pipelineLayoutHandle = createPipelineLayout();
