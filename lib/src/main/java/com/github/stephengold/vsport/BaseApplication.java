@@ -376,7 +376,7 @@ public abstract class BaseApplication {
      * Cleanly terminate the application after the main window closes for any
      * reason.
      */
-    private void cleanup() {
+    private void cleanUpBase() {
         if (logicalDevice != null) {
             // Await completion of all GPU operations:
             VK10.vkDeviceWaitIdle(logicalDevice);
@@ -454,7 +454,7 @@ public abstract class BaseApplication {
             debugMessengerCallback = null;
         }
 
-        cleanupGlfw();
+        cleanUpGlfw();
     }
 
     /**
@@ -842,7 +842,7 @@ public abstract class BaseApplication {
             System.err.flush();
 
         } finally {
-            cleanup();
+            cleanUpBase();
         }
     }
     // *************************************************************************
@@ -961,7 +961,7 @@ public abstract class BaseApplication {
     /**
      * Destroy the main window and terminate GLFW.
      */
-    private void cleanupGlfw() {
+    private void cleanUpGlfw() {
         if (windowHandle != MemoryUtil.NULL) {
             GLFWFramebufferSizeCallback resizeCallback
                     = GLFW.glfwSetFramebufferSizeCallback(windowHandle, null);
@@ -1749,7 +1749,7 @@ public abstract class BaseApplication {
                     System.out.printf("    suitability score = %s%n", score);
                 }
                 System.out.flush();
-                cleanup();
+                cleanUpBase();
                 System.exit(0);
             }
         }
