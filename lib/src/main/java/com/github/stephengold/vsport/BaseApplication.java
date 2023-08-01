@@ -373,91 +373,6 @@ public abstract class BaseApplication {
     }
 
     /**
-     * Cleanly terminate the application after the main window closes for any
-     * reason.
-     */
-    private void cleanUpBase() {
-        if (logicalDevice != null) {
-            // Await completion of all GPU operations:
-            VK10.vkDeviceWaitIdle(logicalDevice);
-        }
-        /*
-         * Destroy resources in the reverse of the order they were created,
-         * starting with the chain resources:
-         */
-        destroyChainResources();
-        if (shaderProgram != null) {
-            shaderProgram.destroy();
-            shaderProgram = null;
-        }
-
-        // Destroy the pipeline layout:
-        if (pipelineLayoutHandle != VK10.VK_NULL_HANDLE) {
-            VK10.vkDestroyPipelineLayout(
-                    logicalDevice, pipelineLayoutHandle, defaultAllocator);
-            pipelineLayoutHandle = VK10.VK_NULL_HANDLE;
-        }
-
-        // Destroy the descriptor-set layout that's used to configure pipelines:
-        if (descriptorSetLayoutHandle != VK10.VK_NULL_HANDLE) {
-            VK10.vkDestroyDescriptorSetLayout(
-                    logicalDevice, descriptorSetLayoutHandle, defaultAllocator);
-            descriptorSetLayoutHandle = VK10.VK_NULL_HANDLE;
-        }
-
-        if (sampleMesh != null) {
-            sampleMesh.destroy();
-        }
-
-        // Destroy the texture sampler:
-        if (samplerHandle != VK10.VK_NULL_HANDLE) {
-            VK10.vkDestroySampler(
-                    logicalDevice, samplerHandle, defaultAllocator);
-            samplerHandle = VK10.VK_NULL_HANDLE;
-        }
-
-        // Destroy the sample texture:
-        if (sampleTexture != null) {
-            sampleTexture.destroy();
-            sampleTexture = null;
-        }
-
-        // Destroy the command pool and its buffers:
-        commandBuffers.clear();
-        if (commandPoolHandle != VK10.VK_NULL_HANDLE) {
-            VK10.vkDestroyCommandPool(
-                    logicalDevice, commandPoolHandle, defaultAllocator);
-            commandPoolHandle = VK10.VK_NULL_HANDLE;
-        }
-
-        // Destroy the logical device:
-        if (logicalDevice != null) {
-            VK10.vkDestroyDevice(logicalDevice, defaultAllocator);
-            logicalDevice = null;
-        }
-
-        // Destroy the surface:
-        if (surfaceHandle != VK10.VK_NULL_HANDLE) {
-            KHRSurface.vkDestroySurfaceKHR(
-                    vkInstance, surfaceHandle, defaultAllocator);
-            surfaceHandle = VK10.VK_NULL_HANDLE;
-        }
-
-        // Destroy the Vulkan instance:
-        if (vkInstance != null) {
-            VK10.vkDestroyInstance(vkInstance, defaultAllocator);
-            vkInstance = null;
-        }
-
-        if (debugMessengerCallback != null) {
-            debugMessengerCallback.free();
-            debugMessengerCallback = null;
-        }
-
-        cleanUpGlfw();
-    }
-
-    /**
      * Return the handle of the main command pool.
      *
      * @return the handle (not null)
@@ -956,6 +871,91 @@ public abstract class BaseApplication {
                 VK10.VK_FORMAT_D24_UNORM_S8_UINT);
 
         return result;
+    }
+
+    /**
+     * Cleanly terminate the application after the main window closes for any
+     * reason.
+     */
+    private void cleanUpBase() {
+        if (logicalDevice != null) {
+            // Await completion of all GPU operations:
+            VK10.vkDeviceWaitIdle(logicalDevice);
+        }
+        /*
+         * Destroy resources in the reverse of the order they were created,
+         * starting with the chain resources:
+         */
+        destroyChainResources();
+        if (shaderProgram != null) {
+            shaderProgram.destroy();
+            shaderProgram = null;
+        }
+
+        // Destroy the pipeline layout:
+        if (pipelineLayoutHandle != VK10.VK_NULL_HANDLE) {
+            VK10.vkDestroyPipelineLayout(
+                    logicalDevice, pipelineLayoutHandle, defaultAllocator);
+            pipelineLayoutHandle = VK10.VK_NULL_HANDLE;
+        }
+
+        // Destroy the descriptor-set layout that's used to configure pipelines:
+        if (descriptorSetLayoutHandle != VK10.VK_NULL_HANDLE) {
+            VK10.vkDestroyDescriptorSetLayout(
+                    logicalDevice, descriptorSetLayoutHandle, defaultAllocator);
+            descriptorSetLayoutHandle = VK10.VK_NULL_HANDLE;
+        }
+
+        if (sampleMesh != null) {
+            sampleMesh.destroy();
+        }
+
+        // Destroy the texture sampler:
+        if (samplerHandle != VK10.VK_NULL_HANDLE) {
+            VK10.vkDestroySampler(
+                    logicalDevice, samplerHandle, defaultAllocator);
+            samplerHandle = VK10.VK_NULL_HANDLE;
+        }
+
+        // Destroy the sample texture:
+        if (sampleTexture != null) {
+            sampleTexture.destroy();
+            sampleTexture = null;
+        }
+
+        // Destroy the command pool and its buffers:
+        commandBuffers.clear();
+        if (commandPoolHandle != VK10.VK_NULL_HANDLE) {
+            VK10.vkDestroyCommandPool(
+                    logicalDevice, commandPoolHandle, defaultAllocator);
+            commandPoolHandle = VK10.VK_NULL_HANDLE;
+        }
+
+        // Destroy the logical device:
+        if (logicalDevice != null) {
+            VK10.vkDestroyDevice(logicalDevice, defaultAllocator);
+            logicalDevice = null;
+        }
+
+        // Destroy the surface:
+        if (surfaceHandle != VK10.VK_NULL_HANDLE) {
+            KHRSurface.vkDestroySurfaceKHR(
+                    vkInstance, surfaceHandle, defaultAllocator);
+            surfaceHandle = VK10.VK_NULL_HANDLE;
+        }
+
+        // Destroy the Vulkan instance:
+        if (vkInstance != null) {
+            VK10.vkDestroyInstance(vkInstance, defaultAllocator);
+            vkInstance = null;
+        }
+
+        if (debugMessengerCallback != null) {
+            debugMessengerCallback.free();
+            debugMessengerCallback = null;
+        }
+
+        cleanUpGlfw();
     }
 
     /**
