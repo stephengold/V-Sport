@@ -117,7 +117,8 @@ class BufferResource {
                         stagingBufferHandle, bufferHandle, numBytes);
 
                 // Destroy the staging buffer and free its memory:
-                VkAllocationCallbacks allocator = BaseApplication.allocator();
+                VkAllocationCallbacks allocator
+                        = BaseApplication.findAllocator();
                 VK10.vkDestroyBuffer(
                         logicalDevice, stagingBufferHandle, allocator);
                 VK10.vkFreeMemory(
@@ -153,7 +154,7 @@ class BufferResource {
      */
     void destroy() {
         VkDevice logicalDevice = BaseApplication.getLogicalDevice();
-        VkAllocationCallbacks allocator = BaseApplication.allocator();
+        VkAllocationCallbacks allocator = BaseApplication.findAllocator();
 
         if (bufferHandle != VK10.VK_NULL_HANDLE) {
             VK10.vkDestroyBuffer(logicalDevice, bufferHandle, allocator);

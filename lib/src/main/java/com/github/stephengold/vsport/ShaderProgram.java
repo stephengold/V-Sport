@@ -91,7 +91,7 @@ class ShaderProgram {
      */
     void destroy() {
         VkDevice logicalDevice = BaseApplication.getLogicalDevice();
-        VkAllocationCallbacks allocator = BaseApplication.allocator();
+        VkAllocationCallbacks allocator = BaseApplication.findAllocator();
 
         // Destroy the shader modules:
         if (vertModuleHandle != VK10.VK_NULL_HANDLE) {
@@ -153,7 +153,7 @@ class ShaderProgram {
             createInfo.pCode(spirvCode);
 
             VkDevice logicalDevice = BaseApplication.getLogicalDevice();
-            VkAllocationCallbacks allocator = BaseApplication.allocator();
+            VkAllocationCallbacks allocator = BaseApplication.findAllocator();
             LongBuffer pHandle = stack.mallocLong(1);
             int retCode = VK10.vkCreateShaderModule(
                     logicalDevice, createInfo, allocator, pHandle);

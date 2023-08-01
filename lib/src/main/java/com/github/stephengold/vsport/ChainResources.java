@@ -245,7 +245,7 @@ class ChainResources {
      */
     void destroy() {
         VkDevice logicalDevice = BaseApplication.getLogicalDevice();
-        VkAllocationCallbacks allocator = BaseApplication.allocator();
+        VkAllocationCallbacks allocator = BaseApplication.findAllocator();
         /*
          * Destroy resources in the reverse of the order they were created,
          * starting with the pipeline.
@@ -527,7 +527,7 @@ class ChainResources {
             createInfo.presentMode(presentMode);
 
             VkDevice logicalDevice = BaseApplication.getLogicalDevice();
-            VkAllocationCallbacks allocator = BaseApplication.allocator();
+            VkAllocationCallbacks allocator = BaseApplication.findAllocator();
             LongBuffer pHandle = stack.mallocLong(1);
             int retCode = KHRSwapchain.vkCreateSwapchainKHR(
                     logicalDevice, createInfo, allocator, pHandle);
@@ -560,7 +560,7 @@ class ChainResources {
         int width = extent.width();
         int height = extent.height();
         VkDevice logicalDevice = BaseApplication.getLogicalDevice();
-        VkAllocationCallbacks allocator = BaseApplication.allocator();
+        VkAllocationCallbacks allocator = BaseApplication.findAllocator();
 
         try (MemoryStack stack = MemoryStack.stackPush()) {
             // order of attachments must match that in createPass() below!
@@ -749,7 +749,7 @@ class ChainResources {
             createInfo.pSubpasses(subpasses);
 
             VkDevice logicalDevice = BaseApplication.getLogicalDevice();
-            VkAllocationCallbacks allocator = BaseApplication.allocator();
+            VkAllocationCallbacks allocator = BaseApplication.findAllocator();
             LongBuffer pHandle = stack.mallocLong(1);
             int retCode = VK10.vkCreateRenderPass(
                     logicalDevice, createInfo, allocator, pHandle);
@@ -955,7 +955,7 @@ class ChainResources {
 
             VkDevice logicalDevice = BaseApplication.getLogicalDevice();
             long pipelineCache = VK10.VK_NULL_HANDLE; // disable cacheing
-            VkAllocationCallbacks allocator = BaseApplication.allocator();
+            VkAllocationCallbacks allocator = BaseApplication.findAllocator();
             LongBuffer pHandle = stack.mallocLong(1);
             int retCode = VK10.vkCreateGraphicsPipelines(logicalDevice,
                     pipelineCache, pCreateInfo, allocator, pHandle);
@@ -998,7 +998,7 @@ class ChainResources {
             createInfo.pPoolSizes(pPoolSizes);
 
             VkDevice logicalDevice = BaseApplication.getLogicalDevice();
-            VkAllocationCallbacks allocator = BaseApplication.allocator();
+            VkAllocationCallbacks allocator = BaseApplication.findAllocator();
             LongBuffer pHandle = stack.mallocLong(1);
             int retCode = VK10.vkCreateDescriptorPool(
                     logicalDevice, createInfo, allocator, pHandle);

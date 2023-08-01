@@ -260,15 +260,6 @@ public abstract class BaseApplication {
     // new methods exposed
 
     /**
-     * Return the allocator for direct buffers.
-     *
-     * @return the pre-existing instance, or null to use the default allocator
-     */
-    static VkAllocationCallbacks allocator() {
-        return defaultAllocator;
-    }
-
-    /**
      * Convert the specified image from one layout to another.
      *
      * @param imageHandle the handle of the image to convert
@@ -597,6 +588,15 @@ public abstract class BaseApplication {
 
             return result;
         }
+    }
+
+    /**
+     * Return the allocator for direct buffers.
+     *
+     * @return the pre-existing instance, or null to use the default allocator
+     */
+    static VkAllocationCallbacks findAllocator() {
+        return defaultAllocator;
     }
 
     /**

@@ -139,7 +139,7 @@ class PhysicalDevice {
             }
 
             // Create the logical device:
-            VkAllocationCallbacks allocator = BaseApplication.allocator();
+            VkAllocationCallbacks allocator = BaseApplication.findAllocator();
             PointerBuffer pPointer = stack.mallocPointer(1);
             int retCode = VK10.vkCreateDevice(
                     vkPhysicalDevice, createInfo, allocator, pPointer);

@@ -78,7 +78,7 @@ class Frame {
      */
     Frame() {
         this.logicalDevice = BaseApplication.getLogicalDevice();
-        this.allocator = BaseApplication.allocator();
+        this.allocator = BaseApplication.findAllocator();
 
         try (MemoryStack stack = MemoryStack.stackPush()) {
             LongBuffer pHandle = stack.mallocLong(1);

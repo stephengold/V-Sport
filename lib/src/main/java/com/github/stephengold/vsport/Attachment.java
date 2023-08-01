@@ -155,7 +155,7 @@ class Attachment {
      */
     void destroy() {
         VkDevice logicalDevice = BaseApplication.getLogicalDevice();
-        VkAllocationCallbacks allocator = BaseApplication.allocator();
+        VkAllocationCallbacks allocator = BaseApplication.findAllocator();
         /*
          * Destroy resources in the reverse of the order they were created,
          * starting with the VkImageView.

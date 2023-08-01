@@ -161,7 +161,7 @@ class Texture {
             generateMipLevels();
 
             // Destroy the staging buffer and free its memory:
-            VkAllocationCallbacks allocator = BaseApplication.allocator();
+            VkAllocationCallbacks allocator = BaseApplication.findAllocator();
             VK10.vkDestroyBuffer(
                     logicalDevice, stagingBufferHandle, allocator);
             VK10.vkFreeMemory(logicalDevice, stagingMemoryHandle, allocator);
@@ -180,7 +180,7 @@ class Texture {
      */
     void destroy() {
         VkDevice logicalDevice = BaseApplication.getLogicalDevice();
-        VkAllocationCallbacks allocator = BaseApplication.allocator();
+        VkAllocationCallbacks allocator = BaseApplication.findAllocator();
 
         if (viewHandle != VK10.VK_NULL_HANDLE) {
             VK10.vkDestroyImageView(
