@@ -122,7 +122,7 @@ public abstract class BaseApplication {
     /**
      * name of the graphics engine
      */
-    final private static String engineName = "V-Sport";
+    final public static String engineName = "V-Sport";
     /**
      * use the default allocator for direct buffers
      */
