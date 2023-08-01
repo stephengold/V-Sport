@@ -1467,11 +1467,7 @@ public abstract class BaseApplication {
      */
     private void mainUpdateLoop() {
         while (!GLFW.glfwWindowShouldClose(windowHandle)) {
-            render();
-            GLFW.glfwPollEvents();
-
-            Frame frame = inFlightFrames[currentFrameIndex];
-            renderFrame(frame);
+            updateBase();
         }
     }
 
@@ -1753,6 +1749,17 @@ public abstract class BaseApplication {
                 System.exit(0);
             }
         }
+    }
+
+    /**
+     * The body of the main update loop.
+     */
+    private void updateBase() {
+        render();
+        GLFW.glfwPollEvents();
+
+        Frame frame = inFlightFrames[currentFrameIndex];
+        renderFrame(frame);
     }
 
     /**
