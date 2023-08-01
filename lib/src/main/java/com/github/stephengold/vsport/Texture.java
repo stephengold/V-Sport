@@ -91,32 +91,33 @@ class Texture {
     // constructors
 
     /**
-     * Instantiate and load a texture from the named class-path resource.
+     * Instantiate a texture.
      *
-     * @param resourceName the name of the resource (not null)
+     * @param numBytes the desired size in bytes (&ge;0)
+     * @param width the width (in pixels, &gt;0)
+     * @param height the height (in pixels, &gt;0)
+     * @param generateMipMaps true to generate MIP maps, false to skip MIP-map
+     * generation
      */
-    Texture(String resourceName) {
+    private Texture(
+            int numBytes, int width, int height, boolean generateMipMaps) {
         this.logicalDevice = BaseApplication.getLogicalDevice();
         this.allocator = BaseApplication.allocator();
-
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            BufferedImage image = Utils.loadResourceAsImage(resourceName);
-            /*
-             * Note: loading with AWT instead of STB
-             * (which doesn't handle InputStream input).
-             */
-            int numChannels = 4;
-            this.width = image.getWidth();
-            this.height = image.getHeight();
-            int numBytes = width * height * numChannels;
-
+        this.width = width;
+        this.height = height;
+        if (generateMipMaps) {
             int maxDimension = Math.max(width, width);
             this.numMipLevels = 1 + Utils.log2(maxDimension); // 1 .. 31
+        } else {
+            this.numMipLevels = 1;
+        }
 
-            // Create a temporary buffer object for staging:
-            int createUsage = VK10.VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
-            int properties = VK10.VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
-                    | VK10.VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+        // Create a temporary buffer object for staging:
+        int createUsage = VK10.VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+        int properties = VK10.VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
+                | VK10.VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+
+        try (MemoryStack stack = MemoryStack.stackPush()) {
             LongBuffer pBufferHandle = stack.mallocLong(1);
             LongBuffer pMemoryHandle = stack.mallocLong(1);
             BaseApplication.createBuffer(numBytes, createUsage, properties,
@@ -134,23 +135,8 @@ class Texture {
 
             int index = 0; // the index within pPointer
             ByteBuffer data = pPointer.getByteBuffer(index, numBytes);
-            /*
-             * Copy pixel-by-pixel to the staging buffer and then unmap the
-             * staging buffer.
-             */
-            for (int x = 0; x < width; ++x) {
-                for (int y = 0; y < height; ++y) {
-                    int argb = image.getRGB(x, y);
-                    int red = (argb >> 16) & 0xFF;
-                    int green = (argb >> 8) & 0xFF;
-                    int blue = argb & 0xFF;
-                    int alpha = (argb >> 24) & 0xFF;
-                    data.put((byte) red)
-                            .put((byte) green)
-                            .put((byte) blue)
-                            .put((byte) alpha);
-                }
-            }
+
+            fill(data);
             VK10.vkUnmapMemory(logicalDevice, stagingMemoryHandle);
             /*
              * Create a device-local image that's optimized for being
@@ -188,6 +174,59 @@ class Texture {
                     imageHandle, imageFormat, VK10.VK_IMAGE_ASPECT_COLOR_BIT,
                     numMipLevels);
         }
+    }
+    // *************************************************************************
+    // new methods exposed
+
+    /**
+     * Fill the buffer's memory with data during creation. Meant to be
+     * overridden.
+     *
+     * @param destinationBuffer the pre-existing mapped data buffer
+     */
+    void fill(ByteBuffer destinationBuffer) {
+        // do nothing
+    }
+
+    /**
+     * Create a texture from the named class-path resource, using AWT.
+     *
+     * @param resourceName the name of the resource (not null)
+     * @param generateMipMaps true to generate MIP maps, false to skip MIP-map
+     * generation
+     * @return a new instance (not null)
+     */
+    static Texture newInstance(String resourceName, boolean generateMipMaps) {
+        BufferedImage image = Utils.loadResourceAsImage(resourceName);
+        /*
+         * Note: loading with AWT instead of STB
+         * (which doesn't handle InputStream input).
+         */
+        int numChannels = 4;
+        int w = image.getWidth();
+        int h = image.getHeight();
+        int numBytes = w * h * numChannels;
+        Texture result = new Texture(numBytes, w, h, generateMipMaps) {
+            @Override
+            void fill(ByteBuffer pixels) {
+                // Copy pixel-by-pixel from the BufferedImage.
+                for (int x = 0; x < w; ++x) {
+                    for (int y = 0; y < h; ++y) {
+                        int argb = image.getRGB(x, y);
+                        int red = (argb >> 16) & 0xFF;
+                        int green = (argb >> 8) & 0xFF;
+                        int blue = argb & 0xFF;
+                        int alpha = (argb >> 24) & 0xFF;
+                        pixels.put((byte) red)
+                                .put((byte) green)
+                                .put((byte) blue)
+                                .put((byte) alpha);
+                    }
+                }
+            }
+        };
+
+        return result;
     }
     // *************************************************************************
     // new methods exposed
