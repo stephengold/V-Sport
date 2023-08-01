@@ -79,14 +79,6 @@ class Texture {
      * handle of the image view (native type: VkImageView)
      */
     private long viewHandle = VK10.VK_NULL_HANDLE;
-    /**
-     * allocator for direct buffers, or null to use the default allocator
-     */
-    final private VkAllocationCallbacks allocator;
-    /**
-     * logical device that owns this instance
-     */
-    final private VkDevice logicalDevice;
     // *************************************************************************
     // constructors
 
@@ -101,8 +93,6 @@ class Texture {
      */
     private Texture(
             int numBytes, int width, int height, boolean generateMipMaps) {
-        this.logicalDevice = BaseApplication.getLogicalDevice();
-        this.allocator = BaseApplication.allocator();
         this.width = width;
         this.height = height;
         if (generateMipMaps) {
@@ -126,6 +116,7 @@ class Texture {
             long stagingMemoryHandle = pMemoryHandle.get(0);
 
             // Temporarily map the staging buffer's memory:
+            VkDevice logicalDevice = BaseApplication.getLogicalDevice();
             int offset = 0;
             int flags = 0x0;
             PointerBuffer pPointer = stack.mallocPointer(1);
@@ -165,6 +156,7 @@ class Texture {
             generateMipLevels();
 
             // Destroy the staging buffer and free its memory:
+            VkAllocationCallbacks allocator = BaseApplication.allocator();
             VK10.vkDestroyBuffer(
                     logicalDevice, stagingBufferHandle, allocator);
             VK10.vkFreeMemory(logicalDevice, stagingMemoryHandle, allocator);
@@ -235,6 +227,9 @@ class Texture {
      * Destroy the LWJGL resources and free the associated memory.
      */
     void destroy() {
+        VkDevice logicalDevice = BaseApplication.getLogicalDevice();
+        VkAllocationCallbacks allocator = BaseApplication.allocator();
+
         if (viewHandle != VK10.VK_NULL_HANDLE) {
             VK10.vkDestroyImageView(
                     logicalDevice, viewHandle, allocator);
