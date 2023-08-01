@@ -376,7 +376,7 @@ public abstract class BaseApplication {
      * Cleanly terminate the application after the main window closes for any
      * reason.
      */
-    static void cleanup() {
+    private void cleanup() {
         if (logicalDevice != null) {
             // Await completion of all GPU operations:
             VK10.vkDeviceWaitIdle(logicalDevice);
@@ -791,10 +791,9 @@ public abstract class BaseApplication {
 
     /**
      * Start the application (simplified interface).
-     *
-     * @param appName the name of the application
      */
-    public static void start(String appName) {
+    public void start() {
+        String appName = getClass().getSimpleName();
         start(appName, 0, 0, 0);
     }
 
@@ -806,7 +805,7 @@ public abstract class BaseApplication {
      * @param appMinor the minor version number of the application
      * @param appPatch the patch version number of the application
      */
-    public static void start(
+    public void start(
             String appName, int appMajor, int appMinor, int appPatch) {
         // Generate the initial text for the window's title bar:
         String title;
@@ -829,7 +828,13 @@ public abstract class BaseApplication {
             int appVersion = VK10.VK_MAKE_VERSION(appMajor, appMinor, appPatch);
             initializeVulkan(appName, appVersion);
 
+            // Initialize the subclass.
+            initialize();
+
             mainUpdateLoop();
+
+            // Clean up the subclass.
+            cleanUp();
 
         } catch (Exception exception) {
             System.err.print("Caught ");
@@ -839,6 +844,26 @@ public abstract class BaseApplication {
         } finally {
             cleanup();
         }
+    }
+    // *************************************************************************
+    // new protected methods
+
+    /**
+     * Callback invoked after the main update loop terminates.
+     */
+    protected abstract void cleanUp();
+
+    /**
+     * Callback invoked before the main update loop begins.
+     */
+    abstract protected void initialize();
+
+    /**
+     * Callback invoked during each iteration of the main update loop. Meant to
+     * be overridden.
+     */
+    public void render() {
+        // do nothing
     }
     // *************************************************************************
     // private methods
@@ -936,7 +961,7 @@ public abstract class BaseApplication {
     /**
      * Destroy the main window and terminate GLFW.
      */
-    private static void cleanupGlfw() {
+    private void cleanupGlfw() {
         if (windowHandle != MemoryUtil.NULL) {
             GLFWFramebufferSizeCallback resizeCallback
                     = GLFW.glfwSetFramebufferSizeCallback(windowHandle, null);
@@ -1346,7 +1371,7 @@ public abstract class BaseApplication {
      * @param appName the name of the application
      * @param appVersion the application's version numbers
      */
-    private static void initializeVulkan(String appName, int appVersion) {
+    private void initializeVulkan(String appName, int appVersion) {
         createVkInstance(appName, appVersion);
         createSurface();
 
@@ -1440,8 +1465,9 @@ public abstract class BaseApplication {
     /**
      * The application's main update loop.
      */
-    private static void mainUpdateLoop() {
+    private void mainUpdateLoop() {
         while (!GLFW.glfwWindowShouldClose(windowHandle)) {
+            render();
             GLFW.glfwPollEvents();
 
             Frame frame = inFlightFrames[currentFrameIndex];
@@ -1679,7 +1705,7 @@ public abstract class BaseApplication {
     /**
      * Select the physical device best suited to displaying the main surface.
      */
-    private static void selectPhysicalDevice() {
+    private void selectPhysicalDevice() {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             // Count the available devices:
             IntBuffer pCount = stack.mallocInt(1);

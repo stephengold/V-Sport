@@ -46,7 +46,31 @@ public class HelloVSport extends BaseApplication {
      * @param arguments array of command-line arguments (not null)
      */
     public static void main(String[] arguments) {
-        String appName = HelloVSport.class.getSimpleName();
-        BaseApplication.start(appName);
+        HelloVSport application = new HelloVSport();
+        application.start();
+    }
+    // *************************************************************************
+    // BaseApplication methods
+
+    /**
+     * Callback invoked after the main update loop terminates.
+     */
+    @Override
+    public void cleanUp() {
+    }
+
+    /**
+     * Initialize this application.
+     */
+    @Override
+    public void initialize() {
+    }
+
+    /**
+     * Callback invoked during each iteration of the main update loop.
+     */
+    @Override
+    public void render() {
+        super.render();
     }
 }
