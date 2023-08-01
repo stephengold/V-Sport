@@ -73,7 +73,7 @@ public class TextureKey {
      *
      * @param uriString unparsed URI to load/generate image data (not null, not
      * empty)
-     * @param mipmaps true to generate mipmaps, false to skip (default=true)
+     * @param mipmaps true to generate MIP maps, false to skip (default=true)
      */
     public TextureKey(String uriString, boolean mipmaps) {
         // It's better to report URI errors now than during load()!
@@ -131,7 +131,7 @@ public class TextureKey {
     }
 
     /**
-     * Test whether mipmaps should be generated during load().
+     * Test whether MIP maps should be generated during load().
      *
      * @return true if they should be generated, otherwise false
      */

@@ -63,7 +63,7 @@ class BufferResource {
     // constructors
 
     /**
-     * Instantiate a buffer object.
+     * Instantiate a buffer resource.
      *
      * @param numBytes the desired size in bytes (&ge;0)
      * @param usage a bitmask specifying the intended usage (index, uniform,

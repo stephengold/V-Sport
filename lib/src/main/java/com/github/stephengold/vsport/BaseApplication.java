@@ -92,7 +92,8 @@ import org.lwjgl.vulkan.VkSamplerCreateInfo;
 import org.lwjgl.vulkan.VkSubmitInfo;
 
 /**
- * A single-window, 3-D visualization application using LWJGL and Vulkan.
+ * A single-window, 3-D visualization application using LWJGL v3, GLFW, and
+ * Vulkan.
  *
  * @author Stephen Gold sgold@sonic.net
  *
@@ -663,7 +664,7 @@ public abstract class BaseApplication {
     }
 
     /**
-     * Test whether debugging is enabled.
+     * Test whether debugging aids are enabled.
      *
      * @return true if enabled, otherwise false
      */
