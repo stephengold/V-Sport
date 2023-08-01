@@ -30,8 +30,13 @@
 package com.github.stephengold.vsport;
 
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.LongBuffer;
+import javax.imageio.ImageIO;
+import jme3utilities.MyString;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.vulkan.VK10;
@@ -171,59 +176,6 @@ class Texture {
     // new methods exposed
 
     /**
-     * Fill the buffer's memory with data during creation. Meant to be
-     * overridden.
-     *
-     * @param destinationBuffer the pre-existing mapped data buffer
-     */
-    void fill(ByteBuffer destinationBuffer) {
-        // do nothing
-    }
-
-    /**
-     * Create a texture from the named class-path resource, using AWT.
-     *
-     * @param resourceName the name of the resource (not null)
-     * @param generateMipMaps true to generate MIP maps, false to skip MIP-map
-     * generation
-     * @return a new instance (not null)
-     */
-    static Texture newInstance(String resourceName, boolean generateMipMaps) {
-        BufferedImage image = Utils.loadResourceAsImage(resourceName);
-        /*
-         * Note: loading with AWT instead of STB
-         * (which doesn't handle InputStream input).
-         */
-        int numChannels = 4;
-        int w = image.getWidth();
-        int h = image.getHeight();
-        int numBytes = w * h * numChannels;
-        Texture result = new Texture(numBytes, w, h, generateMipMaps) {
-            @Override
-            void fill(ByteBuffer pixels) {
-                // Copy pixel-by-pixel from the BufferedImage.
-                for (int x = 0; x < w; ++x) {
-                    for (int y = 0; y < h; ++y) {
-                        int argb = image.getRGB(x, y);
-                        int red = (argb >> 16) & 0xFF;
-                        int green = (argb >> 8) & 0xFF;
-                        int blue = argb & 0xFF;
-                        int alpha = (argb >> 24) & 0xFF;
-                        pixels.put((byte) red)
-                                .put((byte) green)
-                                .put((byte) blue)
-                                .put((byte) alpha);
-                    }
-                }
-            }
-        };
-
-        return result;
-    }
-    // *************************************************************************
-    // new methods exposed
-
-    /**
      * Destroy the LWJGL resources and free the associated memory.
      */
     void destroy() {
@@ -248,12 +200,50 @@ class Texture {
     }
 
     /**
+     * Create a texture from the specified InputStream.
+     *
+     * @param stream the stream to read from (not null)
+     * @param uri the URI from which the stream data originated (not null)
+     * @param generateMipMaps true to generate MIP maps, false to skip MIP-map
+     * generation
+     * @return a new texture (not null)
+     */
+    static Texture newInstance(
+            InputStream stream, URI uri, boolean generateMipMaps) {
+        ImageIO.setUseCache(false);
+        BufferedImage image;
+        try {
+            image = ImageIO.read(stream);
+
+        } catch (IOException exception) {
+            String q = MyString.quote(uri.toString());
+            String message = "URI=" + q + System.lineSeparator() + exception;
+            throw new RuntimeException(message, exception);
+        }
+
+        Texture result = newInstance(image, generateMipMaps);
+        return result;
+    }
+
+    /**
      * Return the handle of the image view.
      *
      * @return the handle
      */
     final long viewHandle() {
         return viewHandle;
+    }
+    // *************************************************************************
+    // protected methods
+
+    /**
+     * Fill the buffer's memory with data during creation. Meant to be
+     * overridden.
+     *
+     * @param destinationBuffer the pre-existing mapped data buffer
+     */
+    protected void fill(ByteBuffer destinationBuffer) {
+        // do nothing
     }
     // *************************************************************************
     // private methods
@@ -370,5 +360,46 @@ class Texture {
 
             commands.submitToGraphicsQueue();
         }
+    }
+
+    /**
+     * Create a texture from the specified BufferedImage.
+     *
+     * @param image the image to use (not null)
+     * @param generateMipMaps true to generate MIP maps, false to skip MIP-map
+     * generation
+     * @return a new instance (not null)
+     */
+    private static Texture newInstance(
+            BufferedImage image, boolean generateMipMaps) {
+        /*
+         * Note: loading with AWT instead of STB
+         * (which doesn't handle InputStream input).
+         */
+        int numChannels = 4;
+        int w = image.getWidth();
+        int h = image.getHeight();
+        int numBytes = w * h * numChannels;
+        Texture result = new Texture(numBytes, w, h, generateMipMaps) {
+            @Override
+            protected void fill(ByteBuffer pixels) {
+                // Copy pixel-by-pixel from the BufferedImage.
+                for (int x = 0; x < w; ++x) {
+                    for (int y = 0; y < h; ++y) {
+                        int argb = image.getRGB(x, y);
+                        int red = (argb >> 16) & 0xFF;
+                        int green = (argb >> 8) & 0xFF;
+                        int blue = argb & 0xFF;
+                        int alpha = (argb >> 24) & 0xFF;
+                        pixels.put((byte) red)
+                                .put((byte) green)
+                                .put((byte) blue)
+                                .put((byte) alpha);
+                    }
+                }
+            }
+        };
+
+        return result;
     }
 }

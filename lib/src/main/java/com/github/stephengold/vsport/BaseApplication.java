@@ -1390,8 +1390,9 @@ public abstract class BaseApplication {
         AssimpUtils.extractTriangles(resourceName, flags, indices, vertices);
         sampleMesh = Mesh.newInstance(vertices);
 
-        sampleTexture = Texture.newInstance(
-                "/Models/viking_room/viking_room.png", true);
+        TextureKey key = new TextureKey(
+                "classpath:/Models/viking_room/viking_room.png");
+        sampleTexture = key.load();
         createTextureSampler(); // depends on the logical device
         createDescriptorSetLayout(); // depends on the logical device
         pipelineLayoutHandle = createPipelineLayout();
