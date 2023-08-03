@@ -62,7 +62,6 @@ import org.lwjgl.vulkan.VkClearColorValue;
 import org.lwjgl.vulkan.VkClearDepthStencilValue;
 import org.lwjgl.vulkan.VkClearValue;
 import org.lwjgl.vulkan.VkCommandBuffer;
-import org.lwjgl.vulkan.VkCommandBufferAllocateInfo;
 import org.lwjgl.vulkan.VkCommandBufferBeginInfo;
 import org.lwjgl.vulkan.VkCommandPoolCreateInfo;
 import org.lwjgl.vulkan.VkDebugUtilsMessengerCallbackDataEXT;
@@ -101,7 +100,7 @@ public abstract class BaseApplication {
      * true to enable debugging output and optional runtime checks, or false to
      * disable them
      */
-    final private static boolean enableDebugging = false;
+    final private static boolean enableDebugging = true;
     /**
      * version of the V-Sport graphics engine
      */
@@ -638,46 +637,6 @@ public abstract class BaseApplication {
     // private methods
 
     /**
-     * Allocate command buffers as needed.
-     *
-     * @param numBuffersNeeded the number of command buffers needed
-     * @param addBuffers storage for allocated command buffers (not null, added
-     * to)
-     */
-    private static void addCommandBuffers(
-            int numBuffersNeeded, List<VkCommandBuffer> addBuffers) {
-        numBuffersNeeded -= addBuffers.size();
-        if (numBuffersNeeded <= 0) {
-            return;
-        }
-
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            // Create a block of command buffers:
-            PointerBuffer pPointers = stack.mallocPointer(numBuffersNeeded);
-            VkCommandBufferAllocateInfo allocInfo
-                    = VkCommandBufferAllocateInfo.calloc(stack);
-            allocInfo.sType(
-                    VK10.VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO);
-
-            allocInfo.commandBufferCount(numBuffersNeeded);
-            allocInfo.commandPool(commandPoolHandle);
-            allocInfo.level(VK10.VK_COMMAND_BUFFER_LEVEL_PRIMARY);
-
-            int retCode = VK10.vkAllocateCommandBuffers(
-                    vkDevice, allocInfo, pPointers);
-            Utils.checkForError(retCode, "allocate command buffers");
-
-            // Collect the command buffers in a list:
-            for (int i = 0; i < numBuffersNeeded; ++i) {
-                long pointer = pPointers.get(i);
-                VkCommandBuffer commandBuffer
-                        = new VkCommandBuffer(pointer, vkDevice);
-                addBuffers.add(commandBuffer);
-            }
-        }
-    }
-
-    /**
      * Add debug-messenger information to the specified VkInstanceCreateInfo.
      *
      * @param createInfo the info to modify (not null, modified)
@@ -855,7 +814,7 @@ public abstract class BaseApplication {
         int numImages = chainResources.countImages();
         createSyncObjects(numImages);
 
-        addCommandBuffers(numImages, commandBuffers);
+        logicalDevice.addCommandBuffers(numImages, commandBuffers);
         for (int i = 0; i < numImages; ++i) {
             recordCommandBuffer(i);
         }
