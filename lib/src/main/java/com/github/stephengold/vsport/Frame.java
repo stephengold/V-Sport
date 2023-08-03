@@ -35,7 +35,6 @@ import org.lwjgl.vulkan.VK10;
 import org.lwjgl.vulkan.VkAllocationCallbacks;
 import org.lwjgl.vulkan.VkDevice;
 import org.lwjgl.vulkan.VkFenceCreateInfo;
-import org.lwjgl.vulkan.VkSemaphoreCreateInfo;
 
 /**
  * Encapsulate the synchronization objects of a single frame in flight.
@@ -85,22 +84,11 @@ class Frame {
             Utils.checkForError(retCode, "create fence");
             this.fenceHandle = pHandle.get(0);
 
-            VkSemaphoreCreateInfo semaphoreCreateInfo
-                    = VkSemaphoreCreateInfo.calloc(stack);
-            semaphoreCreateInfo.sType(
-                    VK10.VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO);
-
-            // Create the image-available semaphore in the unsignaled state:
-            retCode = VK10.vkCreateSemaphore(
-                    vkDevice, semaphoreCreateInfo, allocator, pHandle);
-            Utils.checkForError(retCode, "create semaphore");
-            this.imageAvailableSemaphoreHandle = pHandle.get(0);
-
-            // Create the render-finished semaphore in the unsignaled state:
-            retCode = VK10.vkCreateSemaphore(
-                    vkDevice, semaphoreCreateInfo, allocator, pHandle);
-            Utils.checkForError(retCode, "create semaphore");
-            this.renderFinishedSemaphoreHandle = pHandle.get(0);
+            LogicalDevice logicalDevice = BaseApplication.getLogicalDevice();
+            this.imageAvailableSemaphoreHandle
+                    = logicalDevice.createSemaphore();
+            this.renderFinishedSemaphoreHandle
+                    = logicalDevice.createSemaphore();
         }
     }
     // *************************************************************************
@@ -117,17 +105,11 @@ class Frame {
             this.fenceHandle = VK10.VK_NULL_HANDLE;
         }
 
-        if (imageAvailableSemaphoreHandle != VK10.VK_NULL_HANDLE) {
-            VK10.vkDestroySemaphore(
-                    vkDevice, imageAvailableSemaphoreHandle, allocator);
-            this.imageAvailableSemaphoreHandle = VK10.VK_NULL_HANDLE;
-        }
-
-        if (renderFinishedSemaphoreHandle != VK10.VK_NULL_HANDLE) {
-            VK10.vkDestroySemaphore(
-                    vkDevice, renderFinishedSemaphoreHandle, allocator);
-            this.renderFinishedSemaphoreHandle = VK10.VK_NULL_HANDLE;
-        }
+        LogicalDevice logicalDevice = BaseApplication.getLogicalDevice();
+        this.imageAvailableSemaphoreHandle
+                = logicalDevice.destroySemaphore(imageAvailableSemaphoreHandle);
+        this.renderFinishedSemaphoreHandle
+                = logicalDevice.destroySemaphore(renderFinishedSemaphoreHandle);
     }
 
     /**
