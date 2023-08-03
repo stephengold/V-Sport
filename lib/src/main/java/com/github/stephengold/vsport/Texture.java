@@ -34,30 +34,30 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.ByteBuffer;
-import java.nio.LongBuffer;
 import javax.imageio.ImageIO;
 import jme3utilities.MyString;
-import org.lwjgl.PointerBuffer;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.vulkan.VK10;
-import org.lwjgl.vulkan.VkAllocationCallbacks;
-import org.lwjgl.vulkan.VkDevice;
 import org.lwjgl.vulkan.VkImageBlit;
 import org.lwjgl.vulkan.VkImageMemoryBarrier;
 import org.lwjgl.vulkan.VkImageSubresourceLayers;
 import org.lwjgl.vulkan.VkImageSubresourceRange;
 
 /**
- * Encapsulate the handles of a Vulkan texture.
+ * A 2-D texture for sampling.
  *
  * @author Stephen Gold sgold@sonic.net
  */
-class Texture {
+public class Texture extends DeviceResource {
     // *************************************************************************
     // fields
 
     /**
-     * height of the original image (in pixels)
+     * underlying VkImage and VkDeviceMemory
+     */
+    private DeviceImage deviceImage;
+    /**
+     * height of original image (in pixels, &gt;0)
      */
     final private int height;
     /**
@@ -65,21 +65,17 @@ class Texture {
      */
     final private int imageFormat = VK10.VK_FORMAT_R8G8B8A8_SRGB;
     /**
+     * size of the original image (in bytes, &gt;0)
+     */
+    final int numBytes;
+    /**
      * number of MIP levels in the image (including the original image)
      */
     final private int numMipLevels;
     /**
-     * width of the original image (in pixels)
+     * width of the original image (in pixels, &gt;0)
      */
     final private int width;
-    /**
-     * handle of the image resource (native type: VkImage)
-     */
-    private long imageHandle = VK10.VK_NULL_HANDLE;
-    /**
-     * handle of the image's memory (native type: VkDeviceMemory)
-     */
-    private long memoryHandle = VK10.VK_NULL_HANDLE;
     /**
      * handle of the image view (native type: VkImageView)
      */
@@ -98,107 +94,21 @@ class Texture {
      */
     private Texture(
             int numBytes, int width, int height, boolean generateMipMaps) {
+        this.numBytes = numBytes;
         this.width = width;
         this.height = height;
+
         if (generateMipMaps) {
             int maxDimension = Math.max(width, width);
             this.numMipLevels = 1 + Utils.log2(maxDimension); // 1 .. 31
         } else {
             this.numMipLevels = 1;
         }
-
-        // Create a temporary buffer object for staging:
-        int createUsage = VK10.VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
-        int properties = VK10.VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
-                | VK10.VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
-
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            LongBuffer pBufferHandle = stack.mallocLong(1);
-            LongBuffer pMemoryHandle = stack.mallocLong(1);
-            BaseApplication.createBuffer(numBytes, createUsage, properties,
-                    pBufferHandle, pMemoryHandle);
-            long stagingBufferHandle = pBufferHandle.get(0);
-            long stagingMemoryHandle = pMemoryHandle.get(0);
-
-            // Temporarily map the staging buffer's memory:
-            VkDevice logicalDevice = BaseApplication.getVkDevice();
-            int offset = 0;
-            int flags = 0x0;
-            PointerBuffer pPointer = stack.mallocPointer(1);
-            int retCode = VK10.vkMapMemory(logicalDevice,
-                    stagingMemoryHandle, offset, numBytes, flags, pPointer);
-            Utils.checkForError(retCode, "map staging buffer's memory");
-
-            int index = 0; // the index within pPointer
-            ByteBuffer data = pPointer.getByteBuffer(index, numBytes);
-
-            fill(data);
-            VK10.vkUnmapMemory(logicalDevice, stagingMemoryHandle);
-            /*
-             * Create a device-local image that's optimized for being
-             * both a source and destination for data transfers:
-             */
-            int numSamples = VK10.VK_SAMPLE_COUNT_1_BIT;
-            createUsage = VK10.VK_IMAGE_USAGE_TRANSFER_DST_BIT
-                    | VK10.VK_IMAGE_USAGE_TRANSFER_SRC_BIT
-                    | VK10.VK_IMAGE_USAGE_SAMPLED_BIT;
-            properties = VK10.VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
-            LongBuffer pImageHandle = stack.mallocLong(1);
-            BaseApplication.createImage(
-                    width, height, numMipLevels, numSamples, imageFormat,
-                    VK10.VK_IMAGE_TILING_OPTIMAL, createUsage, properties,
-                    pImageHandle, pMemoryHandle);
-            this.imageHandle = pImageHandle.get(0);
-            this.memoryHandle = pMemoryHandle.get(0);
-            BaseApplication.alterImageLayout(
-                    imageHandle, imageFormat, VK10.VK_IMAGE_LAYOUT_UNDEFINED,
-                    VK10.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, numMipLevels);
-
-            // Copy the data from the staging buffer the new image:
-            BaseApplication.copyBufferToImage(
-                    stagingBufferHandle, imageHandle, width, height);
-
-            generateMipLevels();
-
-            // Destroy the staging buffer and free its memory:
-            VkAllocationCallbacks allocator = BaseApplication.findAllocator();
-            VK10.vkDestroyBuffer(
-                    logicalDevice, stagingBufferHandle, allocator);
-            VK10.vkFreeMemory(logicalDevice, stagingMemoryHandle, allocator);
-
-            // Create a view for the new image:
-            this.viewHandle = BaseApplication.createImageView(
-                    imageHandle, imageFormat, VK10.VK_IMAGE_ASPECT_COLOR_BIT,
-                    numMipLevels);
-        }
+        create();
     }
+
     // *************************************************************************
     // new methods exposed
-
-    /**
-     * Destroy the LWJGL resources and free the associated memory.
-     */
-    void destroy() {
-        VkDevice logicalDevice = BaseApplication.getVkDevice();
-        VkAllocationCallbacks allocator = BaseApplication.findAllocator();
-
-        if (viewHandle != VK10.VK_NULL_HANDLE) {
-            VK10.vkDestroyImageView(
-                    logicalDevice, viewHandle, allocator);
-            this.viewHandle = VK10.VK_NULL_HANDLE;
-        }
-        if (memoryHandle != VK10.VK_NULL_HANDLE) {
-            VK10.vkFreeMemory(
-                    logicalDevice, memoryHandle, allocator);
-            this.memoryHandle = VK10.VK_NULL_HANDLE;
-        }
-        if (imageHandle != VK10.VK_NULL_HANDLE) {
-            VK10.vkDestroyImage(
-                    logicalDevice, imageHandle, allocator);
-            this.imageHandle = VK10.VK_NULL_HANDLE;
-        }
-    }
-
     /**
      * Create a texture from the specified InputStream.
      *
@@ -234,7 +144,7 @@ class Texture {
         return viewHandle;
     }
     // *************************************************************************
-    // protected methods
+    // new protected methods
 
     /**
      * Fill the buffer's memory with data during creation. Meant to be
@@ -246,7 +156,92 @@ class Texture {
         // do nothing
     }
     // *************************************************************************
+    // DeviceResource methods
+
+    /**
+     * Destroy the LWJGL resources and free the associated memory.
+     */
+    @Override
+    protected void destroy() {
+        LogicalDevice logicalDevice = BaseApplication.getLogicalDevice();
+        this.viewHandle = logicalDevice.destroyImageView(viewHandle);
+
+        if (deviceImage != null) {
+            this.deviceImage = deviceImage.destroy();
+        }
+
+        super.destroy();
+    }
+
+    /**
+     * Update this object after a device change.
+     *
+     * @param nextDevice the current device if it's just been created, or null
+     * if the current device is about to be destroyed
+     */
+    @Override
+    void updateLogicalDevice(LogicalDevice nextDevice) {
+        LogicalDevice logicalDevice = BaseApplication.getLogicalDevice();
+        this.viewHandle = logicalDevice.destroyImageView(viewHandle);
+
+        if (deviceImage != null) {
+            this.deviceImage = deviceImage.destroy();
+        }
+
+        if (nextDevice != null) {
+            create();
+        }
+    }
+    // *************************************************************************
     // private methods
+
+    /**
+     * Create the underlying resources: the device image and the image view.
+     */
+    private void create() {
+        // Create a temporary buffer object for staging:
+        int createUsage = VK10.VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+        int properties = VK10.VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
+                | VK10.VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+
+        LogicalDevice logicalDevice = BaseApplication.getLogicalDevice();
+        MappableBuffer stagingBuffer = logicalDevice.createMappable(
+                numBytes, createUsage, properties);
+
+        // Briefly map the staging buffer and fill it with data:
+        ByteBuffer data = logicalDevice.map(stagingBuffer);
+        fill(data);
+        logicalDevice.unmap(stagingBuffer);
+        /*
+         * Create a device-local image that's optimized for being
+         * both a source and destination for data transfers:
+         */
+        int numSamples = VK10.VK_SAMPLE_COUNT_1_BIT;
+        createUsage = VK10.VK_IMAGE_USAGE_TRANSFER_DST_BIT
+                | VK10.VK_IMAGE_USAGE_TRANSFER_SRC_BIT
+                | VK10.VK_IMAGE_USAGE_SAMPLED_BIT;
+        properties = VK10.VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
+        this.deviceImage = logicalDevice.createImage(
+                width, height, numMipLevels, numSamples, imageFormat,
+                VK10.VK_IMAGE_TILING_OPTIMAL, createUsage, properties);
+
+        BaseApplication.alterImageLayout(deviceImage.imageHandle(), imageFormat,
+                VK10.VK_IMAGE_LAYOUT_UNDEFINED,
+                VK10.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, numMipLevels);
+
+        // Copy the data from the staging buffer the new image:
+        BaseApplication.copyBufferToImage(stagingBuffer.vkBufferHandle(),
+                deviceImage.imageHandle(), width, height);
+        generateMipLevels();
+
+        // Destroy the staging buffer and free its memory:
+        stagingBuffer.destroy();
+
+        // Create a view for the new image:
+        long imageHandle = deviceImage.imageHandle();
+        this.viewHandle = BaseApplication.createImageView(imageHandle,
+                imageFormat, VK10.VK_IMAGE_ASPECT_COLOR_BIT, numMipLevels);
+    }
 
     /**
      * Add MIP levels to a newly loaded texture image. On entry, the original
@@ -272,8 +267,10 @@ class Texture {
             pBarrier.sType(VK10.VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER);
 
             pBarrier.dstQueueFamilyIndex(VK10.VK_QUEUE_FAMILY_IGNORED);
-            pBarrier.image(imageHandle);
             pBarrier.srcQueueFamilyIndex(VK10.VK_QUEUE_FAMILY_IGNORED);
+
+            long imageHandle = deviceImage.imageHandle();
+            pBarrier.image(imageHandle);
 
             VkImageSubresourceRange barrierRange = pBarrier.subresourceRange();
             barrierRange.aspectMask(aspectMask);
@@ -285,8 +282,8 @@ class Texture {
             int destinationStage;
             int sourceStage;
 
-            int srcWidth = width;
-            int srcHeight = height;
+            int srcWidth = deviceImage.width();
+            int srcHeight = deviceImage.height();
             for (int srcLevel = 0; srcLevel < lastLevel; ++srcLevel) {
                 int dstLevel = srcLevel + 1;
                 int dstWidth = (srcWidth > 1) ? srcWidth / 2 : 1;
@@ -324,7 +321,7 @@ class Texture {
                 srcRange.layerCount(layerCount);
                 srcRange.mipLevel(srcLevel);
 
-                commands.addBlit(imageHandle, blit);
+                commands.addBlit(deviceImage.imageHandle(), blit);
                 /*
                  * Command to wait until the blit is finished and then optimize
                  * the source level for being read by fragment shaders:
