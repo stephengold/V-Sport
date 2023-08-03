@@ -334,14 +334,13 @@ public class LogicalDevice {
      */
     long createSemaphore() {
         try (MemoryStack stack = MemoryStack.stackPush()) {
-            VkSemaphoreCreateInfo semaphoreCreateInfo
+            VkSemaphoreCreateInfo createInfo
                     = VkSemaphoreCreateInfo.calloc(stack);
-            semaphoreCreateInfo.sType(
-                    VK10.VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO);
+            createInfo.sType(VK10.VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO);
 
             LongBuffer pHandle = stack.mallocLong(1);
             int retCode = VK10.vkCreateSemaphore(
-                    vkDevice, semaphoreCreateInfo, allocator, pHandle);
+                    vkDevice, createInfo, allocator, pHandle);
             Utils.checkForError(retCode, "create a semaphore");
             long result = pHandle.get(0);
 
