@@ -223,10 +223,10 @@ public class Commands {
             Utils.checkForError(retCode, "wait for a queue to be idle");
 
             // Free the command buffer:
-            VkDevice logicalDevice = BaseApplication.getVkDevice();
+            VkDevice vkDevice = BaseApplication.getVkDevice();
             long commandPoolHandle = BaseApplication.commandPoolHandle();
             VK10.vkFreeCommandBuffers(
-                    logicalDevice, commandPoolHandle, commandBuffer);
+                    vkDevice, commandPoolHandle, commandBuffer);
             this.commandBuffer = null;
         }
     }
