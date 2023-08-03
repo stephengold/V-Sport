@@ -29,12 +29,9 @@
  */
 package com.github.stephengold.vsport;
 
-import java.nio.LongBuffer;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.vulkan.VK10;
-import org.lwjgl.vulkan.VkAllocationCallbacks;
 import org.lwjgl.vulkan.VkAttachmentDescription;
-import org.lwjgl.vulkan.VkDevice;
 import org.lwjgl.vulkan.VkExtent2D;
 
 /**
@@ -49,6 +46,10 @@ class Attachment {
     // fields
 
     /**
+     * underlying image
+     */
+    private DeviceImage deviceImage;
+    /**
      * final image layout
      */
     final int finalLayout;
@@ -60,14 +61,6 @@ class Attachment {
      * number of samples per pixel (&ge;1)
      */
     final int numSamples;
-    /**
-     * handle of the VkImage
-     */
-    private long imageHandle = VK10.VK_NULL_HANDLE;
-    /**
-     * handle of the VkDeviceMemory
-     */
-    private long memoryHandle = VK10.VK_NULL_HANDLE;
     /**
      * handle of the VkImageView
      */
@@ -110,15 +103,12 @@ class Attachment {
         }
 
         try (MemoryStack stack = MemoryStack.stackPush()) {
-            LongBuffer pImageHandle = stack.mallocLong(1);
-            LongBuffer pMemoryHandle = stack.mallocLong(1);
-            BaseApplication.createImage(
+            LogicalDevice logicalDevice = BaseApplication.getLogicalDevice();
+            this.deviceImage = logicalDevice.createImage(
                     width, height, numMipLevels, numSamples, format, tiling,
-                    usage, VK10.VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-                    pImageHandle, pMemoryHandle);
-            this.imageHandle = pImageHandle.get(0);
-            this.memoryHandle = pMemoryHandle.get(0);
+                    usage, VK10.VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
+            long imageHandle = deviceImage.imageHandle();
             this.viewHandle = BaseApplication.createImageView(
                     imageHandle, format, aspectMask, numMipLevels);
 
@@ -152,26 +142,17 @@ class Attachment {
 
     /**
      * Destroy all owned resources.
+     *
+     * @return null
      */
-    void destroy() {
-        VkDevice logicalDevice = BaseApplication.getVkDevice();
-        VkAllocationCallbacks allocator = BaseApplication.findAllocator();
-        /*
-         * Destroy resources in the reverse of the order they were created,
-         * starting with the VkImageView.
-         */
-        if (viewHandle != VK10.VK_NULL_HANDLE) {
-            VK10.vkDestroyImageView(logicalDevice, viewHandle, allocator);
-            viewHandle = VK10.VK_NULL_HANDLE;
+    Attachment destroy() {
+        LogicalDevice logicalDevice = BaseApplication.getLogicalDevice();
+        this.viewHandle = logicalDevice.destroyImageView(viewHandle);
+        if (deviceImage != null) {
+            this.deviceImage = deviceImage.destroy();
         }
-        if (memoryHandle != VK10.VK_NULL_HANDLE) {
-            VK10.vkFreeMemory(logicalDevice, memoryHandle, allocator);
-            memoryHandle = VK10.VK_NULL_HANDLE;
-        }
-        if (imageHandle != VK10.VK_NULL_HANDLE) {
-            VK10.vkDestroyImage(logicalDevice, imageHandle, allocator);
-            imageHandle = VK10.VK_NULL_HANDLE;
-        }
+
+        return null;
     }
 
     /**
