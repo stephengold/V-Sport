@@ -100,9 +100,13 @@ class ChainResources {
      */
     final private int numImages;
     /**
-     * uniform buffer objects (one per VkImage in the chain)
+     * global uniform buffer objects (one per VkImage in the chain)
      */
-    final private List<BufferResource> ubos = new ArrayList<>(4);
+    final private List<BufferResource> globalUbos = new ArrayList<>(4);
+    /**
+     * non-global uniform buffer objects (one per VkImage in the chain)
+     */
+    final private List<BufferResource> nonGlobalUbos = new ArrayList<>(4);
     /**
      * handles of the descriptor sets (one per VkImage in the chain)
      */
@@ -162,7 +166,7 @@ class ChainResources {
             int depthFormat, long samplerHandle, long pipelineLayoutHandle,
             Mesh mesh, ShaderProgram shaderProgram, Texture texture) {
         this.numImages = chooseNumImages(surface);
-        addUbos(numImages, ubos);
+        addUbos(numImages, globalUbos, nonGlobalUbos);
 
         this.poolHandle = createPool(numImages);
         this.descriptorSetHandles = allocateDescriptorSets(
@@ -205,8 +209,8 @@ class ChainResources {
         this.pipelineHandle = createPipeline(pipelineLayoutHandle,
                 framebufferExtent, passHandle, mesh, shaderProgram);
 
-        updateDescriptorSets(
-                texture, samplerHandle, ubos, descriptorSetHandles);
+        updateDescriptorSets(texture, samplerHandle, globalUbos, nonGlobalUbos,
+                descriptorSetHandles);
     }
     // *************************************************************************
     // new methods exposed
@@ -294,10 +298,14 @@ class ChainResources {
             this.poolHandle = VK10.VK_NULL_HANDLE;
         }
 
-        for (BufferResource ubo : ubos) {
+        for (BufferResource ubo : globalUbos) {
             ubo.destroy();
         }
-        ubos.clear();
+        globalUbos.clear();
+        for (BufferResource ubo : nonGlobalUbos) {
+            ubo.destroy();
+        }
+        nonGlobalUbos.clear();
     }
 
     /**
@@ -345,13 +353,24 @@ class ChainResources {
     }
 
     /**
-     * Access the Uniform Buffer Object (UBO) for the indexed image.
+     * Access the global Uniform Buffer Object (UBO) for the indexed image.
      *
      * @param imageIndex the index of the desired UBO
      * @return a pre-existing instance
      */
-    BufferResource getUbo(int imageIndex) {
-        BufferResource result = ubos.get(imageIndex);
+    BufferResource getGlobalUbo(int imageIndex) {
+        BufferResource result = globalUbos.get(imageIndex);
+        return result;
+    }
+
+    /**
+     * Access the non-global Uniform Buffer Object (UBO) for the indexed image.
+     *
+     * @param imageIndex the index of the desired UBO
+     * @return a pre-existing instance
+     */
+    BufferResource getNonGlobalUbo(int imageIndex) {
+        BufferResource result = nonGlobalUbos.get(imageIndex);
         return result;
     }
 
@@ -381,21 +400,32 @@ class ChainResources {
      * Allocate uniform buffer objects (UBOs) as needed.
      *
      * @param numUbosNeeded the number of UBOs needed
-     * @param addUbos storage for allocated UBOs (not null, added to)
+     * @param addGlobals storage for allocated global UBOs (not null, added to)
+     * @param addNonGlobals storage for allocated non-global UBOs (not null,
+     * added to)
      */
     private static void addUbos(
-            int numUbosNeeded, List<BufferResource> addUbos) {
-        numUbosNeeded -= addUbos.size();
-        if (numUbosNeeded <= 0) {
-            return;
+            int numUbosNeeded, List<BufferResource> addGlobals,
+            List<BufferResource> addNonGlobals) {
+        boolean staging = false;
+        int needed = numUbosNeeded - addGlobals.size();
+        if (needed > 0) {
+            int numBytes = UniformValues.numBytes();
+            for (int i = 0; i < needed; ++i) {
+                BufferResource ubo = new BufferResource(numBytes,
+                        VK10.VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, staging);
+                addGlobals.add(ubo);
+            }
         }
 
-        int numBytes = UniformValues.numBytes();
-        boolean staging = false;
-        for (int i = 0; i < numUbosNeeded; ++i) {
-            BufferResource ubo = new BufferResource(
-                    numBytes, VK10.VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, staging);
-            addUbos.add(ubo);
+        needed = numUbosNeeded - addNonGlobals.size();
+        if (needed > 0) {
+            int numBytes = NonGlobalUniformValues.numBytes();
+            for (int i = 0; i < needed; ++i) {
+                BufferResource ubo = new BufferResource(numBytes,
+                        VK10.VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, staging);
+                addNonGlobals.add(ubo);
+            }
         }
     }
 
@@ -1047,27 +1077,36 @@ class ChainResources {
      *
      * @param texture the texture to be used in rendering (not null)
      * @param samplerHandle the handle of the VkSampler for textures
-     * @param ubos the uniform buffer objects (not null)
+     * @param globalUbos the global uniform buffer objects (not null)
+     * @param nonGlobalUbos the non-global uniform buffer objects (not null)
      * @param descriptorSetHandles the handles of the descriptor sets (not null,
      * unaffected)
      */
     private static void updateDescriptorSets(
             Texture texture, long samplerHandle,
-            List<BufferResource> ubos, List<Long> descriptorSetHandles) {
-        int numBytes = UniformValues.numBytes();
+            List<BufferResource> globalUbos, List<BufferResource> nonGlobalUbos,
+            List<Long> descriptorSetHandles) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
-            VkDescriptorBufferInfo.Buffer bufferInfo
-                    = VkDescriptorBufferInfo.calloc(1, stack);
-            bufferInfo.offset(0);
-            bufferInfo.range(numBytes);
+            VkDescriptorBufferInfo.Buffer pBufferInfo
+                    = VkDescriptorBufferInfo.calloc(2, stack);
 
-            VkDescriptorImageInfo.Buffer imageInfo
+            VkDescriptorBufferInfo guDbi = pBufferInfo.get(0);
+            guDbi.offset(0);
+            int numBytes = UniformValues.numBytes();
+            guDbi.range(numBytes);
+
+            VkDescriptorBufferInfo nguDbi = pBufferInfo.get(1);
+            nguDbi.offset(0);
+            numBytes = NonGlobalUniformValues.numBytes();
+            nguDbi.range(numBytes);
+
+            VkDescriptorImageInfo.Buffer pImageInfo
                     = VkDescriptorImageInfo.calloc(1, stack);
-            imageInfo.imageLayout(
+            pImageInfo.imageLayout(
                     VK10.VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
             long viewHandle = texture.viewHandle();
-            imageInfo.imageView(viewHandle);
-            imageInfo.sampler(samplerHandle);
+            pImageInfo.imageView(viewHandle);
+            pImageInfo.sampler(samplerHandle);
 
             // Configure the descriptors in each set:
             VkWriteDescriptorSet.Buffer pWrites
@@ -1075,12 +1114,12 @@ class ChainResources {
 
             VkWriteDescriptorSet uboWrite = pWrites.get(0);
             uboWrite.sType(VK10.VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET);
-            uboWrite.descriptorCount(1);
-            uboWrite.descriptorType(VK10.VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
 
+            uboWrite.descriptorCount(2); // 2 UBOs
+            uboWrite.descriptorType(VK10.VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
             uboWrite.dstArrayElement(0);
             uboWrite.dstBinding(0);
-            uboWrite.pBufferInfo(bufferInfo);
+            uboWrite.pBufferInfo(pBufferInfo);
 
             VkWriteDescriptorSet samplerWrite = pWrites.get(1);
             samplerWrite.sType(VK10.VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET);
@@ -1089,14 +1128,17 @@ class ChainResources {
             samplerWrite.descriptorType(
                     VK10.VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
             samplerWrite.dstArrayElement(0);
-            samplerWrite.dstBinding(1);
-            samplerWrite.pImageInfo(imageInfo);
+            samplerWrite.dstBinding(2);
+            samplerWrite.pImageInfo(pImageInfo);
 
             VkCopyDescriptorSet.Buffer pCopies = null;
-            int numImages = ubos.size();
+            int numImages = globalUbos.size();
             for (int setIndex = 0; setIndex < numImages; ++setIndex) {
-                long uboHandle = ubos.get(setIndex).handle();
-                bufferInfo.buffer(uboHandle);
+                long guHandle = globalUbos.get(setIndex).handle();
+                guDbi.buffer(guHandle);
+
+                long nguHandle = nonGlobalUbos.get(setIndex).handle();
+                nguDbi.buffer(nguHandle);
 
                 long setHandle = descriptorSetHandles.get(setIndex);
                 uboWrite.dstSet(setHandle);

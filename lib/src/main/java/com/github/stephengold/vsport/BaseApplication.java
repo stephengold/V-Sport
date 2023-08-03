@@ -217,6 +217,11 @@ public abstract class BaseApplication {
      */
     private static Mesh sampleMesh;
     /**
+     * values to be written to the non-global UBO
+     */
+    final private static NonGlobalUniformValues nguValues
+            = new NonGlobalUniformValues();
+    /**
      * physical device to display the main window
      */
     private static PhysicalDevice physicalDevice;
@@ -237,7 +242,7 @@ public abstract class BaseApplication {
      */
     private static Texture sampleTexture;
     /**
-     * values to be written to the uniform buffer object
+     * values to be written to the global UBO
      */
     final private static UniformValues uniformValues = new UniformValues();
     /**
@@ -1062,20 +1067,31 @@ public abstract class BaseApplication {
     private static void createDescriptorSetLayout() {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             VkDescriptorSetLayoutBinding.Buffer pBindings
-                    = VkDescriptorSetLayoutBinding.calloc(2, stack);
+                    = VkDescriptorSetLayoutBinding.calloc(3, stack);
 
-            // Define the bindings for the first descriptor set (the UBO):
-            VkDescriptorSetLayoutBinding uboBinding = pBindings.get(0);
-            uboBinding.binding(0);
-            uboBinding.descriptorCount(1); // a single UBO
-            uboBinding.descriptorType(VK10.VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
-            uboBinding.pImmutableSamplers(null);
+            // Define binding for the first descriptor set (the global UBO):
+            VkDescriptorSetLayoutBinding guBinding = pBindings.get(0);
+            guBinding.binding(0);
+            guBinding.descriptorCount(1);
+            guBinding.descriptorType(VK10.VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
+            guBinding.pImmutableSamplers(null);
 
-            // The UBOs will be used only by the vertex-shader stage:
-            uboBinding.stageFlags(VK10.VK_SHADER_STAGE_VERTEX_BIT);
+            // The global UBO will be used only by the vertex-shader stage:
+            guBinding.stageFlags(VK10.VK_SHADER_STAGE_VERTEX_BIT);
 
-            VkDescriptorSetLayoutBinding samplerBinding = pBindings.get(1);
-            samplerBinding.binding(1);
+            // Define binding for the 2nd descriptor set (the non-global UBO):
+            VkDescriptorSetLayoutBinding nguBinding = pBindings.get(1);
+            nguBinding.binding(1);
+            nguBinding.descriptorCount(1);
+            nguBinding.descriptorType(VK10.VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
+            nguBinding.pImmutableSamplers(null);
+
+            // The non-global UBO will be used only by the vertex-shader stage:
+            nguBinding.stageFlags(VK10.VK_SHADER_STAGE_VERTEX_BIT);
+
+            // Define the bindings for the 3rd descriptor set (the sampler):
+            VkDescriptorSetLayoutBinding samplerBinding = pBindings.get(2);
+            samplerBinding.binding(2);
             samplerBinding.descriptorCount(1); // a single sampler
             samplerBinding.descriptorType(
                     VK10.VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
@@ -1791,7 +1807,11 @@ public abstract class BaseApplication {
      * @param imageIndex index of the target image among the swap-chain images.
      */
     private static void updateUniformBuffer(int imageIndex) {
-        ByteBuffer byteBuffer = chainResources.getUbo(imageIndex).getData();
+        ByteBuffer byteBuffer
+                = chainResources.getGlobalUbo(imageIndex).getData();
         uniformValues.writeTo(byteBuffer);
+
+        byteBuffer = chainResources.getNonGlobalUbo(imageIndex).getData();
+        nguValues.writeTo(byteBuffer);
     }
 }

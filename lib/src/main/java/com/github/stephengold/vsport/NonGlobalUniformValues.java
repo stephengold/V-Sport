@@ -30,55 +30,35 @@
 package com.github.stephengold.vsport;
 
 import java.nio.ByteBuffer;
+import org.joml.Matrix3f;
 import org.joml.Matrix4f;
-import org.joml.Vector3f;
-import org.joml.Vector3fc;
 import org.joml.Vector4f;
 
 /**
- * Values to be written to a global uniform buffer object (UBO).
+ * Values to be written to a per-geometry uniform buffer object (UBO).
  *
  * @author Stephen Gold sgold@sonic.net
- *
- * Derived from the UniformBufferObject class in Cristian Herrera's
- * Vulkan-Tutorial-Java project.
  */
-class UniformValues {
+class NonGlobalUniformValues {
     // *************************************************************************
     // fields
 
     /**
-     * strength of the ambient light
+     * mesh-to-world coordinate rotation
      */
-    private float ambientStrength;
+    final private Matrix3f modelRotationMatrix = new Matrix3f();
     /**
-     * view-to-clip coordinate transform
+     * mesh-to-world coordinate transform
      */
-    final private Matrix4f projectionMatrix = new Matrix4f();
+    final private Matrix4f modelMatrix = new Matrix4f();
     /**
-     * world-to-view coordinate transform
+     * material color to use with ambient/diffuse lighting
      */
-    final private Matrix4f viewMatrix = new Matrix4f();
+    final private Vector4f baseMaterialColor = new Vector4f();
     /**
-     * direction to the directional light in world coordinates
+     * material color to use with specular reflections
      */
-    final private Vector3f lightDirectionWorldspace = new Vector3f();
-    /**
-     * color of the lights
-     */
-    final private Vector4f lightColor = new Vector4f();
-    // *************************************************************************
-    // constructors
-
-    /**
-     * Instantiate a sample value set.
-     */
-    UniformValues() {
-        Vector3fc eye = new Vector3f(2f, 2f, 2f);
-        Vector3fc origin = new Vector3f(0f, 0f, 0f);
-        Vector3fc up = new Vector3f(0f, 0f, 1f);  // +Z axis
-        viewMatrix.lookAt(eye, origin, up);
-    }
+    final private Vector4f specularMaterialColor = new Vector4f();
     // *************************************************************************
     // new methods exposed
 
@@ -90,24 +70,19 @@ class UniformValues {
     static int numBytes() {
         int result = 0;
 
-        // float ambientStrength
-        result += Float.BYTES;
-
-        // vec3 LightDirection_worldspace
-        result = Utils.align(result, 16);
-        result += 3 * Float.BYTES;
-
-        // vec4 LightColor
+        // vec4 BaseMaterialColor
         result += 4 * Float.BYTES;
 
-        // mat4 viewMatrix
+        // mat4 modelMatrix
         result = Utils.align(result, 16);
         result += 4 * 4 * Float.BYTES;
 
-        // mat4 projectionMatrix
+        // mat3 modelRotationMatrix
         result = Utils.align(result, 16);
-        result += 4 * 4 * Float.BYTES;
+        result += 3 * 3 * Float.BYTES;
 
+        // vec4 SpecularMaterialColor
+        result += 4 * Float.BYTES;
         return result;
     }
 
@@ -118,43 +93,25 @@ class UniformValues {
      * @param target the buffer to write to (not null, modified)
      */
     void writeTo(ByteBuffer target) {
-        // Update the projection matrix:
-        double fov = Math.toRadians(45.); // in radians
-        float aspectRatio = BaseApplication.aspectRatio();
-        float zNear = 0.1f;
-        float zFar = 10f;
-        boolean zeroToOne = true;
-        projectionMatrix.setPerspective(
-                (float) fov, aspectRatio, zNear, zFar, zeroToOne);
-
-        // In Vulkan's clip space, the Y axis increases downward, not upward:
-        float m11 = projectionMatrix.m11();
-        projectionMatrix.m11(-m11);
-
         int byteOffset = 0;
 
-        // float ambientStrength
-        target.putFloat(byteOffset, ambientStrength);
-        byteOffset += Float.BYTES;
-
-        // vec3 LightDirection_worldspace
-        byteOffset = Utils.align(byteOffset, 16);
-        lightDirectionWorldspace.get(byteOffset, target);
-        byteOffset += 3 * Float.BYTES;
-
-        // vec4 LightColor
-        lightColor.get(byteOffset, target);
+        // vec4 BaseMaterialColor
+        baseMaterialColor.get(byteOffset, target);
         byteOffset += 4 * Float.BYTES;
 
-        // mat4 viewMatrix
+        // mat4 modelMatrix
         byteOffset = Utils.align(byteOffset, 16);
-        viewMatrix.get(byteOffset, target);
+        modelMatrix.get(byteOffset, target);
         byteOffset += 4 * 4 * Float.BYTES;
 
-        // mat4 projectionMatrix
+        // mat3 modelRotationMatrix
         byteOffset = Utils.align(byteOffset, 16);
-        projectionMatrix.get(byteOffset, target);
-        byteOffset += 4 * 4 * Float.BYTES;
+        modelRotationMatrix.get(byteOffset, target);
+        byteOffset += 3 * 3 * Float.BYTES;
+
+        // vec4 SpecularMaterialColor
+        specularMaterialColor.get(byteOffset, target);
+        byteOffset += 4 * Float.BYTES;
 
         assert byteOffset == numBytes() :
                 "byteOffset=" + byteOffset + " numBytes = " + numBytes();
