@@ -99,7 +99,7 @@ class ShaderProgram {
      */
     long fragModuleHandle() {
         if (fragModuleHandle == VK10.VK_NULL_HANDLE) {
-            updateFragModule();
+            reloadFragModule();
         }
 
         assert fragModuleHandle != VK10.VK_NULL_HANDLE;
@@ -113,7 +113,7 @@ class ShaderProgram {
      */
     long vertModuleHandle() {
         if (vertModuleHandle == VK10.VK_NULL_HANDLE) {
-            updateVertModule();
+            reloadVertModule();
         }
 
         assert vertModuleHandle != VK10.VK_NULL_HANDLE;
@@ -160,7 +160,10 @@ class ShaderProgram {
         }
     }
 
-    private void updateFragModule() {
+    /**
+     * Load the fragment shader from the classpath.
+     */
+    private void reloadFragModule() {
         String resourceName = String.format("/Shaders/%s.frag", programName);
         long fragSpirvHandle = SpirvUtils.compileShaderFromClasspath(
                 resourceName, Shaderc.shaderc_glsl_fragment_shader);
@@ -168,7 +171,10 @@ class ShaderProgram {
         this.fragModuleHandle = createShaderModule(byteCode);
     }
 
-    private void updateVertModule() {
+    /**
+     * Load the vertex shader from the classpath.
+     */
+    private void reloadVertModule() {
         String resourceName = String.format("/Shaders/%s.vert", programName);
         long vertSpirvHandle = SpirvUtils.compileShaderFromClasspath(
                 resourceName, Shaderc.shaderc_glsl_vertex_shader);
