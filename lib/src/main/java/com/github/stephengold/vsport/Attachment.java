@@ -109,7 +109,7 @@ class Attachment {
                     usage, VK10.VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
             long imageHandle = deviceImage.imageHandle();
-            this.viewHandle = BaseApplication.createImageView(
+            this.viewHandle = logicalDevice.createImageView(
                     imageHandle, format, aspectMask, numMipLevels);
 
             // Immediately transition the image to an optimal layout:

@@ -239,7 +239,7 @@ public class Texture extends DeviceResource {
 
         // Create a view for the new image:
         long imageHandle = deviceImage.imageHandle();
-        this.viewHandle = BaseApplication.createImageView(imageHandle,
+        this.viewHandle = logicalDevice.createImageView(imageHandle,
                 imageFormat, VK10.VK_IMAGE_ASPECT_COLOR_BIT, numMipLevels);
     }
 

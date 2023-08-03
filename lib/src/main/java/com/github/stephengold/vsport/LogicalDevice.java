@@ -42,8 +42,11 @@ import org.lwjgl.vulkan.VkAllocationCallbacks;
 import org.lwjgl.vulkan.VkBufferCreateInfo;
 import org.lwjgl.vulkan.VkCommandBuffer;
 import org.lwjgl.vulkan.VkCommandBufferAllocateInfo;
+import org.lwjgl.vulkan.VkComponentMapping;
 import org.lwjgl.vulkan.VkDevice;
 import org.lwjgl.vulkan.VkImageCreateInfo;
+import org.lwjgl.vulkan.VkImageSubresourceRange;
+import org.lwjgl.vulkan.VkImageViewCreateInfo;
 import org.lwjgl.vulkan.VkMemoryAllocateInfo;
 import org.lwjgl.vulkan.VkMemoryRequirements;
 import org.lwjgl.vulkan.VkQueue;
@@ -207,6 +210,56 @@ public class LogicalDevice {
                     vkDevice, imageHandle, memoryHandle, offset);
             Utils.checkForError(retCode, "bind memory to an image");
 
+            return result;
+        }
+    }
+
+    /**
+     * Create a view for the specified image.
+     *
+     * @param imageHandle the handle of the image (not VK_NULL_HANDLE)
+     * @param format the desired format for the view
+     * @param aspectMask a bitmask of VK_IMAGE_ASPECT_... values
+     * @param numMipLevels the desired number of MIP levels (including the
+     * original image, &ge;1, &le;31)
+     * @return the handle of the new VkImageView (not VK_NULL_HANDLE)
+     */
+    long createImageView(
+            long imageHandle, int format, int aspectMask, int numMipLevels) {
+        Validate.nonZero(imageHandle, "image handle");
+        Validate.inRange(numMipLevels, "number of MIP levels", 1, 31);
+
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            VkImageViewCreateInfo createInfo
+                    = VkImageViewCreateInfo.calloc(stack);
+            createInfo.sType(VK10.VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO);
+
+            createInfo.format(format);
+            createInfo.image(imageHandle);
+            createInfo.viewType(VK10.VK_IMAGE_VIEW_TYPE_2D);
+
+            // Don't swizzle the color channels:
+            VkComponentMapping swizzle = createInfo.components();
+            swizzle.r(VK10.VK_COMPONENT_SWIZZLE_IDENTITY);
+            swizzle.g(VK10.VK_COMPONENT_SWIZZLE_IDENTITY);
+            swizzle.b(VK10.VK_COMPONENT_SWIZZLE_IDENTITY);
+            swizzle.a(VK10.VK_COMPONENT_SWIZZLE_IDENTITY);
+
+            // a single-layer view
+            VkImageSubresourceRange range = createInfo.subresourceRange();
+            range.aspectMask(aspectMask);
+            range.baseArrayLayer(0);
+            range.baseMipLevel(0);
+            range.layerCount(1);
+            range.levelCount(numMipLevels);
+
+            LongBuffer pHandle = stack.mallocLong(1);
+            int retCode = VK10.vkCreateImageView(
+                    vkDevice, createInfo, allocator, pHandle);
+            Utils.checkForError(retCode, "create image view");
+            long result = pHandle.get(0);
+
+            assert result != VK10.VK_NULL_HANDLE;
             return result;
         }
     }

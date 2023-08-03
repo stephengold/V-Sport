@@ -65,7 +65,6 @@ import org.lwjgl.vulkan.VkCommandBuffer;
 import org.lwjgl.vulkan.VkCommandBufferAllocateInfo;
 import org.lwjgl.vulkan.VkCommandBufferBeginInfo;
 import org.lwjgl.vulkan.VkCommandPoolCreateInfo;
-import org.lwjgl.vulkan.VkComponentMapping;
 import org.lwjgl.vulkan.VkDebugUtilsMessengerCallbackDataEXT;
 import org.lwjgl.vulkan.VkDebugUtilsMessengerCreateInfoEXT;
 import org.lwjgl.vulkan.VkDescriptorSetLayoutBinding;
@@ -74,7 +73,6 @@ import org.lwjgl.vulkan.VkDevice;
 import org.lwjgl.vulkan.VkExtent2D;
 import org.lwjgl.vulkan.VkImageMemoryBarrier;
 import org.lwjgl.vulkan.VkImageSubresourceRange;
-import org.lwjgl.vulkan.VkImageViewCreateInfo;
 import org.lwjgl.vulkan.VkInstance;
 import org.lwjgl.vulkan.VkInstanceCreateInfo;
 import org.lwjgl.vulkan.VkLayerProperties;
@@ -411,56 +409,6 @@ public abstract class BaseApplication {
         commands.addCopyBufferToImage(
                 bufferHandle, imageHandle, width, height);
         commands.submitToGraphicsQueue();
-    }
-
-    /**
-     * Create an image view for the specified image.
-     *
-     * @param imageHandle the handle of the image
-     * @param format the desired format for the view
-     * @param aspectMask a bitmask of VK_IMAGE_ASPECT_... values
-     * @param numMipLevels the desired number of MIP levels (including the
-     * original image, &ge;1, &le;31)
-     * @return the handle of the new VkImageView
-     */
-    static long createImageView(
-            long imageHandle, int format, int aspectMask, int numMipLevels) {
-        Validate.inRange(numMipLevels, "number of MIP levels", 1, 31);
-
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            VkImageViewCreateInfo createInfo
-                    = VkImageViewCreateInfo.calloc(stack);
-            createInfo.sType(VK10.VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO);
-
-            createInfo.format(format);
-            createInfo.image(imageHandle);
-            createInfo.viewType(VK10.VK_IMAGE_VIEW_TYPE_2D);
-
-            // Don't swizzle the color channels:
-            VkComponentMapping swizzle = createInfo.components();
-            swizzle.r(VK10.VK_COMPONENT_SWIZZLE_IDENTITY);
-            swizzle.g(VK10.VK_COMPONENT_SWIZZLE_IDENTITY);
-            swizzle.b(VK10.VK_COMPONENT_SWIZZLE_IDENTITY);
-            swizzle.a(VK10.VK_COMPONENT_SWIZZLE_IDENTITY);
-            /*
-             * The image will be used as a single-layer color target
-             * without any MIP mapping.
-             */
-            VkImageSubresourceRange range = createInfo.subresourceRange();
-            range.aspectMask(aspectMask);
-            range.baseArrayLayer(0);
-            range.baseMipLevel(0);
-            range.layerCount(1);
-            range.levelCount(numMipLevels);
-
-            LongBuffer pHandle = stack.mallocLong(1);
-            int retCode = VK10.vkCreateImageView(
-                    vkDevice, createInfo, defaultAllocator, pHandle);
-            Utils.checkForError(retCode, "create image view");
-            long result = pHandle.get(0);
-
-            return result;
-        }
     }
 
     /**
