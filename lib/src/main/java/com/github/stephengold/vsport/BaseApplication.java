@@ -910,24 +910,13 @@ public abstract class BaseApplication {
         QueueFamilySummary queueFamilies
                 = physicalDevice.summarizeFamilies(surfaceHandle);
 
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            // Allocate a buffer to receive various pointers:
-            PointerBuffer pPointer = stack.mallocPointer(1);
+        // Obtain access to the graphics queue:
+        int familyIndex = queueFamilies.graphics();
+        graphicsQueue = logicalDevice.getQueue(familyIndex);
 
-            // Obtain access to the graphics queue:
-            int familyIndex = queueFamilies.graphics();
-            int queueIndex = 0; // index within the queue family
-            VK10.vkGetDeviceQueue(vkDevice, familyIndex, queueIndex, pPointer);
-            long queueHandle = pPointer.get(0);
-            graphicsQueue = new VkQueue(queueHandle, vkDevice);
-
-            // Obtain access to the presentation queue:
-            familyIndex = queueFamilies.presentation();
-            queueIndex = 0; // index within the queue family
-            VK10.vkGetDeviceQueue(vkDevice, familyIndex, queueIndex, pPointer);
-            queueHandle = pPointer.get(0);
-            presentationQueue = new VkQueue(queueHandle, vkDevice);
-        }
+        // Obtain access to the presentation queue:
+        familyIndex = queueFamilies.presentation();
+        presentationQueue = logicalDevice.getQueue(familyIndex);
     }
 
     /**
