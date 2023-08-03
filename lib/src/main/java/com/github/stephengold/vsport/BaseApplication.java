@@ -1026,7 +1026,9 @@ public abstract class BaseApplication {
         createSyncObjects(numImages);
 
         addCommandBuffers(numImages, commandBuffers);
-        recordCommandBuffers(numImages);
+        for (int i = 0; i < numImages; ++i) {
+            recordCommandBuffer(i);
+        }
     }
 
     /**
@@ -1497,11 +1499,11 @@ public abstract class BaseApplication {
     }
 
     /**
-     * Record a command buffer for each image in the main swapchain.
+     * Record the command buffer for rendering to the specified swapchain image.
      *
-     * @param numImages the number of images in the swap chain
+     * @param imageIndex the index of an image in the swapchain (&ge;0)
      */
-    private static void recordCommandBuffers(int numImages) {
+    private static void recordCommandBuffer(int imageIndex) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             // Begin recording:
             VkCommandBufferBeginInfo beginInfo
@@ -1530,75 +1532,70 @@ public abstract class BaseApplication {
             dsClearValue.set(1f, 0);
             renderPassInfo.pClearValues(pClearValues);
 
-            // Record a command buffer for each image in the main swapchain:
-            for (int imageIndex = 0; imageIndex < numImages; ++imageIndex) {
-                VkCommandBuffer commandBuffer = commandBuffers.get(imageIndex);
+            VkCommandBuffer commandBuffer = commandBuffers.get(imageIndex);
 
-                int retCode
-                        = VK10.vkBeginCommandBuffer(commandBuffer, beginInfo);
-                Utils.checkForError(retCode, "begin recording commands");
+            int retCode = VK10.vkBeginCommandBuffer(commandBuffer, beginInfo);
+            Utils.checkForError(retCode, "begin recording commands");
 
-                // command to begin a render pass on the corresponding image:
-                long frameBufferHandle
-                        = chainResources.framebufferHandle(imageIndex);
-                renderPassInfo.framebuffer(frameBufferHandle);
-                VK10.vkCmdBeginRenderPass(commandBuffer, renderPassInfo,
-                        VK10.VK_SUBPASS_CONTENTS_INLINE);
+            // command to begin a render pass on the corresponding image:
+            long frameBufferHandle
+                    = chainResources.framebufferHandle(imageIndex);
+            renderPassInfo.framebuffer(frameBufferHandle);
+            VK10.vkCmdBeginRenderPass(commandBuffer, renderPassInfo,
+                    VK10.VK_SUBPASS_CONTENTS_INLINE);
 
-                // command to bind the graphics pipeline:
-                long pipelineHandle = chainResources.pipelineHandle();
-                VK10.vkCmdBindPipeline(commandBuffer,
-                        VK10.VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineHandle);
+            // command to bind the graphics pipeline:
+            long pipelineHandle = chainResources.pipelineHandle();
+            VK10.vkCmdBindPipeline(commandBuffer,
+                    VK10.VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineHandle);
 
-                // command to bind the vertex buffers:
-                int firstBinding = 0;
-                int numAttributes = sampleMesh.countAttributes();
-                LongBuffer pBufferHandles
-                        = sampleMesh.generateBufferHandles(stack);
-                LongBuffer pOffsets = stack.callocLong(numAttributes);
-                VK10.vkCmdBindVertexBuffers(
-                        commandBuffer, firstBinding, pBufferHandles, pOffsets);
+            // command to bind the vertex buffers:
+            int firstBinding = 0;
+            int numAttributes = sampleMesh.countAttributes();
+            LongBuffer pBufferHandles
+                    = sampleMesh.generateBufferHandles(stack);
+            LongBuffer pOffsets = stack.callocLong(numAttributes);
+            VK10.vkCmdBindVertexBuffers(
+                    commandBuffer, firstBinding, pBufferHandles, pOffsets);
 
-                if (sampleMesh.isIndexed()) {
-                    // command to bind the index buffer:
-                    IndexBuffer indexBuffer = sampleMesh.getIndexBuffer();
-                    int startOffset = 0;
-                    VK10.vkCmdBindIndexBuffer(
-                            commandBuffer, indexBuffer.handle(), startOffset,
-                            indexBuffer.elementType());
-                }
-
-                // command to bind the uniforms:
-                long descriptorSet
-                        = chainResources.descriptorSetHandle(imageIndex);
-                LongBuffer pDescriptorSets = stack.longs(descriptorSet);
-                VK10.vkCmdBindDescriptorSets(
-                        commandBuffer, VK10.VK_PIPELINE_BIND_POINT_GRAPHICS,
-                        pipelineLayoutHandle, 0, pDescriptorSets, null);
-
-                // draw command:
-                int firstVertex = 0;
-                int firstInstance = 0;
-                int instanceCount = 1;
-                if (sampleMesh.isIndexed()) { // indexed draw:
-                    int numIndices = sampleMesh.countIndexedVertices();
-                    int firstIndex = 0;
-                    VK10.vkCmdDrawIndexed(
-                            commandBuffer, numIndices, instanceCount,
-                            firstIndex, firstVertex, firstInstance);
-
-                } else { // non-indexed draw:
-                    int numVertices = sampleMesh.countIndexedVertices();
-                    VK10.vkCmdDraw(commandBuffer, numVertices, instanceCount,
-                            firstVertex, firstInstance);
-                }
-
-                // command to end the render pass:
-                VK10.vkCmdEndRenderPass(commandBuffer);
-
-                retCode = VK10.vkEndCommandBuffer(commandBuffer);
-                Utils.checkForError(retCode, "end recording command");
+            if (sampleMesh.isIndexed()) {
+                // command to bind the index buffer:
+                IndexBuffer indexBuffer = sampleMesh.getIndexBuffer();
+                int startOffset = 0;
+                VK10.vkCmdBindIndexBuffer(commandBuffer, indexBuffer.handle(),
+                        startOffset, indexBuffer.elementType());
             }
+
+            // command to bind the uniforms:
+            long descriptorSet
+                    = chainResources.descriptorSetHandle(imageIndex);
+            LongBuffer pDescriptorSets = stack.longs(descriptorSet);
+            VK10.vkCmdBindDescriptorSets(
+                    commandBuffer, VK10.VK_PIPELINE_BIND_POINT_GRAPHICS,
+                    pipelineLayoutHandle, 0, pDescriptorSets, null);
+
+            // draw command:
+            int firstVertex = 0;
+            int firstInstance = 0;
+            int instanceCount = 1;
+            if (sampleMesh.isIndexed()) { // indexed draw:
+                int numIndices = sampleMesh.countIndexedVertices();
+                int firstIndex = 0;
+                VK10.vkCmdDrawIndexed(
+                        commandBuffer, numIndices, instanceCount,
+                        firstIndex, firstVertex, firstInstance);
+
+            } else { // non-indexed draw:
+                int numVertices = sampleMesh.countIndexedVertices();
+                VK10.vkCmdDraw(commandBuffer, numVertices, instanceCount,
+                        firstVertex, firstInstance);
+            }
+
+            // command to end the render pass:
+            VK10.vkCmdEndRenderPass(commandBuffer);
+
+            retCode = VK10.vkEndCommandBuffer(commandBuffer);
+            Utils.checkForError(retCode, "end recording command");
         }
     }
 
@@ -1664,6 +1661,7 @@ public abstract class BaseApplication {
             Utils.checkForError(retCode, "acquire next image");
             int imageIndex = pImageIndex.get(0);
 
+            recordCommandBuffer(imageIndex);
             updateUniformBuffer(imageIndex);
 
             Frame inFlightFrame = framesInFlight.get(imageIndex);
