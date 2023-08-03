@@ -1411,17 +1411,17 @@ public abstract class BaseApplication {
     private static void recreateChainResources() {
         // If the window is minimized, wait for it to return to the foreground.
         try (MemoryStack stack = MemoryStack.stackPush()) {
-            IntBuffer width = stack.ints(0);
-            IntBuffer height = stack.ints(0);
+            IntBuffer pWidth = stack.ints(0);
+            IntBuffer pHeight = stack.ints(0);
 
-            GLFW.glfwGetFramebufferSize(windowHandle, width, height);
-            if (width.get(0) == 0 && height.get(0) == 0) {
+            GLFW.glfwGetFramebufferSize(windowHandle, pWidth, pHeight);
+            if (pWidth.get(0) == 0 && pHeight.get(0) == 0) {
                 if (isDebuggingEnabled()) {
                     System.out.println("The window is minimized.");
                 }
-                while (width.get(0) == 0 && height.get(0) == 0) {
+                while (pWidth.get(0) == 0 && pHeight.get(0) == 0) {
                     GLFW.glfwWaitEvents();
-                    GLFW.glfwGetFramebufferSize(windowHandle, width, height);
+                    GLFW.glfwGetFramebufferSize(windowHandle, pWidth, pHeight);
                 }
                 if (isDebuggingEnabled()) {
                     System.out.println("The window returns to the foreground.");
