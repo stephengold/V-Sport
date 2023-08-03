@@ -356,7 +356,8 @@ public abstract class BaseApplication {
 
             } else {
                 throw new IllegalArgumentException(
-                        "Unsupported transition, oldLayout=" + oldLayout);
+                        "Unsupported transition from layout=" + oldLayout
+                        + " to layout=" + newLayout);
             }
 
             Commands commandBuffer = new Commands();

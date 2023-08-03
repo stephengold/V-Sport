@@ -524,7 +524,12 @@ public class LogicalDevice {
     void waitIdle() {
         if (vkDevice != null) {
             int retCode = VK10.vkDeviceWaitIdle(vkDevice);
-            // TODO log errors
+            if (retCode != VK10.VK_SUCCESS) {
+                System.err.println(
+                        "vkDeviceWaitIdle returned unexpected value: "
+                        + retCode);
+                System.err.flush();
+            }
         }
     }
     // *************************************************************************
