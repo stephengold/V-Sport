@@ -38,7 +38,7 @@ import org.lwjgl.vulkan.VkDevice;
 import org.lwjgl.vulkan.VkExtent2D;
 
 /**
- * Encapsulate a framebuffer attachment in the V-Sport graphics engine.
+ * A framebuffer attachment in the V-Sport graphics engine.
  *
  * @author Stephen Gold sgold@sonic.net
  *

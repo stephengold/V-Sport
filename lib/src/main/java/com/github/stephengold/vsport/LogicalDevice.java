@@ -337,7 +337,7 @@ public class LogicalDevice {
     /**
      * Destroy the specified semaphore, if any.
      *
-     * @param handle the handle of the VkSemaphor to destroy, or VK_NULL_HANDLE
+     * @param handle the handle of the VkSemaphore to destroy, or VK_NULL_HANDLE
      * @return VK_NULL_HANDLE
      */
     long destroySemaphore(long handle) {

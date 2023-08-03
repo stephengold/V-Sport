@@ -84,7 +84,7 @@ public class Texture extends DeviceResource {
     // constructors
 
     /**
-     * Instantiate a texture.
+     * Instantiate a 2-D texture for sampling.
      *
      * @param numBytes the desired size in bytes (&ge;0)
      * @param width the width (in pixels, &gt;0)
@@ -106,9 +106,9 @@ public class Texture extends DeviceResource {
         }
         create();
     }
-
     // *************************************************************************
     // new methods exposed
+
     /**
      * Create a texture from the specified InputStream.
      *
@@ -136,7 +136,7 @@ public class Texture extends DeviceResource {
     }
 
     /**
-     * Return the handle of the image view.
+     * Return the handle of the underlying VkImageView.
      *
      * @return the handle
      */
@@ -147,7 +147,7 @@ public class Texture extends DeviceResource {
     // new protected methods
 
     /**
-     * Fill the buffer's memory with data during creation. Meant to be
+     * Fill the staging buffer's memory with data during creation. Meant to be
      * overridden.
      *
      * @param destinationBuffer the pre-existing mapped data buffer
@@ -159,7 +159,7 @@ public class Texture extends DeviceResource {
     // DeviceResource methods
 
     /**
-     * Destroy the LWJGL resources and free the associated memory.
+     * Destroy the resources and free the associated memory, if it exists.
      */
     @Override
     protected void destroy() {

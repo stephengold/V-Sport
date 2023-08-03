@@ -39,7 +39,7 @@ import org.lwjgl.vulkan.VkDevice;
 import org.lwjgl.vulkan.VkShaderModuleCreateInfo;
 
 /**
- * Encapsulate a vertex shader and a fragment shader.
+ * Encapsulate a vertex shader and a fragment shader that are used together.
  */
 public class ShaderProgram extends DeviceResource {
     // *************************************************************************
@@ -75,7 +75,7 @@ public class ShaderProgram extends DeviceResource {
     /**
      * Return the module for the fragment shader.
      *
-     * @return the handle of the VkShaderModule
+     * @return the handle of the VkShaderModule (not VK_NULL_HANDLE)
      */
     long fragModuleHandle() {
         if (fragModuleHandle == VK10.VK_NULL_HANDLE) {

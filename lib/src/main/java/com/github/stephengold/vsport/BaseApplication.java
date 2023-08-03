@@ -1081,7 +1081,7 @@ public abstract class BaseApplication {
             VkDescriptorSetLayoutBinding.Buffer pBindings
                     = VkDescriptorSetLayoutBinding.calloc(3, stack);
 
-            // Define binding for the first descriptor set (the global UBO):
+            // Define a binding for the first descriptor set (the global UBO):
             VkDescriptorSetLayoutBinding guBinding = pBindings.get(0);
             guBinding.binding(0);
             guBinding.descriptorCount(1);
