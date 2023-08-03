@@ -58,7 +58,6 @@ import org.lwjgl.vulkan.KHRSwapchain;
 import org.lwjgl.vulkan.VK10;
 import org.lwjgl.vulkan.VkAllocationCallbacks;
 import org.lwjgl.vulkan.VkApplicationInfo;
-import org.lwjgl.vulkan.VkBufferCreateInfo;
 import org.lwjgl.vulkan.VkClearColorValue;
 import org.lwjgl.vulkan.VkClearDepthStencilValue;
 import org.lwjgl.vulkan.VkClearValue;
@@ -73,15 +72,12 @@ import org.lwjgl.vulkan.VkDescriptorSetLayoutBinding;
 import org.lwjgl.vulkan.VkDescriptorSetLayoutCreateInfo;
 import org.lwjgl.vulkan.VkDevice;
 import org.lwjgl.vulkan.VkExtent2D;
-import org.lwjgl.vulkan.VkImageCreateInfo;
 import org.lwjgl.vulkan.VkImageMemoryBarrier;
 import org.lwjgl.vulkan.VkImageSubresourceRange;
 import org.lwjgl.vulkan.VkImageViewCreateInfo;
 import org.lwjgl.vulkan.VkInstance;
 import org.lwjgl.vulkan.VkInstanceCreateInfo;
 import org.lwjgl.vulkan.VkLayerProperties;
-import org.lwjgl.vulkan.VkMemoryAllocateInfo;
-import org.lwjgl.vulkan.VkMemoryRequirements;
 import org.lwjgl.vulkan.VkOffset2D;
 import org.lwjgl.vulkan.VkPipelineLayoutCreateInfo;
 import org.lwjgl.vulkan.VkPresentInfoKHR;
@@ -415,137 +411,6 @@ public abstract class BaseApplication {
         commands.addCopyBufferToImage(
                 bufferHandle, imageHandle, width, height);
         commands.submitToGraphicsQueue();
-    }
-
-    /**
-     * Create a buffer object with some memory bound to it.
-     *
-     * @param numBytes the desired buffer capacity (in bytes)
-     * @param usage a bitmask
-     * @param requiredProperties a bitmask
-     * @param pBuffer to store the handle of the resulting buffer object (not
-     * null, modified)
-     * @param pMemory to store the handle of the buffer's memory (not null,
-     * modified)
-     */
-    static void createBuffer(long numBytes, int usage,
-            int requiredProperties, LongBuffer pBuffer, LongBuffer pMemory) {
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            // Create the buffer object:
-            VkBufferCreateInfo createInfo = VkBufferCreateInfo.calloc(stack);
-            createInfo.sType(VK10.VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO);
-
-            createInfo.sharingMode(VK10.VK_SHARING_MODE_EXCLUSIVE);
-            createInfo.size(numBytes);
-            createInfo.usage(usage);
-
-            int retCode = VK10.vkCreateBuffer(
-                    vkDevice, createInfo, defaultAllocator, pBuffer);
-            Utils.checkForError(retCode, "create buffer object");
-            long bufferHandle = pBuffer.get(0);
-
-            // Query the buffer's memory requirements:
-            VkMemoryRequirements memRequirements
-                    = VkMemoryRequirements.malloc(stack);
-            VK10.vkGetBufferMemoryRequirements(
-                    vkDevice, bufferHandle, memRequirements);
-
-            // Allocate memory for the buffer:
-            // TODO a custom allocator to reduce the number of allocations
-            VkMemoryAllocateInfo allocInfo = VkMemoryAllocateInfo.calloc(stack);
-            allocInfo.sType(VK10.VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO);
-
-            long allocationBytes = memRequirements.size();
-            allocInfo.allocationSize(allocationBytes);
-
-            int typeFilter = memRequirements.memoryTypeBits();
-            int memoryTypeIndex = physicalDevice.findMemoryType(
-                    typeFilter, requiredProperties);
-            allocInfo.memoryTypeIndex(memoryTypeIndex);
-
-            retCode = VK10.vkAllocateMemory(
-                    vkDevice, allocInfo, defaultAllocator, pMemory);
-            Utils.checkForError(retCode, "allocate memory for a buffer");
-            long memoryHandle = pMemory.get(0);
-
-            // Bind the newly allocated memory to the buffer object:
-            int offset = 0;
-            retCode = VK10.vkBindBufferMemory(
-                    vkDevice, bufferHandle, memoryHandle, offset);
-            Utils.checkForError(retCode, "bind memory to a buffer object");
-        }
-    }
-
-    /**
-     * Create a 2-D image with the specified properties.
-     *
-     * @param width the desired width (in pixels)
-     * @param height the desired height (in pixels)
-     * @param numMipLevels the desired number of MIP levels (including the
-     * original image, &ge;1, &le;31)
-     * @param numSamples the desired number of samples per pixel (a power of 2,
-     * &ge;1, &le;64)
-     * @param format the desired format
-     * @param tiling the desired tiling
-     * @param usage a bitmask
-     * @param requiredProperties a bitmask
-     * @param pImage to store the handle of the resulting image (not null,
-     * modified)
-     * @param pMemory to store the handle of the image's memory (not null,
-     * modified)
-     */
-    static void createImage(int width, int height, int numMipLevels,
-            int numSamples, int format, int tiling, int usage,
-            int requiredProperties, LongBuffer pImage, LongBuffer pMemory) {
-        Validate.inRange(numMipLevels, "number of MIP levels", 1, 31);
-        Validate.inRange(numSamples, "number of samples per pixel", 1, 64);
-
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            VkImageCreateInfo imageInfo = VkImageCreateInfo.calloc(stack);
-            imageInfo.sType(VK10.VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO);
-
-            imageInfo.arrayLayers(1);
-            imageInfo.extent().depth(1);
-            imageInfo.extent().height(height);
-            imageInfo.extent().width(width);
-            imageInfo.format(format);
-            imageInfo.imageType(VK10.VK_IMAGE_TYPE_2D);
-            imageInfo.initialLayout(VK10.VK_IMAGE_LAYOUT_UNDEFINED);
-            imageInfo.mipLevels(numMipLevels);
-            imageInfo.samples(numSamples);
-            imageInfo.sharingMode(VK10.VK_SHARING_MODE_EXCLUSIVE);
-            imageInfo.tiling(tiling);
-            imageInfo.usage(usage);
-
-            int retCode = VK10.vkCreateImage(
-                    vkDevice, imageInfo, defaultAllocator, pImage);
-            Utils.checkForError(retCode, "create image");
-            long imageHandle = pImage.get(0);
-
-            // Query the images's memory requirements:
-            VkMemoryRequirements memRequirements
-                    = VkMemoryRequirements.malloc(stack);
-            VK10.vkGetImageMemoryRequirements(
-                    vkDevice, imageHandle, memRequirements);
-
-            // Allocate memory for the image:
-            VkMemoryAllocateInfo allocInfo = VkMemoryAllocateInfo.calloc(stack);
-            allocInfo.sType(VK10.VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO);
-
-            allocInfo.allocationSize(memRequirements.size());
-            int memoryTypeIndex = physicalDevice.findMemoryType(
-                    memRequirements.memoryTypeBits(), requiredProperties);
-            allocInfo.memoryTypeIndex(memoryTypeIndex);
-
-            retCode = VK10.vkAllocateMemory(
-                    vkDevice, allocInfo, defaultAllocator, pMemory);
-            Utils.checkForError(retCode, "allocate image memory");
-            long memoryHandle = pMemory.get(0);
-
-            // Bind the newly allocated memory to the image object:
-            int offset = 0;
-            VK10.vkBindImageMemory(vkDevice, imageHandle, memoryHandle, offset);
-        }
     }
 
     /**
