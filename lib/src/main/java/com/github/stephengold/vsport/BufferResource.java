@@ -30,35 +30,39 @@
 package com.github.stephengold.vsport;
 
 import java.nio.ByteBuffer;
-import java.nio.LongBuffer;
-import org.lwjgl.PointerBuffer;
-import org.lwjgl.system.MemoryStack;
 import org.lwjgl.vulkan.VK10;
-import org.lwjgl.vulkan.VkAllocationCallbacks;
-import org.lwjgl.vulkan.VkDevice;
 
 /**
- * Encapsulate the handles of a Vulkan buffer resource, such as an index buffer,
- * uniform buffer, or vertex buffer.
+ * A buffer resource that persists across device changes, such as an index
+ * buffer, uniform buffer, or vertex buffer.
  *
  * @author Stephen Gold sgold@sonic.net
  */
-class BufferResource {
+public class BufferResource extends DeviceResource {
     // *************************************************************************
     // fields
 
+    /**
+     * true to use a staging buffer during creation, false to create a
+     * persistent mapping
+     */
+    private boolean staging;
     /**
      * mapped data buffer, or null if none
      */
     private ByteBuffer data;
     /**
-     * handle of the buffer resource
+     * buffer size in bytes (&ge;0)
      */
-    private long bufferHandle = VK10.VK_NULL_HANDLE;
+    private int numBytes;
     /**
-     * handle of the buffer's memory
+     * bitmask specifying the intended usage (index, uniform, vertex, etcetera)
      */
-    private long memoryHandle = VK10.VK_NULL_HANDLE;
+    private int usage;
+    /**
+     * underlying VkBuffer and VkDeviceMemory
+     */
+    private MappableBuffer mappableBuffer = null;
     // *************************************************************************
     // constructors
 
@@ -68,132 +72,135 @@ class BufferResource {
      * @param numBytes the desired size in bytes (&ge;0)
      * @param usage a bitmask specifying the intended usage (index, uniform,
      * vertex, etcetera)
-     * @param staging true to use a staging buffer and invoke the {@code fill{}}
-     * method, false for a persistent mapping and no staging buffer
+     * @param staging true to use a staging buffer during creation, method,
+     * false for a persistent mapping
      */
     BufferResource(int numBytes, int usage, boolean staging) {
-        VkDevice logicalDevice = BaseApplication.getVkDevice();
+        this.numBytes = numBytes;
+        this.usage = usage;
+        this.staging = staging;
 
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            LongBuffer pBufferHandle = stack.mallocLong(1);
-            LongBuffer pMemoryHandle = stack.mallocLong(1);
-            PointerBuffer pPointer = stack.mallocPointer(1);
-            int properties;
-
-            if (staging) {
-                // Create a temporary buffer object for staging:
-                int createUsage = VK10.VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
-                properties = VK10.VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
-                        | VK10.VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
-                BaseApplication.createBuffer(numBytes, createUsage,
-                        properties, pBufferHandle, pMemoryHandle);
-                long stagingBufferHandle = pBufferHandle.get(0);
-                long stagingMemoryHandle = pMemoryHandle.get(0);
-
-                // Temporarily map the staging buffer's memory:
-                int offset = 0;
-                int flags = 0x0;
-                int retCode = VK10.vkMapMemory(logicalDevice,
-                        stagingMemoryHandle, offset, numBytes, flags, pPointer);
-                Utils.checkForError(retCode, "map a staging buffer's memory");
-
-                int index = 0; // the index within pPointer
-                this.data = pPointer.getByteBuffer(index, numBytes);
-                fill(data);
-                this.data = null;
-                VK10.vkUnmapMemory(logicalDevice, stagingMemoryHandle);
-                /*
-                 * Create a device-local buffer that's optimized for being a
-                 * copy destination:
-                 */
-                createUsage = usage | VK10.VK_BUFFER_USAGE_TRANSFER_DST_BIT;
-                properties = VK10.VK_MEMORY_HEAP_DEVICE_LOCAL_BIT;
-                BaseApplication.createBuffer(numBytes, createUsage,
-                        properties, pBufferHandle, pMemoryHandle);
-                this.bufferHandle = pBufferHandle.get(0);
-                this.memoryHandle = pMemoryHandle.get(0);
-
-                BaseApplication.copyBuffer(
-                        stagingBufferHandle, bufferHandle, numBytes);
-
-                // Destroy the staging buffer and free its memory:
-                VkAllocationCallbacks allocator
-                        = BaseApplication.findAllocator();
-                VK10.vkDestroyBuffer(
-                        logicalDevice, stagingBufferHandle, allocator);
-                VK10.vkFreeMemory(
-                        logicalDevice, stagingMemoryHandle, allocator);
-
-            } else {
-                properties = VK10.VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
-                        | VK10.VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
-                BaseApplication.createBuffer(numBytes, usage,
-                        properties, pBufferHandle, pMemoryHandle);
-                this.bufferHandle = pBufferHandle.get(0);
-                this.memoryHandle = pMemoryHandle.get(0);
-
-                // Persistently map the buffer's memory:
-                int offset = 0;
-                int flags = 0x0;
-                int retCode = VK10.vkMapMemory(logicalDevice, memoryHandle,
-                        offset, numBytes, flags, pPointer);
-                Utils.checkForError(
-                        retCode, "map the memory of a persistent buffer");
-
-                int index = 0;
-                this.data = pPointer.getByteBuffer(index, numBytes);
-                fill(data);
-            }
-        }
+        create();
     }
     // *************************************************************************
     // new methods exposed
 
     /**
-     * Destroy the buffer, if it has been created.
-     */
-    void destroy() {
-        VkDevice logicalDevice = BaseApplication.getVkDevice();
-        VkAllocationCallbacks allocator = BaseApplication.findAllocator();
-
-        if (bufferHandle != VK10.VK_NULL_HANDLE) {
-            VK10.vkDestroyBuffer(logicalDevice, bufferHandle, allocator);
-            this.bufferHandle = VK10.VK_NULL_HANDLE;
-        }
-
-        if (memoryHandle != VK10.VK_NULL_HANDLE) {
-            VK10.vkFreeMemory(logicalDevice, memoryHandle, allocator);
-            this.memoryHandle = VK10.VK_NULL_HANDLE;
-        }
-    }
-
-    /**
-     * Access the data buffer.
+     * Access the mapped data.
      *
-     * @return the pre-existing buffer, or null if not persistent
+     * @return the pre-existing NIO buffer, or null if not mapped
      */
     final ByteBuffer getData() {
         return data;
     }
 
     /**
-     * Return the buffer's handle.
+     * Return the handle of the underlying VkBuffer.
      *
      * @return the handle
      */
     final long handle() {
-        return bufferHandle;
+        long result = mappableBuffer.vkBufferHandle();
+        return result;
     }
     // *************************************************************************
     // new protected methods
 
     /**
-     * Fill the buffer's memory with data during instantiation with
-     * {@code staging=true}. Meant to be overridden.
+     * Fill the buffer's memory with data during creation. Meant to be
+     * overridden.
      *
      * @param destinationBuffer the pre-existing mapped data buffer
      */
     protected void fill(ByteBuffer destinationBuffer) {
         // do nothing
+    }
+    // *************************************************************************
+    // DeviceResource methods
+
+    /**
+     * Unmap and destroy the mappable buffer, if it exists.
+     */
+    @Override
+    protected void destroy() {
+        this.data = null;
+        if (mappableBuffer != null) {
+            this.mappableBuffer = mappableBuffer.destroy();
+        }
+
+        super.destroy();
+    }
+
+    /**
+     * Update this object after a device change.
+     *
+     * @param nextDevice the current device if it's just been created, or null
+     * if the current device is about to be destroyed
+     */
+    @Override
+    void updateLogicalDevice(LogicalDevice nextDevice) {
+        this.data = null;
+        if (mappableBuffer != null) {
+            this.mappableBuffer = mappableBuffer.destroy();
+        }
+
+        if (nextDevice != null) {
+            create();
+        }
+    }
+    // *************************************************************************
+    // private methods
+
+    /**
+     * Create the underlying resources.
+     */
+    private void create() {
+        if (staging) {
+            createByStaging();
+        } else {
+            createWithPersistentMapping();
+        }
+    }
+
+    private void createByStaging() {
+        // Create a temporary MappableBuffer for staging:
+        LogicalDevice logicalDevice = BaseApplication.getLogicalDevice();
+        int createUsage = VK10.VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+        int properties = VK10.VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
+                | VK10.VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+        MappableBuffer stagingBuffer = logicalDevice.createMappable(
+                numBytes, createUsage, properties);
+
+        // Briefly map the staging buffer's memory and fill it with data:
+        this.data = logicalDevice.map(stagingBuffer);
+        fill(data);
+        this.data = null;
+        logicalDevice.unmap(stagingBuffer);
+        /*
+         * Create a device-local MappableBuffer that's optimized for being a
+         * copy destination:
+         */
+        createUsage = usage | VK10.VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+        properties = VK10.VK_MEMORY_HEAP_DEVICE_LOCAL_BIT;
+        this.mappableBuffer = logicalDevice.createMappable(
+                numBytes, createUsage, properties);
+
+        BaseApplication.copyBuffer(stagingBuffer.vkBufferHandle(),
+                mappableBuffer.vkBufferHandle(), numBytes);
+
+        // Destroy the staging buffer and free its memory:
+        stagingBuffer.destroy();
+    }
+
+    private void createWithPersistentMapping() {
+        LogicalDevice logicalDevice = BaseApplication.getLogicalDevice();
+        int properties = VK10.VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
+                | VK10.VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+        this.mappableBuffer = logicalDevice.createMappable(
+                numBytes, usage, properties);
+
+        // Persistently map the buffer's memory and fill it with data:
+        this.data = logicalDevice.map(mappableBuffer);
+        fill(data);
     }
 }
