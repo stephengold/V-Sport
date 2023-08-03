@@ -320,7 +320,7 @@ public class Texture extends DeviceResource {
                 srcRange.layerCount(layerCount);
                 srcRange.mipLevel(srcLevel);
 
-                commands.addBlit(deviceImage.imageHandle(), blit);
+                commands.addBlit(deviceImage, blit);
                 /*
                  * Command to wait until the blit is finished and then optimize
                  * the source level for being read by fragment shaders:

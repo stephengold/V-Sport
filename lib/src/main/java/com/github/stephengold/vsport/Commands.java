@@ -110,11 +110,12 @@ public class Commands {
      * Append a command to blit data within a single image, using a linear
      * filter.
      *
-     * @param imageHandle the handle of source/destination image
+     * @param image the source/destination image (not null)
      * @param pBlits the regions to be blitted
      * @return the current sequence (for chaining)
      */
-    Commands addBlit(long imageHandle, VkImageBlit.Buffer pBlits) {
+    Commands addBlit(DeviceImage image, VkImageBlit.Buffer pBlits) {
+        long imageHandle = image.imageHandle();
         VK10.vkCmdBlitImage(commandBuffer,
                 imageHandle, VK10.VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
                 imageHandle, VK10.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
