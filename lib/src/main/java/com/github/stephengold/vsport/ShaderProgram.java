@@ -68,20 +68,6 @@ class ShaderProgram {
     ShaderProgram(String programName) {
         assert programName != null;
         this.programName = programName;
-
-        // Compile both GLSL shaders into SPIR-V using the Shaderc library:
-        // TODO:  Defer compilation until a module handle is requested.
-        String resourceName = String.format("/Shaders/%s.frag", programName);
-        long fragSpirvHandle = SpirvUtils.compileShaderFromClasspath(
-                resourceName, Shaderc.shaderc_glsl_fragment_shader);
-        ByteBuffer byteCode = Shaderc.shaderc_result_get_bytes(fragSpirvHandle);
-        this.fragModuleHandle = createShaderModule(byteCode);
-
-        resourceName = String.format("/Shaders/%s.vert", programName);
-        long vertSpirvHandle = SpirvUtils.compileShaderFromClasspath(
-                resourceName, Shaderc.shaderc_glsl_vertex_shader);
-        byteCode = Shaderc.shaderc_result_get_bytes(vertSpirvHandle);
-        this.vertModuleHandle = createShaderModule(byteCode);
     }
     // *************************************************************************
     // new methods exposed
@@ -112,6 +98,11 @@ class ShaderProgram {
      * @return the handle of the VkShaderModule
      */
     long fragModuleHandle() {
+        if (fragModuleHandle == VK10.VK_NULL_HANDLE) {
+            updateFragModule();
+        }
+
+        assert fragModuleHandle != VK10.VK_NULL_HANDLE;
         return fragModuleHandle;
     }
 
@@ -121,6 +112,11 @@ class ShaderProgram {
      * @return the handle of the VkShaderModule
      */
     long vertModuleHandle() {
+        if (vertModuleHandle == VK10.VK_NULL_HANDLE) {
+            updateVertModule();
+        }
+
+        assert vertModuleHandle != VK10.VK_NULL_HANDLE;
         return vertModuleHandle;
     }
     // *************************************************************************
@@ -162,5 +158,21 @@ class ShaderProgram {
 
             return result;
         }
+    }
+
+    private void updateFragModule() {
+        String resourceName = String.format("/Shaders/%s.frag", programName);
+        long fragSpirvHandle = SpirvUtils.compileShaderFromClasspath(
+                resourceName, Shaderc.shaderc_glsl_fragment_shader);
+        ByteBuffer byteCode = Shaderc.shaderc_result_get_bytes(fragSpirvHandle);
+        this.fragModuleHandle = createShaderModule(byteCode);
+    }
+
+    private void updateVertModule() {
+        String resourceName = String.format("/Shaders/%s.vert", programName);
+        long vertSpirvHandle = SpirvUtils.compileShaderFromClasspath(
+                resourceName, Shaderc.shaderc_glsl_vertex_shader);
+        ByteBuffer byteCode = Shaderc.shaderc_result_get_bytes(vertSpirvHandle);
+        this.vertModuleHandle = createShaderModule(byteCode);
     }
 }
