@@ -41,7 +41,7 @@ import org.lwjgl.vulkan.VkShaderModuleCreateInfo;
 /**
  * Encapsulate a vertex shader and a fragment shader.
  */
-class ShaderProgram {
+public class ShaderProgram extends DeviceResource {
     // *************************************************************************
     // fields
 
@@ -73,26 +73,6 @@ class ShaderProgram {
     // new methods exposed
 
     /**
-     * Destroy all owned resources.
-     */
-    void destroy() {
-        VkDevice logicalDevice = BaseApplication.getVkDevice();
-        VkAllocationCallbacks allocator = BaseApplication.findAllocator();
-
-        // Destroy the shader modules:
-        if (vertModuleHandle != VK10.VK_NULL_HANDLE) {
-            VK10.vkDestroyShaderModule(
-                    logicalDevice, vertModuleHandle, allocator);
-            this.vertModuleHandle = VK10.VK_NULL_HANDLE;
-        }
-        if (fragModuleHandle != VK10.VK_NULL_HANDLE) {
-            VK10.vkDestroyShaderModule(
-                    logicalDevice, fragModuleHandle, allocator);
-            this.fragModuleHandle = VK10.VK_NULL_HANDLE;
-        }
-    }
-
-    /**
      * Return the module for the fragment shader.
      *
      * @return the handle of the VkShaderModule
@@ -118,6 +98,31 @@ class ShaderProgram {
 
         assert vertModuleHandle != VK10.VK_NULL_HANDLE;
         return vertModuleHandle;
+    }
+    // *************************************************************************
+    // DeviceResource methods
+
+    /**
+     * Destroy all owned resources.
+     */
+    @Override
+    protected void destroy() {
+        updateLogicalDevice(null);
+        super.destroy();
+    }
+
+    /**
+     * Callback when the logical device changes.
+     *
+     * @param nextDevice ignored
+     */
+    @Override
+    void updateLogicalDevice(LogicalDevice nextDevice) {
+        LogicalDevice logicalDevice = BaseApplication.getLogicalDevice();
+        this.fragModuleHandle
+                = logicalDevice.destroyShaderModule(fragModuleHandle);
+        this.vertModuleHandle
+                = logicalDevice.destroyShaderModule(vertModuleHandle);
     }
     // *************************************************************************
     // Object methods
