@@ -29,7 +29,6 @@
  */
 package com.github.stephengold.vsport;
 
-import org.lwjgl.system.MemoryStack;
 import org.lwjgl.vulkan.VK10;
 import org.lwjgl.vulkan.VkAttachmentDescription;
 import org.lwjgl.vulkan.VkExtent2D;
@@ -102,20 +101,18 @@ class Attachment {
             throw new IllegalArgumentException("aspect = " + aspectMask);
         }
 
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            LogicalDevice logicalDevice = BaseApplication.getLogicalDevice();
-            this.deviceImage = logicalDevice.createImage(
-                    width, height, numMipLevels, numSamples, format, tiling,
-                    usage, VK10.VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+        LogicalDevice logicalDevice = BaseApplication.getLogicalDevice();
+        this.deviceImage = logicalDevice.createImage(
+                width, height, numMipLevels, numSamples, format, tiling,
+                usage, VK10.VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-            long imageHandle = deviceImage.imageHandle();
-            this.viewHandle = logicalDevice.createImageView(
-                    imageHandle, format, aspectMask, numMipLevels);
+        long imageHandle = deviceImage.imageHandle();
+        this.viewHandle = logicalDevice.createImageView(
+                imageHandle, format, aspectMask, numMipLevels);
 
-            // Immediately transition the image to an optimal layout:
-            BaseApplication.alterImageLayout(imageHandle, format,
-                    VK10.VK_IMAGE_LAYOUT_UNDEFINED, finalLayout, numMipLevels);
-        }
+        // Immediately transition the image to an optimal layout:
+        BaseApplication.alterImageLayout(imageHandle, format,
+                VK10.VK_IMAGE_LAYOUT_UNDEFINED, finalLayout, numMipLevels);
     }
     // *************************************************************************
     // new methods exposed
