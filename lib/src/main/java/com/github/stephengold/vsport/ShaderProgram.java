@@ -31,6 +31,7 @@ package com.github.stephengold.vsport;
 
 import java.nio.ByteBuffer;
 import java.nio.LongBuffer;
+import jme3utilities.Validate;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.util.shaderc.Shaderc;
 import org.lwjgl.vulkan.VK10;
@@ -63,10 +64,11 @@ public class ShaderProgram extends DeviceResource {
     /**
      * Instantiate the named program.
      *
-     * @param programName the base name of the shaders to load (not null)
+     * @param programName the base name of the shaders to load (not null, not
+     * empty)
      */
     ShaderProgram(String programName) {
-        assert programName != null;
+        Validate.nonEmpty(programName, "program name");
         this.programName = programName;
     }
     // *************************************************************************
