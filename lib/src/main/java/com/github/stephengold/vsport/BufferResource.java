@@ -72,7 +72,7 @@ public class BufferResource extends DeviceResource {
      * @param numBytes the desired size in bytes (&ge;0)
      * @param usage a bitmask specifying the intended usage (index, uniform,
      * vertex, etcetera)
-     * @param staging true to use a staging buffer during creation, method,
+     * @param staging true to use a staging buffer during creation,
      * false for a persistent mapping
      */
     BufferResource(int numBytes, int usage, boolean staging) {

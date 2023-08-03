@@ -100,6 +100,7 @@ class Frame {
     void destroy() {
         VkDevice vkDevice = BaseApplication.getVkDevice();
         VkAllocationCallbacks allocator = BaseApplication.findAllocator();
+
         if (fenceHandle != VK10.VK_NULL_HANDLE) {
             VK10.vkDestroyFence(vkDevice, fenceHandle, allocator);
             this.fenceHandle = VK10.VK_NULL_HANDLE;
