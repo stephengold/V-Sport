@@ -36,7 +36,6 @@ import org.lwjgl.vulkan.VkBufferCopy;
 import org.lwjgl.vulkan.VkBufferImageCopy;
 import org.lwjgl.vulkan.VkBufferMemoryBarrier;
 import org.lwjgl.vulkan.VkCommandBuffer;
-import org.lwjgl.vulkan.VkCommandBufferAllocateInfo;
 import org.lwjgl.vulkan.VkCommandBufferBeginInfo;
 import org.lwjgl.vulkan.VkDevice;
 import org.lwjgl.vulkan.VkExtent3D;
@@ -71,17 +70,6 @@ public class Commands {
     Commands() {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             // Allocate a temporary command buffer:
-            // TODO a pool of short-lived command buffers - see copyBuffer()
-            VkCommandBufferAllocateInfo allocInfo
-                    = VkCommandBufferAllocateInfo.calloc(stack);
-            allocInfo.sType(
-                    VK10.VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO);
-
-            allocInfo.commandBufferCount(1);
-            long commandPoolHandle = BaseApplication.commandPoolHandle();
-            allocInfo.commandPool(commandPoolHandle);
-            allocInfo.level(VK10.VK_COMMAND_BUFFER_LEVEL_PRIMARY);
-
             LogicalDevice logicalDevice = BaseApplication.getLogicalDevice();
             this.commandBuffer = logicalDevice.allocateCommandBuffer();
 
