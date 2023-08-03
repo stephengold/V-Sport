@@ -50,6 +50,7 @@ import org.lwjgl.vulkan.VkImageViewCreateInfo;
 import org.lwjgl.vulkan.VkMemoryAllocateInfo;
 import org.lwjgl.vulkan.VkMemoryRequirements;
 import org.lwjgl.vulkan.VkQueue;
+import org.lwjgl.vulkan.VkSemaphoreCreateInfo;
 
 /**
  * Encapsulate a Vulkan logical device, used to allocate command buffers,
@@ -321,6 +322,28 @@ public class LogicalDevice {
             retCode = VK10.vkBindBufferMemory(
                     vkDevice, bufferHandle, memoryHandle, offset);
             Utils.checkForError(retCode, "bind memory to a buffer");
+
+            return result;
+        }
+    }
+
+    /**
+     * Create an image-available queue semaphore in the unsignaled state.
+     *
+     * @return the handle of the new VkSemaphore
+     */
+    long createSemaphore() {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            VkSemaphoreCreateInfo semaphoreCreateInfo
+                    = VkSemaphoreCreateInfo.calloc(stack);
+            semaphoreCreateInfo.sType(
+                    VK10.VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO);
+
+            LongBuffer pHandle = stack.mallocLong(1);
+            int retCode = VK10.vkCreateSemaphore(
+                    vkDevice, semaphoreCreateInfo, allocator, pHandle);
+            Utils.checkForError(retCode, "create a semaphore");
+            long result = pHandle.get(0);
 
             return result;
         }
