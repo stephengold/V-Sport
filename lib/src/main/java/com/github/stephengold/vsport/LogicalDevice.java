@@ -90,22 +90,6 @@ public class LogicalDevice {
     // new methods exposed
 
     /**
-     * Allocate a single command buffer from this device.
-     *
-     * @return the new instance (not null)
-     */
-    VkCommandBuffer allocateCommandBuffer() {
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            // TODO a pool of short-lived command buffers - see copyBuffer()
-            PointerBuffer pPointer = allocateCommandBuffersInternal(1, stack);
-            long pointer = pPointer.get(0);
-            VkCommandBuffer result = new VkCommandBuffer(pointer, vkDevice);
-
-            return result;
-        }
-    }
-
-    /**
      * Allocate command buffers from this device as needed.
      *
      * @param numBuffersNeeded the total number of command buffers needed
@@ -131,6 +115,22 @@ public class LogicalDevice {
                         = new VkCommandBuffer(pointer, vkDevice);
                 addBuffers.add(commandBuffer);
             }
+        }
+    }
+
+    /**
+     * Allocate a single command buffer from this device.
+     *
+     * @return the new instance (not null)
+     */
+    VkCommandBuffer allocateCommandBuffer() {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            // TODO a pool of short-lived command buffers - see copyBuffer()
+            PointerBuffer pPointer = allocateCommandBuffersInternal(1, stack);
+            long pointer = pPointer.get(0);
+            VkCommandBuffer result = new VkCommandBuffer(pointer, vkDevice);
+
+            return result;
         }
     }
 
@@ -432,16 +432,6 @@ public class LogicalDevice {
     }
 
     /**
-     * Access the underlying VkDevice.
-     *
-     * @return the pre-existing instance (not null)
-     */
-    VkDevice getVkDevice() {
-        assert vkDevice != null;
-        return vkDevice;
-    }
-
-    /**
      * Access the first queue in the specified family.
      *
      * @param familyIndex the index of the queue family to access
@@ -457,6 +447,16 @@ public class LogicalDevice {
 
             return result;
         }
+    }
+
+    /**
+     * Access the underlying VkDevice.
+     *
+     * @return the pre-existing instance (not null)
+     */
+    VkDevice getVkDevice() {
+        assert vkDevice != null;
+        return vkDevice;
     }
 
     /**
