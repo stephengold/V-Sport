@@ -1409,9 +1409,18 @@ public abstract class BaseApplication {
             IntBuffer width = stack.ints(0);
             IntBuffer height = stack.ints(0);
 
-            while (width.get(0) == 0 && height.get(0) == 0) {
-                GLFW.glfwGetFramebufferSize(windowHandle, width, height);
-                GLFW.glfwWaitEvents();
+            GLFW.glfwGetFramebufferSize(windowHandle, width, height);
+            if (width.get(0) == 0 && height.get(0) == 0) {
+                if (isDebuggingEnabled()) {
+                    System.out.println("The window is minimized.");
+                }
+                while (width.get(0) == 0 && height.get(0) == 0) {
+                    GLFW.glfwWaitEvents();
+                    GLFW.glfwGetFramebufferSize(windowHandle, width, height);
+                }
+                if (isDebuggingEnabled()) {
+                    System.out.println("The window returns to the foreground.");
+                }
             }
         }
 
@@ -1419,6 +1428,9 @@ public abstract class BaseApplication {
             logicalDevice.waitIdle();
         }
 
+        if (isDebuggingEnabled()) {
+            System.out.println("Recreate the swap chain.");
+        }
         destroyChainResources();
         needsResize = false;
         createChainResources();
@@ -1454,6 +1466,10 @@ public abstract class BaseApplication {
                     fenceToSignalHandle, pImageIndex);
             boolean outdated
                     = (retCode == KHRSwapchain.VK_ERROR_OUT_OF_DATE_KHR);
+            if (outdated && isDebuggingEnabled()) {
+                System.out.println("vkAcquireNextImageKHR"
+                        + " reports the swapchain is outdated.");
+            }
             if (outdated) {
                 recreateChainResources();
                 return;
@@ -1510,8 +1526,12 @@ public abstract class BaseApplication {
 
             retCode = KHRSwapchain.vkQueuePresentKHR(
                     presentationQueue, presentationInfo);
-            if (retCode == KHRSwapchain.VK_ERROR_OUT_OF_DATE_KHR
-                    || needsResize) {
+            outdated = (retCode == KHRSwapchain.VK_ERROR_OUT_OF_DATE_KHR);
+            if (outdated && isDebuggingEnabled()) {
+                System.out.println(
+                        "vkQueuePresentKHR reports the swapchain is outdated.");
+            }
+            if (outdated || needsResize) {
                 recreateChainResources();
                 return;
             }
