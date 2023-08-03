@@ -390,29 +390,32 @@ public abstract class BaseApplication {
     /**
      * Copy the contents of one buffer object to another.
      *
-     * @param sourceHandle the handle of the source buffer object
-     * @param destHandle the handle of the destination buffer object
-     * @param numBytes the number of bytes to copy
+     * @param source the source buffer object (not null)
+     * @param destination the destination buffer object (not null, same capacity
+     * as source)
      */
-    static void copyBuffer(long sourceHandle, long destHandle, long numBytes) {
+    static void copyBuffer(MappableBuffer source, MappableBuffer destination) {
+        Validate.nonNull(source, "source");
+        Validate.nonNull(destination, "destination");
+
         Commands commands = new Commands();
-        commands.addCopyBufferToBuffer(numBytes, sourceHandle, destHandle);
+        commands.addCopyBufferToBuffer(source, destination);
         commands.submitToGraphicsQueue();
     }
 
     /**
      * Copy the data from the specified buffer to the specified 2-D image.
      *
-     * @param bufferHandle the handle of the source buffer
-     * @param imageHandle the handle of the destination image
-     * @param width the width of the image (in pixels)
-     * @param height the height of the image (in pixels)
+     * @param sourceBuffer the source buffer (not null)
+     * @param destinationImage the destination image (not null)
      */
     static void copyBufferToImage(
-            long bufferHandle, long imageHandle, int width, int height) {
+            MappableBuffer sourceBuffer, DeviceImage destinationImage) {
+        Validate.nonNull(sourceBuffer, "source buffer");
+        Validate.nonNull(destinationImage, "destination image");
+
         Commands commands = new Commands();
-        commands.addCopyBufferToImage(
-                bufferHandle, imageHandle, width, height);
+        commands.addCopyBufferToImage(sourceBuffer, destinationImage);
         commands.submitToGraphicsQueue();
     }
 

@@ -230,8 +230,7 @@ public class Texture extends DeviceResource {
                 VK10.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, numMipLevels);
 
         // Copy the data from the staging buffer the new image:
-        BaseApplication.copyBufferToImage(stagingBuffer.vkBufferHandle(),
-                deviceImage.imageHandle(), width, height);
+        BaseApplication.copyBufferToImage(stagingBuffer, deviceImage);
         generateMipLevels();
 
         // Destroy the staging buffer and free its memory:

@@ -138,13 +138,19 @@ public class Commands {
     /**
      * Append a simple buffer-to-buffer copy command to the sequence.
      *
-     * @param numBytes the number of bytes to copy (&ge;0)
-     * @param sourceHandle the handle of the source buffer
-     * @param destHandle the handle of the destination buffer
+     * @param source the source buffer (not null)
+     * @param destination the destination buffer (not null, same capacity as
+     * source)
      * @return the current sequence (for chaining)
      */
     Commands addCopyBufferToBuffer(
-            long numBytes, long sourceHandle, long destHandle) {
+            MappableBuffer source, MappableBuffer destination) {
+        int numBytes = source.numBytes();
+        assert destination.numBytes() == source.numBytes();
+
+        long sourceHandle = source.vkBufferHandle();
+        long destHandle = destination.vkBufferHandle();
+
         try (MemoryStack stack = MemoryStack.stackPush()) {
             VkBufferCopy.Buffer pRegion = VkBufferCopy.calloc(1, stack);
             pRegion.dstOffset(0);
@@ -162,14 +168,15 @@ public class Commands {
      * Append a simple buffer-to-image copy command to the sequence. The final
      * image layout is TRANSFER_DST.
      *
-     * @param bufferHandle the handle of the source buffer
-     * @param imageHandle the handle of the destination image
-     * @param width the width of the image (in pixels)
-     * @param height the height of the image (in pixels)
+     * @param source the source buffer (not null)
+     * @param destination the destination image (not null)
      * @return the current sequence (for chaining)
      */
     Commands addCopyBufferToImage(
-            long bufferHandle, long imageHandle, int width, int height) {
+            MappableBuffer source, DeviceImage destination) {
+        long bufferHandle = source.vkBufferHandle();
+        long imageHandle = destination.imageHandle();
+
         try (MemoryStack stack = MemoryStack.stackPush()) {
             VkBufferImageCopy.Buffer pRegions
                     = VkBufferImageCopy.calloc(1, stack);
@@ -179,6 +186,8 @@ public class Commands {
             pRegions.imageOffset().set(0, 0, 0);
 
             VkExtent3D extent = VkExtent3D.calloc(stack);
+            int width = destination.width();
+            int height = destination.height();
             int depth = 1;
             extent.set(width, height, depth);
             pRegions.imageExtent(extent);

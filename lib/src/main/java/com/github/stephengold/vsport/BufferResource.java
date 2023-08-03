@@ -185,8 +185,7 @@ public class BufferResource extends DeviceResource {
         this.mappableBuffer = logicalDevice.createMappable(
                 numBytes, createUsage, properties);
 
-        BaseApplication.copyBuffer(stagingBuffer.vkBufferHandle(),
-                mappableBuffer.vkBufferHandle(), numBytes);
+        BaseApplication.copyBuffer(stagingBuffer, mappableBuffer);
 
         // Destroy the staging buffer and free its memory:
         stagingBuffer.destroy();
