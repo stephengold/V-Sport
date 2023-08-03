@@ -1401,8 +1401,7 @@ public abstract class BaseApplication {
      * extent of its frame buffers.
      */
     private static void recreateChainResources() {
-        needsResize = false;
-
+        // If the window is minimized, wait for it to return to the foreground.
         try (MemoryStack stack = MemoryStack.stackPush()) {
             IntBuffer width = stack.ints(0);
             IntBuffer height = stack.ints(0);
@@ -1418,6 +1417,7 @@ public abstract class BaseApplication {
         }
 
         destroyChainResources();
+        needsResize = false;
         createChainResources();
     }
 
@@ -1449,8 +1449,9 @@ public abstract class BaseApplication {
             int retCode = KHRSwapchain.vkAcquireNextImageKHR(vkDevice,
                     chainHandle, noTimeout, imageAvailableSemaphoreHandle,
                     fenceToSignalHandle, pImageIndex);
-            if (retCode == KHRSwapchain.VK_ERROR_OUT_OF_DATE_KHR
-                    || needsResize) {
+            boolean outdated
+                    = (retCode == KHRSwapchain.VK_ERROR_OUT_OF_DATE_KHR);
+            if (outdated) {
                 recreateChainResources();
                 return;
             }
