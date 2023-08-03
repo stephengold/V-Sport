@@ -398,6 +398,7 @@ public abstract class BaseApplication {
     static void copyBuffer(MappableBuffer source, MappableBuffer destination) {
         Validate.nonNull(source, "source");
         Validate.nonNull(destination, "destination");
+        assert destination.numBytes() == source.numBytes();
 
         Commands commands = new Commands();
         commands.addCopyBufferToBuffer(source, destination);
@@ -1141,6 +1142,8 @@ public abstract class BaseApplication {
      */
     private static void frameBufferResizeCallback(
             long window, int width, int height) {
+        assert window == windowHandle :
+                "window=" + window + " handle=" + windowHandle;
         needsResize = true;
     }
 
