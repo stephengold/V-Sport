@@ -72,7 +72,7 @@ class BufferResource {
      * method, false for a persistent mapping and no staging buffer
      */
     BufferResource(int numBytes, int usage, boolean staging) {
-        VkDevice logicalDevice = BaseApplication.getLogicalDevice();
+        VkDevice logicalDevice = BaseApplication.getVkDevice();
 
         try (MemoryStack stack = MemoryStack.stackPush()) {
             LongBuffer pBufferHandle = stack.mallocLong(1);
@@ -153,7 +153,7 @@ class BufferResource {
      * Destroy the buffer, if it has been created.
      */
     void destroy() {
-        VkDevice logicalDevice = BaseApplication.getLogicalDevice();
+        VkDevice logicalDevice = BaseApplication.getVkDevice();
         VkAllocationCallbacks allocator = BaseApplication.findAllocator();
 
         if (bufferHandle != VK10.VK_NULL_HANDLE) {

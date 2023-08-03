@@ -248,7 +248,7 @@ class ChainResources {
      * Destroy all owned resources.
      */
     void destroy() {
-        VkDevice logicalDevice = BaseApplication.getLogicalDevice();
+        VkDevice logicalDevice = BaseApplication.getVkDevice();
         VkAllocationCallbacks allocator = BaseApplication.findAllocator();
         /*
          * Destroy resources in the reverse of the order they were created,
@@ -457,7 +457,7 @@ class ChainResources {
             allocInfo.pSetLayouts(pLayoutHandles);
 
             LongBuffer pSetHandles = stack.mallocLong(numImages);
-            VkDevice logicalDevice = BaseApplication.getLogicalDevice();
+            VkDevice logicalDevice = BaseApplication.getVkDevice();
             int retCode = VK10.vkAllocateDescriptorSets(
                     logicalDevice, allocInfo, pSetHandles);
             Utils.checkForError(retCode, "allocate descriptor sets");
@@ -556,7 +556,7 @@ class ChainResources {
             int presentMode = surface.choosePresentationMode();
             createInfo.presentMode(presentMode);
 
-            VkDevice logicalDevice = BaseApplication.getLogicalDevice();
+            VkDevice logicalDevice = BaseApplication.getVkDevice();
             VkAllocationCallbacks allocator = BaseApplication.findAllocator();
             LongBuffer pHandle = stack.mallocLong(1);
             int retCode = KHRSwapchain.vkCreateSwapchainKHR(
@@ -589,7 +589,7 @@ class ChainResources {
         long depthViewHandle = depth.viewHandle();
         int width = extent.width();
         int height = extent.height();
-        VkDevice logicalDevice = BaseApplication.getLogicalDevice();
+        VkDevice logicalDevice = BaseApplication.getVkDevice();
         VkAllocationCallbacks allocator = BaseApplication.findAllocator();
 
         try (MemoryStack stack = MemoryStack.stackPush()) {
@@ -778,7 +778,7 @@ class ChainResources {
             createInfo.pDependencies(pDependency);
             createInfo.pSubpasses(subpasses);
 
-            VkDevice logicalDevice = BaseApplication.getLogicalDevice();
+            VkDevice logicalDevice = BaseApplication.getVkDevice();
             VkAllocationCallbacks allocator = BaseApplication.findAllocator();
             LongBuffer pHandle = stack.mallocLong(1);
             int retCode = VK10.vkCreateRenderPass(
@@ -983,7 +983,7 @@ class ChainResources {
             pCreateInfo.renderPass(passHandle);
             pCreateInfo.subpass(0);
 
-            VkDevice logicalDevice = BaseApplication.getLogicalDevice();
+            VkDevice logicalDevice = BaseApplication.getVkDevice();
             long pipelineCache = VK10.VK_NULL_HANDLE; // disable cacheing
             VkAllocationCallbacks allocator = BaseApplication.findAllocator();
             LongBuffer pHandle = stack.mallocLong(1);
@@ -1027,7 +1027,7 @@ class ChainResources {
             createInfo.maxSets(poolSize);
             createInfo.pPoolSizes(pPoolSizes);
 
-            VkDevice logicalDevice = BaseApplication.getLogicalDevice();
+            VkDevice logicalDevice = BaseApplication.getVkDevice();
             VkAllocationCallbacks allocator = BaseApplication.findAllocator();
             LongBuffer pHandle = stack.mallocLong(1);
             int retCode = VK10.vkCreateDescriptorPool(
@@ -1048,7 +1048,7 @@ class ChainResources {
     private static List<Long> listImages(long chainHandle) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             // Count the images:
-            VkDevice logicalDevice = BaseApplication.getLogicalDevice();
+            VkDevice logicalDevice = BaseApplication.getVkDevice();
             IntBuffer pCount = stack.mallocInt(1);
             int retCode = KHRSwapchain.vkGetSwapchainImagesKHR(
                     logicalDevice, chainHandle, pCount, null);
@@ -1144,7 +1144,7 @@ class ChainResources {
                 uboWrite.dstSet(setHandle);
                 samplerWrite.dstSet(setHandle);
 
-                VkDevice logicalDevice = BaseApplication.getLogicalDevice();
+                VkDevice logicalDevice = BaseApplication.getVkDevice();
                 VK10.vkUpdateDescriptorSets(logicalDevice, pWrites, pCopies);
             }
         }

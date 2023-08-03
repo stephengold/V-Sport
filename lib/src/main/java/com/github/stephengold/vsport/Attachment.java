@@ -154,7 +154,7 @@ class Attachment {
      * Destroy all owned resources.
      */
     void destroy() {
-        VkDevice logicalDevice = BaseApplication.getLogicalDevice();
+        VkDevice logicalDevice = BaseApplication.getVkDevice();
         VkAllocationCallbacks allocator = BaseApplication.findAllocator();
         /*
          * Destroy resources in the reverse of the order they were created,

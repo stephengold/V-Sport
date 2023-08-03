@@ -121,7 +121,7 @@ class Texture {
             long stagingMemoryHandle = pMemoryHandle.get(0);
 
             // Temporarily map the staging buffer's memory:
-            VkDevice logicalDevice = BaseApplication.getLogicalDevice();
+            VkDevice logicalDevice = BaseApplication.getVkDevice();
             int offset = 0;
             int flags = 0x0;
             PointerBuffer pPointer = stack.mallocPointer(1);
@@ -179,7 +179,7 @@ class Texture {
      * Destroy the LWJGL resources and free the associated memory.
      */
     void destroy() {
-        VkDevice logicalDevice = BaseApplication.getLogicalDevice();
+        VkDevice logicalDevice = BaseApplication.getVkDevice();
         VkAllocationCallbacks allocator = BaseApplication.findAllocator();
 
         if (viewHandle != VK10.VK_NULL_HANDLE) {

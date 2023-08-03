@@ -175,6 +175,10 @@ public abstract class BaseApplication {
     final private static List<VkCommandBuffer> commandBuffers
             = new ArrayList<>(4);
     /**
+     * logical device for resource creation
+     */
+    private static LogicalDevice logicalDevice;
+    /**
      * handle of the command pool for the main window
      */
     private static long commandPoolHandle = VK10.VK_NULL_HANDLE;
@@ -246,9 +250,9 @@ public abstract class BaseApplication {
      */
     final private static UniformValues uniformValues = new UniformValues();
     /**
-     * logical device to display the main window
+     * logical device for resource creation
      */
-    private static VkDevice logicalDevice;
+    private static VkDevice vkDevice;
     /**
      * link this application to the lwjgl-vulkan library
      */
@@ -436,7 +440,7 @@ public abstract class BaseApplication {
             createInfo.usage(usage);
 
             int retCode = VK10.vkCreateBuffer(
-                    logicalDevice, createInfo, defaultAllocator, pBuffer);
+                    vkDevice, createInfo, defaultAllocator, pBuffer);
             Utils.checkForError(retCode, "create buffer object");
             long bufferHandle = pBuffer.get(0);
 
@@ -444,7 +448,7 @@ public abstract class BaseApplication {
             VkMemoryRequirements memRequirements
                     = VkMemoryRequirements.malloc(stack);
             VK10.vkGetBufferMemoryRequirements(
-                    logicalDevice, bufferHandle, memRequirements);
+                    vkDevice, bufferHandle, memRequirements);
 
             // Allocate memory for the buffer:
             // TODO a custom allocator to reduce the number of allocations
@@ -460,14 +464,14 @@ public abstract class BaseApplication {
             allocInfo.memoryTypeIndex(memoryTypeIndex);
 
             retCode = VK10.vkAllocateMemory(
-                    logicalDevice, allocInfo, defaultAllocator, pMemory);
+                    vkDevice, allocInfo, defaultAllocator, pMemory);
             Utils.checkForError(retCode, "allocate memory for a buffer");
             long memoryHandle = pMemory.get(0);
 
             // Bind the newly allocated memory to the buffer object:
             int offset = 0;
             retCode = VK10.vkBindBufferMemory(
-                    logicalDevice, bufferHandle, memoryHandle, offset);
+                    vkDevice, bufferHandle, memoryHandle, offset);
             Utils.checkForError(retCode, "bind memory to a buffer object");
         }
     }
@@ -514,7 +518,7 @@ public abstract class BaseApplication {
             imageInfo.usage(usage);
 
             int retCode = VK10.vkCreateImage(
-                    logicalDevice, imageInfo, defaultAllocator, pImage);
+                    vkDevice, imageInfo, defaultAllocator, pImage);
             Utils.checkForError(retCode, "create image");
             long imageHandle = pImage.get(0);
 
@@ -522,7 +526,7 @@ public abstract class BaseApplication {
             VkMemoryRequirements memRequirements
                     = VkMemoryRequirements.malloc(stack);
             VK10.vkGetImageMemoryRequirements(
-                    logicalDevice, imageHandle, memRequirements);
+                    vkDevice, imageHandle, memRequirements);
 
             // Allocate memory for the image:
             VkMemoryAllocateInfo allocInfo = VkMemoryAllocateInfo.calloc(stack);
@@ -534,14 +538,13 @@ public abstract class BaseApplication {
             allocInfo.memoryTypeIndex(memoryTypeIndex);
 
             retCode = VK10.vkAllocateMemory(
-                    logicalDevice, allocInfo, defaultAllocator, pMemory);
+                    vkDevice, allocInfo, defaultAllocator, pMemory);
             Utils.checkForError(retCode, "allocate image memory");
             long memoryHandle = pMemory.get(0);
 
             // Bind the newly allocated memory to the image object:
             int offset = 0;
-            VK10.vkBindImageMemory(
-                    logicalDevice, imageHandle, memoryHandle, offset);
+            VK10.vkBindImageMemory(vkDevice, imageHandle, memoryHandle, offset);
         }
     }
 
@@ -587,7 +590,7 @@ public abstract class BaseApplication {
 
             LongBuffer pHandle = stack.mallocLong(1);
             int retCode = VK10.vkCreateImageView(
-                    logicalDevice, createInfo, defaultAllocator, pHandle);
+                    vkDevice, createInfo, defaultAllocator, pHandle);
             Utils.checkForError(retCode, "create image view");
             long result = pHandle.get(0);
 
@@ -615,11 +618,11 @@ public abstract class BaseApplication {
     }
 
     /**
-     * Access the logical device for rendering.
+     * Access the logical device for resource creation.
      *
      * @return the pre-existing instance (not null)
      */
-    static VkDevice getLogicalDevice() {
+    static LogicalDevice getLogicalDevice() {
         assert logicalDevice != null;
         return logicalDevice;
     }
@@ -666,6 +669,16 @@ public abstract class BaseApplication {
         ShaderProgram result = programMap.get(name);
         assert result != null;
         return result;
+    }
+
+    /**
+     * Access the logical device for resource creation.
+     *
+     * @return the pre-existing instance (not null)
+     */
+    static VkDevice getVkDevice() {
+        assert vkDevice != null;
+        return vkDevice;
     }
 
     /**
@@ -838,14 +851,14 @@ public abstract class BaseApplication {
             allocInfo.level(VK10.VK_COMMAND_BUFFER_LEVEL_PRIMARY);
 
             int retCode = VK10.vkAllocateCommandBuffers(
-                    logicalDevice, allocInfo, pPointers);
+                    vkDevice, allocInfo, pPointers);
             Utils.checkForError(retCode, "allocate command buffers");
 
             // Collect the command buffers in a list:
             for (int i = 0; i < numBuffersNeeded; ++i) {
                 long pointer = pPointers.get(i);
                 VkCommandBuffer commandBuffer
-                        = new VkCommandBuffer(pointer, logicalDevice);
+                        = new VkCommandBuffer(pointer, vkDevice);
                 addBuffers.add(commandBuffer);
             }
         }
@@ -906,9 +919,9 @@ public abstract class BaseApplication {
      * reason.
      */
     private void cleanUpBase() {
-        if (logicalDevice != null) {
+        if (vkDevice != null) {
             // Await completion of all GPU operations:
-            VK10.vkDeviceWaitIdle(logicalDevice);
+            VK10.vkDeviceWaitIdle(vkDevice);
         }
         /*
          * Destroy resources in the reverse of the order they were created,
@@ -923,14 +936,14 @@ public abstract class BaseApplication {
         // Destroy the pipeline layout:
         if (pipelineLayoutHandle != VK10.VK_NULL_HANDLE) {
             VK10.vkDestroyPipelineLayout(
-                    logicalDevice, pipelineLayoutHandle, defaultAllocator);
+                    vkDevice, pipelineLayoutHandle, defaultAllocator);
             pipelineLayoutHandle = VK10.VK_NULL_HANDLE;
         }
 
         // Destroy the descriptor-set layout that's used to configure pipelines:
         if (descriptorSetLayoutHandle != VK10.VK_NULL_HANDLE) {
             VK10.vkDestroyDescriptorSetLayout(
-                    logicalDevice, descriptorSetLayoutHandle, defaultAllocator);
+                    vkDevice, descriptorSetLayoutHandle, defaultAllocator);
             descriptorSetLayoutHandle = VK10.VK_NULL_HANDLE;
         }
 
@@ -940,8 +953,7 @@ public abstract class BaseApplication {
 
         // Destroy the texture sampler:
         if (samplerHandle != VK10.VK_NULL_HANDLE) {
-            VK10.vkDestroySampler(
-                    logicalDevice, samplerHandle, defaultAllocator);
+            VK10.vkDestroySampler(vkDevice, samplerHandle, defaultAllocator);
             samplerHandle = VK10.VK_NULL_HANDLE;
         }
 
@@ -955,14 +967,14 @@ public abstract class BaseApplication {
         commandBuffers.clear();
         if (commandPoolHandle != VK10.VK_NULL_HANDLE) {
             VK10.vkDestroyCommandPool(
-                    logicalDevice, commandPoolHandle, defaultAllocator);
+                    vkDevice, commandPoolHandle, defaultAllocator);
             commandPoolHandle = VK10.VK_NULL_HANDLE;
         }
 
         // Destroy the logical device:
+        vkDevice = null;
         if (logicalDevice != null) {
-            VK10.vkDestroyDevice(logicalDevice, defaultAllocator);
-            logicalDevice = null;
+            logicalDevice = logicalDevice.destroy();
         }
 
         // Destroy the surface:
@@ -1055,7 +1067,7 @@ public abstract class BaseApplication {
 
             LongBuffer pHandle = stack.mallocLong(1);
             int retCode = VK10.vkCreateCommandPool(
-                    logicalDevice, createInfo, defaultAllocator, pHandle);
+                    vkDevice, createInfo, defaultAllocator, pHandle);
             Utils.checkForError(retCode, "create command-buffer pool");
             commandPoolHandle = pHandle.get(0);
         }
@@ -1110,7 +1122,7 @@ public abstract class BaseApplication {
             createInfo.pBindings(pBindings);
 
             int retCode = VK10.vkCreateDescriptorSetLayout(
-                    logicalDevice, createInfo, defaultAllocator, pHandle);
+                    vkDevice, createInfo, defaultAllocator, pHandle);
             Utils.checkForError(retCode, "create descriptor-set layout");
             descriptorSetLayoutHandle = pHandle.get(0);
         }
@@ -1120,8 +1132,9 @@ public abstract class BaseApplication {
      * Create a logical device in the application's main window.
      */
     private static void createLogicalDevice() {
-        logicalDevice = physicalDevice.createLogicalDevice(
+        vkDevice = physicalDevice.createLogicalDevice(
                 surfaceHandle, enableDebugging);
+        logicalDevice = new LogicalDevice(vkDevice);
         QueueFamilySummary queueFamilies
                 = physicalDevice.summarizeFamilies(surfaceHandle);
 
@@ -1132,18 +1145,16 @@ public abstract class BaseApplication {
             // Obtain access to the graphics queue:
             int familyIndex = queueFamilies.graphics();
             int queueIndex = 0; // index within the queue family
-            VK10.vkGetDeviceQueue(
-                    logicalDevice, familyIndex, queueIndex, pPointer);
+            VK10.vkGetDeviceQueue(vkDevice, familyIndex, queueIndex, pPointer);
             long queueHandle = pPointer.get(0);
-            graphicsQueue = new VkQueue(queueHandle, logicalDevice);
+            graphicsQueue = new VkQueue(queueHandle, vkDevice);
 
             // Obtain access to the presentation queue:
             familyIndex = queueFamilies.presentation();
             queueIndex = 0; // index within the queue family
-            VK10.vkGetDeviceQueue(
-                    logicalDevice, familyIndex, queueIndex, pPointer);
+            VK10.vkGetDeviceQueue(vkDevice, familyIndex, queueIndex, pPointer);
             queueHandle = pPointer.get(0);
-            presentationQueue = new VkQueue(queueHandle, logicalDevice);
+            presentationQueue = new VkQueue(queueHandle, vkDevice);
         }
     }
 
@@ -1168,7 +1179,7 @@ public abstract class BaseApplication {
 
             LongBuffer pHandle = stack.mallocLong(1);
             int retCode = VK10.vkCreatePipelineLayout(
-                    logicalDevice, plCreateInfo, defaultAllocator, pHandle);
+                    vkDevice, plCreateInfo, defaultAllocator, pHandle);
             Utils.checkForError(retCode, "create pipeline layout");
             long result = pHandle.get(0);
 
@@ -1230,7 +1241,7 @@ public abstract class BaseApplication {
             samplerInfo.unnormalizedCoordinates(false);
 
             LongBuffer pTextureSampler = stack.mallocLong(1);
-            int retCode = VK10.vkCreateSampler(logicalDevice, samplerInfo,
+            int retCode = VK10.vkCreateSampler(vkDevice, samplerInfo,
                     defaultAllocator, pTextureSampler);
             Utils.checkForError(retCode, "create texture sampler");
             samplerHandle = pTextureSampler.get(0);
@@ -1632,9 +1643,9 @@ public abstract class BaseApplication {
             }
         }
 
-        if (logicalDevice != null) {
+        if (vkDevice != null) {
             // Wait for all operations on the logical device to complete:
-            VK10.vkDeviceWaitIdle(logicalDevice);
+            VK10.vkDeviceWaitIdle(vkDevice);
         }
 
         destroyChainResources();
@@ -1666,7 +1677,7 @@ public abstract class BaseApplication {
 
             // Acquire the next image from the swapchain:
             long fenceToSignalHandle = VK10.VK_NULL_HANDLE;
-            int retCode = KHRSwapchain.vkAcquireNextImageKHR(logicalDevice,
+            int retCode = KHRSwapchain.vkAcquireNextImageKHR(vkDevice,
                     chainHandle, noTimeout, imageAvailableSemaphoreHandle,
                     fenceToSignalHandle, pImageIndex);
             if (retCode == KHRSwapchain.VK_ERROR_OUT_OF_DATE_KHR
@@ -1707,7 +1718,7 @@ public abstract class BaseApplication {
             submitInfo.pWaitSemaphores(pWaitSemaphores);
 
             // Reset fence and submit pre-recorded commands to graphics queue:
-            VK10.vkResetFences(logicalDevice, fenceHandle);
+            VK10.vkResetFences(vkDevice, fenceHandle);
             retCode = VK10.vkQueueSubmit(
                     graphicsQueue, submitInfo, fenceHandle);
             Utils.checkForError(retCode, "submit draw command");

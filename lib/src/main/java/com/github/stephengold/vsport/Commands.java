@@ -82,7 +82,7 @@ public class Commands {
             allocInfo.commandPool(commandPoolHandle);
             allocInfo.level(VK10.VK_COMMAND_BUFFER_LEVEL_PRIMARY);
 
-            VkDevice logicalDevice = BaseApplication.getLogicalDevice();
+            VkDevice logicalDevice = BaseApplication.getVkDevice();
             PointerBuffer pPointer = stack.mallocPointer(1);
             int retCode = VK10.vkAllocateCommandBuffers(
                     logicalDevice, allocInfo, pPointer);
@@ -230,7 +230,7 @@ public class Commands {
             Utils.checkForError(retCode, "wait for a queue to be idle");
 
             // Free the command buffer:
-            VkDevice logicalDevice = BaseApplication.getLogicalDevice();
+            VkDevice logicalDevice = BaseApplication.getVkDevice();
             long commandPoolHandle = BaseApplication.commandPoolHandle();
             VK10.vkFreeCommandBuffers(
                     logicalDevice, commandPoolHandle, commandBuffer);
