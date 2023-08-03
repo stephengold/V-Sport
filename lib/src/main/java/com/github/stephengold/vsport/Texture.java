@@ -225,7 +225,7 @@ public class Texture extends DeviceResource {
                 width, height, numMipLevels, numSamples, imageFormat,
                 VK10.VK_IMAGE_TILING_OPTIMAL, createUsage, properties);
 
-        BaseApplication.alterImageLayout(deviceImage.imageHandle(), imageFormat,
+        BaseApplication.alterImageLayout(deviceImage, imageFormat,
                 VK10.VK_IMAGE_LAYOUT_UNDEFINED,
                 VK10.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, numMipLevels);
 

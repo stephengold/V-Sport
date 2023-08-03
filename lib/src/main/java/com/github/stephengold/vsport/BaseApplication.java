@@ -264,14 +264,14 @@ public abstract class BaseApplication {
     /**
      * Convert the specified image from one layout to another.
      *
-     * @param imageHandle the handle of the image to convert
+     * @param image the image to convert (not null)
      * @param format the image format
      * @param oldLayout the pre-existing layout
      * @param newLayout the desired layout
      * @param numMipLevels the desired number of MIP levels (including the
      * original image, &ge;1, &le;31)
      */
-    static void alterImageLayout(long imageHandle, int format, int oldLayout,
+    static void alterImageLayout(DeviceImage image, int format, int oldLayout,
             int newLayout, int numMipLevels) {
         Validate.inRange(numMipLevels, "number of MIP levels", 1, 31);
 
@@ -281,10 +281,12 @@ public abstract class BaseApplication {
             pBarrier.sType(VK10.VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER);
 
             pBarrier.dstQueueFamilyIndex(VK10.VK_QUEUE_FAMILY_IGNORED);
-            pBarrier.image(imageHandle);
             pBarrier.newLayout(newLayout);
             pBarrier.oldLayout(oldLayout);
             pBarrier.srcQueueFamilyIndex(VK10.VK_QUEUE_FAMILY_IGNORED);
+
+            long imageHandle = image.imageHandle();
+            pBarrier.image(imageHandle);
 
             int aspectMask;
             if (newLayout
