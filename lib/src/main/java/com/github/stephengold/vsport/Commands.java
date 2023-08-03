@@ -82,13 +82,8 @@ public class Commands {
             allocInfo.commandPool(commandPoolHandle);
             allocInfo.level(VK10.VK_COMMAND_BUFFER_LEVEL_PRIMARY);
 
-            VkDevice logicalDevice = BaseApplication.getVkDevice();
-            PointerBuffer pPointer = stack.mallocPointer(1);
-            int retCode = VK10.vkAllocateCommandBuffers(
-                    logicalDevice, allocInfo, pPointer);
-            Utils.checkForError(retCode, "allocate a command buffer");
-            long pointer = pPointer.get(0);
-            this.commandBuffer = new VkCommandBuffer(pointer, logicalDevice);
+            LogicalDevice logicalDevice = BaseApplication.getLogicalDevice();
+            this.commandBuffer = logicalDevice.allocateCommandBuffer();
 
             VkCommandBufferBeginInfo beginInfo
                     = VkCommandBufferBeginInfo.calloc(stack);
@@ -96,7 +91,7 @@ public class Commands {
 
             beginInfo.flags(VK10.VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
-            retCode = VK10.vkBeginCommandBuffer(commandBuffer, beginInfo);
+            int retCode = VK10.vkBeginCommandBuffer(commandBuffer, beginInfo);
             Utils.checkForError(retCode, "begin recording commands");
         }
     }
