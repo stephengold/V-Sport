@@ -62,14 +62,6 @@ class Frame {
      * rendering and can be presented to the surface
      */
     private long renderFinishedSemaphoreHandle;
-    /**
-     * allocator for direct buffers, or null to use the default allocator
-     */
-    final private VkAllocationCallbacks allocator;
-    /**
-     * logical device that owns this instance
-     */
-    final private VkDevice logicalDevice;
     // *************************************************************************
     // constructors
 
@@ -77,9 +69,6 @@ class Frame {
      * Instantiate a group of synchronization objects.
      */
     Frame() {
-        this.logicalDevice = BaseApplication.getVkDevice();
-        this.allocator = BaseApplication.findAllocator();
-
         try (MemoryStack stack = MemoryStack.stackPush()) {
             LongBuffer pHandle = stack.mallocLong(1);
 
@@ -89,8 +78,10 @@ class Frame {
 
             fenceCreateInfo.flags(VK10.VK_FENCE_CREATE_SIGNALED_BIT);
 
+            VkDevice vkDevice = BaseApplication.getVkDevice();
+            VkAllocationCallbacks allocator = BaseApplication.findAllocator();
             int retCode = VK10.vkCreateFence(
-                    logicalDevice, fenceCreateInfo, allocator, pHandle);
+                    vkDevice, fenceCreateInfo, allocator, pHandle);
             Utils.checkForError(retCode, "create fence");
             this.fenceHandle = pHandle.get(0);
 
@@ -101,13 +92,13 @@ class Frame {
 
             // Create the image-available semaphore in the unsignaled state:
             retCode = VK10.vkCreateSemaphore(
-                    logicalDevice, semaphoreCreateInfo, allocator, pHandle);
+                    vkDevice, semaphoreCreateInfo, allocator, pHandle);
             Utils.checkForError(retCode, "create semaphore");
             this.imageAvailableSemaphoreHandle = pHandle.get(0);
 
             // Create the render-finished semaphore in the unsignaled state:
             retCode = VK10.vkCreateSemaphore(
-                    logicalDevice, semaphoreCreateInfo, allocator, pHandle);
+                    vkDevice, semaphoreCreateInfo, allocator, pHandle);
             Utils.checkForError(retCode, "create semaphore");
             this.renderFinishedSemaphoreHandle = pHandle.get(0);
         }
@@ -119,20 +110,22 @@ class Frame {
      * Destroy the synchronization objects.
      */
     void destroy() {
+        VkDevice vkDevice = BaseApplication.getVkDevice();
+        VkAllocationCallbacks allocator = BaseApplication.findAllocator();
         if (fenceHandle != VK10.VK_NULL_HANDLE) {
-            VK10.vkDestroyFence(logicalDevice, fenceHandle, allocator);
+            VK10.vkDestroyFence(vkDevice, fenceHandle, allocator);
             this.fenceHandle = VK10.VK_NULL_HANDLE;
         }
 
         if (imageAvailableSemaphoreHandle != VK10.VK_NULL_HANDLE) {
             VK10.vkDestroySemaphore(
-                    logicalDevice, imageAvailableSemaphoreHandle, allocator);
+                    vkDevice, imageAvailableSemaphoreHandle, allocator);
             this.imageAvailableSemaphoreHandle = VK10.VK_NULL_HANDLE;
         }
 
         if (renderFinishedSemaphoreHandle != VK10.VK_NULL_HANDLE) {
             VK10.vkDestroySemaphore(
-                    logicalDevice, renderFinishedSemaphoreHandle, allocator);
+                    vkDevice, renderFinishedSemaphoreHandle, allocator);
             this.renderFinishedSemaphoreHandle = VK10.VK_NULL_HANDLE;
         }
     }
@@ -168,8 +161,9 @@ class Frame {
      * Make the host wait for the GPU to signal the fence.
      */
     void waitForFence() {
+        VkDevice vkDevice = BaseApplication.getVkDevice();
         boolean waitAll = true;
-        int retCode = VK10.vkWaitForFences(logicalDevice, fenceHandle, waitAll,
+        int retCode = VK10.vkWaitForFences(vkDevice, fenceHandle, waitAll,
                 BaseApplication.noTimeout);
         Utils.checkForError(retCode, "wait for fence");
     }
