@@ -61,6 +61,32 @@ final class Utils {
     // new methods exposed
 
     /**
+     * Calculate the offset of a UBO field, taking alignment into account.
+     *
+     * @param offset the offset of the byte following the previous field (&ge;0)
+     * @param alignment the required alignment of the next field (in bytes,
+     * &gt;0)
+     * @return the offset of the first byte of the next field
+     */
+    static int align(int offset, int alignment) {
+        Validate.nonNegative(offset, "offset");
+        Validate.positive(alignment, "alignment");
+
+        int excess = MyMath.modulo(offset, alignment);
+
+        int result;
+        if (excess == 0) {
+            result = offset;
+        } else {
+            result = offset - excess + alignment;
+        }
+
+        assert result - offset < alignment;
+        assert result % alignment == 0;
+        return result;
+    }
+
+    /**
      * Throw a runtime exception if an operation returned a code other than
      * {@code VK_SUCCESS} or {S@code VK_SUBOPTIMAL}.
      *
