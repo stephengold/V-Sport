@@ -519,7 +519,7 @@ public class LogicalDevice {
     }
 
     /**
-     * Wait for all operations on the device to complete.
+     * Wait for all operations on the GPU device to complete.
      */
     void waitIdle() {
         if (vkDevice != null) {
@@ -543,8 +543,7 @@ public class LogicalDevice {
 
         VkCommandBufferAllocateInfo allocInfo
                 = VkCommandBufferAllocateInfo.calloc(stack);
-        allocInfo.sType(
-                VK10.VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO);
+        allocInfo.sType(VK10.VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO);
 
         allocInfo.commandBufferCount(numBuffersNeeded);
         allocInfo.level(VK10.VK_COMMAND_BUFFER_LEVEL_PRIMARY);

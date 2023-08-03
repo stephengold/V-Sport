@@ -311,6 +311,7 @@ public abstract class BaseApplication {
 
             if (oldLayout == VK10.VK_IMAGE_LAYOUT_UNDEFINED
                     && newLayout == VK10.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) {
+                // UNDEFINED to TRANSFER_DST
                 pBarrier.dstAccessMask(VK10.VK_ACCESS_TRANSFER_WRITE_BIT);
                 pBarrier.srcAccessMask(0x0);
 
@@ -320,6 +321,7 @@ public abstract class BaseApplication {
             } else if (oldLayout == VK10.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
                     && newLayout
                     == VK10.VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
+                // TRANSFER_DST to SHADER_READ_ONLY
                 pBarrier.srcAccessMask(VK10.VK_ACCESS_TRANSFER_WRITE_BIT);
                 pBarrier.dstAccessMask(VK10.VK_ACCESS_SHADER_READ_BIT);
 
@@ -329,6 +331,7 @@ public abstract class BaseApplication {
             } else if (oldLayout == VK10.VK_IMAGE_LAYOUT_UNDEFINED
                     && newLayout
                     == VK10.VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL) {
+                // UNDEFINED to COLOR_ATTACHMENT
                 pBarrier.dstAccessMask(
                         VK10.VK_ACCESS_COLOR_ATTACHMENT_READ_BIT
                         | VK10.VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT);
@@ -341,6 +344,7 @@ public abstract class BaseApplication {
             } else if (oldLayout == VK10.VK_IMAGE_LAYOUT_UNDEFINED
                     && newLayout
                     == VK10.VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL) {
+                // UNDEFINED to DEPTH_STENCIL_ATTACHMENT
                 pBarrier.dstAccessMask(
                         VK10.VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT
                         | VK10.VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT);
