@@ -391,9 +391,9 @@ public abstract class BaseApplication {
     /**
      * Copy the contents of one buffer object to another.
      *
-     * @param source the source buffer object (not null)
-     * @param destination the destination buffer object (not null, same capacity
-     * as source)
+     * @param source the source buffer (not null)
+     * @param destination the destination buffer (not null, same capacity as
+     * source)
      */
     static void copyBuffer(MappableBuffer source, MappableBuffer destination) {
         Validate.nonNull(source, "source");
@@ -703,6 +703,7 @@ public abstract class BaseApplication {
      */
     private void cleanUpBase() {
         if (logicalDevice != null) {
+            // Await completion of all GPU operations:
             logicalDevice.waitIdle();
         }
         /*
@@ -873,7 +874,7 @@ public abstract class BaseApplication {
             // The global UBO will be used only by the vertex-shader stage:
             guBinding.stageFlags(VK10.VK_SHADER_STAGE_VERTEX_BIT);
 
-            // Define binding for the 2nd descriptor set (the non-global UBO):
+            // Define a binding for the 2nd descriptor set (the non-global UBO):
             VkDescriptorSetLayoutBinding nguBinding = pBindings.get(1);
             nguBinding.binding(1);
             nguBinding.descriptorCount(1);
@@ -883,7 +884,7 @@ public abstract class BaseApplication {
             // The non-global UBO will be used only by the vertex-shader stage:
             nguBinding.stageFlags(VK10.VK_SHADER_STAGE_VERTEX_BIT);
 
-            // Define the bindings for the 3rd descriptor set (the sampler):
+            // Define a binding for the 3rd descriptor set (the sampler):
             VkDescriptorSetLayoutBinding samplerBinding = pBindings.get(2);
             samplerBinding.binding(2);
             samplerBinding.descriptorCount(1); // a single sampler
@@ -1144,6 +1145,10 @@ public abstract class BaseApplication {
             long window, int width, int height) {
         assert window == windowHandle :
                 "window=" + window + " handle=" + windowHandle;
+        /*
+         * For drivers/platforms that don't return VK_ERROR_OUT_OF_DATE_KHR
+         * after a window resize, we use this fallback mechanism.
+         */
         needsResize = true;
     }
 
@@ -1401,7 +1406,7 @@ public abstract class BaseApplication {
 
     /**
      * Re-create the main swapchain and any resources that depend on it or the
-     * extent of its frame buffers.
+     * extents of its frame buffers.
      */
     private static void recreateChainResources() {
         // If the window is minimized, wait for it to return to the foreground.
