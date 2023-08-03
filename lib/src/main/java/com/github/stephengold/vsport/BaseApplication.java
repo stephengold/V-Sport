@@ -691,9 +691,8 @@ public abstract class BaseApplication {
      * reason.
      */
     private void cleanUpBase() {
-        if (vkDevice != null) {
-            // Await completion of all GPU operations:
-            VK10.vkDeviceWaitIdle(vkDevice);
+        if (logicalDevice != null) {
+            logicalDevice.waitIdle();
         }
         /*
          * Destroy resources in the reverse of the order they were created,
@@ -1404,9 +1403,8 @@ public abstract class BaseApplication {
             }
         }
 
-        if (vkDevice != null) {
-            // Wait for all operations on the logical device to complete:
-            VK10.vkDeviceWaitIdle(vkDevice);
+        if (logicalDevice != null) {
+            logicalDevice.waitIdle();
         }
 
         destroyChainResources();
