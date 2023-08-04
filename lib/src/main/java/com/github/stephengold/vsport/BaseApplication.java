@@ -461,23 +461,6 @@ public abstract class BaseApplication {
     }
 
     /**
-     * Return the Texture for the specified key.
-     *
-     * @param key (not null)
-     * @return a valid texture (not null)
-     */
-    static Texture getTexture(TextureKey key) {
-        if (!textureMap.containsKey(key)) {
-            Texture texture = key.load();
-            textureMap.put(key, texture);
-        }
-
-        Texture result = textureMap.get(key);
-        assert result != null;
-        return result;
-    }
-
-    /**
      * Access the named ShaderProgram, returning a cached result if possible.
      *
      * @param name (not null)
@@ -490,6 +473,23 @@ public abstract class BaseApplication {
         }
 
         ShaderProgram result = programMap.get(name);
+        assert result != null;
+        return result;
+    }
+
+    /**
+     * Return the Texture for the specified key.
+     *
+     * @param key (not null)
+     * @return a valid texture (not null)
+     */
+    static Texture getTexture(TextureKey key) {
+        if (!textureMap.containsKey(key)) {
+            Texture texture = key.load();
+            textureMap.put(key, texture);
+        }
+
+        Texture result = textureMap.get(key);
         assert result != null;
         return result;
     }
