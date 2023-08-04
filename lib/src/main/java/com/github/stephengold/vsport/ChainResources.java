@@ -209,8 +209,13 @@ class ChainResources {
         this.pipelineHandle = createPipeline(pipelineLayoutHandle,
                 framebufferExtent, passHandle, mesh, shaderProgram);
 
-        updateDescriptorSets(texture, samplerHandle, globalUbos, nonGlobalUbos,
-                descriptorSetHandles);
+        for (int i = 0; i < numImages; ++i) {
+            BufferResource globalUbo = getGlobalUbo(i);
+            BufferResource nonGlobalUbo = getNonGlobalUbo(i);
+            long descriptorSetHandle = descriptorSetHandle(i);
+            updateDescriptorSet(texture, samplerHandle, globalUbo, nonGlobalUbo,
+                    descriptorSetHandle);
+        }
     }
     // *************************************************************************
     // new methods exposed
@@ -1079,15 +1084,14 @@ class ChainResources {
      *
      * @param texture the texture to be used in rendering (not null)
      * @param samplerHandle the handle of the VkSampler for textures
-     * @param globalUbos the global uniform buffer objects (not null)
-     * @param nonGlobalUbos the non-global uniform buffer objects (not null)
-     * @param descriptorSetHandles the handles of the descriptor sets (not null,
-     * unaffected)
+     * @param globalUbo the global uniform buffer object (not null)
+     * @param nonGlobalUbo the non-global uniform buffer object (not null)
+     * @param descriptorSetHandle the handle of the descriptor set
      */
-    private static void updateDescriptorSets(
+    private static void updateDescriptorSet(
             Texture texture, long samplerHandle,
-            List<BufferResource> globalUbos, List<BufferResource> nonGlobalUbos,
-            List<Long> descriptorSetHandles) {
+            BufferResource globalUbo, BufferResource nonGlobalUbo,
+            long descriptorSetHandle) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             VkDescriptorBufferInfo.Buffer pBufferInfo
                     = VkDescriptorBufferInfo.calloc(2, stack);
@@ -1096,11 +1100,15 @@ class ChainResources {
             guDbi.offset(0);
             int numBytes = UniformValues.numBytes();
             guDbi.range(numBytes);
+            long guHandle = globalUbo.handle();
+            guDbi.buffer(guHandle);
 
             VkDescriptorBufferInfo nguDbi = pBufferInfo.get(1);
             nguDbi.offset(0);
             numBytes = NonGlobalUniformValues.numBytes();
             nguDbi.range(numBytes);
+            long nguHandle = nonGlobalUbo.handle();
+            nguDbi.buffer(nguHandle);
 
             VkDescriptorImageInfo.Buffer pImageInfo
                     = VkDescriptorImageInfo.calloc(1, stack);
@@ -1121,6 +1129,7 @@ class ChainResources {
             uboWrite.descriptorType(VK10.VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
             uboWrite.dstArrayElement(0);
             uboWrite.dstBinding(0);
+            uboWrite.dstSet(descriptorSetHandle);
             uboWrite.pBufferInfo(pBufferInfo);
 
             VkWriteDescriptorSet samplerWrite = pWrites.get(1);
@@ -1131,24 +1140,12 @@ class ChainResources {
                     VK10.VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
             samplerWrite.dstArrayElement(0);
             samplerWrite.dstBinding(2);
+            samplerWrite.dstSet(descriptorSetHandle);
             samplerWrite.pImageInfo(pImageInfo);
 
+            VkDevice vkDevice = BaseApplication.getVkDevice();
             VkCopyDescriptorSet.Buffer pCopies = null;
-            int numImages = globalUbos.size();
-            for (int setIndex = 0; setIndex < numImages; ++setIndex) {
-                long guHandle = globalUbos.get(setIndex).handle();
-                guDbi.buffer(guHandle);
-
-                long nguHandle = nonGlobalUbos.get(setIndex).handle();
-                nguDbi.buffer(nguHandle);
-
-                long setHandle = descriptorSetHandles.get(setIndex);
-                uboWrite.dstSet(setHandle);
-                samplerWrite.dstSet(setHandle);
-
-                VkDevice vkDevice = BaseApplication.getVkDevice();
-                VK10.vkUpdateDescriptorSets(vkDevice, pWrites, pCopies);
-            }
+            VK10.vkUpdateDescriptorSets(vkDevice, pWrites, pCopies);
         }
     }
 }
