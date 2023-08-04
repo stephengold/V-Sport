@@ -826,9 +826,6 @@ public abstract class BaseApplication {
         createSyncObjects(numImages);
 
         logicalDevice.addCommandBuffers(numImages, commandBuffers);
-        for (int i = 0; i < numImages; ++i) {
-            recordCommandBuffer(i);
-        }
     }
 
     /**
