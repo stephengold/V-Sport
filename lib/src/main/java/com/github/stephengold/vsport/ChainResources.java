@@ -196,8 +196,8 @@ class ChainResources {
         this.imageHandles = listImages(chainHandle);
         this.viewHandles = createImageViews(imageHandles, imageFormat);
 
-        this.passHandle = createPass(
-                imageFormat, colorAttachment, depthAttachment);
+        this.passHandle
+                = createPass(imageFormat, colorAttachment, depthAttachment);
         this.framebufferHandles = createFramebuffers(
                 viewHandles, colorAttachment, depthAttachment, passHandle,
                 framebufferExtent);
@@ -269,7 +269,7 @@ class ChainResources {
             }
             this.viewHandles = null;
         }
-        // imageHandles are owned by the KHRSwapchain
+        // The image handles are owned by the KHRSwapchain.
         if (chainHandle != VK10.VK_NULL_HANDLE) {
             KHRSwapchain.vkDestroySwapchainKHR(
                     vkDevice, chainHandle, allocator);
@@ -295,6 +295,7 @@ class ChainResources {
             ubo.destroy();
         }
         globalUbos.clear();
+
         for (BufferResource ubo : nonGlobalUbos) {
             ubo.destroy();
         }
@@ -346,7 +347,7 @@ class ChainResources {
     }
 
     /**
-     * Access the global Uniform Buffer Object (UBO) for the indexed image.
+     * Access the global Uniform Buffer Object (UBO) for the specified image.
      *
      * @param imageIndex the index of the desired UBO
      * @return a pre-existing instance
@@ -357,7 +358,8 @@ class ChainResources {
     }
 
     /**
-     * Access the non-global Uniform Buffer Object (UBO) for the indexed image.
+     * Access the non-global Uniform Buffer Object (UBO) for the specified
+     * image.
      *
      * @param imageIndex the index of the desired UBO
      * @return a pre-existing instance
