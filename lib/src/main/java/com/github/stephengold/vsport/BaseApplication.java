@@ -73,19 +73,32 @@ import org.lwjgl.vulkan.VkDescriptorSetLayoutBinding;
 import org.lwjgl.vulkan.VkDescriptorSetLayoutCreateInfo;
 import org.lwjgl.vulkan.VkDevice;
 import org.lwjgl.vulkan.VkExtent2D;
+import org.lwjgl.vulkan.VkGraphicsPipelineCreateInfo;
 import org.lwjgl.vulkan.VkImageMemoryBarrier;
 import org.lwjgl.vulkan.VkImageSubresourceRange;
 import org.lwjgl.vulkan.VkInstance;
 import org.lwjgl.vulkan.VkInstanceCreateInfo;
 import org.lwjgl.vulkan.VkLayerProperties;
 import org.lwjgl.vulkan.VkOffset2D;
+import org.lwjgl.vulkan.VkPipelineColorBlendAttachmentState;
+import org.lwjgl.vulkan.VkPipelineColorBlendStateCreateInfo;
+import org.lwjgl.vulkan.VkPipelineDepthStencilStateCreateInfo;
+import org.lwjgl.vulkan.VkPipelineInputAssemblyStateCreateInfo;
 import org.lwjgl.vulkan.VkPipelineLayoutCreateInfo;
+import org.lwjgl.vulkan.VkPipelineMultisampleStateCreateInfo;
+import org.lwjgl.vulkan.VkPipelineRasterizationStateCreateInfo;
+import org.lwjgl.vulkan.VkPipelineShaderStageCreateInfo;
+import org.lwjgl.vulkan.VkPipelineVertexInputStateCreateInfo;
+import org.lwjgl.vulkan.VkPipelineViewportStateCreateInfo;
 import org.lwjgl.vulkan.VkPresentInfoKHR;
 import org.lwjgl.vulkan.VkQueue;
 import org.lwjgl.vulkan.VkRect2D;
 import org.lwjgl.vulkan.VkRenderPassBeginInfo;
 import org.lwjgl.vulkan.VkSamplerCreateInfo;
 import org.lwjgl.vulkan.VkSubmitInfo;
+import org.lwjgl.vulkan.VkVertexInputAttributeDescription;
+import org.lwjgl.vulkan.VkVertexInputBindingDescription;
+import org.lwjgl.vulkan.VkViewport;
 import org.lwjgl.vulkan.VkWriteDescriptorSet;
 
 /**
@@ -183,6 +196,10 @@ public abstract class BaseApplication {
      * handle of the descriptor-set layout for the UBO
      */
     private static long descriptorSetLayoutHandle = VK10.VK_NULL_HANDLE;
+    /**
+     * handle of the graphics VkPipeline
+     */
+    private static long pipelineHandle = VK10.VK_NULL_HANDLE;
     /**
      * handle of the graphics-pipeline layout
      */
@@ -823,6 +840,12 @@ public abstract class BaseApplication {
                     sampleTexture);
             frameBufferHeight = chainResources.framebufferHeight();
             frameBufferWidth = chainResources.framebufferWidth();
+            VkExtent2D framebufferExtent
+                    = chainResources.framebufferExtent(stack);
+
+            long passHandle = chainResources.passHandle();
+            pipelineHandle = createPipeline(pipelineLayoutHandle,
+                    framebufferExtent, passHandle, sampleMesh, shaderProgram);
 
             int numImages = chainResources.countImages();
             createSyncObjects(numImages);
@@ -931,7 +954,212 @@ public abstract class BaseApplication {
     }
 
     /**
-     * Create the graphics pipeline layout.
+     * Create a graphics pipeline.
+     *
+     * @param pipelineLayoutHandle the handle of the graphics-pipeline layout to
+     * use
+     * @param framebufferExtent the framebuffer dimensions (not null)
+     * @param passHandle the handle of the VkRenderPass to use
+     * @param mesh the mesh to be rendered (not null)
+     * @param shaderProgram the shader program to use (not null)
+     * @return the handle of the new VkPipeline
+     */
+    private static long createPipeline(long pipelineLayoutHandle,
+            VkExtent2D framebufferExtent, long passHandle, Mesh mesh,
+            ShaderProgram shaderProgram) {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            // color-blend attachment state - per attached frame buffer:
+            VkPipelineColorBlendAttachmentState.Buffer cbaState
+                    = VkPipelineColorBlendAttachmentState.calloc(1, stack);
+            cbaState.alphaBlendOp(VK10.VK_BLEND_OP_ADD);
+            cbaState.blendEnable(false); // no linear blend
+            cbaState.colorWriteMask(
+                    VK10.VK_COLOR_COMPONENT_R_BIT
+                    | VK10.VK_COLOR_COMPONENT_G_BIT
+                    | VK10.VK_COLOR_COMPONENT_B_BIT
+                    | VK10.VK_COLOR_COMPONENT_A_BIT);
+            cbaState.colorBlendOp(VK10.VK_BLEND_OP_ADD);
+            cbaState.dstAlphaBlendFactor(VK10.VK_BLEND_FACTOR_ZERO);
+            cbaState.dstColorBlendFactor(VK10.VK_BLEND_FACTOR_ZERO);
+            cbaState.srcAlphaBlendFactor(VK10.VK_BLEND_FACTOR_ONE);
+            cbaState.srcColorBlendFactor(VK10.VK_BLEND_FACTOR_ONE);
+
+            // color-blend state - affects all attached framebuffers:
+            //   combine frag shader output color with color in the framebuffer
+            VkPipelineColorBlendStateCreateInfo cbsCreateInfo
+                    = VkPipelineColorBlendStateCreateInfo.calloc(stack);
+            cbsCreateInfo.sType(
+                    VK10.VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO
+            );
+
+            cbsCreateInfo.blendConstants(stack.floats(0f, 0f, 0f, 0f));
+            cbsCreateInfo.logicOp(VK10.VK_LOGIC_OP_COPY);
+            cbsCreateInfo.logicOpEnable(false); // no logic operation blend
+            cbsCreateInfo.pAttachments(cbaState);
+
+            // depth-stencil state:
+            VkPipelineDepthStencilStateCreateInfo dssCreateInfo
+                    = VkPipelineDepthStencilStateCreateInfo.calloc(stack);
+            dssCreateInfo.sType(
+                    VK10.VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO
+            );
+
+            dssCreateInfo.depthTestEnable(true);
+            dssCreateInfo.depthWriteEnable(true);
+            dssCreateInfo.depthCompareOp(VK10.VK_COMPARE_OP_LESS);
+            dssCreateInfo.depthBoundsTestEnable(false);
+            dssCreateInfo.minDepthBounds(0f); // Optional
+            dssCreateInfo.maxDepthBounds(1f); // Optional
+            dssCreateInfo.stencilTestEnable(false);
+
+            // input-assembly state:
+            //    1. what kind of mesh to build (mesh mode/topology)
+            //    2. whether primitive restart should be enabled
+            VkPipelineInputAssemblyStateCreateInfo iasCreateInfo
+                    = VkPipelineInputAssemblyStateCreateInfo.calloc(stack);
+            iasCreateInfo.sType(
+                    VK10.VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO
+            );
+
+            iasCreateInfo.primitiveRestartEnable(false);
+            iasCreateInfo.topology(VK10.VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
+
+            // multisample state:
+            VkPipelineMultisampleStateCreateInfo msCreateInfo
+                    = VkPipelineMultisampleStateCreateInfo.calloc(stack);
+            msCreateInfo.sType(
+                    VK10.VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO
+            );
+
+            msCreateInfo.alphaToCoverageEnable(false);
+            msCreateInfo.alphaToOneEnable(false);
+            msCreateInfo.minSampleShading(1f);
+            msCreateInfo.pSampleMask(0);
+            msCreateInfo.sampleShadingEnable(false);
+
+            int numSamples = BaseApplication.numMsaaSamples();
+            msCreateInfo.rasterizationSamples(numSamples);
+
+            // rasterization state:
+            //    1. turns mesh primitives into fragments
+            //    2. performs depth testing, face culling, and the scissor test
+            //    3. fills polygons and/or edges (wireframe)
+            //    4. determines front/back faces of polygons (winding)
+            VkPipelineRasterizationStateCreateInfo rsCreateInfo
+                    = VkPipelineRasterizationStateCreateInfo.calloc(stack);
+            rsCreateInfo.sType(
+                    VK10.VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO
+            );
+
+            rsCreateInfo.cullMode(VK10.VK_CULL_MODE_BACK_BIT);
+            rsCreateInfo.depthBiasEnable(false);
+            rsCreateInfo.depthClampEnable(false);
+            rsCreateInfo.frontFace(VK10.VK_FRONT_FACE_COUNTER_CLOCKWISE);
+            rsCreateInfo.lineWidth(1f); // in fragments
+            rsCreateInfo.polygonMode(VK10.VK_POLYGON_MODE_FILL);
+            rsCreateInfo.rasterizerDiscardEnable(false);
+
+            VkPipelineShaderStageCreateInfo.Buffer stageCreateInfos
+                    = VkPipelineShaderStageCreateInfo.calloc(2, stack);
+
+            // shader stage 0 - vertex shader:
+            VkPipelineShaderStageCreateInfo vertCreateInfo
+                    = stageCreateInfos.get(0);
+            vertCreateInfo.sType(
+                    VK10.VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO);
+
+            ByteBuffer entryPoint = stack.UTF8("main");
+
+            long vertModuleHandle = shaderProgram.vertModuleHandle();
+            vertCreateInfo.module(vertModuleHandle);
+            vertCreateInfo.pName(entryPoint);
+            vertCreateInfo.stage(VK10.VK_SHADER_STAGE_VERTEX_BIT);
+
+            // shader stage 1 - fragment shader:
+            VkPipelineShaderStageCreateInfo fragCreateInfo
+                    = stageCreateInfos.get(1);
+            fragCreateInfo.sType(
+                    VK10.VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO);
+
+            long fragModuleHandle = shaderProgram.fragModuleHandle();
+            fragCreateInfo.module(fragModuleHandle);
+            fragCreateInfo.pName(entryPoint);
+            fragCreateInfo.stage(VK10.VK_SHADER_STAGE_FRAGMENT_BIT);
+
+            // vertex-input state - describes format of vertex data:
+            VkPipelineVertexInputStateCreateInfo visCreateInfo
+                    = VkPipelineVertexInputStateCreateInfo.calloc(stack);
+            visCreateInfo.sType(
+                    VK10.VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO
+            );
+
+            VkVertexInputBindingDescription.Buffer pBindingDesc
+                    = mesh.generateBindingDescription(stack);
+            visCreateInfo.pVertexBindingDescriptions(pBindingDesc);
+
+            VkVertexInputAttributeDescription.Buffer pAttributeDesc
+                    = mesh.generateAttributeDescriptions(stack);
+            visCreateInfo.pVertexAttributeDescriptions(pAttributeDesc);
+
+            // viewport location and dimensions:
+            int framebufferHeight = framebufferExtent.height();
+            int framebufferWidth = framebufferExtent.width();
+            VkViewport.Buffer viewport = VkViewport.calloc(1, stack);
+            viewport.height(framebufferHeight);
+            viewport.maxDepth(1f);
+            viewport.minDepth(0f);
+            viewport.width(framebufferWidth);
+            viewport.x(0f);
+            viewport.y(0f);
+
+            // scissor - region of the frame buffer where pixels are written:
+            VkRect2D.Buffer scissor = VkRect2D.calloc(1, stack);
+            scissor.offset(VkOffset2D.calloc(stack).set(0, 0));
+            scissor.extent(framebufferExtent);
+
+            // viewport state:
+            VkPipelineViewportStateCreateInfo vsCreateInfo
+                    = VkPipelineViewportStateCreateInfo.calloc(stack);
+            vsCreateInfo.sType(
+                    VK10.VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO);
+
+            vsCreateInfo.pViewports(viewport);
+            vsCreateInfo.pScissors(scissor);
+
+            // Create the pipeline:
+            VkGraphicsPipelineCreateInfo.Buffer pCreateInfo
+                    = VkGraphicsPipelineCreateInfo.calloc(1, stack);
+            pCreateInfo.sType(
+                    VK10.VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO);
+
+            pCreateInfo.basePipelineHandle(VK10.VK_NULL_HANDLE);
+            pCreateInfo.basePipelineIndex(-1);
+            pCreateInfo.layout(pipelineLayoutHandle);
+            pCreateInfo.pColorBlendState(cbsCreateInfo);
+            pCreateInfo.pDepthStencilState(dssCreateInfo);
+            pCreateInfo.pInputAssemblyState(iasCreateInfo);
+            pCreateInfo.pMultisampleState(msCreateInfo);
+            pCreateInfo.pRasterizationState(rsCreateInfo);
+            pCreateInfo.pStages(stageCreateInfos);
+            pCreateInfo.pVertexInputState(visCreateInfo);
+            pCreateInfo.pViewportState(vsCreateInfo);
+            pCreateInfo.renderPass(passHandle);
+            pCreateInfo.subpass(0);
+
+            long pipelineCache = VK10.VK_NULL_HANDLE; // disable cacheing
+            VkAllocationCallbacks allocator = BaseApplication.findAllocator();
+            LongBuffer pHandle = stack.mallocLong(1);
+            int retCode = VK10.vkCreateGraphicsPipelines(
+                    vkDevice, pipelineCache, pCreateInfo, allocator, pHandle);
+            Utils.checkForError(retCode, "create graphics pipeline");
+            long result = pHandle.get(0);
+
+            return result;
+        }
+    }
+
+    /**
+     * Create the graphics-pipeline layout.
      *
      * @return the handle of the new layout
      */
@@ -1126,6 +1354,11 @@ public abstract class BaseApplication {
                 frame.destroy();
             }
             inFlightFrames = null;
+        }
+
+        if (pipelineHandle != VK10.VK_NULL_HANDLE) {
+            VK10.vkDestroyPipeline(vkDevice, pipelineHandle, defaultAllocator);
+            pipelineHandle = VK10.VK_NULL_HANDLE;
         }
 
         if (chainResources != null) {
@@ -1350,7 +1583,6 @@ public abstract class BaseApplication {
                     VK10.VK_SUBPASS_CONTENTS_INLINE);
 
             // command to bind the graphics pipeline:
-            long pipelineHandle = chainResources.pipelineHandle();
             VK10.vkCmdBindPipeline(commandBuffer,
                     VK10.VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineHandle);
 
