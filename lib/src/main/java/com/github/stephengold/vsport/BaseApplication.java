@@ -836,8 +836,7 @@ public abstract class BaseApplication {
             chainResources = new ChainResources(
                     surface, descriptorSetLayoutHandle, frameBufferWidth,
                     frameBufferHeight, depthBufferFormat, samplerHandle,
-                    pipelineLayoutHandle, sampleMesh, shaderProgram,
-                    sampleTexture);
+                    pipelineLayoutHandle);
             frameBufferHeight = chainResources.framebufferHeight();
             frameBufferWidth = chainResources.framebufferWidth();
             VkExtent2D framebufferExtent

@@ -133,14 +133,10 @@ class ChainResources {
      * @param depthFormat the depth-buffer format
      * @param samplerHandle the handle of the VkSampler for textures
      * @param pipelineLayoutHandle the handle of the graphics-pipeline layout
-     * @param mesh the mesh to render (not null)
-     * @param shaderProgram the shader program to use (not null)
-     * @param texture the texture to be used in rendering (not null)
      */
     ChainResources(SurfaceSummary surface, long descriptorSetLayoutHandle,
             int desiredWidth, int desiredHeight,
-            int depthFormat, long samplerHandle, long pipelineLayoutHandle,
-            Mesh mesh, ShaderProgram shaderProgram, Texture texture) {
+            int depthFormat, long samplerHandle, long pipelineLayoutHandle) {
         this.numImages = chooseNumImages(surface);
         addUbos(numImages, globalUbos, nonGlobalUbos);
 
