@@ -41,9 +41,6 @@ import org.lwjgl.vulkan.VK10;
 import org.lwjgl.vulkan.VkAllocationCallbacks;
 import org.lwjgl.vulkan.VkAttachmentDescription;
 import org.lwjgl.vulkan.VkAttachmentReference;
-import org.lwjgl.vulkan.VkCopyDescriptorSet;
-import org.lwjgl.vulkan.VkDescriptorBufferInfo;
-import org.lwjgl.vulkan.VkDescriptorImageInfo;
 import org.lwjgl.vulkan.VkDescriptorPoolCreateInfo;
 import org.lwjgl.vulkan.VkDescriptorPoolSize;
 import org.lwjgl.vulkan.VkDescriptorSetAllocateInfo;
@@ -70,7 +67,6 @@ import org.lwjgl.vulkan.VkSwapchainCreateInfoKHR;
 import org.lwjgl.vulkan.VkVertexInputAttributeDescription;
 import org.lwjgl.vulkan.VkVertexInputBindingDescription;
 import org.lwjgl.vulkan.VkViewport;
-import org.lwjgl.vulkan.VkWriteDescriptorSet;
 
 /**
  * Encapsulate Vulkan resources that depend on the swap chain.
@@ -208,14 +204,6 @@ class ChainResources {
 
         this.pipelineHandle = createPipeline(pipelineLayoutHandle,
                 framebufferExtent, passHandle, mesh, shaderProgram);
-
-        for (int i = 0; i < numImages; ++i) {
-            BufferResource globalUbo = getGlobalUbo(i);
-            BufferResource nonGlobalUbo = getNonGlobalUbo(i);
-            long descriptorSetHandle = descriptorSetHandle(i);
-            updateDescriptorSet(texture, samplerHandle, globalUbo, nonGlobalUbo,
-                    descriptorSetHandle);
-        }
     }
     // *************************************************************************
     // new methods exposed
@@ -1076,76 +1064,6 @@ class ChainResources {
             }
 
             return result;
-        }
-    }
-
-    /**
-     * Update the descriptor sets after a change.
-     *
-     * @param texture the texture to be used in rendering (not null)
-     * @param samplerHandle the handle of the VkSampler for textures
-     * @param globalUbo the global uniform buffer object (not null)
-     * @param nonGlobalUbo the non-global uniform buffer object (not null)
-     * @param descriptorSetHandle the handle of the descriptor set
-     */
-    private static void updateDescriptorSet(
-            Texture texture, long samplerHandle,
-            BufferResource globalUbo, BufferResource nonGlobalUbo,
-            long descriptorSetHandle) {
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            VkDescriptorBufferInfo.Buffer pBufferInfo
-                    = VkDescriptorBufferInfo.calloc(2, stack);
-
-            VkDescriptorBufferInfo guDbi = pBufferInfo.get(0);
-            guDbi.offset(0);
-            int numBytes = UniformValues.numBytes();
-            guDbi.range(numBytes);
-            long guHandle = globalUbo.handle();
-            guDbi.buffer(guHandle);
-
-            VkDescriptorBufferInfo nguDbi = pBufferInfo.get(1);
-            nguDbi.offset(0);
-            numBytes = NonGlobalUniformValues.numBytes();
-            nguDbi.range(numBytes);
-            long nguHandle = nonGlobalUbo.handle();
-            nguDbi.buffer(nguHandle);
-
-            VkDescriptorImageInfo.Buffer pImageInfo
-                    = VkDescriptorImageInfo.calloc(1, stack);
-            pImageInfo.imageLayout(
-                    VK10.VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-            long viewHandle = texture.viewHandle();
-            pImageInfo.imageView(viewHandle);
-            pImageInfo.sampler(samplerHandle);
-
-            // Configure the descriptors in each set:
-            VkWriteDescriptorSet.Buffer pWrites
-                    = VkWriteDescriptorSet.calloc(2, stack);
-
-            VkWriteDescriptorSet uboWrite = pWrites.get(0);
-            uboWrite.sType(VK10.VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET);
-
-            uboWrite.descriptorCount(2); // 2 UBOs
-            uboWrite.descriptorType(VK10.VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
-            uboWrite.dstArrayElement(0);
-            uboWrite.dstBinding(0);
-            uboWrite.dstSet(descriptorSetHandle);
-            uboWrite.pBufferInfo(pBufferInfo);
-
-            VkWriteDescriptorSet samplerWrite = pWrites.get(1);
-            samplerWrite.sType(VK10.VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET);
-
-            samplerWrite.descriptorCount(1);
-            samplerWrite.descriptorType(
-                    VK10.VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-            samplerWrite.dstArrayElement(0);
-            samplerWrite.dstBinding(2);
-            samplerWrite.dstSet(descriptorSetHandle);
-            samplerWrite.pImageInfo(pImageInfo);
-
-            VkDevice vkDevice = BaseApplication.getVkDevice();
-            VkCopyDescriptorSet.Buffer pCopies = null;
-            VK10.vkUpdateDescriptorSets(vkDevice, pWrites, pCopies);
         }
     }
 }

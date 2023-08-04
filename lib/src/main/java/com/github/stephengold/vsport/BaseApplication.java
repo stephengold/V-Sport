@@ -64,8 +64,11 @@ import org.lwjgl.vulkan.VkClearValue;
 import org.lwjgl.vulkan.VkCommandBuffer;
 import org.lwjgl.vulkan.VkCommandBufferBeginInfo;
 import org.lwjgl.vulkan.VkCommandPoolCreateInfo;
+import org.lwjgl.vulkan.VkCopyDescriptorSet;
 import org.lwjgl.vulkan.VkDebugUtilsMessengerCallbackDataEXT;
 import org.lwjgl.vulkan.VkDebugUtilsMessengerCreateInfoEXT;
+import org.lwjgl.vulkan.VkDescriptorBufferInfo;
+import org.lwjgl.vulkan.VkDescriptorImageInfo;
 import org.lwjgl.vulkan.VkDescriptorSetLayoutBinding;
 import org.lwjgl.vulkan.VkDescriptorSetLayoutCreateInfo;
 import org.lwjgl.vulkan.VkDevice;
@@ -83,6 +86,7 @@ import org.lwjgl.vulkan.VkRect2D;
 import org.lwjgl.vulkan.VkRenderPassBeginInfo;
 import org.lwjgl.vulkan.VkSamplerCreateInfo;
 import org.lwjgl.vulkan.VkSubmitInfo;
+import org.lwjgl.vulkan.VkWriteDescriptorSet;
 
 /**
  * A single-window, 3-D visualization application using LWJGL v3, GLFW, and
@@ -813,19 +817,18 @@ public abstract class BaseApplication {
             SurfaceSummary surface
                     = physicalDevice.summarizeSurface(surfaceHandle, stack);
             chainResources = new ChainResources(
-                    surface, descriptorSetLayoutHandle,
-                    frameBufferWidth, frameBufferHeight,
-                    depthBufferFormat, samplerHandle,
-                    pipelineLayoutHandle, sampleMesh,
-                    shaderProgram, sampleTexture);
+                    surface, descriptorSetLayoutHandle, frameBufferWidth,
+                    frameBufferHeight, depthBufferFormat, samplerHandle,
+                    pipelineLayoutHandle, sampleMesh, shaderProgram,
+                    sampleTexture);
             frameBufferHeight = chainResources.framebufferHeight();
             frameBufferWidth = chainResources.framebufferWidth();
+
+            int numImages = chainResources.countImages();
+            createSyncObjects(numImages);
+
+            logicalDevice.addCommandBuffers(numImages, commandBuffers);
         }
-
-        int numImages = chainResources.countImages();
-        createSyncObjects(numImages);
-
-        logicalDevice.addCommandBuffers(numImages, commandBuffers);
     }
 
     /**
@@ -1476,8 +1479,16 @@ public abstract class BaseApplication {
                 recreateChainResources();
                 return;
             }
-            Utils.checkForError(retCode, "acquire next image");
+            Utils.checkForError(retCode, "acquire the next swapchain image");
             int imageIndex = pImageIndex.get(0);
+
+            BufferResource globalUbo = chainResources.getGlobalUbo(imageIndex);
+            BufferResource nonGlobalUbo
+                    = chainResources.getNonGlobalUbo(imageIndex);
+            long descriptorSetHandle
+                    = chainResources.descriptorSetHandle(imageIndex);
+            updateDescriptorSet(sampleTexture, samplerHandle, globalUbo,
+                    nonGlobalUbo, descriptorSetHandle);
 
             recordCommandBuffer(imageIndex);
             updateUniformBuffer(imageIndex);
@@ -1608,7 +1619,76 @@ public abstract class BaseApplication {
     }
 
     /**
-     * Update the Uniform Buffer Object (UBO) of the indexed image.
+     * Update the descriptor sets after a change.
+     *
+     * @param texture the texture to be sampled (not null)
+     * @param samplerHandle the handle of the VkSampler for textures
+     * @param globalUbo the global uniform buffer object (not null)
+     * @param nonGlobalUbo the non-global uniform buffer object (not null)
+     * @param descriptorSetHandle the handle of the descriptor set
+     */
+    private static void updateDescriptorSet(
+            Texture texture, long samplerHandle,
+            BufferResource globalUbo, BufferResource nonGlobalUbo,
+            long descriptorSetHandle) {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            VkDescriptorBufferInfo.Buffer pBufferInfo
+                    = VkDescriptorBufferInfo.calloc(2, stack);
+
+            VkDescriptorBufferInfo guDbi = pBufferInfo.get(0);
+            guDbi.offset(0);
+            int numBytes = UniformValues.numBytes();
+            guDbi.range(numBytes);
+            long guHandle = globalUbo.handle();
+            guDbi.buffer(guHandle);
+
+            VkDescriptorBufferInfo nguDbi = pBufferInfo.get(1);
+            nguDbi.offset(0);
+            numBytes = NonGlobalUniformValues.numBytes();
+            nguDbi.range(numBytes);
+            long nguHandle = nonGlobalUbo.handle();
+            nguDbi.buffer(nguHandle);
+
+            VkDescriptorImageInfo.Buffer pImageInfo
+                    = VkDescriptorImageInfo.calloc(1, stack);
+            pImageInfo.imageLayout(
+                    VK10.VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+            long viewHandle = texture.viewHandle();
+            pImageInfo.imageView(viewHandle);
+            pImageInfo.sampler(samplerHandle);
+
+            // Configure the descriptors to be written:
+            VkWriteDescriptorSet.Buffer pWrites
+                    = VkWriteDescriptorSet.calloc(2, stack);
+
+            VkWriteDescriptorSet uboWrite = pWrites.get(0);
+            uboWrite.sType(VK10.VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET);
+
+            uboWrite.descriptorCount(2); // 2 UBOs
+            uboWrite.descriptorType(VK10.VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
+            uboWrite.dstArrayElement(0);
+            uboWrite.dstBinding(0);
+            uboWrite.dstSet(descriptorSetHandle);
+            uboWrite.pBufferInfo(pBufferInfo);
+
+            VkWriteDescriptorSet samplerWrite = pWrites.get(1);
+            samplerWrite.sType(VK10.VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET);
+
+            samplerWrite.descriptorCount(1);
+            samplerWrite.descriptorType(
+                    VK10.VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
+            samplerWrite.dstArrayElement(0);
+            samplerWrite.dstBinding(2);
+            samplerWrite.dstSet(descriptorSetHandle);
+            samplerWrite.pImageInfo(pImageInfo);
+
+            VkCopyDescriptorSet.Buffer pCopies = null;
+            VK10.vkUpdateDescriptorSets(vkDevice, pWrites, pCopies);
+        }
+    }
+
+    /**
+     * Update the Uniform Buffer Objects (UBOs) of the indexed image.
      *
      * @param imageIndex index of the target image among the swap-chain images.
      */
