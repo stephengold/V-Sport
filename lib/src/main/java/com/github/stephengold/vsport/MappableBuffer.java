@@ -47,21 +47,21 @@ class MappableBuffer {
      */
     final private int numBytes;
     /**
-     * handle of the associated VkDeviceMemory, or VK_NULL_HANDLE if none
+     * handle of the associated {@code VkDeviceMemory}, or null if none
      */
     private long memoryHandle = VK10.VK_NULL_HANDLE;
     /**
-     * handle of the VkBuffer
+     * handle of the underlying {@code VkBuffer}
      */
     private long vkBufferHandle;
     // *************************************************************************
     // constructors
 
     /**
-     * Instantiate a buffer without any associated memory.
+     * Instantiate a mappable buffer without any associated memory.
      *
      * @param numBytes the size of the buffer (in bytes, &gt;0)
-     * @param bufferHandle the handle of the VkBuffer (not VK_NULL_HANDLE)
+     * @param bufferHandle the handle of the {@code VkBuffer} (not null)
      */
     MappableBuffer(int numBytes, long bufferHandle) {
         Validate.positive(numBytes, "number of bytes");
@@ -76,7 +76,8 @@ class MappableBuffer {
     /**
      * Associate the specified memory with this buffer.
      *
-     * @param handle a VkDeviceMemory handle (not VK_NULL_HANDLE)
+     * @param handle the handle of the {@code VkDeviceMemory} to associate (not
+     * null)
      */
     void associateWithMemory(long handle) {
         Validate.nonZero(handle, "handle");
@@ -102,9 +103,10 @@ class MappableBuffer {
     }
 
     /**
-     * Return the handle of the associated memory, if any.
+     * Access the associated memory, if any.
      *
-     * @return a VkDeviceMemory handle, or VK_NULL_HANDLE if none set
+     * @return the handle of the pre-existing {@code VkDeviceMemory}, or null if
+     * none set
      */
     long memoryHandle() {
         return memoryHandle;
@@ -121,9 +123,9 @@ class MappableBuffer {
     }
 
     /**
-     * Return the buffer handle.
+     * Access the underlying {@code VkBuffer}.
      *
-     * @return a VkBuffer handle (not VK_NULL_HANDLE)
+     * @return the handle of the pre-existing instance (not null)
      */
     long vkBufferHandle() {
         assert vkBufferHandle != VK10.VK_NULL_HANDLE;

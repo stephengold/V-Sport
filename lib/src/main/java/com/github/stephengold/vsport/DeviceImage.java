@@ -51,11 +51,11 @@ class DeviceImage {
      */
     final private int width;
     /**
-     * handle of the VkImage
+     * {@code VkImage} handle
      */
     private long imageHandle;
     /**
-     * handle of the associated VkDeviceMemory, or VK_NULL_HANDLE if none
+     * handle of the associated {@code VkDeviceMemory}, or null if none
      */
     private long memoryHandle = VK10.VK_NULL_HANDLE;
     // *************************************************************************
@@ -66,7 +66,7 @@ class DeviceImage {
      *
      * @param width the width of the image (in pixels, &gt;0)
      * @param height the height of the image (in pixels, &gt;0)
-     * @param imageHandle the handle of the VkImage (not VK_NULL_HANDLE)
+     * @param imageHandle the handle of the {@code VkImage} to use (not null)
      */
     DeviceImage(int width, int height, long imageHandle) {
         Validate.positive(width, "width");
@@ -83,7 +83,8 @@ class DeviceImage {
     /**
      * Associate the specified memory with this image.
      *
-     * @param handle a VkDeviceMemory handle (not VK_NULL_HANDLE)
+     * @param handle the handle of the {@code VkDeviceMemory} to associate (not
+     * null)
      */
     void associateWithMemory(long handle) {
         Validate.nonZero(handle, "handle");
@@ -109,9 +110,9 @@ class DeviceImage {
     }
 
     /**
-     * Return the height of the image, in pixels.
+     * Return the height of the image.
      *
-     * @return the height (&gt;0)
+     * @return the height (in pixels, &gt;0)
      */
     int height() {
         assert height > 0 : height;
@@ -121,7 +122,7 @@ class DeviceImage {
     /**
      * Return the handle of the image.
      *
-     * @return a VkImage handle (not VK_NULL_HANDLE)
+     * @return the handle of the pre-existing {@code VkImage} (not null)
      */
     long imageHandle() {
         assert imageHandle != VK10.VK_NULL_HANDLE;
@@ -131,16 +132,17 @@ class DeviceImage {
     /**
      * Return the handle of the associated memory, if any.
      *
-     * @return a VkDeviceMemory handle, or VK_NULL_HANDLE if none set
+     * @return the handle of the pre-existing {@code VkDeviceMemory}, or null if
+     * none associated with the image
      */
     long memoryHandle() {
         return memoryHandle;
     }
 
     /**
-     * Return the width of the image, in pixels.
+     * Return the width of the image.
      *
-     * @return the width (&gt;0)
+     * @return the width (in pixels, &gt;0)
      */
     int width() {
         assert width > 0 : width;

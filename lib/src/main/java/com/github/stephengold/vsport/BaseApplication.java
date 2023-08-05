@@ -189,11 +189,11 @@ public abstract class BaseApplication {
      */
     private static LogicalDevice logicalDevice;
     /**
-     * handle of the command pool for the main window
+     * {@code VkCommandPool} handle
      */
     private static long commandPoolHandle = VK10.VK_NULL_HANDLE;
     /**
-     * handle of the descriptor-set layout for the UBO
+     * {@code VkDescriptorSetLayout} handle
      */
     private static long descriptorSetLayoutHandle = VK10.VK_NULL_HANDLE;
     /**
@@ -205,7 +205,7 @@ public abstract class BaseApplication {
      */
     private static long pipelineLayoutHandle = VK10.VK_NULL_HANDLE;
     /**
-     * handle of the VkSampler for textures
+     * handle of the {@code VkSampler} for sampling textures
      */
     private static long samplerHandle = VK10.VK_NULL_HANDLE;
     /**
@@ -400,9 +400,9 @@ public abstract class BaseApplication {
     }
 
     /**
-     * Return the handle of the main command pool.
+     * Access the command pool.
      *
-     * @return the handle (not null)
+     * @return the handle of the pre-existing {@code VkCommandPool} (not null)
      */
     static long commandPoolHandle() {
         assert commandPoolHandle != VK10.VK_NULL_HANDLE;
@@ -956,12 +956,12 @@ public abstract class BaseApplication {
      * Create a graphics pipeline.
      *
      * @param pipelineLayoutHandle the handle of the graphics-pipeline layout to
-     * use
+     * use (not null)
      * @param framebufferExtent the framebuffer dimensions (not null)
-     * @param passHandle the handle of the VkRenderPass to use
+     * @param passHandle the handle of the VkRenderPass to use (not null)
      * @param mesh the mesh to be rendered (not null)
      * @param shaderProgram the shader program to use (not null)
-     * @return the handle of the new VkPipeline
+     * @return the handle of the new {@code VkPipeline} (not null)
      */
     private static long createPipeline(long pipelineLayoutHandle,
             VkExtent2D framebufferExtent, long passHandle, Mesh mesh,
@@ -1007,8 +1007,8 @@ public abstract class BaseApplication {
             dssCreateInfo.depthWriteEnable(true);
             dssCreateInfo.depthCompareOp(VK10.VK_COMPARE_OP_LESS);
             dssCreateInfo.depthBoundsTestEnable(false);
-            dssCreateInfo.minDepthBounds(0f); // Optional
-            dssCreateInfo.maxDepthBounds(1f); // Optional
+            dssCreateInfo.minDepthBounds(0f); // optional
+            dssCreateInfo.maxDepthBounds(1f); // optional
             dssCreateInfo.stencilTestEnable(false);
 
             // input-assembly state:
@@ -1438,6 +1438,7 @@ public abstract class BaseApplication {
         createSurface();
 
         selectPhysicalDevice();
+
         depthBufferFormat = chooseDepthBufferFormat();
         numMsaaSamples = physicalDevice.maxNumSamples();
         System.out.println("numSamples = " + numMsaaSamples);
@@ -1854,8 +1855,8 @@ public abstract class BaseApplication {
      *
      * @param texture the texture to be sampled (not null)
      * @param samplerHandle the handle of the VkSampler for textures
-     * @param globalUbo the global uniform buffer object (not null)
-     * @param nonGlobalUbo the non-global uniform buffer object (not null)
+     * @param globalUbo the global UBO (not null)
+     * @param nonGlobalUbo the per-geometry UBO (not null)
      * @param descriptorSetHandle the handle of the descriptor set
      */
     private static void updateDescriptorSet(

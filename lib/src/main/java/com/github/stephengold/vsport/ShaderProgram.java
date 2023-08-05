@@ -47,11 +47,11 @@ public class ShaderProgram extends DeviceResource {
     // fields
 
     /**
-     * handle of the VkShaderModule for the fragment shader
+     * handle of the {@code VkShaderModule} for the fragment shader
      */
     private long fragModuleHandle = VK10.VK_NULL_HANDLE;
     /**
-     * handle of the VkShaderModule for the vertex shader
+     * handle of the {@code VkShaderModule} for the vertex shader
      */
     private long vertModuleHandle = VK10.VK_NULL_HANDLE;
     /**
@@ -75,9 +75,9 @@ public class ShaderProgram extends DeviceResource {
     // new methods exposed
 
     /**
-     * Return the module for the fragment shader.
+     * Return the fragment shader.
      *
-     * @return the handle of the VkShaderModule (not VK_NULL_HANDLE)
+     * @return the handle of a {@code VkShaderModule} (not null)
      */
     long fragModuleHandle() {
         if (fragModuleHandle == VK10.VK_NULL_HANDLE) {
@@ -89,9 +89,9 @@ public class ShaderProgram extends DeviceResource {
     }
 
     /**
-     * Return the module for the vertex shader.
+     * Return the vertex shader.
      *
-     * @return the handle of the VkShaderModule
+     * @return the handle of a {@code VkShaderModule} (not null)
      */
     long vertModuleHandle() {
         if (vertModuleHandle == VK10.VK_NULL_HANDLE) {
@@ -105,7 +105,7 @@ public class ShaderProgram extends DeviceResource {
     // DeviceResource methods
 
     /**
-     * Destroy all owned resources.
+     * Destroy all resources owned by this program.
      */
     @Override
     protected void destroy() {
@@ -114,7 +114,7 @@ public class ShaderProgram extends DeviceResource {
     }
 
     /**
-     * Callback when the logical device changes.
+     * Callback invoked when the logical device changes.
      *
      * @param nextDevice ignored
      */
@@ -146,7 +146,7 @@ public class ShaderProgram extends DeviceResource {
      * Create a shader module from the specified SPIR-V bytecodes.
      *
      * @param spirvCode the bytecodes to use (not null)
-     * @return the handle of the new module
+     * @return the handle of the new {@code VkShaderModule} (not null)
      */
     private static long createShaderModule(ByteBuffer spirvCode) {
         try (MemoryStack stack = MemoryStack.stackPush()) {

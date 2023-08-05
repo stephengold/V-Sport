@@ -136,11 +136,12 @@ public class Texture extends DeviceResource {
     }
 
     /**
-     * Return the handle of the underlying VkImageView.
+     * Access the image view.
      *
-     * @return the handle
+     * @return the handle of the pre-existing {@code VkImageView} (not null)
      */
     final long viewHandle() {
+        assert viewHandle != VK10.VK_NULL_HANDLE;
         return viewHandle;
     }
     // *************************************************************************
@@ -159,7 +160,7 @@ public class Texture extends DeviceResource {
     // DeviceResource methods
 
     /**
-     * Destroy the resources and free the associated memory, if it exists.
+     * Destroy the resources associated with the texture.
      */
     @Override
     protected void destroy() {
@@ -174,7 +175,7 @@ public class Texture extends DeviceResource {
     }
 
     /**
-     * Update this object after a device change.
+     * Update the texture after a device change.
      *
      * @param nextDevice the current device if it's just been created, or null
      * if the current device is about to be destroyed

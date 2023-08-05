@@ -34,7 +34,7 @@ import org.lwjgl.vulkan.VK10;
 
 /**
  * A buffer resource that persists across device changes, such as an index
- * buffer, uniform buffer, or vertex buffer.
+ * buffer, uniform buffer object (UBO), or vertex buffer.
  *
  * @author Stephen Gold sgold@sonic.net
  */
@@ -56,7 +56,8 @@ public class BufferResource extends DeviceResource {
      */
     private int numBytes;
     /**
-     * bitmask specifying the intended usage (index, uniform, vertex, etcetera)
+     * bitmask specifying the intended usage (index buffer, UBO, vertex buffer,
+     * etcetera)
      */
     private int usage;
     /**
@@ -70,10 +71,10 @@ public class BufferResource extends DeviceResource {
      * Instantiate a buffer resource.
      *
      * @param numBytes the desired size in bytes (&ge;0)
-     * @param usage a bitmask specifying the intended usage (index, uniform,
-     * vertex, etcetera)
-     * @param staging true to use a staging buffer during creation,
-     * false for a persistent mapping
+     * @param usage a bitmask specifying the intended usage (index buffer, UBO,
+     * vertex buffer, etcetera)
+     * @param staging true to use a staging buffer during creation, false for a
+     * persistent mapping
      */
     BufferResource(int numBytes, int usage, boolean staging) {
         this.numBytes = numBytes;
@@ -95,9 +96,9 @@ public class BufferResource extends DeviceResource {
     }
 
     /**
-     * Return the handle of the underlying VkBuffer.
+     * Access the underlying {@code VkBuffer}.
      *
-     * @return the handle
+     * @return the handle of the pre-existing instance (not null)
      */
     final long handle() {
         long result = mappableBuffer.vkBufferHandle();

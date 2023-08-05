@@ -114,27 +114,27 @@ class Frame {
     }
 
     /**
-     * Return the fence for the GPU to signal after completing a frame.
+     * Access the fence for the GPU to signal completion of a frame.
      *
-     * @return the handle of the fence
+     * @return the handle of the pre-existing {@code VkFence} (not null)
      */
     long fenceHandle() {
         return fenceHandle;
     }
 
     /**
-     * Return the image-available semaphore.
+     * Access the image-available semaphore.
      *
-     * @return the handle of the semaphore
+     * @return the handle of the pre-existing {@code VkSemaphore} (not null)
      */
     long imageAvailableSemaphoreHandle() {
         return imageAvailableSemaphoreHandle;
     }
 
     /**
-     * Return the render-finished semaphore.
+     * Access the render-finished semaphore.
      *
-     * @return the handle of the semaphore
+     * @return the handle of the pre-existing {@code VkSemaphore} (not null)
      */
     long renderFinishedSemaphoreHandle() {
         return renderFinishedSemaphoreHandle;

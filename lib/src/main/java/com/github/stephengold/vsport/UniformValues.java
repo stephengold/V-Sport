@@ -36,7 +36,7 @@ import org.joml.Vector3fc;
 import org.joml.Vector4f;
 
 /**
- * Values to be written to a global uniform buffer object (UBO).
+ * Values to be written to a global Uniform Buffer Object (UBO).
  *
  * @author Stephen Gold sgold@sonic.net
  *
@@ -112,8 +112,8 @@ class UniformValues {
     }
 
     /**
-     * Write the uniform data to the specified ByteBuffer (starting at the
-     * current buffer position) and advance the buffer position.
+     * Write the data to the specified ByteBuffer (starting at the current
+     * buffer position) and advance the buffer position.
      *
      * @param target the buffer to write to (not null, modified)
      */

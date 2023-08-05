@@ -209,7 +209,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     /**
      * Count how many attributes this Mesh contains.
      *
-     * @return the count (&ge;1)
+     * @return the count (&gt;0)
      */
     int countAttributes() {
         int result = 1; // for the position buffer

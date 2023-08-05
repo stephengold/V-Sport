@@ -64,7 +64,7 @@ class ChainResources {
     // fields
 
     /**
-     * transient color attachment for framebuffers
+     * transient color attachment for multi-sample framebuffers
      */
     private Attachment colorAttachment;
     /**
@@ -72,11 +72,11 @@ class ChainResources {
      */
     private Attachment depthAttachment;
     /**
-     * image format (shared by all images in the chain)
+     * image format (shared by all images in the swapchain)
      */
     final private int imageFormat;
     /**
-     * number of images in the chain (&ge;1)
+     * number of presentation images in the swapchain (&gt;0)
      */
     final private int numImages;
     /**
@@ -108,15 +108,15 @@ class ChainResources {
      */
     private long chainHandle = VK10.VK_NULL_HANDLE;
     /**
-     * handle of the VkRenderPass
+     * {@code VkRenderPass} handle
      */
     private long passHandle = VK10.VK_NULL_HANDLE;
     /**
-     * handle of the descriptor-set pool
+     * {@code VkDescriptorPool} handle
      */
     private long poolHandle = VK10.VK_NULL_HANDLE;
     /**
-     * framebuffer dimensions (in pixels, shared by all images in the chain)
+     * framebuffer dimensions (in pixels, shared by all presentation images)
      */
     final private VkExtent2D framebufferExtent = VkExtent2D.create();
     // *************************************************************************
@@ -125,14 +125,16 @@ class ChainResources {
     /**
      * Instantiate resources for the specified configuration.
      *
-     * @param surface the features of the active VkSurfaceKHR (not null)
+     * @param surface the features of the active {@code VkSurfaceKHR} (not null)
      * @param descriptorSetLayoutHandle the handle of the descriptor-set layout
-     * for the UBO
-     * @param desiredWidth the desired framebuffer width (in pixels)
-     * @param desiredHeight the desired framebuffer height (in pixels)
-     * @param depthFormat the depth-buffer format
-     * @param samplerHandle the handle of the VkSampler for textures
+     * (not null)
+     * @param desiredWidth the desired framebuffer width (in pixels, &gt;0)
+     * @param desiredHeight the desired framebuffer height (in pixels, &gt;0)
+     * @param depthFormat the desired depth-buffer format
+     * @param samplerHandle the handle of the {@code VkSampler} for textures
+     * (not null)
      * @param pipelineLayoutHandle the handle of the graphics-pipeline layout
+     * (not null)
      */
     ChainResources(SurfaceSummary surface, long descriptorSetLayoutHandle,
             int desiredWidth, int desiredHeight,
@@ -182,18 +184,18 @@ class ChainResources {
     // new methods exposed
 
     /**
-     * Return the swap-chain handle.
+     * Access the swap chain.
      *
-     * @return the handle of the pre-existing VkSwapchainKHR
+     * @return the handle of the pre-existing {@code VkSwapchainKHR} (not null)
      */
     long chainHandle() {
         return chainHandle;
     }
 
     /**
-     * Count the images in the chain.
+     * Count the presentation images in the swap chain.
      *
-     * @return the count (&ge;1)
+     * @return the count (&gt;0)
      */
     int countImages() {
         return numImages;
@@ -338,9 +340,9 @@ class ChainResources {
     }
 
     /**
-     * Return the render-pass handle.
+     * Access the render pass.
      *
-     * @return the handle of the pre-existing VkRenderPass (not VK_NULL_HANDLE)
+     * @return the handle of the pre-existing {@code VkRenderPass} (not null)
      */
     long passHandle() {
         assert passHandle != VK10.VK_NULL_HANDLE;
@@ -428,8 +430,8 @@ class ChainResources {
     /**
      * Choose the number of images in the chain.
      *
-     * @param surface the features of a active VkSurfaceKHR (not null)
-     * @return the count (&ge;1)
+     * @param surface the features of a active surface (not null)
+     * @return the count (&gt;0)
      */
     private static int chooseNumImages(SurfaceSummary surface) {
         /*
@@ -452,7 +454,7 @@ class ChainResources {
     }
 
     /**
-     * Create a VkSwapchainKHR during initialization.
+     * Create a swap chain.
      *
      * @param framebufferExtent the desired framebuffer dimensions (not null)
      * @param imageFormat the desired image format
@@ -460,14 +462,13 @@ class ChainResources {
      * @param surface the features of a active VkSurfaceKHR (not null)
      * @param surfaceFormat the desired surface format (not null)
      * @param queueFamilies a summary of the available queue families (not null)
-     * @return the handle of the new VkSwapchainKHR
+     * @return the handle of the new {@code VkSwapchainKHR}
      */
     private static long createChain(VkExtent2D framebufferExtent,
             int imageFormat, int numImages, SurfaceSummary surface,
             VkSurfaceFormatKHR surfaceFormat,
             QueueFamilySummary queueFamilies) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
-            // swap-chain creation information:
             VkSwapchainCreateInfoKHR createInfo
                     = VkSwapchainCreateInfoKHR.calloc(stack);
             createInfo.sType(
@@ -617,7 +618,7 @@ class ChainResources {
      * @param color the (transient) color attachment for each framebuffer (may
      * be null)
      * @param depth the depth attachment for each framebuffer (not null)
-     * @return the handle of the new VkRenderPass
+     * @return the handle of the new {@code VkRenderPass} (not null)
      */
     private static long createPass(
             int imageFormat, Attachment color, Attachment depth) {
@@ -746,22 +747,23 @@ class ChainResources {
     }
 
     /**
-     * Create the descriptor-set pool for UBOs and samplers.
+     * Create the descriptor-set pool for UBO descriptors and sampler
+     * descriptors.
      *
      * @param poolSize the desired number of descriptors of each type
-     * @return the handle of the new VkDescriptorPool
+     * @return the handle of the new {@code VkDescriptorPool} (not null)
      */
     private static long createPool(int poolSize) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             VkDescriptorPoolSize.Buffer pPoolSizes
                     = VkDescriptorPoolSize.calloc(2, stack);
 
-            // The UBO descriptor pool will contain numImages descriptors:
+            // The UBO descriptor pool will contain poolSize descriptors:
             VkDescriptorPoolSize uboPool = pPoolSizes.get(0);
             uboPool.type(VK10.VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
             uboPool.descriptorCount(poolSize);
 
-            // The sampler descriptor pool will contain numImages descriptors:
+            // The sampler descriptor pool will contain poolSize descriptors:
             VkDescriptorPoolSize samplerPool = pPoolSizes.get(1);
             samplerPool.type(VK10.VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
             samplerPool.descriptorCount(poolSize);
@@ -789,9 +791,9 @@ class ChainResources {
     }
 
     /**
-     * Enumerate the images created by KHRSwapchain.
+     * Enumerate the images created by a KHRSwapchain.
      *
-     * @param chainHandle the handle of the VkSwapchainKHR
+     * @param chainHandle the handle of the {@code VkSwapchainKHR} (not null)
      * @return a new List of {@code VkImage} handles
      */
     private static List<Long> listImages(long chainHandle) {
@@ -804,7 +806,7 @@ class ChainResources {
             Utils.checkForError(retCode, "count swap-chain images");
             int numImages = pCount.get(0);
 
-            // Enumerate the images:
+            // Enumerate the presentation images:
             LongBuffer pHandles = stack.mallocLong(numImages);
             retCode = KHRSwapchain.vkGetSwapchainImagesKHR(
                     vkDevice, chainHandle, pCount, pHandles);

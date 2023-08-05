@@ -81,7 +81,7 @@ final public class IndexBuffer extends jme3utilities.lbj.IndexBuffer {
     // new methods exposed
 
     /**
-     * Destroy all resources owned by this IndexBuffer.
+     * Destroy the buffer resource.
      */
     void destroy() {
         if (bufferResource != null) {
@@ -93,16 +93,17 @@ final public class IndexBuffer extends jme3utilities.lbj.IndexBuffer {
     /**
      * Return the type of index.
      *
-     * @return either
+     * @return either {@code VK_INDEX_TYPE_UINT16} or
+     * {@code VK_INDEX_TYPE_UINT32}
      */
     int elementType() {
         return elementType;
     }
 
     /**
-     * Return the handle of the buffer resource.
+     * Access the underlying {@code VkBuffer}.
      *
-     * @return the handle
+     * @return the handle (not null)
      */
     long handle() {
         long result = bufferResource.handle();

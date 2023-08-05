@@ -53,8 +53,8 @@ import org.lwjgl.vulkan.VkQueue;
 import org.lwjgl.vulkan.VkSemaphoreCreateInfo;
 
 /**
- * Encapsulate a Vulkan logical device, used to allocate command buffers,
- * images, and mappable buffers.
+ * Encapsulate a logical device, used to allocate resources such as command
+ * buffers, images, mappable buffers, pipelines, semaphores, and shader modules.
  *
  * @author Stephen Gold sgold@sonic.net
  *
@@ -91,7 +91,7 @@ public class LogicalDevice {
     // new methods exposed
 
     /**
-     * Allocate command buffers from this device as needed.
+     * Allocate command buffers from the device as needed.
      *
      * @param numBuffersNeeded the total number of command buffers needed
      * @param addBuffers storage for allocated command buffers (not null, added
@@ -120,9 +120,9 @@ public class LogicalDevice {
     }
 
     /**
-     * Allocate a single command buffer from this device.
+     * Allocate a single command buffer from the device.
      *
-     * @return the new instance (not null)
+     * @return the new {@code VkCommandBuffer} (not null)
      */
     VkCommandBuffer allocateCommandBuffer() {
         try (MemoryStack stack = MemoryStack.stackPush()) {
@@ -218,12 +218,12 @@ public class LogicalDevice {
     /**
      * Create a view for the specified image.
      *
-     * @param imageHandle the handle of the image (not VK_NULL_HANDLE)
+     * @param imageHandle the handle of the image (not null)
      * @param format the desired format for the view
      * @param aspectMask a bitmask of VK_IMAGE_ASPECT_... values
      * @param numMipLevels the desired number of MIP levels (including the
      * original image, &ge;1, &le;31)
-     * @return the handle of the new VkImageView (not VK_NULL_HANDLE)
+     * @return the handle of the new {@code VkImageView} (not null)
      */
     long createImageView(
             long imageHandle, int format, int aspectMask, int numMipLevels) {
@@ -328,9 +328,9 @@ public class LogicalDevice {
     }
 
     /**
-     * Create an image-available queue semaphore in the unsignaled state.
+     * Create an image-available queue semaphore in the un-signaled state.
      *
-     * @return the handle of the new VkSemaphore
+     * @return the handle of the new {@code VkSemaphore} (not null)
      */
     long createSemaphore() {
         try (MemoryStack stack = MemoryStack.stackPush()) {
@@ -349,8 +349,8 @@ public class LogicalDevice {
     }
 
     /**
-     * Update all resources dependent on this device and then destroy the
-     * underlying VkDevice.
+     * Destroy all resources that depend on this device and then destroy the
+     * underlying {@code VkDevice}.
      *
      * @return null
      */
@@ -370,8 +370,8 @@ public class LogicalDevice {
     /**
      * Destroy the specified device buffer, if any.
      *
-     * @param handle the handle of the VkBuffer to destroy, or VK_NULL_HANDLE
-     * @return VK_NULL_HANDLE
+     * @param handle the handle of the {@code VkBuffer} to destroy, or null
+     * @return null
      */
     long destroyBuffer(long handle) {
         if (handle != VK10.VK_NULL_HANDLE) {
@@ -384,8 +384,8 @@ public class LogicalDevice {
     /**
      * Destroy the specified image, if any.
      *
-     * @param handle the handle of the VkImage to destroy, or VK_NULL_HANDLE
-     * @return VK_NULL_HANDLE
+     * @param handle the handle of the {@code VkImage} to destroy, or null
+     * @return null
      */
     long destroyImage(long handle) {
         if (handle != VK10.VK_NULL_HANDLE) {
@@ -398,8 +398,8 @@ public class LogicalDevice {
     /**
      * Destroy the specified image view, if any.
      *
-     * @param handle the handle of the VkImageView to destroy, or VK_NULL_HANDLE
-     * @return VK_NULL_HANDLE
+     * @param handle the handle of the {@code VkImageView} to destroy, or null
+     * @return null
      */
     long destroyImageView(long handle) {
         if (handle != VK10.VK_NULL_HANDLE) {
@@ -412,8 +412,8 @@ public class LogicalDevice {
     /**
      * Destroy the specified semaphore, if any.
      *
-     * @param handle the handle of the VkSemaphore to destroy, or VK_NULL_HANDLE
-     * @return VK_NULL_HANDLE
+     * @param handle the handle of the {@code VkSemaphore} to destroy, or null
+     * @return null
      */
     long destroySemaphore(long handle) {
         if (handle != VK10.VK_NULL_HANDLE) {
@@ -426,9 +426,9 @@ public class LogicalDevice {
     /**
      * Destroy the specified shader module, if any.
      *
-     * @param handle the handle of the VkShaderModule to destroy, or
-     * VK_NULL_HANDLE
-     * @return VK_NULL_HANDLE
+     * @param handle the handle of the {@code VkShaderModule} to destroy, or
+     * null
+     * @return null
      */
     long destroyShaderModule(long handle) {
         if (handle != VK10.VK_NULL_HANDLE) {
@@ -442,8 +442,8 @@ public class LogicalDevice {
      * Free the specified device memory, if any. If the memory is mapped, it is
      * implicitly unmapped.
      *
-     * @param handle the handle of the VkDeviceMemory to free, or VK_NULL_HANDLE
-     * @return VK_NULL_HANDLE
+     * @param handle the handle of the {@code VkDeviceMemory} to free, or null
+     * @return null
      */
     long freeMemory(long handle) {
         if (handle != VK10.VK_NULL_HANDLE) {

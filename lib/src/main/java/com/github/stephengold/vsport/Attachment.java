@@ -57,7 +57,7 @@ class Attachment {
      */
     final int format;
     /**
-     * number of samples per pixel (&ge;1)
+     * number of samples per pixel (&gt;0)
      */
     final int numSamples;
     /**
@@ -73,7 +73,7 @@ class Attachment {
      * @param format the desired image format
      * @param extent the desired extent (in pixels, not null, unaffected)
      * @param aspectMask the desired aspect (a VK10.VK_IMAGE_ASPECT_... bit)
-     * @param numSamples the desired number of samples per pixel (&ge;1)
+     * @param numSamples the desired number of samples per pixel (&gt;0)
      */
     Attachment(int format, VkExtent2D extent, int aspectMask, int numSamples) {
         this.format = format;
@@ -138,7 +138,7 @@ class Attachment {
     }
 
     /**
-     * Destroy all owned resources.
+     * Destroy all resources owned by the attachment.
      *
      * @return null
      */
@@ -162,9 +162,9 @@ class Attachment {
     }
 
     /**
-     * Return the handle of the VkImageView.
+     * Access the image view.
      *
-     * @return the handle (not null)
+     * @return the handle of the pre-existing {@code VkImageView} (not null)
      */
     long viewHandle() {
         assert viewHandle != VK10.VK_NULL_HANDLE;

@@ -206,11 +206,12 @@ class SurfaceSummary {
     }
 
     /**
-     * Return the handle of the VkSurfaceKH being analyzed.
+     * Access the underlying {@code VkSurfaceKHR}.
      *
-     * @return the handle
+     * @return the handle (not null)
      */
     long handle() {
+        assert surfaceHandle != VK10.VK_NULL_HANDLE;
         return surfaceHandle;
     }
 
@@ -235,9 +236,9 @@ class SurfaceSummary {
     }
 
     /**
-     * Return the maximum number of swapchain images supported.
+     * Return the maximum number of swap-chain images supported.
      *
-     * @return the count (&gt;1), or zero for no limit
+     * @return the count (&ge;2), or zero for no limit
      */
     int maxImageCount() {
         int result = capabilities.maxImageCount();
@@ -247,9 +248,9 @@ class SurfaceSummary {
     }
 
     /**
-     * Return the minimum number of swapchain images supported.
+     * Return the minimum number of swap-chain images supported.
      *
-     * @return the count (&ge;1)
+     * @return the count (&gt;0)
      */
     int minImageCount() {
         int result = capabilities.minImageCount();
