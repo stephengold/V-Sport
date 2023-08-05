@@ -29,6 +29,7 @@
  */
 package com.github.stephengold.vsport;
 
+import jme3utilities.Validate;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.vulkan.VK10;
@@ -47,41 +48,30 @@ import org.lwjgl.vulkan.VkQueue;
 import org.lwjgl.vulkan.VkSubmitInfo;
 
 /**
- * Encapsulate a Vulkan command buffer, typically for a single use.
+ * A container for commands to be submitted to a queue.
  *
  * @author Stephen Gold sgold@sonic.net
  *
  * Derived from Cristian Herrera's Vulkan-Tutorial-Java project.
  */
-public class Commands {
+class CommandSequence {
     // *************************************************************************
     // fields
 
     /**
-     * command buffer allocated from the default pool
+     * underlying command buffer
      */
-    private VkCommandBuffer commandBuffer;
+    private VkCommandBuffer vkCommandBuffer;
     // *************************************************************************
     // constructors
 
     /**
-     * Begin recording a single-use command sequence.
+     * Instantiate a new sequence, allocating the command buffer from the
+     * default pool.
      */
-    Commands() {
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            // Allocate a temporary command buffer:
-            LogicalDevice logicalDevice = BaseApplication.getLogicalDevice();
-            this.commandBuffer = logicalDevice.allocateCommandBuffer();
-
-            VkCommandBufferBeginInfo beginInfo
-                    = VkCommandBufferBeginInfo.calloc(stack);
-            beginInfo.sType(VK10.VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO);
-
-            beginInfo.flags(VK10.VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
-
-            int retCode = VK10.vkBeginCommandBuffer(commandBuffer, beginInfo);
-            Utils.checkForError(retCode, "begin recording commands");
-        }
+    CommandSequence() {
+        LogicalDevice logicalDevice = BaseApplication.getLogicalDevice();
+        this.vkCommandBuffer = logicalDevice.allocateCommandBuffer();
     }
     // *************************************************************************
     // new methods exposed
@@ -94,13 +84,12 @@ public class Commands {
      * @param pImBarriers the image-memory pipeline barriers to use
      * @return the current sequence (for chaining)
      */
-    Commands addBarrier(int sourceStages, int destStages,
+    CommandSequence addBarrier(int sourceStages, int destStages,
             VkImageMemoryBarrier.Buffer pImBarriers) {
         int dependencyFlags = 0x0;
         VkMemoryBarrier.Buffer pMemoryBarriers = null;
         VkBufferMemoryBarrier.Buffer pBmBarriers = null;
-
-        VK10.vkCmdPipelineBarrier(commandBuffer, sourceStages, destStages,
+        VK10.vkCmdPipelineBarrier(vkCommandBuffer, sourceStages, destStages,
                 dependencyFlags, pMemoryBarriers, pBmBarriers, pImBarriers);
 
         return this;
@@ -114,9 +103,9 @@ public class Commands {
      * @param pBlits the regions to be blitted
      * @return the current sequence (for chaining)
      */
-    Commands addBlit(DeviceImage image, VkImageBlit.Buffer pBlits) {
+    CommandSequence addBlit(DeviceImage image, VkImageBlit.Buffer pBlits) {
         long imageHandle = image.imageHandle();
-        VK10.vkCmdBlitImage(commandBuffer,
+        VK10.vkCmdBlitImage(vkCommandBuffer,
                 imageHandle, VK10.VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
                 imageHandle, VK10.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
                 pBlits, VK10.VK_FILTER_LINEAR);
@@ -132,7 +121,7 @@ public class Commands {
      * source)
      * @return the current sequence (for chaining)
      */
-    Commands addCopyBufferToBuffer(
+    CommandSequence addCopyBufferToBuffer(
             MappableBuffer source, MappableBuffer destination) {
         int numBytes = source.numBytes();
         assert destination.numBytes() == source.numBytes();
@@ -147,7 +136,7 @@ public class Commands {
             pRegion.srcOffset(0);
 
             VK10.vkCmdCopyBuffer(
-                    commandBuffer, sourceHandle, destHandle, pRegion);
+                    vkCommandBuffer, sourceHandle, destHandle, pRegion);
         }
 
         return this;
@@ -161,7 +150,7 @@ public class Commands {
      * @param destination the destination image (not null)
      * @return the current sequence (for chaining)
      */
-    Commands addCopyBufferToImage(
+    CommandSequence addCopyBufferToImage(
             MappableBuffer source, DeviceImage destination) {
         long bufferHandle = source.vkBufferHandle();
         long imageHandle = destination.imageHandle();
@@ -188,7 +177,7 @@ public class Commands {
             sub.mipLevel(0);
 
             VK10.vkCmdCopyBufferToImage(
-                    commandBuffer, bufferHandle, imageHandle,
+                    vkCommandBuffer, bufferHandle, imageHandle,
                     VK10.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, pRegions);
         }
 
@@ -196,38 +185,81 @@ public class Commands {
     }
 
     /**
-     * Terminate the sequence, submit it to a queue with graphics capabilities,
-     * wait for it to complete, and free the command buffer.
+     * Free the underlying {@code VkCommandBuffer}.
+     *
+     * @return null
      */
-    void submitToGraphicsQueue() {
+    CommandSequence destroy() {
+        VkDevice vkDevice = BaseApplication.getVkDevice();
+        long commandPoolHandle = BaseApplication.commandPoolHandle();
+        VK10.vkFreeCommandBuffers(vkDevice, commandPoolHandle, vkCommandBuffer);
+        this.vkCommandBuffer = null;
+
+        return null;
+    }
+
+    /**
+     * Terminate the recorded sequence, but don't submit it yet.
+     *
+     * @return the modified sequence, for chaining
+     */
+    CommandSequence end() {
+        int retCode = VK10.vkEndCommandBuffer(vkCommandBuffer);
+        Utils.checkForError(retCode, "terminate a command sequence");
+
+        return this;
+    }
+
+    /**
+     * Begin recording a new series of commands.
+     *
+     * @param flags the flags to pass to {@code vkBeginCommandBuffer()}
+     * @return the modified sequence, for chaining
+     */
+    CommandSequence reset(int flags) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
-            int retCode = VK10.vkEndCommandBuffer(commandBuffer);
-            Utils.checkForError(retCode, "terminate a command sequence");
+            VkCommandBufferBeginInfo beginInfo
+                    = VkCommandBufferBeginInfo.calloc(stack);
+            beginInfo.sType(VK10.VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO);
 
-            // info to submit a command buffer to the graphics queue:
-            VkSubmitInfo.Buffer pSubmitInfo = VkSubmitInfo.calloc(1, stack);
-            pSubmitInfo.sType(VK10.VK_STRUCTURE_TYPE_SUBMIT_INFO);
+            beginInfo.flags(flags);
 
-            PointerBuffer pCommandBuffer = stack.pointers(commandBuffer);
-            pSubmitInfo.pCommandBuffers(pCommandBuffer);
+            int retCode = VK10.vkBeginCommandBuffer(vkCommandBuffer, beginInfo);
+            Utils.checkForError(retCode, "begin recording commands");
+        }
 
-            // Submit the command buffer to the graphics queue:
-            VkQueue queue = BaseApplication.getGraphicsQueue();
+        return this;
+    }
+
+    /**
+     * Submit the recorded sequence to the specified queue and wait for it to
+     * complete.
+     *
+     * @param queue the queue to submit to (not null)
+     * @return the current sequence, for chaining
+     */
+    CommandSequence submitTo(VkQueue queue) {
+        Validate.nonNull(queue, "queue");
+
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            // Submit to the queue:
+            VkSubmitInfo submitInfo = VkSubmitInfo.calloc(stack);
+            submitInfo.sType(VK10.VK_STRUCTURE_TYPE_SUBMIT_INFO);
+
+            PointerBuffer pCommandBuffer = stack.pointers(vkCommandBuffer);
+            submitInfo.pCommandBuffers(pCommandBuffer);
+
             long fenceHandle = VK10.VK_NULL_HANDLE;
-            retCode = VK10.vkQueueSubmit(queue, pSubmitInfo, fenceHandle);
-            Utils.checkForError(retCode, "submit a command sequence");
+            int retCode = VK10.vkQueueSubmit(queue, submitInfo, fenceHandle);
+            Utils.checkForError(
+                    retCode, "submit a command sequence to a queue");
 
             // Wait until the graphics queue is idle:
             // TODO use a fence to submit multiple command sequences in parallel
             retCode = VK10.vkQueueWaitIdle(queue);
             Utils.checkForError(retCode, "wait for a queue to be idle");
 
-            // Free the command buffer:
-            VkDevice vkDevice = BaseApplication.getVkDevice();
-            long commandPoolHandle = BaseApplication.commandPoolHandle();
-            VK10.vkFreeCommandBuffers(
-                    vkDevice, commandPoolHandle, commandBuffer);
-            this.commandBuffer = null;
+            return this;
         }
     }
 }

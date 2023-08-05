@@ -278,7 +278,7 @@ public class Texture extends DeviceResource {
             barrierRange.layerCount(layerCount);
             barrierRange.levelCount(1);
 
-            Commands commands = new Commands();
+            SingleUse commandSequence = new SingleUse();
             int destinationStage;
             int sourceStage;
 
@@ -300,7 +300,8 @@ public class Texture extends DeviceResource {
 
                 sourceStage = VK10.VK_PIPELINE_STAGE_TRANSFER_BIT;
                 destinationStage = VK10.VK_PIPELINE_STAGE_TRANSFER_BIT;
-                commands.addBarrier(sourceStage, destinationStage, pBarrier);
+                commandSequence.addBarrier(
+                        sourceStage, destinationStage, pBarrier);
 
                 // Command to blit from the source level to the next level:
                 VkImageBlit.Buffer blit = VkImageBlit.calloc(1, stack);
@@ -321,7 +322,7 @@ public class Texture extends DeviceResource {
                 srcRange.layerCount(layerCount);
                 srcRange.mipLevel(srcLevel);
 
-                commands.addBlit(deviceImage, blit);
+                commandSequence.addBlit(deviceImage, blit);
                 /*
                  * Command to wait until the blit is finished and then optimize
                  * the source level for being read by fragment shaders:
@@ -335,7 +336,8 @@ public class Texture extends DeviceResource {
 
                 sourceStage = VK10.VK_PIPELINE_STAGE_TRANSFER_BIT;
                 destinationStage = VK10.VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-                commands.addBarrier(sourceStage, destinationStage, pBarrier);
+                commandSequence.addBarrier(
+                        sourceStage, destinationStage, pBarrier);
 
                 // The current destination level becomes the next source level:
                 srcWidth = dstWidth;
@@ -353,9 +355,9 @@ public class Texture extends DeviceResource {
 
             sourceStage = VK10.VK_PIPELINE_STAGE_TRANSFER_BIT;
             destinationStage = VK10.VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-            commands.addBarrier(sourceStage, destinationStage, pBarrier);
+            commandSequence.addBarrier(sourceStage, destinationStage, pBarrier);
 
-            commands.submitToGraphicsQueue();
+            commandSequence.submitToGraphicsQueue();
         }
     }
 

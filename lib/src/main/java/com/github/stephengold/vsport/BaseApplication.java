@@ -381,9 +381,9 @@ public abstract class BaseApplication {
                         + " to layout=" + newLayout);
             }
 
-            Commands commandBuffer = new Commands();
-            commandBuffer.addBarrier(sourceStage, destinationStage, pBarrier);
-            commandBuffer.submitToGraphicsQueue();
+            SingleUse commandSequence = new SingleUse();
+            commandSequence.addBarrier(sourceStage, destinationStage, pBarrier);
+            commandSequence.submitToGraphicsQueue();
         }
     }
 
@@ -421,9 +421,9 @@ public abstract class BaseApplication {
         Validate.nonNull(destination, "destination");
         assert destination.numBytes() == source.numBytes();
 
-        Commands commands = new Commands();
-        commands.addCopyBufferToBuffer(source, destination);
-        commands.submitToGraphicsQueue();
+        SingleUse commandSequence = new SingleUse();
+        commandSequence.addCopyBufferToBuffer(source, destination);
+        commandSequence.submitToGraphicsQueue();
     }
 
     /**
@@ -437,9 +437,9 @@ public abstract class BaseApplication {
         Validate.nonNull(sourceBuffer, "source buffer");
         Validate.nonNull(destinationImage, "destination image");
 
-        Commands commands = new Commands();
-        commands.addCopyBufferToImage(sourceBuffer, destinationImage);
-        commands.submitToGraphicsQueue();
+        SingleUse commandSequence = new SingleUse();
+        commandSequence.addCopyBufferToImage(sourceBuffer, destinationImage);
+        commandSequence.submitToGraphicsQueue();
     }
 
     /**
