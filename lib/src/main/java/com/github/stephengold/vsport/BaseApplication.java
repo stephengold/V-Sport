@@ -155,6 +155,10 @@ public abstract class BaseApplication {
      */
     private static ChainResources chainResources;
     /**
+     * geometry to be rendered
+     */
+    private static Geometry sampleGeometry;
+    /**
      * synchronization objects for frames in flight
      */
     private static Frame[] inFlightFrames;
@@ -231,15 +235,6 @@ public abstract class BaseApplication {
     final private static Map<TextureKey, Texture> textureMap
             = new HashMap<>(16);
     /**
-     * mesh of triangles to be rendered
-     */
-    private static Mesh sampleMesh;
-    /**
-     * values to be written to the non-global UBO
-     */
-    final private static NonGlobalUniformValues nguValues
-            = new NonGlobalUniformValues();
-    /**
      * physical device to display the main window
      */
     private static PhysicalDevice physicalDevice;
@@ -251,14 +246,6 @@ public abstract class BaseApplication {
      * names of validation layers to enable during initialization
      */
     final private static Set<String> requiredLayers = new HashSet<>();
-    /**
-     * shader modules for rendering
-     */
-    private static ShaderProgram shaderProgram;
-    /**
-     * sample texture for texture mapping
-     */
-    private static Texture sampleTexture;
     /**
      * values to be written to the global UBO
      */
@@ -732,10 +719,6 @@ public abstract class BaseApplication {
          * starting with the chain resources:
          */
         destroyChainResources();
-        if (shaderProgram != null) {
-            shaderProgram.destroy();
-            shaderProgram = null;
-        }
 
         // Destroy the pipeline layout:
         if (pipelineLayoutHandle != VK10.VK_NULL_HANDLE) {
@@ -751,20 +734,10 @@ public abstract class BaseApplication {
             descriptorSetLayoutHandle = VK10.VK_NULL_HANDLE;
         }
 
-        if (sampleMesh != null) {
-            sampleMesh.destroy();
-        }
-
         // Destroy the texture sampler:
         if (samplerHandle != VK10.VK_NULL_HANDLE) {
             VK10.vkDestroySampler(vkDevice, samplerHandle, defaultAllocator);
             samplerHandle = VK10.VK_NULL_HANDLE;
-        }
-
-        // Destroy the sample texture:
-        if (sampleTexture != null) {
-            sampleTexture.destroy();
-            sampleTexture = null;
         }
 
         // Destroy the command pool and its buffers:
@@ -843,6 +816,8 @@ public abstract class BaseApplication {
                     = chainResources.framebufferExtent(stack);
 
             long passHandle = chainResources.passHandle();
+            Mesh sampleMesh = sampleGeometry.getMesh();
+            ShaderProgram shaderProgram = sampleGeometry.getProgram();
             pipelineHandle = createPipeline(pipelineLayoutHandle,
                     framebufferExtent, passHandle, sampleMesh, shaderProgram);
 
@@ -1447,21 +1422,23 @@ public abstract class BaseApplication {
         createLogicalDevice();
         createCommandPool();
 
-        String resourceName = "/Models/viking_room/viking_room.obj";
-        int flags = Assimp.aiProcess_DropNormals | Assimp.aiProcess_FlipUVs;
+        String modelName = "/Models/viking_room/viking_room.obj";
+        int postFlags = Assimp.aiProcess_DropNormals | Assimp.aiProcess_FlipUVs;
         List<Integer> indices = null;
         List<Vertex> vertices = new ArrayList<>();
-        AssimpUtils.extractTriangles(resourceName, flags, indices, vertices);
-        sampleMesh = Mesh.newInstance(vertices);
+        AssimpUtils.extractTriangles(modelName, postFlags, indices, vertices);
+        Mesh sampleMesh = Mesh.newInstance(vertices);
 
-        TextureKey key = new TextureKey(
+        TextureKey textureKey = new TextureKey(
                 "classpath:/Models/viking_room/viking_room.png");
-        sampleTexture = getTexture(key);
+
+        sampleGeometry = new Geometry(sampleMesh);
+        sampleGeometry.setProgram("Unshaded/Texture");
+        sampleGeometry.setTexture(textureKey);
+
         createTextureSampler(); // depends on the logical device
         createDescriptorSetLayout(); // depends on the logical device
         pipelineLayoutHandle = createPipelineLayout();
-
-        shaderProgram = getProgram("Unshaded/Texture");
 
         createChainResources();
     }
@@ -1589,6 +1566,7 @@ public abstract class BaseApplication {
 
             // command to bind the vertex buffers:
             int firstBinding = 0;
+            Mesh sampleMesh = sampleGeometry.getMesh();
             int numAttributes = sampleMesh.countAttributes();
             LongBuffer pBufferHandles
                     = sampleMesh.generateBufferHandles(stack);
@@ -1720,6 +1698,7 @@ public abstract class BaseApplication {
                     = chainResources.getNonGlobalUbo(imageIndex);
             long descriptorSetHandle
                     = chainResources.descriptorSetHandle(imageIndex);
+            Texture sampleTexture = sampleGeometry.getTexture();
             updateDescriptorSet(sampleTexture, samplerHandle, globalUbo,
                     nonGlobalUbo, descriptorSetHandle);
 
@@ -1931,7 +1910,7 @@ public abstract class BaseApplication {
                 = chainResources.getGlobalUbo(imageIndex).getData();
         uniformValues.writeTo(byteBuffer);
 
-        byteBuffer = chainResources.getNonGlobalUbo(imageIndex).getData();
-        nguValues.writeTo(byteBuffer);
+        BufferResource ngUbo = chainResources.getNonGlobalUbo(imageIndex);
+        sampleGeometry.writeUniformValuesTo(ngUbo);
     }
 }
