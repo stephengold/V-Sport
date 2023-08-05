@@ -57,7 +57,7 @@ abstract class DeviceResource implements Comparable<DeviceResource> {
      */
     protected DeviceResource() {
         this.lookupId = nextId.getAndIncrement();
-        LogicalDevice.resourceSet.add(this);
+        LogicalDevice.trackResource(this);
     }
     // *************************************************************************
     // new methods exposed
@@ -76,7 +76,7 @@ abstract class DeviceResource implements Comparable<DeviceResource> {
      * Callback when the subclass is being destroyed.
      */
     protected void destroy() {
-        LogicalDevice.resourceSet.remove(this);
+        LogicalDevice.stopTrackingResource(this);
     }
     // *************************************************************************
     // Comparable methods

@@ -31,6 +31,7 @@ package com.github.stephengold.vsport;
 
 import java.nio.ByteBuffer;
 import java.nio.LongBuffer;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -67,11 +68,12 @@ public class LogicalDevice {
     /**
      * all device-dependent resources
      */
-    final static Set<DeviceResource> resourceSet = new TreeSet<>();
+    final private static Collection<DeviceResource> resourceSet
+            = new TreeSet<>();
     /**
      * allocator for direct buffers
      */
-    final VkAllocationCallbacks allocator;
+    private final VkAllocationCallbacks allocator;
     /**
      * underlying lwjgl-vulkan device
      */
