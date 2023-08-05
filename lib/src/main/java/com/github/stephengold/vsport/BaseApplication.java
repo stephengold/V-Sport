@@ -1440,6 +1440,7 @@ public abstract class BaseApplication {
         selectPhysicalDevice();
 
         depthBufferFormat = chooseDepthBufferFormat();
+        System.out.println("depthBufferFormat = " + depthBufferFormat);
         numMsaaSamples = physicalDevice.maxNumSamples();
         System.out.println("numSamples = " + numMsaaSamples);
 
@@ -1801,11 +1802,12 @@ public abstract class BaseApplication {
                 throw new RuntimeException(
                         "Didn't find a physical device with Vulkan support");
             }
+            System.out.println("numDevices = " + numDevices);
 
             PointerBuffer pPointers = stack.mallocPointer(numDevices);
             retCode = VK10.vkEnumeratePhysicalDevices(
                     vkInstance, pCount, pPointers);
-            Utils.checkForError(retCode, "enumerate physicsl devices");
+            Utils.checkForError(retCode, "enumerate physical devices");
 
             // Select the most suitable device:
             physicalDevice = null;

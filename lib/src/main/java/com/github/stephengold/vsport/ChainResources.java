@@ -739,7 +739,7 @@ class ChainResources {
             LongBuffer pHandle = stack.mallocLong(1);
             int retCode = VK10.vkCreateRenderPass(
                     vkDevice, createInfo, allocator, pHandle);
-            Utils.checkForError(retCode, "create reander pass");
+            Utils.checkForError(retCode, "create render pass");
             long result = pHandle.get(0);
 
             return result;
@@ -803,14 +803,14 @@ class ChainResources {
             IntBuffer pCount = stack.mallocInt(1);
             int retCode = KHRSwapchain.vkGetSwapchainImagesKHR(
                     vkDevice, chainHandle, pCount, null);
-            Utils.checkForError(retCode, "count swap-chain images");
+            Utils.checkForError(retCode, "count presentation images");
             int numImages = pCount.get(0);
 
             // Enumerate the presentation images:
             LongBuffer pHandles = stack.mallocLong(numImages);
             retCode = KHRSwapchain.vkGetSwapchainImagesKHR(
                     vkDevice, chainHandle, pCount, pHandles);
-            Utils.checkForError(retCode, "enumerate swap-chain images");
+            Utils.checkForError(retCode, "enumerate presentation images");
 
             // Collect the image handles into a list:
             List<Long> result = new ArrayList<>(numImages);
