@@ -105,6 +105,16 @@ public class Geometry {
     }
 
     /**
+     * Access the Texture.
+     *
+     * @return the pre-existing instance (not null)
+     */
+    Texture getTexture() {
+        assert texture != null;
+        return texture;
+    }
+
+    /**
      * Replace the geometry's Mesh with the specified Mesh.
      *
      * @param newMesh the desired Mesh (not null, alias created)
