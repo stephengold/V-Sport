@@ -29,6 +29,7 @@
  */
 package com.github.stephengold.vsport;
 
+import java.nio.ByteBuffer;
 import jme3utilities.Validate;
 
 /**
@@ -43,6 +44,11 @@ public class Geometry {
      * draw mode and vertex data for visualization
      */
     private Mesh mesh;
+    /**
+     * values to be written to the non-global UBO
+     */
+    final private NonGlobalUniformValues uniformValues
+            = new NonGlobalUniformValues();
     /**
      * rendering program
      */
@@ -148,6 +154,16 @@ public class Geometry {
     long textureViewHandle() {
         long result = texture.viewHandle();
         return result;
+    }
+
+    /**
+     * Write the uniform values to the specified UBO.
+     *
+     * @param ubo the target resource (not null)
+     */
+    void writeUniformValuesTo(BufferResource ubo) {
+        ByteBuffer byteBuffer = ubo.getData();
+        uniformValues.writeTo(byteBuffer);
     }
     // *************************************************************************
     // private methods
