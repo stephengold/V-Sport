@@ -411,6 +411,20 @@ public class LogicalDevice {
     }
 
     /**
+     * Destroy the specified pipeline, if any.
+     *
+     * @param handle the handle of the {@code VkPipeline} to destroy, or null
+     * @return null
+     */
+    long destroyPipeline(long handle) {
+        if (handle != VK10.VK_NULL_HANDLE) {
+            VK10.vkDestroyPipeline(vkDevice, handle, allocator);
+        }
+
+        return VK10.VK_NULL_HANDLE;
+    }
+
+    /**
      * Destroy the specified semaphore, if any.
      *
      * @param handle the handle of the {@code VkSemaphore} to destroy, or null
@@ -505,6 +519,30 @@ public class LogicalDevice {
             ByteBuffer result = pPointer.getByteBuffer(index, numBytes);
             return result;
         }
+    }
+
+    /**
+     * Stop tracking the specified resource.
+     *
+     * @param resource the resource to stop tracking (not null)
+     */
+    static void stopTrackingResource(DeviceResource resource) {
+        Validate.nonNull(resource, "resource");
+        assert resourceSet.contains(resource);
+
+        resourceSet.remove(resource);
+    }
+
+    /**
+     * Begin tracking the specified resource.
+     *
+     * @param resource the resource to track (not null)
+     */
+    static void trackResource(DeviceResource resource) {
+        Validate.nonNull(resource, "resource");
+        assert !resourceSet.contains(resource);
+
+        resourceSet.add(resource);
     }
 
     /**
