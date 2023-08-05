@@ -29,6 +29,8 @@
  */
 package com.github.stephengold.vsport;
 
+import java.nio.IntBuffer;
+import java.nio.LongBuffer;
 import jme3utilities.Validate;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.system.MemoryStack;
@@ -36,15 +38,22 @@ import org.lwjgl.vulkan.VK10;
 import org.lwjgl.vulkan.VkBufferCopy;
 import org.lwjgl.vulkan.VkBufferImageCopy;
 import org.lwjgl.vulkan.VkBufferMemoryBarrier;
+import org.lwjgl.vulkan.VkClearColorValue;
+import org.lwjgl.vulkan.VkClearDepthStencilValue;
+import org.lwjgl.vulkan.VkClearValue;
 import org.lwjgl.vulkan.VkCommandBuffer;
 import org.lwjgl.vulkan.VkCommandBufferBeginInfo;
 import org.lwjgl.vulkan.VkDevice;
+import org.lwjgl.vulkan.VkExtent2D;
 import org.lwjgl.vulkan.VkExtent3D;
 import org.lwjgl.vulkan.VkImageBlit;
 import org.lwjgl.vulkan.VkImageMemoryBarrier;
 import org.lwjgl.vulkan.VkImageSubresourceLayers;
 import org.lwjgl.vulkan.VkMemoryBarrier;
+import org.lwjgl.vulkan.VkOffset2D;
 import org.lwjgl.vulkan.VkQueue;
+import org.lwjgl.vulkan.VkRect2D;
+import org.lwjgl.vulkan.VkRenderPassBeginInfo;
 import org.lwjgl.vulkan.VkSubmitInfo;
 
 /**
@@ -93,6 +102,126 @@ class CommandSequence {
                 dependencyFlags, pMemoryBarriers, pBmBarriers, pImBarriers);
 
         return this;
+    }
+
+    /**
+     * Append a command to initiate a new render pass.
+     *
+     * @param chainResources (not null)
+     * @param pass (not null)
+     * @return the current sequence (for chaining)
+     */
+    CommandSequence addBeginRenderPass(
+            ChainResources chainResources, Pass pass) {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            VkRenderPassBeginInfo renderPassInfo
+                    = VkRenderPassBeginInfo.calloc(stack);
+            renderPassInfo.sType(VK10.VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO);
+
+            long framebufferHandle = pass.framebufferHandle();
+            renderPassInfo.framebuffer(framebufferHandle);
+
+            VkClearValue.Buffer pClearValues = VkClearValue.calloc(2, stack);
+            VkClearColorValue colorClearValue = pClearValues.get(0).color();
+            colorClearValue.float32(stack.floats(0f, 0f, 0f, 1f));
+            VkClearDepthStencilValue dsClearValue
+                    = pClearValues.get(1).depthStencil();
+            dsClearValue.set(1f, 0);
+            renderPassInfo.pClearValues(pClearValues);
+
+            VkRect2D renderArea = VkRect2D.calloc(stack);
+            renderArea.offset(VkOffset2D.calloc(stack).set(0, 0));
+            VkExtent2D frameBufferExtent
+                    = chainResources.framebufferExtent(stack);
+            renderArea.extent(frameBufferExtent);
+            renderPassInfo.renderArea(renderArea);
+
+            long renderPassHandle = chainResources.passHandle();
+            renderPassInfo.renderPass(renderPassHandle);
+
+            int contents = VK10.VK_SUBPASS_CONTENTS_INLINE;
+            VK10.vkCmdBeginRenderPass(
+                    vkCommandBuffer, renderPassInfo, contents);
+
+            return this;
+        }
+    }
+
+    /**
+     * Append a command to bind descriptors for drawing.
+     *
+     * @param draw the draw resources (not null)
+     * @param pipelineLayoutHandle the handle of the pipeline layout (not null)
+     * @return the current sequence (for chaining)
+     */
+    CommandSequence addBindDescriptors(Draw draw, long pipelineLayoutHandle) {
+        Validate.nonNull(draw, "draw");
+        Validate.nonZero(pipelineLayoutHandle, "pipeline-layout handle");
+
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            long descriptorSetHandle = draw.descriptorSetHandle();
+            LongBuffer pDescriptorSets = stack.longs(descriptorSetHandle);
+
+            int bindPoint = VK10.VK_PIPELINE_BIND_POINT_GRAPHICS;
+            int firstSet = 0;
+            IntBuffer pDynamicOffsets = null;
+            VK10.vkCmdBindDescriptorSets(
+                    vkCommandBuffer, bindPoint, pipelineLayoutHandle, firstSet,
+                    pDescriptorSets, pDynamicOffsets);
+
+            return this;
+        }
+    }
+
+    /**
+     * Append a command to bind an index buffer for drawing.
+     *
+     * @param indexBuffer (not null)
+     * @return the current sequence (for chaining)
+     */
+    CommandSequence addBindIndexBuffer(IndexBuffer indexBuffer) {
+        long bufferHandle = indexBuffer.handle();
+        int startOffset = 0;
+        int elementType = indexBuffer.elementType();
+        VK10.vkCmdBindIndexBuffer(
+                vkCommandBuffer, bufferHandle, startOffset, elementType);
+
+        return this;
+    }
+
+    /**
+     * Append a command to bind a graphics pipeline for drawing.
+     *
+     * @param draw (not null)
+     * @return the current sequence (for chaining)
+     */
+    CommandSequence addBindPipeline(Draw draw) {
+        long pipelineHandle = draw.pipelineHandle();
+        VK10.vkCmdBindPipeline(vkCommandBuffer,
+                VK10.VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineHandle);
+
+        return this;
+    }
+
+    /**
+     * Append a command to bind vertex buffers for drawing.
+     *
+     * @param geometry (not null)
+     * @return the current sequence (for chaining)
+     */
+    CommandSequence addBindVertexBuffers(Geometry geometry) {
+        Mesh mesh = geometry.getMesh();
+        int numAttributes = mesh.countAttributes();
+
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            int firstBinding = 0;
+            LongBuffer pBufferHandles = mesh.generateBufferHandles(stack);
+            LongBuffer pOffsets = stack.callocLong(numAttributes);
+            VK10.vkCmdBindVertexBuffers(
+                    vkCommandBuffer, firstBinding, pBufferHandles, pOffsets);
+
+            return this;
+        }
     }
 
     /**
@@ -185,6 +314,43 @@ class CommandSequence {
     }
 
     /**
+     * Append a draw command to the sequence.
+     *
+     * @param geometry the geometry to draw (not null, unaffected)
+     * @return the current sequence (for chaining)
+     */
+    CommandSequence addDraw(Geometry geometry) {
+        Mesh mesh = geometry.getMesh();
+        int firstVertex = 0;
+        int firstInstance = 0;
+        int instanceCount = 1;
+
+        if (mesh.isIndexed()) { // indexed draw:
+            int numIndices = mesh.countIndexedVertices();
+            int firstIndex = 0;
+            VK10.vkCmdDrawIndexed(vkCommandBuffer, numIndices, instanceCount,
+                    firstIndex, firstVertex, firstInstance);
+
+        } else { // non-indexed draw:
+            int numVertices = mesh.countIndexedVertices();
+            VK10.vkCmdDraw(vkCommandBuffer, numVertices, instanceCount,
+                    firstVertex, firstInstance);
+        }
+
+        return this;
+    }
+
+    /**
+     * Append a command to terminate the current render pass.
+     *
+     * @return the current sequence (for chaining)
+     */
+    CommandSequence addEndRenderPass() {
+        VK10.vkCmdEndRenderPass(vkCommandBuffer);
+        return this;
+    }
+
+    /**
      * Free the underlying {@code VkCommandBuffer}.
      *
      * @return null
@@ -207,6 +373,16 @@ class CommandSequence {
         int retCode = VK10.vkEndCommandBuffer(vkCommandBuffer);
         Utils.checkForError(retCode, "terminate a command sequence");
 
+        return this;
+    }
+
+    /**
+     * Begin recording a new series of commands.
+     *
+     * @return the modified sequence, for chaining
+     */
+    CommandSequence reset() {
+        reset(0x0);
         return this;
     }
 
@@ -258,6 +434,51 @@ class CommandSequence {
             // TODO use a fence to submit multiple command sequences in parallel
             retCode = VK10.vkQueueWaitIdle(queue);
             Utils.checkForError(retCode, "wait for a queue to be idle");
+
+            return this;
+        }
+    }
+
+    /**
+     * Submit the sequence to the specified queue and synchronize.
+     *
+     * @param queue (not null)
+     * @param frame the resource for frame synchronization (not null)
+     * @return the current sequence, for chaining
+     */
+    CommandSequence submitWithSynch(VkQueue queue, Frame frame) {
+        Validate.nonNull(queue, "queue");
+
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            VkSubmitInfo submitInfo = VkSubmitInfo.calloc(stack);
+            submitInfo.sType(VK10.VK_STRUCTURE_TYPE_SUBMIT_INFO);
+
+            PointerBuffer pCommandBuffer = stack.pointers(vkCommandBuffer);
+            submitInfo.pCommandBuffers(pCommandBuffer);
+
+            submitInfo.waitSemaphoreCount(1);
+
+            long signalSemaphoreHandle
+                    = frame.renderFinishedSemaphoreHandle();
+            LongBuffer pSignalSemaphores = stack.longs(signalSemaphoreHandle);
+            submitInfo.pSignalSemaphores(pSignalSemaphores);
+
+            IntBuffer pMask = stack.ints(
+                    VK10.VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT);
+            submitInfo.pWaitDstStageMask(pMask);
+
+            long waitSemaphoreHandle
+                    = frame.imageAvailableSemaphoreHandle();
+            LongBuffer pWaitSemaphores = stack.longs(waitSemaphoreHandle);
+            submitInfo.pWaitSemaphores(pWaitSemaphores);
+
+            VkDevice vkDevice = BaseApplication.getVkDevice();
+            long fenceHandle = frame.fenceHandle();
+            VK10.vkResetFences(vkDevice, fenceHandle);
+
+            int retCode = VK10.vkQueueSubmit(queue, submitInfo, fenceHandle);
+            Utils.checkForError(retCode,
+                    "submit a command sequence to a queue");
 
             return this;
         }
