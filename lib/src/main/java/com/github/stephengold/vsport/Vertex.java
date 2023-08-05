@@ -42,7 +42,7 @@ import org.joml.Vector3fc;
  * Derived from the Vertex class in Cristian Herrera's Vulkan-Tutorial-Java
  * project.
  */
-class Vertex {
+public class Vertex {
     // *************************************************************************
     // fields
 

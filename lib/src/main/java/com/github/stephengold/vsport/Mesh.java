@@ -480,7 +480,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
      * @param vertices the vertex data to use (not null, unaffected)
      * @return a new instance
      */
-    static Mesh newInstance(List<Vertex> vertices) {
+    public static Mesh newInstance(List<Vertex> vertices) {
         int count = vertices.size();
         List<Integer> tempIndices = new ArrayList<>(count);
         List<Vertex> tempVertices = new ArrayList<>(count);

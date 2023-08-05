@@ -41,7 +41,7 @@ import org.lwjgl.vulkan.VK10;
  *
  * @author Stephen Gold sgold@sonic.net
  */
-final class IndexBuffer extends jme3utilities.lbj.IndexBuffer {
+final public class IndexBuffer extends jme3utilities.lbj.IndexBuffer {
     // *************************************************************************
     // fields
 

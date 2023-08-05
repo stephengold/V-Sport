@@ -53,7 +53,7 @@ import org.lwjgl.assimp.Assimp;
  * Derived from ModelLoader.java in Cristian Herrera's Vulkan-Tutorial-Java
  * project.
  */
-final class AssimpUtils {
+final public class AssimpUtils {
     // *************************************************************************
     // constructors
 
@@ -76,7 +76,7 @@ final class AssimpUtils {
      * @param addVertexIndices storage for vertex indices (added to if not null)
      * @param addVertices storage for vertex attributes (not null, added to)
      */
-    static void extractTriangles(String resourceName, int flags,
+    public static void extractTriangles(String resourceName, int flags,
             List<Integer> addVertexIndices, List<Vertex> addVertices) {
         ByteBuffer pLoadedBytes = Utils.loadResourceAsBytes(resourceName);
 

@@ -67,7 +67,7 @@ public class ShaderProgram extends DeviceResource {
      * @param programName the base name of the shaders to load (not null, not
      * empty)
      */
-    ShaderProgram(String programName) {
+    public ShaderProgram(String programName) {
         Validate.nonEmpty(programName, "program name");
         this.programName = programName;
     }
