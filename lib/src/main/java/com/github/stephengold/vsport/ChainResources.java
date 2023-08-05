@@ -189,6 +189,7 @@ class ChainResources {
      * @return the handle of the pre-existing {@code VkSwapchainKHR} (not null)
      */
     long chainHandle() {
+        assert chainHandle != VK10.VK_NULL_HANDLE;
         return chainHandle;
     }
 
@@ -742,6 +743,7 @@ class ChainResources {
             Utils.checkForError(retCode, "create render pass");
             long result = pHandle.get(0);
 
+            assert result != VK10.VK_NULL_HANDLE;
             return result;
         }
     }
@@ -786,6 +788,7 @@ class ChainResources {
             Utils.checkForError(retCode, "create descriptor-set pool");
             long result = pHandle.get(0);
 
+            assert result != VK10.VK_NULL_HANDLE;
             return result;
         }
     }

@@ -83,6 +83,7 @@ class Frame {
                     vkDevice, fenceCreateInfo, allocator, pHandle);
             Utils.checkForError(retCode, "create fence");
             this.fenceHandle = pHandle.get(0);
+            assert fenceHandle != VK10.VK_NULL_HANDLE;
 
             LogicalDevice logicalDevice = BaseApplication.getLogicalDevice();
             this.imageAvailableSemaphoreHandle
@@ -119,6 +120,7 @@ class Frame {
      * @return the handle of the pre-existing {@code VkFence} (not null)
      */
     long fenceHandle() {
+        assert fenceHandle != VK10.VK_NULL_HANDLE;
         return fenceHandle;
     }
 
@@ -128,6 +130,7 @@ class Frame {
      * @return the handle of the pre-existing {@code VkSemaphore} (not null)
      */
     long imageAvailableSemaphoreHandle() {
+        assert imageAvailableSemaphoreHandle != VK10.VK_NULL_HANDLE;
         return imageAvailableSemaphoreHandle;
     }
 
@@ -137,6 +140,7 @@ class Frame {
      * @return the handle of the pre-existing {@code VkSemaphore} (not null)
      */
     long renderFinishedSemaphoreHandle() {
+        assert renderFinishedSemaphoreHandle != VK10.VK_NULL_HANDLE;
         return renderFinishedSemaphoreHandle;
     }
 
