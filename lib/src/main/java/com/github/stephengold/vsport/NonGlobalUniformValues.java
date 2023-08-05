@@ -30,8 +30,12 @@
 package com.github.stephengold.vsport;
 
 import java.nio.ByteBuffer;
+import jme3utilities.Validate;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
+import org.joml.Matrix4x3f;
+import org.joml.Matrix4x3fc;
+import org.joml.Vector3fc;
 import org.joml.Vector4f;
 
 /**
@@ -63,6 +67,20 @@ class NonGlobalUniformValues {
     // new methods exposed
 
     /**
+     * Return the mesh-to-world coordinate transform.
+     *
+     * @param storeResult storage for the result (modified if not null)
+     * @return the transform (either {@code storeResult} or a new matrix, not
+     * null)
+     */
+    Matrix4x3f getTransform(Matrix4x3f storeResult) {
+        Matrix4x3f result
+                = (storeResult == null) ? new Matrix4x3f() : storeResult;
+        modelMatrix.get4x3(result);
+        return result;
+    }
+
+    /**
      * Return the size of the UBO.
      *
      * @return the size (in bytes, &ge;0)
@@ -84,6 +102,39 @@ class NonGlobalUniformValues {
         // vec4 SpecularMaterialColor
         result += 4 * Float.BYTES;
         return result;
+    }
+
+    /**
+     * Alter the mesh-to-world coordinate transform.
+     *
+     * @param desiredTransform the desired coordinate transform (not null)
+     */
+    void setTransform(Matrix4x3fc desiredTransform) {
+        Validate.nonNull(desiredTransform, "desired transform");
+
+        modelMatrix.set4x3(desiredTransform);
+        modelRotationMatrix.set(desiredTransform);
+    }
+
+    /**
+     * Alter the mesh-to-world offset.
+     *
+     * @param desiredOffset the desired offset (in world coordinates, not null)
+     */
+    void setTranslation(Vector3fc desiredOffset) {
+        Validate.nonNull(desiredOffset, "desired offset");
+        modelMatrix.setTranslation(desiredOffset);
+    }
+
+    /**
+     * Alter the mesh-to-world offset.
+     *
+     * @param x the desired X offset (in world coordinates)
+     * @param y the desired Y offset (in world coordinates)
+     * @param z the desired Z offset (in world coordinates)
+     */
+    void setTranslation(float x, float y, float z) {
+        modelMatrix.setTranslation(x, y, z);
     }
 
     /**
