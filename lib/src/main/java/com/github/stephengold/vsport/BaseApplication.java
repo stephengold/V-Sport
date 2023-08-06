@@ -995,10 +995,8 @@ public abstract class BaseApplication {
             msCreateInfo.alphaToOneEnable(false);
             msCreateInfo.minSampleShading(1f);
             msCreateInfo.pSampleMask(0);
+            msCreateInfo.rasterizationSamples(numMsaaSamples);
             msCreateInfo.sampleShadingEnable(false);
-
-            int numSamples = BaseApplication.numMsaaSamples();
-            msCreateInfo.rasterizationSamples(numSamples);
 
             // rasterization state:
             //    1. turns mesh primitives into fragments
@@ -1107,10 +1105,9 @@ public abstract class BaseApplication {
             pCreateInfo.subpass(0);
 
             long pipelineCache = VK10.VK_NULL_HANDLE; // disable cacheing
-            VkAllocationCallbacks allocator = BaseApplication.findAllocator();
             LongBuffer pHandle = stack.mallocLong(1);
-            int retCode = VK10.vkCreateGraphicsPipelines(
-                    vkDevice, pipelineCache, pCreateInfo, allocator, pHandle);
+            int retCode = VK10.vkCreateGraphicsPipelines(vkDevice,
+                    pipelineCache, pCreateInfo, defaultAllocator, pHandle);
             Utils.checkForError(retCode, "create graphics pipeline");
             long result = pHandle.get(0);
 

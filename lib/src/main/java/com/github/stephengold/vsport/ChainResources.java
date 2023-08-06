@@ -218,12 +218,10 @@ class ChainResources {
         }
 
         if (depthAttachment != null) {
-            depthAttachment.destroy();
-            this.depthAttachment = null;
+            this.depthAttachment = depthAttachment.destroy();
         }
         if (colorAttachment != null) {
-            colorAttachment.destroy();
-            this.colorAttachment = null;
+            this.colorAttachment = colorAttachment.destroy();
         }
 
         if (poolHandle != VK10.VK_NULL_HANDLE) {
