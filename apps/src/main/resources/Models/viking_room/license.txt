@@ -1,4 +1,4 @@
-Licensing history for files in "src/main/resources/Models/viking_room"
+Licensing history for files in "apps/src/main/resources/Models/viking_room"
 
 Based on "Viking room" with modifications by Alexander Overvoorde:
 * download files:    viking_room.obj and viking_room.png
