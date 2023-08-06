@@ -1,0 +1,17 @@
+Licensing history for files in "apps/src/main/resources/Textures/sss"
+
+Based on "Mars":
+* download files:    2k_mars.jpg
+* downloaded from:   https://www.solarsystemscope.com/textures/download/2k_mars.jpg
+* download options:  HIGH RESOLUTION 2K
+* download date:     6 August 2023
+* publisher:         Solar System Scope
+* publisher URL:     https://www.solarsystemscope.com
+* license type:      CC-BY-4.0 (CC Attribution)
+* license URL:       https://creativecommons.org/licenses/by/4.0/
+
+Files used without modification:
+* 2k_mars.jpg
+
+Added files (also licensed CC-BY-4.0):
+* license.txt
