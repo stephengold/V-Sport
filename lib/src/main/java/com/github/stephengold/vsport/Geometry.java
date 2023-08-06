@@ -173,6 +173,15 @@ public class Geometry {
     }
 
     /**
+     * Scale the model by the specified factor.
+     *
+     * @param factor the scaling factor (1 = no effect)
+     */
+    public void scale(float factor) {
+        uniformValues.scale(factor);
+    }
+
+    /**
      * Replace the geometry's primary Texture with one obtained using the
      * specified key.
      *
