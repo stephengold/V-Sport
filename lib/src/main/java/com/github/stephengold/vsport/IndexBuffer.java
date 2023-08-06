@@ -33,6 +33,7 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.List;
+import jme3utilities.Validate;
 import org.lwjgl.vulkan.VK10;
 
 /**
@@ -58,6 +59,24 @@ final public class IndexBuffer extends jme3utilities.lbj.IndexBuffer {
     // constructors
 
     /**
+     * Instantiate an IndexBuffer with a new data buffer.
+     *
+     * @param maxVertices one more than the highest index value (&ge;0)
+     * @param capacity number of indices (&ge;0)
+     */
+    public IndexBuffer(int maxVertices, int capacity) {
+        super(maxVertices, capacity);
+        Validate.nonNegative(maxVertices, "max vertices");
+        Validate.nonNegative(capacity, "capacity");
+
+        if (maxVertices > (1 << 16)) {
+            elementType = VK10.VK_INDEX_TYPE_UINT32;
+        } else { // Use 16-bit indices to conserve memory:
+            elementType = VK10.VK_INDEX_TYPE_UINT16;
+        }
+    }
+
+    /**
      * Instantiate an IndexBuffer by wrapping the specified Buffer.
      *
      * @param data the data buffer to wrap (either a {@code ShortBuffer} or a
@@ -81,6 +100,16 @@ final public class IndexBuffer extends jme3utilities.lbj.IndexBuffer {
     // new methods exposed
 
     /**
+     * Return the buffer's capacity.
+     *
+     * @return the element count (&ge;0)
+     */
+    public int capacity() {
+        int result = getBuffer().capacity();
+        return result;
+    }
+
+    /**
      * Destroy the buffer resource.
      */
     void destroy() {
@@ -101,12 +130,34 @@ final public class IndexBuffer extends jme3utilities.lbj.IndexBuffer {
     }
 
     /**
+     * Flip the buffer. The limit is set to the current read/write position, and
+     * then the read/write position is zeroed. The data in the buffer is
+     * unaffected.
+     *
+     * @return the (modified) current instance (for chaining)
+     */
+    public IndexBuffer flip() {
+        getBuffer().flip();
+        return this;
+    }
+
+    /**
      * Access the underlying {@code VkBuffer}.
      *
      * @return the handle (not null)
      */
     long handle() {
         long result = bufferResource.handle();
+        return result;
+    }
+
+    /**
+     * Return the buffer's limit.
+     *
+     * @return the limit position (&ge;0, &le;capacity)
+     */
+    public int limit() {
+        int result = getBuffer().limit();
         return result;
     }
 
@@ -172,6 +223,19 @@ final public class IndexBuffer extends jme3utilities.lbj.IndexBuffer {
     @Override
     public IndexBuffer makeImmutable() {
         super.makeImmutable();
+        return this;
+    }
+
+    /**
+     * Write the specified index at the current read/write position, then
+     * increment the position.
+     *
+     * @param index the index to be written (&ge;0, &lt;numVertices)
+     * @return the (modified) current instance (for chaining)
+     */
+    @Override
+    public IndexBuffer put(int index) {
+        super.put(index);
         return this;
     }
 }
