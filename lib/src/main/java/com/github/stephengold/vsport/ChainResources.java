@@ -188,7 +188,7 @@ class ChainResources {
     }
 
     /**
-     * Destroy all owned resources.
+     * Destroy all resources owned by this instance.
      */
     void destroy() {
         VkDevice vkDevice = BaseApplication.getVkDevice();
@@ -392,7 +392,7 @@ class ChainResources {
     }
 
     /**
-     * Create a VkRenderPass for the specified formats.
+     * Create a render pass with the specified properties.
      *
      * @param imageFormat the format of images in the swap chain
      * @param color the (transient) color attachment for each framebuffer (may

@@ -176,7 +176,7 @@ public abstract class BaseApplication {
      */
     private static int numMsaaSamples;
     /**
-     * logical device for resource creation
+     * logical device for resource creation/destruction
      */
     private static LogicalDevice logicalDevice;
     /**
@@ -234,7 +234,7 @@ public abstract class BaseApplication {
      */
     final private static UniformValues uniformValues = new UniformValues();
     /**
-     * logical device for resource creation
+     * logical device for resource creation/destruction
      */
     private static VkDevice vkDevice;
     /**
@@ -432,7 +432,7 @@ public abstract class BaseApplication {
     }
 
     /**
-     * Access the logical device for resource creation.
+     * Access the logical device for resource creation/destruction.
      *
      * @return the pre-existing instance (not null)
      */
@@ -486,7 +486,7 @@ public abstract class BaseApplication {
     }
 
     /**
-     * Access the logical device for resource creation.
+     * Access the logical device for resource creation/destruction.
      *
      * @return the pre-existing instance (not null)
      */
@@ -1449,8 +1449,8 @@ public abstract class BaseApplication {
      * @return a temporary buffer containing the names of all instance
      * extensions required by this application
      */
-    private static PointerBuffer listRequiredInstanceExtensions(
-            MemoryStack stack) {
+    private static PointerBuffer
+            listRequiredInstanceExtensions(MemoryStack stack) {
         PointerBuffer glfwRequirements
                 = GLFWVulkan.glfwGetRequiredInstanceExtensions();
 
@@ -1583,9 +1583,11 @@ public abstract class BaseApplication {
     }
 
     /**
-     * Record the command buffer for rendering to the specified swapchain image.
+     * Record a command sequence to render the specified presentation image
+     * using a single pass.
      *
-     * @param imageIndex the index of an image in the swapchain (&ge;0)
+     * @param imageIndex the index of the presentation image in the swapchain
+     * (&ge;0)
      * @param pass the render-pass resources to use (not null)
      */
     private static void recordCommandBuffer(int imageIndex, Pass pass) {
