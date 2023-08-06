@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import jme3utilities.Validate;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.vulkan.VK10;
 import org.lwjgl.vulkan.VkVertexInputAttributeDescription;
@@ -202,6 +203,17 @@ public class Mesh implements jme3utilities.lbj.Mesh {
             this.colorBuffer = null;
             this.colorFloats = null;
         }
+    }
+
+    /**
+     * Instantiate a mesh with the specified number of vertices, but no indices,
+     * normals, positions, or texture coordinates.
+     *
+     * @param vertexCount number of vertices (&ge;0)
+     */
+    protected Mesh(int vertexCount) {
+        Validate.nonNegative(vertexCount, "vertex count");
+        this.vertexCount = vertexCount;
     }
     // *************************************************************************
     // new methods exposed
