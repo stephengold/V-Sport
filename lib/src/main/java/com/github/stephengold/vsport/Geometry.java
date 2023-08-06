@@ -31,6 +31,9 @@ package com.github.stephengold.vsport;
 
 import java.nio.ByteBuffer;
 import jme3utilities.Validate;
+import org.joml.Matrix4x3f;
+import org.joml.Matrix4x3fc;
+import org.joml.Vector3fc;
 
 /**
  * A 3-D object to be rendered by V-Sport, including a Mesh, a Texture, and a
@@ -115,6 +118,18 @@ public class Geometry {
     }
 
     /**
+     * Return the mesh-to-world coordinate transform.
+     *
+     * @param storeResult storage for the result (modified if not null)
+     * @return the transform (either {@code storeResult} or a new matrix, not
+     * null)
+     */
+    public Matrix4x3f getTransform(Matrix4x3f storeResult) {
+        Matrix4x3f result = uniformValues.getTransform(storeResult);
+        return result;
+    }
+
+    /**
      * Replace the geometry's Mesh with the specified Mesh.
      *
      * @param newMesh the desired Mesh (not null, alias created)
@@ -154,6 +169,37 @@ public class Geometry {
         Validate.nonNull(textureKey, "texture key");
         this.texture = BaseApplication.getTexture(textureKey);
         return this;
+    }
+
+    /**
+     * Alter the mesh-to-world coordinate transform.
+     *
+     * @param desiredTransform the desired coordinate transform (not null)
+     */
+    public void setTransform(Matrix4x3fc desiredTransform) {
+        Validate.nonNull(desiredTransform, "desired transform");
+        uniformValues.setTransform(desiredTransform);
+    }
+
+    /**
+     * Alter the mesh-to-world offset.
+     *
+     * @param x the desired X offset (in world coordinates)
+     * @param y the desired Y offset (in world coordinates)
+     * @param z the desired Z offset (in world coordinates)
+     */
+    public void setTranslation(float x, float y, float z) {
+        uniformValues.setTranslation(x, y, z);
+    }
+
+    /**
+     * Alter the mesh-to-world offset.
+     *
+     * @param desiredOffset the desired offset (in world coordinates, not null)
+     */
+    public void setTranslation(Vector3fc desiredOffset) {
+        Validate.nonNull(desiredOffset, "desired offset");
+        uniformValues.setTranslation(desiredOffset);
     }
 
     /**
