@@ -95,7 +95,7 @@ public class Geometry {
      * null)
      */
     public Matrix4x3f copyTransform(Matrix4x3f storeResult) {
-        Matrix4x3f result = uniformValues.getTransform(storeResult);
+        Matrix4x3f result = uniformValues.copyTransform(storeResult);
         return result;
     }
 

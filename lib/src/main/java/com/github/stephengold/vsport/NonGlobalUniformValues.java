@@ -73,7 +73,7 @@ class NonGlobalUniformValues {
      * @return the transform (either {@code storeResult} or a new matrix, not
      * null)
      */
-    Matrix4x3f getTransform(Matrix4x3f storeResult) {
+    Matrix4x3f copyTransform(Matrix4x3f storeResult) {
         Matrix4x3f result
                 = (storeResult == null) ? new Matrix4x3f() : storeResult;
         modelMatrix.get4x3(result);
