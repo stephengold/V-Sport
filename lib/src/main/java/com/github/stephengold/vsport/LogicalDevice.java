@@ -33,7 +33,6 @@ import java.nio.ByteBuffer;
 import java.nio.LongBuffer;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.TreeSet;
 import jme3utilities.Validate;
 import org.lwjgl.PointerBuffer;
