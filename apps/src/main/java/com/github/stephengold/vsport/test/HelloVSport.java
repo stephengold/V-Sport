@@ -29,7 +29,15 @@
  */
 package com.github.stephengold.vsport.test;
 
+import com.github.stephengold.vsport.AssimpUtils;
 import com.github.stephengold.vsport.BaseApplication;
+import com.github.stephengold.vsport.Geometry;
+import com.github.stephengold.vsport.Mesh;
+import com.github.stephengold.vsport.TextureKey;
+import com.github.stephengold.vsport.Vertex;
+import java.util.ArrayList;
+import java.util.List;
+import org.lwjgl.assimp.Assimp;
 
 /**
  * The first tutorial app for the V-Sport graphics engine.
@@ -64,6 +72,19 @@ public class HelloVSport extends BaseApplication {
      */
     @Override
     public void initialize() {
+        String modelName = "/Models/viking_room/viking_room.obj";
+        int postFlags = Assimp.aiProcess_DropNormals | Assimp.aiProcess_FlipUVs;
+        List<Integer> indices = null;
+        List<Vertex> vertices = new ArrayList<>();
+        AssimpUtils.extractTriangles(modelName, postFlags, indices, vertices);
+        Mesh mesh = Mesh.newInstance(vertices);
+
+        TextureKey textureKey = new TextureKey(
+                "classpath:/Models/viking_room/viking_room.png");
+
+        Geometry geometry = new Geometry(mesh);
+        geometry.setProgram("Unshaded/Texture");
+        geometry.setTexture(textureKey);
     }
 
     /**

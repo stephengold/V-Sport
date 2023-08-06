@@ -71,7 +71,7 @@ public class Geometry {
         Validate.nonNull(mesh, "mesh");
 
         this.mesh = mesh;
-        // BaseApplication.makeVisible(this); TODO
+        BaseApplication.makeVisible(this);
     }
 
     /**

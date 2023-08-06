@@ -33,7 +33,6 @@ import java.io.PrintStream;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -43,7 +42,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import jme3utilities.Validate;
 import org.lwjgl.PointerBuffer;
-import org.lwjgl.assimp.Assimp;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWFramebufferSizeCallback;
@@ -538,6 +536,18 @@ public abstract class BaseApplication {
         result.rewind();
 
         return result;
+    }
+
+    /**
+     * Make the specified Geometry visible.
+     *
+     * @param geometry the Geometry to visualize (not null, unaffected)
+     */
+    public static void makeVisible(Geometry geometry) {
+        assert geometry.getMesh() != null;
+        assert geometry.getProgram() != null;
+
+        sampleGeometry = geometry;
     }
 
     /**
@@ -1390,20 +1400,6 @@ public abstract class BaseApplication {
 
         createLogicalDevice();
         createCommandPool();
-
-        String modelName = "/Models/viking_room/viking_room.obj";
-        int postFlags = Assimp.aiProcess_DropNormals | Assimp.aiProcess_FlipUVs;
-        List<Integer> indices = null;
-        List<Vertex> vertices = new ArrayList<>();
-        AssimpUtils.extractTriangles(modelName, postFlags, indices, vertices);
-        Mesh sampleMesh = Mesh.newInstance(vertices);
-
-        TextureKey textureKey = new TextureKey(
-                "classpath:/Models/viking_room/viking_room.png");
-
-        sampleGeometry = new Geometry(sampleMesh);
-        sampleGeometry.setProgram("Unshaded/Texture");
-        sampleGeometry.setTexture(textureKey);
 
         createTextureSampler(); // depends on the logical device
         createDescriptorSetLayout(); // depends on the logical device
