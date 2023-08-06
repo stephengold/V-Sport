@@ -120,6 +120,15 @@ class NonGlobalUniformValues {
     }
 
     /**
+     * Scale the model by the specified factor.
+     *
+     * @param factor the scaling factor
+     */
+    void scale(float factor) {
+        modelMatrix.scale(factor);
+    }
+
+    /**
      * Alter the mesh-to-world coordinate transform.
      *
      * @param desiredTransform the desired coordinate transform (not null)
