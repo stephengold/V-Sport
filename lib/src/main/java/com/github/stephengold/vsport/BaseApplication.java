@@ -1114,6 +1114,7 @@ public abstract class BaseApplication {
             Utils.checkForError(retCode, "create graphics pipeline");
             long result = pHandle.get(0);
 
+            assert result != VK10.VK_NULL_HANDLE;
             return result;
         }
     }

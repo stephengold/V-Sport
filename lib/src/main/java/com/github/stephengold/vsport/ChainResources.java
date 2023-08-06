@@ -33,6 +33,7 @@ import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import jme3utilities.Validate;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.vulkan.KHRSurface;
 import org.lwjgl.vulkan.KHRSwapchain;
@@ -121,6 +122,12 @@ class ChainResources {
     ChainResources(SurfaceSummary surface, long descriptorSetLayoutHandle,
             int desiredWidth, int desiredHeight,
             int depthFormat, long samplerHandle, long pipelineLayoutHandle) {
+        Validate.nonNull(surface, "surface");
+        Validate.nonZero(
+                descriptorSetLayoutHandle, "descriptor-set layout handle");
+        Validate.nonZero(samplerHandle, "sampler handle");
+        Validate.nonZero(pipelineLayoutHandle, "pipeline-layout handle");
+
         this.numImages = chooseNumImages(surface);
 
         this.poolHandle = createPool(numImages * 64); // TODO plenty for now
