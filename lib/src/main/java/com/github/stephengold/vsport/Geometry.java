@@ -203,16 +203,6 @@ public class Geometry {
     }
 
     /**
-     * Return the default view handle of the texture.
-     *
-     * @return a VkImageView handle
-     */
-    long textureViewHandle() {
-        long result = texture.viewHandle();
-        return result;
-    }
-
-    /**
      * Write the uniform values to the specified UBO.
      *
      * @param ubo the target resource (not null)
