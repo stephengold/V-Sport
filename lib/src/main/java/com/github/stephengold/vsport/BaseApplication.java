@@ -58,11 +58,6 @@ import org.lwjgl.vulkan.KHRSwapchain;
 import org.lwjgl.vulkan.VK10;
 import org.lwjgl.vulkan.VkAllocationCallbacks;
 import org.lwjgl.vulkan.VkApplicationInfo;
-import org.lwjgl.vulkan.VkClearColorValue;
-import org.lwjgl.vulkan.VkClearDepthStencilValue;
-import org.lwjgl.vulkan.VkClearValue;
-import org.lwjgl.vulkan.VkCommandBuffer;
-import org.lwjgl.vulkan.VkCommandBufferBeginInfo;
 import org.lwjgl.vulkan.VkCommandPoolCreateInfo;
 import org.lwjgl.vulkan.VkCopyDescriptorSet;
 import org.lwjgl.vulkan.VkDebugUtilsMessengerCallbackDataEXT;
@@ -93,9 +88,7 @@ import org.lwjgl.vulkan.VkPipelineViewportStateCreateInfo;
 import org.lwjgl.vulkan.VkPresentInfoKHR;
 import org.lwjgl.vulkan.VkQueue;
 import org.lwjgl.vulkan.VkRect2D;
-import org.lwjgl.vulkan.VkRenderPassBeginInfo;
 import org.lwjgl.vulkan.VkSamplerCreateInfo;
-import org.lwjgl.vulkan.VkSubmitInfo;
 import org.lwjgl.vulkan.VkVertexInputAttributeDescription;
 import org.lwjgl.vulkan.VkVertexInputBindingDescription;
 import org.lwjgl.vulkan.VkViewport;
@@ -183,12 +176,6 @@ public abstract class BaseApplication {
      */
     private static int numMsaaSamples;
     /**
-     * command buffers (at least one per image in the chain) TODO move to
-     * ChainResources
-     */
-    final private static List<VkCommandBuffer> commandBuffers
-            = new ArrayList<>(4);
-    /**
      * logical device for resource creation
      */
     private static LogicalDevice logicalDevice;
@@ -200,10 +187,6 @@ public abstract class BaseApplication {
      * {@code VkDescriptorSetLayout} handle
      */
     private static long descriptorSetLayoutHandle = VK10.VK_NULL_HANDLE;
-    /**
-     * handle of the graphics VkPipeline
-     */
-    private static long pipelineHandle = VK10.VK_NULL_HANDLE;
     /**
      * handle of the graphics-pipeline layout
      */
@@ -741,7 +724,6 @@ public abstract class BaseApplication {
         }
 
         // Destroy the command pool and its buffers:
-        commandBuffers.clear();
         if (commandPoolHandle != VK10.VK_NULL_HANDLE) {
             VK10.vkDestroyCommandPool(
                     vkDevice, commandPoolHandle, defaultAllocator);
@@ -815,16 +797,8 @@ public abstract class BaseApplication {
             VkExtent2D framebufferExtent
                     = chainResources.framebufferExtent(stack);
 
-            long passHandle = chainResources.passHandle();
-            Mesh sampleMesh = sampleGeometry.getMesh();
-            ShaderProgram shaderProgram = sampleGeometry.getProgram();
-            pipelineHandle = createPipeline(pipelineLayoutHandle,
-                    framebufferExtent, passHandle, sampleMesh, shaderProgram);
-
             int numImages = chainResources.countImages();
             createSyncObjects(numImages);
-
-            logicalDevice.addCommandBuffers(numImages, commandBuffers);
         }
     }
 
@@ -1330,11 +1304,6 @@ public abstract class BaseApplication {
             inFlightFrames = null;
         }
 
-        if (pipelineHandle != VK10.VK_NULL_HANDLE) {
-            VK10.vkDestroyPipeline(vkDevice, pipelineHandle, defaultAllocator);
-            pipelineHandle = VK10.VK_NULL_HANDLE;
-        }
-
         if (chainResources != null) {
             chainResources.destroy();
             chainResources = null;
@@ -1515,104 +1484,135 @@ public abstract class BaseApplication {
     }
 
     /**
+     * Return the next presentation image in the swapchain.
+     *
+     * @param frame (not null)
+     * @return the index of the image to present (&ge;0) or null if the
+     * swapchain should be recreated
+     */
+    private static Integer nextPresentationImage(Frame frame) {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            long chainHandle = chainResources.chainHandle();
+            long imageAvailableSemaphoreHandle
+                    = frame.imageAvailableSemaphoreHandle();
+            long fenceToSignalHandle = VK10.VK_NULL_HANDLE;
+            IntBuffer pImageIndex = stack.mallocInt(1);
+            int retCode = KHRSwapchain.vkAcquireNextImageKHR(vkDevice,
+                    chainHandle, noTimeout, imageAvailableSemaphoreHandle,
+                    fenceToSignalHandle, pImageIndex);
+
+            // check for abnormal return codes:
+            boolean outdated
+                    = (retCode == KHRSwapchain.VK_ERROR_OUT_OF_DATE_KHR);
+            if (outdated && isDebuggingEnabled()) {
+                System.out.println("vkAcquireNextImageKHR"
+                        + " reports the swapchain is outdated.");
+            }
+
+            boolean suboptimal = (retCode == KHRSwapchain.VK_SUBOPTIMAL_KHR);
+            if (suboptimal && isDebuggingEnabled()) {
+                System.out.println("vkAcquireNextImageKHR"
+                        + " reports the swapchain is suboptimal.");
+            }
+
+            Integer result;
+            if (outdated || suboptimal) {
+                result = null;
+            } else {
+                Utils.checkForError(
+                        retCode, "acquire the next presentation image");
+                result = pImageIndex.get(0);
+                assert result >= 0 : result;
+                assert result < chainResources.countImages() : result;
+            }
+
+            return result;
+        }
+    }
+
+    /**
+     * Enqueue an image for presentation.
+     *
+     * @param imageIndex the index of the image to present (&ge;0)
+     * @param frame (not null)
+     * @return true if successful, or false if the swapchain should be recreated
+     */
+    private static boolean presentImage(int imageIndex, Frame frame) {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            VkPresentInfoKHR presentationInfo = VkPresentInfoKHR.calloc(stack);
+            presentationInfo.sType(
+                    KHRSwapchain.VK_STRUCTURE_TYPE_PRESENT_INFO_KHR);
+
+            IntBuffer pImageIndices = stack.ints(imageIndex);
+            presentationInfo.pImageIndices(pImageIndices);
+
+            long chainHandle = chainResources.chainHandle();
+            LongBuffer pSwapchains = stack.longs(chainHandle);
+            presentationInfo.pSwapchains(pSwapchains);
+            presentationInfo.swapchainCount(pSwapchains.capacity());
+
+            long waitSemaphore = frame.renderFinishedSemaphoreHandle();
+            LongBuffer pWaitSemaphores = stack.longs(waitSemaphore);
+            presentationInfo.pWaitSemaphores(pWaitSemaphores);
+
+            int retCode = KHRSwapchain.vkQueuePresentKHR(
+                    presentationQueue, presentationInfo);
+
+            // check for abnormal return codes:
+            boolean outdated
+                    = (retCode == KHRSwapchain.VK_ERROR_OUT_OF_DATE_KHR);
+            if (outdated && isDebuggingEnabled()) {
+                System.out.println(
+                        "vkQueuePresentKHR reports the swapchain is outdated.");
+            }
+
+            boolean suboptimal = (retCode == KHRSwapchain.VK_SUBOPTIMAL_KHR);
+            if (suboptimal && isDebuggingEnabled()) {
+                System.out.println("vkQueuePresentKHR"
+                        + " reports the swapchain is suboptimal.");
+            }
+
+            boolean success;
+            if (outdated || suboptimal || needsResize) {
+                success = false;
+            } else {
+                Utils.checkForError(retCode, "enqueue image for presentation");
+                success = true;
+            }
+
+            return success;
+        }
+    }
+
+    /**
      * Record the command buffer for rendering to the specified swapchain image.
      *
      * @param imageIndex the index of an image in the swapchain (&ge;0)
+     * @param pass the render-pass resources to use (not null)
      */
-    private static void recordCommandBuffer(int imageIndex) {
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            // Begin recording:
-            VkCommandBufferBeginInfo beginInfo
-                    = VkCommandBufferBeginInfo.calloc(stack);
-            beginInfo.sType(VK10.VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO);
+    private static void recordCommandBuffer(int imageIndex, Pass pass) {
+        CommandSequence sequence = chainResources.getSequence(imageIndex);
+        sequence.reset(); // not a one-time sequence
+        sequence.addBeginRenderPass(chainResources, pass);
 
-            VkRenderPassBeginInfo renderPassInfo
-                    = VkRenderPassBeginInfo.calloc(stack);
-            renderPassInfo.sType(VK10.VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO);
+        int geometryI = 0;
+        Draw draw = pass.getDraw(geometryI);
+        sequence.addBindPipeline(draw);
 
-            long renderPassHandle = chainResources.passHandle();
-            renderPassInfo.renderPass(renderPassHandle);
+        Geometry geometry = sampleGeometry;
+        sequence.addBindVertexBuffers(geometry);
 
-            VkRect2D renderArea = VkRect2D.calloc(stack);
-            renderArea.offset(VkOffset2D.calloc(stack).set(0, 0));
-            VkExtent2D frameBufferExtent
-                    = chainResources.framebufferExtent(stack);
-            renderArea.extent(frameBufferExtent);
-            renderPassInfo.renderArea(renderArea);
-
-            VkClearValue.Buffer pClearValues = VkClearValue.calloc(2, stack);
-            VkClearColorValue colorClearValue = pClearValues.get(0).color();
-            colorClearValue.float32(stack.floats(0f, 0f, 0f, 1f));
-            VkClearDepthStencilValue dsClearValue
-                    = pClearValues.get(1).depthStencil();
-            dsClearValue.set(1f, 0);
-            renderPassInfo.pClearValues(pClearValues);
-
-            VkCommandBuffer commandBuffer = commandBuffers.get(imageIndex);
-
-            int retCode = VK10.vkBeginCommandBuffer(commandBuffer, beginInfo);
-            Utils.checkForError(retCode, "begin recording commands");
-
-            // command to begin a render pass on the corresponding image:
-            long frameBufferHandle
-                    = chainResources.framebufferHandle(imageIndex);
-            renderPassInfo.framebuffer(frameBufferHandle);
-            VK10.vkCmdBeginRenderPass(commandBuffer, renderPassInfo,
-                    VK10.VK_SUBPASS_CONTENTS_INLINE);
-
-            // command to bind the graphics pipeline:
-            VK10.vkCmdBindPipeline(commandBuffer,
-                    VK10.VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineHandle);
-
-            // command to bind the vertex buffers:
-            int firstBinding = 0;
-            Mesh sampleMesh = sampleGeometry.getMesh();
-            int numAttributes = sampleMesh.countAttributes();
-            LongBuffer pBufferHandles
-                    = sampleMesh.generateBufferHandles(stack);
-            LongBuffer pOffsets = stack.callocLong(numAttributes);
-            VK10.vkCmdBindVertexBuffers(
-                    commandBuffer, firstBinding, pBufferHandles, pOffsets);
-
-            if (sampleMesh.isIndexed()) {
-                // command to bind the index buffer:
-                IndexBuffer indexBuffer = sampleMesh.getIndexBuffer();
-                int startOffset = 0;
-                VK10.vkCmdBindIndexBuffer(commandBuffer, indexBuffer.handle(),
-                        startOffset, indexBuffer.elementType());
-            }
-
-            // command to bind the uniforms:
-            long descriptorSet
-                    = chainResources.descriptorSetHandle(imageIndex);
-            LongBuffer pDescriptorSets = stack.longs(descriptorSet);
-            VK10.vkCmdBindDescriptorSets(
-                    commandBuffer, VK10.VK_PIPELINE_BIND_POINT_GRAPHICS,
-                    pipelineLayoutHandle, 0, pDescriptorSets, null);
-
-            // draw command:
-            int firstVertex = 0;
-            int firstInstance = 0;
-            int instanceCount = 1;
-            if (sampleMesh.isIndexed()) { // indexed draw:
-                int numIndices = sampleMesh.countIndexedVertices();
-                int firstIndex = 0;
-                VK10.vkCmdDrawIndexed(
-                        commandBuffer, numIndices, instanceCount,
-                        firstIndex, firstVertex, firstInstance);
-
-            } else { // non-indexed draw:
-                int numVertices = sampleMesh.countIndexedVertices();
-                VK10.vkCmdDraw(commandBuffer, numVertices, instanceCount,
-                        firstVertex, firstInstance);
-            }
-
-            // command to end the render pass:
-            VK10.vkCmdEndRenderPass(commandBuffer);
-
-            retCode = VK10.vkEndCommandBuffer(commandBuffer);
-            Utils.checkForError(retCode, "end recording command");
+        Mesh mesh = geometry.getMesh();
+        if (mesh.isIndexed()) {
+            IndexBuffer indexBuffer = mesh.getIndexBuffer();
+            sequence.addBindIndexBuffer(indexBuffer);
         }
+
+        sequence.addBindDescriptors(draw, pipelineLayoutHandle);
+        sequence.addDraw(geometry);
+
+        sequence.addEndRenderPass();
+        sequence.end();
     }
 
     /**
@@ -1658,52 +1658,49 @@ public abstract class BaseApplication {
      * @param frame the frame to render (not null)
      */
     private static void renderFrame(Frame frame) {
-        long chainHandle = chainResources.chainHandle();
-        long fenceHandle = frame.fenceHandle();
-        long imageAvailableSemaphoreHandle
-                = frame.imageAvailableSemaphoreHandle();
-        long renderFinishedSemaphoreHandle
-                = frame.renderFinishedSemaphoreHandle();
+        // Wait for the GPU to signal completion of the previous frame:
+        frame.waitForFence();
+
+        // Acquire the next presentation image from the swapchain:
+        Integer imageIndex = nextPresentationImage(frame);
+        if (imageIndex == null) {
+            recreateChainResources();
+            return;
+        }
+
+        Pass pass = chainResources.getPass(imageIndex);
+        int geometryI = 0;
+        List<Geometry> geometries = pass.getGeometryList();
+        geometries.clear();
+        Geometry geometry = sampleGeometry;
+        geometries.add(geometry);
+
+        BufferResource globalUbo = pass.getGlobalUbo();
+        ByteBuffer byteBuffer = globalUbo.getData();
+        uniformValues.writeTo(byteBuffer);
 
         try (MemoryStack stack = MemoryStack.stackPush()) {
-            IntBuffer pImageIndex = stack.mallocInt(1);
-            LongBuffer pChainHandle = stack.longs(chainHandle);
-            LongBuffer pSignalSemaphores = stack.mallocLong(1);
-            LongBuffer pWaitSemaphores = stack.mallocLong(1);
-            PointerBuffer pCommandBuffer = stack.mallocPointer(1);
+            VkExtent2D framebufferExtent
+                    = chainResources.framebufferExtent(stack);
+            long passHandle = chainResources.passHandle();
 
-            // Wait for the GPU to signal completion of the previous frame:
-            frame.waitForFence();
+            Draw draw = pass.getDraw(geometryI);
 
-            // Acquire the next image from the swapchain:
-            long fenceToSignalHandle = VK10.VK_NULL_HANDLE;
-            int retCode = KHRSwapchain.vkAcquireNextImageKHR(vkDevice,
-                    chainHandle, noTimeout, imageAvailableSemaphoreHandle,
-                    fenceToSignalHandle, pImageIndex);
-            boolean outdated
-                    = (retCode == KHRSwapchain.VK_ERROR_OUT_OF_DATE_KHR);
-            if (outdated && isDebuggingEnabled()) {
-                System.out.println("vkAcquireNextImageKHR"
-                        + " reports the swapchain is outdated.");
-            }
-            if (outdated) {
-                recreateChainResources();
-                return;
-            }
-            Utils.checkForError(retCode, "acquire the next swapchain image");
-            int imageIndex = pImageIndex.get(0);
+            BufferResource nonGlobalUbo = draw.getNonGlobalUbo();
+            geometry.writeUniformValuesTo(nonGlobalUbo);
 
-            BufferResource globalUbo = chainResources.getGlobalUbo(imageIndex);
-            BufferResource nonGlobalUbo
-                    = chainResources.getNonGlobalUbo(imageIndex);
-            long descriptorSetHandle
-                    = chainResources.descriptorSetHandle(imageIndex);
-            Texture sampleTexture = sampleGeometry.getTexture();
-            updateDescriptorSet(sampleTexture, samplerHandle, globalUbo,
+            Texture texture = geometry.getTexture();
+            long descriptorSetHandle = draw.descriptorSetHandle();
+            updateDescriptorSet(texture, samplerHandle, globalUbo,
                     nonGlobalUbo, descriptorSetHandle);
 
-            recordCommandBuffer(imageIndex);
-            updateUniformBuffer(imageIndex);
+            Mesh mesh = geometry.getMesh();
+            ShaderProgram shaderProgram = geometry.getProgram();
+            long pipelineHandle = createPipeline(pipelineLayoutHandle,
+                    framebufferExtent, passHandle, mesh, shaderProgram);
+            draw.setPipeline(pipelineHandle);
+
+            recordCommandBuffer(imageIndex, pass);
 
             Frame inFlightFrame = framesInFlight.get(imageIndex);
             if (inFlightFrame != null) {
@@ -1711,56 +1708,15 @@ public abstract class BaseApplication {
             }
             framesInFlight.put(imageIndex, frame);
 
-            // info to submit a command buffer to the graphics queue:
-            VkSubmitInfo submitInfo = VkSubmitInfo.calloc(stack);
-            submitInfo.sType(VK10.VK_STRUCTURE_TYPE_SUBMIT_INFO);
-
-            submitInfo.waitSemaphoreCount(1);
-
-            VkCommandBuffer commandBuffer = commandBuffers.get(imageIndex);
-            pCommandBuffer.put(0, commandBuffer);
-            submitInfo.pCommandBuffers(pCommandBuffer);
-
-            pSignalSemaphores.put(0, renderFinishedSemaphoreHandle);
-            submitInfo.pSignalSemaphores(pSignalSemaphores);
-
-            IntBuffer pMask = stack.ints(
-                    VK10.VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT);
-            submitInfo.pWaitDstStageMask(pMask);
-
-            pWaitSemaphores.put(0, imageAvailableSemaphoreHandle);
-            submitInfo.pWaitSemaphores(pWaitSemaphores);
-
-            // Reset fence and submit pre-recorded commands to graphics queue:
-            VK10.vkResetFences(vkDevice, fenceHandle);
-            retCode = VK10.vkQueueSubmit(
-                    graphicsQueue, submitInfo, fenceHandle);
-            Utils.checkForError(retCode, "submit draw command");
+            CommandSequence sequence = chainResources.getSequence(imageIndex);
+            sequence.submitWithSynch(graphicsQueue, frame);
 
             // Enqueue the image for presentation:
-            VkPresentInfoKHR presentationInfo = VkPresentInfoKHR.calloc(stack);
-            presentationInfo.sType(
-                    KHRSwapchain.VK_STRUCTURE_TYPE_PRESENT_INFO_KHR);
-
-            presentationInfo.pImageIndices(pImageIndex);
-            presentationInfo.pSwapchains(pChainHandle);
-            presentationInfo.swapchainCount(pChainHandle.capacity());
-
-            pWaitSemaphores.put(0, renderFinishedSemaphoreHandle);
-            presentationInfo.pWaitSemaphores(pWaitSemaphores);
-
-            retCode = KHRSwapchain.vkQueuePresentKHR(
-                    presentationQueue, presentationInfo);
-            outdated = (retCode == KHRSwapchain.VK_ERROR_OUT_OF_DATE_KHR);
-            if (outdated && isDebuggingEnabled()) {
-                System.out.println(
-                        "vkQueuePresentKHR reports the swapchain is outdated.");
-            }
-            if (outdated || needsResize) {
+            boolean success = presentImage(imageIndex, frame);
+            if (!success) {
                 recreateChainResources();
                 return;
             }
-            Utils.checkForError(retCode, "enqueue image for presentation");
 
             currentFrameIndex = (currentFrameIndex + 1) % maxFramesInFlight;
         }
@@ -1898,19 +1854,5 @@ public abstract class BaseApplication {
             VkCopyDescriptorSet.Buffer pCopies = null;
             VK10.vkUpdateDescriptorSets(vkDevice, pWrites, pCopies);
         }
-    }
-
-    /**
-     * Update the Uniform Buffer Objects (UBOs) of the indexed image.
-     *
-     * @param imageIndex index of the target image among the swap-chain images.
-     */
-    private static void updateUniformBuffer(int imageIndex) {
-        ByteBuffer byteBuffer
-                = chainResources.getGlobalUbo(imageIndex).getData();
-        uniformValues.writeTo(byteBuffer);
-
-        BufferResource ngUbo = chainResources.getNonGlobalUbo(imageIndex);
-        sampleGeometry.writeUniformValuesTo(ngUbo);
     }
 }

@@ -42,10 +42,8 @@ import org.lwjgl.vulkan.VkAttachmentDescription;
 import org.lwjgl.vulkan.VkAttachmentReference;
 import org.lwjgl.vulkan.VkDescriptorPoolCreateInfo;
 import org.lwjgl.vulkan.VkDescriptorPoolSize;
-import org.lwjgl.vulkan.VkDescriptorSetAllocateInfo;
 import org.lwjgl.vulkan.VkDevice;
 import org.lwjgl.vulkan.VkExtent2D;
-import org.lwjgl.vulkan.VkFramebufferCreateInfo;
 import org.lwjgl.vulkan.VkRenderPassCreateInfo;
 import org.lwjgl.vulkan.VkSubpassDependency;
 import org.lwjgl.vulkan.VkSubpassDescription;
@@ -80,31 +78,15 @@ class ChainResources {
      */
     final private int numImages;
     /**
-     * global uniform buffer objects (one per VkImage in the chain)
+     * command sequences (one for each presentation image in the swapchain)
      */
-    final private List<BufferResource> globalUbos = new ArrayList<>(4);
+    final private List<CommandSequence> sequenceList = new ArrayList<>(3);
     /**
-     * non-global uniform buffer objects (one per VkImage in the chain)
+     * render passes (one for each presentation image in the swapchain)
      */
-    final private List<BufferResource> nonGlobalUbos = new ArrayList<>(4);
+    final private List<Pass> passList = new ArrayList<>(3);
     /**
-     * handles of the descriptor sets (one per VkImage in the chain)
-     */
-    private List<Long> descriptorSetHandles;
-    /**
-     * handles of framebuffers (one per VkImage in the chain)
-     */
-    private List<Long> framebufferHandles;
-    /**
-     * VkImage handles for color buffers (acquired from KHRSwapchain)
-     */
-    final private List<Long> imageHandles;
-    /**
-     * VkImageView handles (one per VkImage in the chain)
-     */
-    private List<Long> viewHandles;
-    /**
-     * handle of the VkSwapchainKHR
+     * {@code VkSwapchainKHR} handle
      */
     private long chainHandle = VK10.VK_NULL_HANDLE;
     /**
@@ -140,11 +122,8 @@ class ChainResources {
             int desiredWidth, int desiredHeight,
             int depthFormat, long samplerHandle, long pipelineLayoutHandle) {
         this.numImages = chooseNumImages(surface);
-        addUbos(numImages, globalUbos, nonGlobalUbos);
 
         this.poolHandle = createPool(numImages);
-        this.descriptorSetHandles = allocateDescriptorSets(
-                numImages, descriptorSetLayoutHandle, poolHandle);
 
         VkSurfaceFormatKHR surfaceFormat = surface.chooseSurfaceFormat();
         this.imageFormat = surfaceFormat.format();
@@ -171,14 +150,20 @@ class ChainResources {
 
         this.chainHandle = createChain(framebufferExtent, imageFormat,
                 numImages, surface, surfaceFormat, queueFamilies);
-        this.imageHandles = listImages(chainHandle);
-        this.viewHandles = createImageViews(imageHandles, imageFormat);
 
         this.passHandle
                 = createPass(imageFormat, colorAttachment, depthAttachment);
-        this.framebufferHandles = createFramebuffers(
-                viewHandles, colorAttachment, depthAttachment, passHandle,
-                framebufferExtent);
+        List<Long> imageHandles = listImages(chainHandle);
+        for (long imageHandle : imageHandles) {
+            CommandSequence sequence = new CommandSequence();
+            sequenceList.add(sequence);
+
+            Pass pass = new Pass(
+                    imageHandle, poolHandle, descriptorSetLayoutHandle,
+                    imageFormat, colorAttachment, depthAttachment, passHandle,
+                    framebufferExtent);
+            passList.add(pass);
+        }
     }
     // *************************************************************************
     // new methods exposed
@@ -203,44 +188,22 @@ class ChainResources {
     }
 
     /**
-     * Return the indexed descriptor-set handle.
-     *
-     * @param imageIndex the index of the desired descriptor set
-     * @return the handle of the pre-existing VkDescriptorSet
-     */
-    long descriptorSetHandle(int imageIndex) {
-        long result = descriptorSetHandles.get(imageIndex);
-        return result;
-    }
-
-    /**
      * Destroy all owned resources.
      */
     void destroy() {
         VkDevice vkDevice = BaseApplication.getVkDevice();
         VkAllocationCallbacks allocator = BaseApplication.findAllocator();
-        /*
-         * Destroy resources in the reverse of the order they were created,
-         * starting with the pipeline.
-         */
-        if (framebufferHandles != null) {
-            for (long handle : framebufferHandles) {
-                VK10.vkDestroyFramebuffer(vkDevice, handle, allocator);
-            }
-            this.framebufferHandles = null;
+
+        // Destroy resources in the reverse of the order they were created:
+        for (Pass pass : passList) {
+            pass.destroy();
         }
+
         if (passHandle != VK10.VK_NULL_HANDLE) {
             VK10.vkDestroyRenderPass(vkDevice, passHandle, allocator);
             this.passHandle = VK10.VK_NULL_HANDLE;
         }
 
-        if (viewHandles != null) {
-            for (Long handle : viewHandles) {
-                VK10.vkDestroyImageView(vkDevice, handle, allocator);
-            }
-            this.viewHandles = null;
-        }
-        // The image handles are owned by the KHRSwapchain.
         if (chainHandle != VK10.VK_NULL_HANDLE) {
             KHRSwapchain.vkDestroySwapchainKHR(
                     vkDevice, chainHandle, allocator);
@@ -256,21 +219,10 @@ class ChainResources {
             this.colorAttachment = null;
         }
 
-        descriptorSetHandles = null;
         if (poolHandle != VK10.VK_NULL_HANDLE) {
             VK10.vkDestroyDescriptorPool(vkDevice, poolHandle, allocator);
             this.poolHandle = VK10.VK_NULL_HANDLE;
         }
-
-        for (BufferResource ubo : globalUbos) {
-            ubo.destroy();
-        }
-        globalUbos.clear();
-
-        for (BufferResource ubo : nonGlobalUbos) {
-            ubo.destroy();
-        }
-        nonGlobalUbos.clear();
     }
 
     /**
@@ -283,17 +235,6 @@ class ChainResources {
         VkExtent2D result = VkExtent2D.malloc(stack);
         result.set(framebufferExtent);
 
-        return result;
-    }
-
-    /**
-     * Return the handle of the indexed framebuffer.
-     *
-     * @param imageIndex the index of the desired framebuffer
-     * @return the handle of the pre-existing VkFramebuffer
-     */
-    long framebufferHandle(int imageIndex) {
-        long result = framebufferHandles.get(imageIndex);
         return result;
     }
 
@@ -318,25 +259,28 @@ class ChainResources {
     }
 
     /**
-     * Access the global Uniform Buffer Object (UBO) for the specified image.
+     * Access the render-pass resources for the specified presentation image.
      *
-     * @param imageIndex the index of the desired UBO
-     * @return a pre-existing instance
+     * @param imageIndex the index of the corresponding image (&ge;0)
+     * @return a new or pre-existing instance (not null)
      */
-    BufferResource getGlobalUbo(int imageIndex) {
-        BufferResource result = globalUbos.get(imageIndex);
+    Pass getPass(int imageIndex) {
+        Pass result = passList.get(imageIndex);
+
+        assert result != null;
         return result;
     }
 
     /**
-     * Access the non-global Uniform Buffer Object (UBO) for the specified
-     * image.
+     * Access the command sequence for the specified presentation image.
      *
-     * @param imageIndex the index of the desired UBO
-     * @return a pre-existing instance
+     * @param imageIndex the index of the corresponding image (&ge;0)
+     * @return the pre-existing instance (not null)
      */
-    BufferResource getNonGlobalUbo(int imageIndex) {
-        BufferResource result = nonGlobalUbos.get(imageIndex);
+    CommandSequence getSequence(int imageIndex) {
+        CommandSequence result = sequenceList.get(imageIndex);
+
+        assert result != null;
         return result;
     }
 
@@ -351,82 +295,6 @@ class ChainResources {
     }
     // *************************************************************************
     // private methods
-
-    /**
-     * Allocate uniform buffer objects (UBOs) as needed.
-     *
-     * @param numUbosNeeded the number of UBOs needed
-     * @param addGlobals storage for allocated global UBOs (not null, added to)
-     * @param addNonGlobals storage for allocated non-global UBOs (not null,
-     * added to)
-     */
-    private static void addUbos(
-            int numUbosNeeded, List<BufferResource> addGlobals,
-            List<BufferResource> addNonGlobals) {
-        boolean staging = false;
-        int needed = numUbosNeeded - addGlobals.size();
-        if (needed > 0) {
-            int numBytes = UniformValues.numBytes();
-            for (int i = 0; i < needed; ++i) {
-                BufferResource ubo = new BufferResource(numBytes,
-                        VK10.VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, staging);
-                addGlobals.add(ubo);
-            }
-        }
-
-        needed = numUbosNeeded - addNonGlobals.size();
-        if (needed > 0) {
-            int numBytes = NonGlobalUniformValues.numBytes();
-            for (int i = 0; i < needed; ++i) {
-                BufferResource ubo = new BufferResource(numBytes,
-                        VK10.VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, staging);
-                addNonGlobals.add(ubo);
-            }
-        }
-    }
-
-    /**
-     * Allocate a descriptor set for each image in the chain.
-     *
-     * @param numImages the number of images in the chain
-     * @param layoutHandle the handle of the desciptor-set layout to use
-     * @param poolHandle the handle of the descriptor-set pool to use
-     * @return a new list of VkDescriptorSet handles
-     */
-    private static List<Long> allocateDescriptorSets(
-            int numImages, long layoutHandle, long poolHandle) {
-        List<Long> result = new ArrayList<>(numImages);
-
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            // All descriptor sets will have the same layout:
-            LongBuffer pLayoutHandles = stack.mallocLong(numImages);
-            for (int setIndex = 0; setIndex < numImages; ++setIndex) {
-                pLayoutHandles.put(setIndex, layoutHandle);
-            }
-
-            VkDescriptorSetAllocateInfo allocInfo
-                    = VkDescriptorSetAllocateInfo.calloc(stack);
-            allocInfo.sType(
-                    VK10.VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO);
-
-            allocInfo.descriptorPool(poolHandle);
-            allocInfo.pSetLayouts(pLayoutHandles);
-
-            LongBuffer pSetHandles = stack.mallocLong(numImages);
-            VkDevice vkDevice = BaseApplication.getVkDevice();
-            int retCode = VK10.vkAllocateDescriptorSets(
-                    vkDevice, allocInfo, pSetHandles);
-            Utils.checkForError(retCode, "allocate descriptor sets");
-
-            // Collect the descriptor-set handles in a list:
-            for (int setIndex = 0; setIndex < numImages; ++setIndex) {
-                long setHandle = pSetHandles.get(setIndex);
-                result.add(setHandle);
-            }
-
-            return result;
-        }
-    }
 
     /**
      * Choose the number of images in the chain.
@@ -521,95 +389,6 @@ class ChainResources {
 
             return result;
         }
-    }
-
-    /**
-     * Create a framebuffer for each image in the chain.
-     *
-     * @param viewHandles the list of VkImageView handles for presentation (not
-     * null)
-     * @param color the (transient) color attachment for each framebuffer (may
-     * be null)
-     * @param depth the depth attachment for each framebuffer (not null)
-     * @param renderPassHandle the handle of the VkRenderPass to use
-     * @param extent the desired dimensions (in pixels, not null)
-     * @return a new list of VkFramebuffer handles
-     */
-    private static List<Long> createFramebuffers(List<Long> viewHandles,
-            Attachment color, Attachment depth,
-            long renderPassHandle, VkExtent2D extent) {
-        int numImages = viewHandles.size();
-        List<Long> result = new ArrayList<>(numImages);
-
-        long depthViewHandle = depth.viewHandle();
-        int width = extent.width();
-        int height = extent.height();
-        VkDevice vkDevice = BaseApplication.getVkDevice();
-        VkAllocationCallbacks allocator = BaseApplication.findAllocator();
-
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            // order of attachments must match that in createPass() below!
-            int presentAttachIndex;
-            LongBuffer pAttachmentHandles;
-            if (color == null) {
-                presentAttachIndex = 0;
-                pAttachmentHandles
-                        = stack.longs(VK10.VK_NULL_HANDLE, depthViewHandle);
-            } else {
-                presentAttachIndex = 2;
-                long colorViewHandle = color.viewHandle();
-                pAttachmentHandles = stack.longs(
-                        colorViewHandle, depthViewHandle, VK10.VK_NULL_HANDLE);
-            }
-
-            LongBuffer pHandle = stack.mallocLong(1);
-
-            // reusable Struct for framebuffer creation:
-            VkFramebufferCreateInfo createInfo
-                    = VkFramebufferCreateInfo.calloc(stack);
-            createInfo.sType(VK10.VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO);
-
-            createInfo.height(height);
-            createInfo.layers(1);
-            createInfo.pAttachments(pAttachmentHandles);
-            createInfo.renderPass(renderPassHandle);
-            createInfo.width(width);
-
-            for (long viewHandle : viewHandles) {
-                pAttachmentHandles.put(presentAttachIndex, viewHandle);
-
-                int retCode = VK10.vkCreateFramebuffer(
-                        vkDevice, createInfo, allocator, pHandle);
-                Utils.checkForError(retCode, "create a framebuffer");
-                long frameBufferHandle = pHandle.get(0);
-                result.add(frameBufferHandle);
-            }
-
-            return result;
-        }
-    }
-
-    /**
-     * Create a view for each image in the specified list.
-     *
-     * @param imageHandles the list of VkImage handles (not null)
-     * @param imageFormat the image format of the images
-     * @return a new list of VkImageView handles
-     */
-    private static List<Long> createImageViews(
-            List<Long> imageHandles, int imageFormat) {
-        int numImages = imageHandles.size();
-        List<Long> result = new ArrayList<>(numImages);
-
-        LogicalDevice logicalDevice = BaseApplication.getLogicalDevice();
-        int numMipLevels = 1;
-        for (long imageHandle : imageHandles) {
-            long viewHandle = logicalDevice.createImageView(imageHandle,
-                    imageFormat, VK10.VK_IMAGE_ASPECT_COLOR_BIT, numMipLevels);
-            result.add(viewHandle);
-        }
-
-        return result;
     }
 
     /**
