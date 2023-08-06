@@ -105,6 +105,21 @@ class NonGlobalUniformValues {
     }
 
     /**
+     * Rotate the model by the specified angle around the specified axis.
+     * <p>
+     * The axis is assumed to be a unit vector.
+     *
+     * @param angle the rotation angle (in radians)
+     * @param x the X component of the axis
+     * @param y the Y component of the axis
+     * @param z the Z component of the axis
+     */
+    void rotate(float angle, float x, float y, float z) {
+        modelMatrix.rotate(angle, x, y, z);
+        modelRotationMatrix.rotate(angle, x, y, z);
+    }
+
+    /**
      * Alter the mesh-to-world coordinate transform.
      *
      * @param desiredTransform the desired coordinate transform (not null)
