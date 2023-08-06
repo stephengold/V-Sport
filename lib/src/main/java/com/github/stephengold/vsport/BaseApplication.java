@@ -920,13 +920,11 @@ public abstract class BaseApplication {
      * use (not null)
      * @param framebufferExtent the framebuffer dimensions (not null)
      * @param passHandle the handle of the VkRenderPass to use (not null)
-     * @param mesh the mesh to be rendered (not null)
-     * @param shaderProgram the shader program to use (not null)
+     * @param geometry the Geometry to be rendered (not null)
      * @return the handle of the new {@code VkPipeline} (not null)
      */
     private static long createPipeline(long pipelineLayoutHandle,
-            VkExtent2D framebufferExtent, long passHandle, Mesh mesh,
-            ShaderProgram shaderProgram) {
+            VkExtent2D framebufferExtent, long passHandle, Geometry geometry) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             // color-blend attachment state - per attached frame buffer:
             VkPipelineColorBlendAttachmentState.Buffer cbaState
@@ -1028,6 +1026,7 @@ public abstract class BaseApplication {
 
             ByteBuffer entryPoint = stack.UTF8("main");
 
+            ShaderProgram shaderProgram = geometry.getProgram();
             long vertModuleHandle = shaderProgram.vertModuleHandle();
             vertCreateInfo.module(vertModuleHandle);
             vertCreateInfo.pName(entryPoint);
@@ -1051,6 +1050,7 @@ public abstract class BaseApplication {
                     VK10.VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO
             );
 
+            Mesh mesh = geometry.getMesh();
             VkVertexInputBindingDescription.Buffer pBindingDesc
                     = mesh.generateBindingDescription(stack);
             visCreateInfo.pVertexBindingDescriptions(pBindingDesc);
@@ -1699,10 +1699,8 @@ public abstract class BaseApplication {
                 updateDescriptorSet(texture, samplerHandle, globalUbo,
                         nonGlobalUbo, descriptorSetHandle);
 
-                Mesh mesh = geometry.getMesh();
-                ShaderProgram shaderProgram = geometry.getProgram();
                 long pipelineHandle = createPipeline(pipelineLayoutHandle,
-                        framebufferExtent, passHandle, mesh, shaderProgram);
+                        framebufferExtent, passHandle, geometry);
                 draw.setPipeline(pipelineHandle);
             }
             recordCommandBuffer(imageIndex, pass);
