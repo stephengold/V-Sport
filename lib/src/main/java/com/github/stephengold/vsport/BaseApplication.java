@@ -34,6 +34,7 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -496,6 +497,15 @@ public abstract class BaseApplication {
     }
 
     /**
+     * Hide the specified geometries.
+     *
+     * @param geometries the geometries to de-visualize (not null, unaffected)
+     */
+    public static void hideAll(Collection<Geometry> geometries) {
+        visibleGeometries.removeAll(geometries);
+    }
+
+    /**
      * Test whether debugging aids are enabled.
      *
      * @return true if enabled, otherwise false
@@ -538,6 +548,15 @@ public abstract class BaseApplication {
         result.rewind();
 
         return result;
+    }
+
+    /**
+     * Enumerate all the visible geometries.
+     *
+     * @return an unmodifiable collection of pre-existing objects
+     */
+    public static Collection<Geometry> listVisible() {
+        return Collections.unmodifiableCollection(visibleGeometries);
     }
 
     /**
