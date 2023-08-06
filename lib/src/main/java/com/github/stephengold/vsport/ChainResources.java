@@ -153,7 +153,7 @@ class ChainResources {
 
         this.passHandle
                 = createPass(imageFormat, colorAttachment, depthAttachment);
-        List<Long> imageHandles = listImages(chainHandle);
+        long[] imageHandles = listImages(chainHandle);
         for (long imageHandle : imageHandles) {
             CommandSequence sequence = new CommandSequence();
             sequenceList.add(sequence);
@@ -576,9 +576,9 @@ class ChainResources {
      * Enumerate the images created by a KHRSwapchain.
      *
      * @param chainHandle the handle of the {@code VkSwapchainKHR} (not null)
-     * @return a new List of {@code VkImage} handles
+     * @return a new array of {@code VkImage} handles
      */
-    private static List<Long> listImages(long chainHandle) {
+    private static long[] listImages(long chainHandle) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             // Count the images:
             VkDevice vkDevice = BaseApplication.getVkDevice();
@@ -594,11 +594,11 @@ class ChainResources {
                     vkDevice, chainHandle, pCount, pHandles);
             Utils.checkForError(retCode, "enumerate presentation images");
 
-            // Collect the image handles into a list:
-            List<Long> result = new ArrayList<>(numImages);
+            // Collect the image handles in an array:
+            long[] result = new long[numImages];
             for (int imageIndex = 0; imageIndex < numImages; ++imageIndex) {
-                long imageHandle = pHandles.get(imageIndex);
-                result.add(imageHandle);
+                long handle = pHandles.get(imageIndex);
+                result[imageIndex] = handle;
             }
 
             return result;
