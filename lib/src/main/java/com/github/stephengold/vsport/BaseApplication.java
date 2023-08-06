@@ -644,7 +644,7 @@ public abstract class BaseApplication {
      * Callback invoked during each iteration of the main update loop. Meant to
      * be overridden.
      */
-    public void render() {
+    protected void render() {
         // do nothing
     }
     // *************************************************************************
