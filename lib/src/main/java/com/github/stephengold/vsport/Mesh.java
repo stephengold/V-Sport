@@ -249,6 +249,16 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
 
     /**
+     * Count how many vertices this Mesh contains, based on VertexBuffer
+     * capacities, unmodified by draw mode and indexing.
+     *
+     * @return the count (&ge;0)
+     */
+    public int countVertices() {
+        return vertexCount;
+    }
+
+    /**
      * Generate an attribute-description buffer.
      *
      * @param stack for memory allocation (not null)
