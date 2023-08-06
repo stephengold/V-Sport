@@ -129,6 +129,7 @@ class ChainResources {
         Validate.nonZero(pipelineLayoutHandle, "pipeline-layout handle");
 
         this.numImages = chooseNumImages(surface);
+        System.out.println("numImages = " + numImages);
 
         this.poolHandle = createPool(numImages * 64); // TODO plenty for now
 
