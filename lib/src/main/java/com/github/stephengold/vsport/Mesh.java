@@ -421,6 +421,55 @@ public class Mesh implements jme3utilities.lbj.Mesh {
         }
     }
     // *************************************************************************
+    // new protected methods
+
+    /**
+     * Create a buffer for putting vertex indices.
+     *
+     * @param capacity the desired capacity (in indices, &ge;0)
+     * @return a new IndexBuffer with the specified capacity
+     */
+    protected IndexBuffer createIndices(int capacity) {
+        this.indexBuffer = new IndexBuffer(vertexCount, capacity);
+        return indexBuffer;
+    }
+
+    /**
+     * Create a buffer for putting vertex positions.
+     *
+     * @return a new buffer with a capacity of 3 * vertexCount floats
+     */
+    protected FloatBuffer createPositions() {
+        int numBytes = vertexCount * 3 * Float.BYTES;
+        int usage = VK10.VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+        boolean staging = false;
+        this.positionBuffer = new BufferResource(numBytes, usage, staging);
+
+        ByteBuffer byteBuffer = positionBuffer.getData();
+        byteBuffer.rewind();
+        this.positionFloats = byteBuffer.asFloatBuffer();
+
+        return positionFloats;
+    }
+
+    /**
+     * Create a buffer for putting vertex texture coordinates.
+     *
+     * @return a new buffer with a capacity of 2 * vertexCount floats
+     */
+    protected FloatBuffer createUvs() {
+        int numBytes = vertexCount * 2 * Float.BYTES;
+        int usage = VK10.VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+        boolean staging = false;
+        this.texCoordsBuffer = new BufferResource(numBytes, usage, staging);
+
+        ByteBuffer byteBuffer = texCoordsBuffer.getData();
+        byteBuffer.rewind();
+        this.texCoordsFloats = byteBuffer.asFloatBuffer();
+
+        return texCoordsFloats;
+    }
+    // *************************************************************************
     // jme3utilities.lbj.Mesh methods
 
     /**
