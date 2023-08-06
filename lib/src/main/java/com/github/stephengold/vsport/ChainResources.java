@@ -123,7 +123,7 @@ class ChainResources {
             int depthFormat, long samplerHandle, long pipelineLayoutHandle) {
         this.numImages = chooseNumImages(surface);
 
-        this.poolHandle = createPool(numImages);
+        this.poolHandle = createPool(numImages * 64); // TODO plenty for now
 
         VkSurfaceFormatKHR surfaceFormat = surface.chooseSurfaceFormat();
         this.imageFormat = surfaceFormat.format();

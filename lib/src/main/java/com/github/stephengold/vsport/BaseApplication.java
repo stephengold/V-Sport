@@ -33,6 +33,7 @@ import java.io.PrintStream;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -146,9 +147,10 @@ public abstract class BaseApplication {
      */
     private static ChainResources chainResources;
     /**
-     * geometry to be rendered
+     * all visible geometries
      */
-    private static Geometry sampleGeometry;
+    private static final Collection<Geometry> visibleGeometries
+            = new HashSet<>(256);
     /**
      * synchronization objects for frames in flight
      */
@@ -547,7 +549,7 @@ public abstract class BaseApplication {
         assert geometry.getMesh() != null;
         assert geometry.getProgram() != null;
 
-        sampleGeometry = geometry;
+        visibleGeometries.add(geometry);
     }
 
     /**
@@ -1591,21 +1593,25 @@ public abstract class BaseApplication {
         sequence.reset(); // not a one-time sequence
         sequence.addBeginRenderPass(chainResources, pass);
 
-        int geometryI = 0;
-        Draw draw = pass.getDraw(geometryI);
-        sequence.addBindPipeline(draw);
+        List<Geometry> geometryList = pass.getGeometryList();
+        int numGeometries = geometryList.size();
 
-        Geometry geometry = sampleGeometry;
-        sequence.addBindVertexBuffers(geometry);
+        for (int geometryI = 0; geometryI < numGeometries; ++geometryI) {
+            Draw draw = pass.getDraw(geometryI);
+            sequence.addBindPipeline(draw);
 
-        Mesh mesh = geometry.getMesh();
-        if (mesh.isIndexed()) {
-            IndexBuffer indexBuffer = mesh.getIndexBuffer();
-            sequence.addBindIndexBuffer(indexBuffer);
+            Geometry geometry = geometryList.get(geometryI);
+            sequence.addBindVertexBuffers(geometry);
+
+            Mesh mesh = geometry.getMesh();
+            if (mesh.isIndexed()) {
+                IndexBuffer indexBuffer = mesh.getIndexBuffer();
+                sequence.addBindIndexBuffer(indexBuffer);
+            }
+
+            sequence.addBindDescriptors(draw, pipelineLayoutHandle);
+            sequence.addDraw(geometry);
         }
-
-        sequence.addBindDescriptors(draw, pipelineLayoutHandle);
-        sequence.addDraw(geometry);
 
         sequence.addEndRenderPass();
         sequence.end();
@@ -1665,11 +1671,12 @@ public abstract class BaseApplication {
         }
 
         Pass pass = chainResources.getPass(imageIndex);
-        int geometryI = 0;
+        int numGeometries = visibleGeometries.size();
         List<Geometry> geometries = pass.getGeometryList();
         geometries.clear();
-        Geometry geometry = sampleGeometry;
-        geometries.add(geometry);
+        for (Geometry geometry : visibleGeometries) {
+            geometries.add(geometry);
+        }
 
         BufferResource globalUbo = pass.getGlobalUbo();
         ByteBuffer byteBuffer = globalUbo.getData();
@@ -1680,22 +1687,24 @@ public abstract class BaseApplication {
                     = chainResources.framebufferExtent(stack);
             long passHandle = chainResources.passHandle();
 
-            Draw draw = pass.getDraw(geometryI);
+            for (int geometryI = 0; geometryI < numGeometries; ++geometryI) {
+                Draw draw = pass.getDraw(geometryI);
 
-            BufferResource nonGlobalUbo = draw.getNonGlobalUbo();
-            geometry.writeUniformValuesTo(nonGlobalUbo);
+                BufferResource nonGlobalUbo = draw.getNonGlobalUbo();
+                Geometry geometry = geometries.get(geometryI);
+                geometry.writeUniformValuesTo(nonGlobalUbo);
 
-            Texture texture = geometry.getTexture();
-            long descriptorSetHandle = draw.descriptorSetHandle();
-            updateDescriptorSet(texture, samplerHandle, globalUbo,
-                    nonGlobalUbo, descriptorSetHandle);
+                Texture texture = geometry.getTexture();
+                long descriptorSetHandle = draw.descriptorSetHandle();
+                updateDescriptorSet(texture, samplerHandle, globalUbo,
+                        nonGlobalUbo, descriptorSetHandle);
 
-            Mesh mesh = geometry.getMesh();
-            ShaderProgram shaderProgram = geometry.getProgram();
-            long pipelineHandle = createPipeline(pipelineLayoutHandle,
-                    framebufferExtent, passHandle, mesh, shaderProgram);
-            draw.setPipeline(pipelineHandle);
-
+                Mesh mesh = geometry.getMesh();
+                ShaderProgram shaderProgram = geometry.getProgram();
+                long pipelineHandle = createPipeline(pipelineLayoutHandle,
+                        framebufferExtent, passHandle, mesh, shaderProgram);
+                draw.setPipeline(pipelineHandle);
+            }
             recordCommandBuffer(imageIndex, pass);
 
             Frame inFlightFrame = framesInFlight.get(imageIndex);
