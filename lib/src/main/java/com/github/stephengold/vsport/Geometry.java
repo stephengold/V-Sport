@@ -88,6 +88,18 @@ public class Geometry {
     // new methods exposed
 
     /**
+     * Return a copy of the mesh-to-world coordinate transform.
+     *
+     * @param storeResult storage for the result (modified if not null)
+     * @return the transform (either {@code storeResult} or a new matrix, not
+     * null)
+     */
+    public Matrix4x3f copyTransform(Matrix4x3f storeResult) {
+        Matrix4x3f result = uniformValues.getTransform(storeResult);
+        return result;
+    }
+
+    /**
      * Access the Mesh.
      *
      * @return the pre-existing object (not null)
@@ -115,18 +127,6 @@ public class Geometry {
     Texture getTexture() {
         assert texture != null;
         return texture;
-    }
-
-    /**
-     * Return the mesh-to-world coordinate transform.
-     *
-     * @param storeResult storage for the result (modified if not null)
-     * @return the transform (either {@code storeResult} or a new matrix, not
-     * null)
-     */
-    public Matrix4x3f getTransform(Matrix4x3f storeResult) {
-        Matrix4x3f result = uniformValues.getTransform(storeResult);
-        return result;
     }
 
     /**
