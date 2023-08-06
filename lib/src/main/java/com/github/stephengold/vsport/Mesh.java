@@ -237,37 +237,6 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
 
     /**
-     * Destroy all resources owned by this Mesh.
-     */
-    void destroy() {
-        if (colorBuffer != null) {
-            colorBuffer.destroy();
-            this.colorBuffer = null;
-            this.colorFloats = null;
-        }
-        if (texCoordsBuffer != null) {
-            texCoordsBuffer.destroy();
-            this.texCoordsBuffer = null;
-            this.texCoordsFloats = null;
-        }
-        if (normalBuffer != null) {
-            normalBuffer.destroy();
-            this.normalBuffer = null;
-            this.normalFloats = null;
-        }
-        if (positionBuffer != null) {
-            positionBuffer.destroy();
-            this.positionBuffer = null;
-            this.positionFloats = null;
-        }
-
-        if (indexBuffer != null) {
-            indexBuffer.destroy();
-            this.indexBuffer = null;
-        }
-    }
-
-    /**
      * Generate an attribute-description buffer.
      *
      * @param stack for memory allocation (not null)
