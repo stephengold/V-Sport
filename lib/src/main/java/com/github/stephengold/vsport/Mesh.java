@@ -259,6 +259,14 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
 
     /**
+     * Remove the normals from the mesh.
+     */
+    public void dropNormals() {
+        this.normalBuffer = null;
+        this.normalFloats = null;
+    }
+
+    /**
      * Generate an attribute-description buffer.
      *
      * @param stack for memory allocation (not null)
@@ -488,6 +496,99 @@ public class Mesh implements jme3utilities.lbj.Mesh {
         this.texCoordsFloats = byteBuffer.asFloatBuffer();
 
         return texCoordsFloats;
+    }
+
+    /**
+     * Assign new vertex indices.
+     *
+     * @param indexArray the vertex indices to use (not null, unaffected)
+     */
+    protected void setIndices(int... indexArray) {
+        this.indexBuffer = IndexBuffer.newInstance(indexArray);
+    }
+
+    /**
+     * Assign new normals to the vertices.
+     *
+     * @param normalArray the desired vertex normals (not null,
+     * length=3*vertexCount, unaffected)
+     */
+    protected void setNormals(float... normalArray) {
+        int numFloats = normalArray.length;
+        Validate.require(numFloats == vertexCount * numAxes, "correct length");
+
+        int numBytes = numFloats * Float.BYTES;
+        int usage = VK10.VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+        boolean staging = false;
+        this.normalBuffer = new BufferResource(numBytes, usage, staging) {
+            @Override
+            protected void fill(ByteBuffer destinationBuffer) {
+                for (int floatI = 0; floatI < numFloats; ++floatI) {
+                    float fValue = normalArray[floatI];
+                    destinationBuffer.putFloat(fValue);
+                }
+            }
+        };
+
+        ByteBuffer byteBuffer = normalBuffer.getData();
+        byteBuffer.flip();
+        this.normalFloats = byteBuffer.asFloatBuffer();
+    }
+
+    /**
+     * Assign new positions to the vertices.
+     *
+     * @param positionArray the desired vertex positions (not null,
+     * length=3*vertexCount, unaffected)
+     */
+    protected void setPositions(float... positionArray) {
+        int numFloats = positionArray.length;
+        Validate.require(numFloats == vertexCount * numAxes, "correct length");
+
+        int numBytes = numFloats * Float.BYTES;
+        int usage = VK10.VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+        boolean staging = false;
+        this.positionBuffer = new BufferResource(numBytes, usage, staging) {
+            @Override
+            protected void fill(ByteBuffer destinationBuffer) {
+                for (int floatI = 0; floatI < numFloats; ++floatI) {
+                    float fValue = positionArray[floatI];
+                    destinationBuffer.putFloat(fValue);
+                }
+            }
+        };
+
+        ByteBuffer byteBuffer = positionBuffer.getData();
+        byteBuffer.flip();
+        this.positionFloats = byteBuffer.asFloatBuffer();
+    }
+
+    /**
+     * Assign new texture coordinates to the vertices.
+     *
+     * @param uvArray the desired vertex texture coordinates (not null,
+     * length=2*vertexCount, unaffected)
+     */
+    protected void setUvs(float... uvArray) {
+        int numFloats = uvArray.length;
+        Validate.require(numFloats == 2 * vertexCount, "correct length");
+
+        int numBytes = numFloats * Float.BYTES;
+        int usage = VK10.VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+        boolean staging = false;
+        this.texCoordsBuffer = new BufferResource(numBytes, usage, staging) {
+            @Override
+            protected void fill(ByteBuffer destinationBuffer) {
+                for (int floatI = 0; floatI < numFloats; ++floatI) {
+                    float fValue = uvArray[floatI];
+                    destinationBuffer.putFloat(fValue);
+                }
+            }
+        };
+
+        ByteBuffer byteBuffer = texCoordsBuffer.getData();
+        byteBuffer.flip();
+        this.texCoordsFloats = byteBuffer.asFloatBuffer();
     }
     // *************************************************************************
     // jme3utilities.lbj.Mesh methods
