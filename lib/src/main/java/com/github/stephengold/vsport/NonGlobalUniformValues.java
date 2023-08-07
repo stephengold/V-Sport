@@ -120,6 +120,16 @@ class NonGlobalUniformValues {
     }
 
     /**
+     * Reset the model transform so that mesh coordinates and world coordinates
+     * are the same.
+     */
+    void resetModelTransform() {
+        modelScale.set(1f);
+        modelRotation.identity();
+        modelTranslation.zero();
+    }
+
+    /**
      * Rotate the model by the specified angle around the specified axis.
      * <p>
      * The axis is assumed to be a unit vector.

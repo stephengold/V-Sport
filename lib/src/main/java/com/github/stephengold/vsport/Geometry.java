@@ -129,6 +129,17 @@ public class Geometry {
     }
 
     /**
+     * Reset the model transform so that mesh coordinates and world coordinates
+     * are the same.
+     *
+     * @return the (modified) current instance (for chaining)
+     */
+    public Geometry resetModelTransform() {
+        uniformValues.resetModelTransform();
+        return this;
+    }
+
+    /**
      * Rotate the model by the specified angle around the specified axis.
      * <p>
      * The axis is assumed to be a unit vector.
