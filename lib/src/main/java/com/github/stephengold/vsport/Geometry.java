@@ -137,9 +137,11 @@ public class Geometry {
      * @param x the X component of the axis
      * @param y the Y component of the axis
      * @param z the Z component of the axis
+     * @return the (modified) current instance (for chaining)
      */
-    public void rotate(float angle, float x, float y, float z) {
+    public Geometry rotate(float angle, float x, float y, float z) {
         uniformValues.rotate(angle, x, y, z);
+        return this;
     }
 
     /**
@@ -175,9 +177,11 @@ public class Geometry {
      * Scale the model by the specified factor.
      *
      * @param factor the scaling factor (1 = no effect)
+     * @return the (modified) current instance (for chaining)
      */
-    public void scale(float factor) {
+    public Geometry scale(float factor) {
         uniformValues.scale(factor);
+        return this;
     }
 
     /**
@@ -215,19 +219,23 @@ public class Geometry {
      * @param x the desired X offset (in world coordinates)
      * @param y the desired Y offset (in world coordinates)
      * @param z the desired Z offset (in world coordinates)
+     * @return the (modified) current instance (for chaining)
      */
-    public void setTranslation(float x, float y, float z) {
+    public Geometry setTranslation(float x, float y, float z) {
         uniformValues.setTranslation(x, y, z);
+        return this;
     }
 
     /**
      * Alter the mesh-to-world offset.
      *
      * @param desiredOffset the desired offset (in world coordinates, not null)
+     * @return the (modified) current instance (for chaining)
      */
-    public void setTranslation(Vector3fc desiredOffset) {
+    public Geometry setTranslation(Vector3fc desiredOffset) {
         Validate.nonNull(desiredOffset, "desired offset");
         uniformValues.setTranslation(desiredOffset);
+        return this;
     }
 
     /**
