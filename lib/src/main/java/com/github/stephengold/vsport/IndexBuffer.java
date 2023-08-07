@@ -120,16 +120,6 @@ final public class IndexBuffer extends jme3utilities.lbj.IndexBuffer {
     }
 
     /**
-     * Return the type of index.
-     *
-     * @return either {@code VK_INDEX_TYPE_UINT16} or
-     * {@code VK_INDEX_TYPE_UINT32}
-     */
-    int indexType() {
-        return indexType;
-    }
-
-    /**
      * Flip the buffer. The limit is set to the current read/write position, and
      * then the read/write position is zeroed. The data in the buffer is
      * unaffected.
@@ -149,6 +139,16 @@ final public class IndexBuffer extends jme3utilities.lbj.IndexBuffer {
     long handle() {
         long result = bufferResource.handle();
         return result;
+    }
+
+    /**
+     * Return the type of index.
+     *
+     * @return either {@code VK_INDEX_TYPE_UINT16} or
+     * {@code VK_INDEX_TYPE_UINT32}
+     */
+    int indexType() {
+        return indexType;
     }
 
     /**
