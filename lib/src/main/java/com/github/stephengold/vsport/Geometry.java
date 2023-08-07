@@ -142,12 +142,12 @@ public class Geometry {
     /**
      * Rotate the model by the specified angle around the specified axis.
      * <p>
-     * The axis is assumed to be a unit vector.
+     * The rotation axis is assumed to be a unit vector.
      *
-     * @param angle the rotation angle (in radians)
-     * @param x the X component of the axis
-     * @param y the Y component of the axis
-     * @param z the Z component of the axis
+     * @param angle the rotation angle (in radians, 0 = no effect)
+     * @param x the X component of the rotation axis
+     * @param y the Y component of the rotation axis
+     * @param z the Z component of the rotation axis
      * @return the (modified) current instance (for chaining)
      */
     public Geometry rotate(float angle, float x, float y, float z) {

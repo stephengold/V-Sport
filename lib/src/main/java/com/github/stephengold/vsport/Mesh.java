@@ -421,7 +421,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
 
     /**
-     * Create a mesh by de-duplicating a sequence of vertices.
+     * Create a mesh by de-duplicating a list of vertices.
      *
      * @param vertices the vertex data to use (not null, unaffected)
      * @return a new instance

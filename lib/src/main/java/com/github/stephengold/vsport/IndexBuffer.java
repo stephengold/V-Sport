@@ -51,7 +51,7 @@ final public class IndexBuffer extends jme3utilities.lbj.IndexBuffer {
      */
     private BufferResource bufferResource;
     /**
-     * Vulkan data type of the individual elements (either
+     * Vulkan data type of the individual indices (either
      * {@code VK_INDEX_TYPE_UINT16} or {@code VK_INDEX_TYPE_UINT32})
      */
     final private int indexType;
@@ -82,7 +82,7 @@ final public class IndexBuffer extends jme3utilities.lbj.IndexBuffer {
      * @param data the data buffer to wrap (either a {@code ShortBuffer} or a
      * {@code IntBuffer}, alias created)
      * @param indexType either {@code VK_INDEX_TYPE_UINT16} or
-     * {@code VK_INDEX_TYPE_UINT32}}
+     * {@code VK_INDEX_TYPE_UINT32}
      * @param bufferResource (not null, alias created)
      */
     private IndexBuffer(
