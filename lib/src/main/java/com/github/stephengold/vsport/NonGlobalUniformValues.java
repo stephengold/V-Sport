@@ -110,9 +110,9 @@ class NonGlobalUniformValues {
      * The axis is assumed to be a unit vector.
      *
      * @param angle the rotation angle (in radians)
-     * @param x the X component of the axis
-     * @param y the Y component of the axis
-     * @param z the Z component of the axis
+     * @param x the X component of the rotation axis
+     * @param y the Y component of the rotation axis
+     * @param z the Z component of the rotation axis
      */
     void rotate(float angle, float x, float y, float z) {
         modelMatrix.rotate(angle, x, y, z);
@@ -120,7 +120,7 @@ class NonGlobalUniformValues {
     }
 
     /**
-     * Scale the model by the specified factor.
+     * Uniformly scale the model by the specified factor.
      *
      * @param factor the scaling factor
      */

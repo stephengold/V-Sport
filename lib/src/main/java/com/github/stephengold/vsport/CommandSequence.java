@@ -68,7 +68,7 @@ class CommandSequence {
     // fields
 
     /**
-     * underlying command buffer
+     * underlying lwjgl-vulkan command buffer
      */
     private VkCommandBuffer vkCommandBuffer;
     // *************************************************************************
@@ -181,7 +181,7 @@ class CommandSequence {
      */
     CommandSequence addBindIndexBuffer(IndexBuffer indexBuffer) {
         long bufferHandle = indexBuffer.handle();
-        int startOffset = 0;
+        int startOffset = 0; // byte offset in VkBuffer
         int elementType = indexBuffer.elementType();
         VK10.vkCmdBindIndexBuffer(
                 vkCommandBuffer, bufferHandle, startOffset, elementType);

@@ -158,9 +158,9 @@ class ChainResources {
 
         this.chainHandle = createChain(framebufferExtent, imageFormat,
                 numImages, surface, surfaceFormat, queueFamilies);
-
         this.passHandle
                 = createPass(imageFormat, colorAttachment, depthAttachment);
+
         long[] imageHandles = listImages(chainHandle);
         for (long imageHandle : imageHandles) {
             CommandSequence sequence = new CommandSequence();

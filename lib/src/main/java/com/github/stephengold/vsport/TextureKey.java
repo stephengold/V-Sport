@@ -50,6 +50,9 @@ public class TextureKey {
      * true to generate MIP maps, false to skip generating them
      */
     final private boolean mipmaps;
+    /**
+     * default setting for mipmaps
+     */
     private static boolean mipmapsDefault = true;
     /**
      * URI to load/generate image data

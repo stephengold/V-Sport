@@ -66,7 +66,7 @@ class PhysicalDevice {
     // fields
 
     /**
-     * encapsulated lwjgl-vulkan object
+     * underlying lwjgl-vulkan resource
      */
     final private VkPhysicalDevice vkPhysicalDevice;
     // *************************************************************************

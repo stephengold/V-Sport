@@ -51,7 +51,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     // constants
 
     /**
-     * number of axes in a vector
+     * number of axes in a 3-D vector
      */
     final private static int numAxes = 3;
     /**
@@ -207,7 +207,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
 
     /**
      * Instantiate a mesh with the specified number of vertices, but no indices,
-     * normals, positions, or texture coordinates.
+     * positions, colors, normals, or texture coordinates.
      *
      * @param vertexCount number of vertices (&ge;0)
      */
@@ -219,7 +219,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     // new methods exposed
 
     /**
-     * Count how many attributes this Mesh contains.
+     * Count how many attributes the mesh contains.
      *
      * @return the count (&gt;0)
      */
@@ -239,7 +239,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
 
     /**
-     * Count how many vertices this Mesh renders, taking indexing into account.
+     * Count how many vertices the mesh renders, taking indexing into account.
      *
      * @return the count (&ge;0)
      */
@@ -249,7 +249,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
 
     /**
-     * Count how many vertices this Mesh contains, based on VertexBuffer
+     * Count how many vertices the mesh contains, based on VertexBuffer
      * capacities, unmodified by draw mode and indexing.
      *
      * @return the count (&ge;0)
