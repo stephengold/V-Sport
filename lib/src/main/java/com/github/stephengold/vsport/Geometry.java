@@ -31,8 +31,7 @@ package com.github.stephengold.vsport;
 
 import java.nio.ByteBuffer;
 import jme3utilities.Validate;
-import org.joml.Matrix4x3f;
-import org.joml.Matrix4x3fc;
+import org.joml.Matrix4f;
 import org.joml.Vector3fc;
 
 /**
@@ -94,8 +93,8 @@ public class Geometry {
      * @return the transform (either {@code storeResult} or a new matrix, not
      * null)
      */
-    public Matrix4x3f copyTransform(Matrix4x3f storeResult) {
-        Matrix4x3f result = uniformValues.copyTransform(storeResult);
+    public Matrix4f copyTransform(Matrix4f storeResult) {
+        Matrix4f result = uniformValues.copyTransform(storeResult);
         return result;
     }
 
@@ -182,6 +181,22 @@ public class Geometry {
     }
 
     /**
+     * Alter the mesh-to-world coordinate rotation.
+     * <p>
+     * The axis is assumed to be a unit vector.
+     *
+     * @param angle the desired rotation angle (in radians)
+     * @param x the X component of the rotation axis
+     * @param y the Y component of the rotation axis
+     * @param z the Z component of the rotation axis
+     * @return the (modified) current instance (for chaining)
+     */
+    public Geometry setOrientation(float angle, float x, float y, float z) {
+        uniformValues.setOrientation(angle, x, y, z);
+        return this;
+    }
+
+    /**
      * Replace the geometry's primary Texture with one obtained using the
      * specified key.
      *
@@ -192,16 +207,6 @@ public class Geometry {
         Validate.nonNull(textureKey, "texture key");
         this.texture = BaseApplication.getTexture(textureKey);
         return this;
-    }
-
-    /**
-     * Alter the mesh-to-world coordinate transform.
-     *
-     * @param desiredTransform the desired coordinate transform (not null)
-     */
-    public void setTransform(Matrix4x3fc desiredTransform) {
-        Validate.nonNull(desiredTransform, "desired transform");
-        uniformValues.setTransform(desiredTransform);
     }
 
     /**

@@ -33,8 +33,8 @@ import java.nio.ByteBuffer;
 import jme3utilities.Validate;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
-import org.joml.Matrix4x3f;
-import org.joml.Matrix4x3fc;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector4f;
 
@@ -48,13 +48,22 @@ class NonGlobalUniformValues {
     // fields
 
     /**
+     * temporary storage (TODO not thread-safe)
+     */
+    final private static Matrix3f tmpMatrix3f = new Matrix3f();
+    final private static Matrix4f tmpMatrix4f = new Matrix4f();
+    /**
      * mesh-to-world coordinate rotation
      */
-    final private Matrix3f modelRotationMatrix = new Matrix3f();
+    final private Quaternionf modelRotation = new Quaternionf();
     /**
-     * mesh-to-world coordinate transform
+     * mesh-to-world coordinate scale factor for each local axis
      */
-    final private Matrix4f modelMatrix = new Matrix4f();
+    final private Vector3f modelScale = new Vector3f(1f);
+    /**
+     * mesh-to-world coordinate translation
+     */
+    final private Vector3f modelTranslation = new Vector3f();
     /**
      * material color to use with ambient/diffuse lighting
      */
@@ -73,10 +82,16 @@ class NonGlobalUniformValues {
      * @return the transform (either {@code storeResult} or a new matrix, not
      * null)
      */
-    Matrix4x3f copyTransform(Matrix4x3f storeResult) {
-        Matrix4x3f result
-                = (storeResult == null) ? new Matrix4x3f() : storeResult;
-        modelMatrix.get4x3(result);
+    Matrix4f copyTransform(Matrix4f storeResult) {
+        Matrix4f result = (storeResult == null) ? new Matrix4f() : storeResult;
+        /*
+         * Conceptually, the order of application is: scale, then rotate, then
+         * translate. However, matrices combine using post-multiplication ...
+         */
+        storeResult.translation(modelTranslation);
+        storeResult.rotate(modelRotation);
+        storeResult.scale(modelScale);
+
         return result;
     }
 
@@ -115,8 +130,9 @@ class NonGlobalUniformValues {
      * @param z the Z component of the rotation axis
      */
     void rotate(float angle, float x, float y, float z) {
-        modelMatrix.rotate(angle, x, y, z);
-        modelRotationMatrix.rotate(angle, x, y, z);
+        Quaternionf q = new Quaternionf();
+        q.fromAxisAngleRad(x, y, z, angle);
+        modelRotation.premul(q);
     }
 
     /**
@@ -125,19 +141,21 @@ class NonGlobalUniformValues {
      * @param factor the scaling factor
      */
     void scale(float factor) {
-        modelMatrix.scale(factor);
+        modelScale.mul(factor);
     }
 
     /**
-     * Alter the mesh-to-world coordinate transform.
+     * Alter the mesh-to-world coordinate rotation.
+     * <p>
+     * The axis is assumed to be a unit vector.
      *
-     * @param desiredTransform the desired coordinate transform (not null)
+     * @param angle the desired rotation angle (in radians)
+     * @param x the X component of the rotation axis
+     * @param y the Y component of the rotation axis
+     * @param z the Z component of the rotation axis
      */
-    void setTransform(Matrix4x3fc desiredTransform) {
-        Validate.nonNull(desiredTransform, "desired transform");
-
-        modelMatrix.set4x3(desiredTransform);
-        modelRotationMatrix.set(desiredTransform);
+    void setOrientation(float angle, float x, float y, float z) {
+        modelRotation.fromAxisAngleRad(x, y, z, angle);
     }
 
     /**
@@ -148,7 +166,7 @@ class NonGlobalUniformValues {
      * @param z the desired Z offset (in world coordinates)
      */
     void setTranslation(float x, float y, float z) {
-        modelMatrix.setTranslation(x, y, z);
+        modelTranslation.set(x, y, z);
     }
 
     /**
@@ -158,7 +176,7 @@ class NonGlobalUniformValues {
      */
     void setTranslation(Vector3fc desiredOffset) {
         Validate.nonNull(desiredOffset, "desired offset");
-        modelMatrix.setTranslation(desiredOffset);
+        modelTranslation.set(desiredOffset);
     }
 
     /**
@@ -176,12 +194,14 @@ class NonGlobalUniformValues {
 
         // mat4 modelMatrix
         byteOffset = Utils.align(byteOffset, 16);
-        modelMatrix.get(byteOffset, target);
+        copyTransform(tmpMatrix4f);
+        tmpMatrix4f.get(byteOffset, target);
         byteOffset += 4 * 4 * Float.BYTES;
 
         // mat3 modelRotationMatrix
         byteOffset = Utils.align(byteOffset, 16);
-        modelRotationMatrix.get(byteOffset, target);
+        tmpMatrix3f.set(modelRotation);
+        tmpMatrix3f.get(byteOffset, target);
         byteOffset += 3 * 3 * Float.BYTES;
 
         // vec4 SpecularMaterialColor
