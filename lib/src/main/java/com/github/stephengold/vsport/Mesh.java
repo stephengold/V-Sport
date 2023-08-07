@@ -411,6 +411,34 @@ public class Mesh implements jme3utilities.lbj.Mesh {
             return true;
         }
     }
+
+    /**
+     * Create a mesh by de-duplicating a sequence of vertices.
+     *
+     * @param vertices the vertex data to use (not null, unaffected)
+     * @return a new instance
+     */
+    public static Mesh newInstance(List<Vertex> vertices) {
+        int count = vertices.size();
+        List<Integer> tempIndices = new ArrayList<>(count);
+        List<Vertex> tempVertices = new ArrayList<>(count);
+        Map<Vertex, Integer> tempMap = new HashMap<>(count);
+
+        for (Vertex vertex : vertices) {
+            Integer index = tempMap.get(vertex);
+            if (index == null) {
+                int nextIndex = tempVertices.size();
+                tempIndices.add(nextIndex);
+                tempVertices.add(vertex);
+                tempMap.put(vertex, nextIndex);
+            } else { // reuse a vertex we've already seen
+                tempIndices.add(index);
+            }
+        }
+
+        Mesh result = new Mesh(tempIndices, tempVertices);
+        return result;
+    }
     // *************************************************************************
     // new protected methods
 
@@ -513,34 +541,6 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     @Override
     public boolean isPureTriangles() {
         return true;
-    }
-
-    /**
-     * Create a mesh by de-duplicating a sequence of vertices.
-     *
-     * @param vertices the vertex data to use (not null, unaffected)
-     * @return a new instance
-     */
-    public static Mesh newInstance(List<Vertex> vertices) {
-        int count = vertices.size();
-        List<Integer> tempIndices = new ArrayList<>(count);
-        List<Vertex> tempVertices = new ArrayList<>(count);
-        Map<Vertex, Integer> tempMap = new HashMap<>(count);
-
-        for (Vertex vertex : vertices) {
-            Integer index = tempMap.get(vertex);
-            if (index == null) {
-                int nextIndex = tempVertices.size();
-                tempIndices.add(nextIndex);
-                tempVertices.add(vertex);
-                tempMap.put(vertex, nextIndex);
-            } else { // reuse a vertex we've already seen
-                tempIndices.add(index);
-            }
-        }
-
-        Mesh result = new Mesh(tempIndices, tempVertices);
-        return result;
     }
 
     /**
