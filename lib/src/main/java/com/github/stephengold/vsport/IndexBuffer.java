@@ -81,17 +81,17 @@ final public class IndexBuffer extends jme3utilities.lbj.IndexBuffer {
      *
      * @param data the data buffer to wrap (either a {@code ShortBuffer} or a
      * {@code IntBuffer}, alias created)
-     * @param elementType either {@code VK_INDEX_TYPE_UINT16} or
+     * @param indexType either {@code VK_INDEX_TYPE_UINT16} or
      * {@code VK_INDEX_TYPE_UINT32}}
      * @param bufferResource (not null, alias created)
      */
     private IndexBuffer(
-            Buffer data, int elementType, BufferResource bufferResource) {
+            Buffer data, int indexType, BufferResource bufferResource) {
         super(data);
 
-        assert elementType == VK10.VK_INDEX_TYPE_UINT16
-                || elementType == VK10.VK_INDEX_TYPE_UINT32 : elementType;
-        this.indexType = elementType;
+        assert indexType == VK10.VK_INDEX_TYPE_UINT16
+                || indexType == VK10.VK_INDEX_TYPE_UINT32 : indexType;
+        this.indexType = indexType;
 
         assert bufferResource != null;
         this.bufferResource = bufferResource;
