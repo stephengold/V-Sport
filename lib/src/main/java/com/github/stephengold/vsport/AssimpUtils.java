@@ -192,8 +192,7 @@ final public class AssimpUtils {
             Vector2fc texCoords = null;
             if (pAiTexCoords != null) {
                 AIVector3D aiTexCoords = pAiTexCoords.get(vertexIndex);
-                // TODO:  Why must coordinates be swapped here?
-                texCoords = new Vector2f(aiTexCoords.y(), aiTexCoords.x());
+                texCoords = new Vector2f(aiTexCoords.x(), aiTexCoords.y());
             }
 
             Vertex vertex = new Vertex(position, color, normal, texCoords);

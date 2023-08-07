@@ -382,9 +382,12 @@ public class Texture extends DeviceResource {
         Texture result = new Texture(numBytes, w, h, generateMipMaps) {
             @Override
             protected void fill(ByteBuffer pixels) {
-                // Copy pixel-by-pixel from the BufferedImage.
-                for (int x = 0; x < w; ++x) {
-                    for (int y = 0; y < h; ++y) {
+                /*
+                 * Copy pixel-by-pixel from the BufferedImage, in row-major
+                 * order, starting from uv=(0,0).
+                 */
+                for (int y = 0; y < h; ++y) { // row index
+                    for (int x = 0; x < w; ++x) { // column index
                         int argb = image.getRGB(x, y);
                         int red = (argb >> 16) & 0xFF;
                         int green = (argb >> 8) & 0xFF;
