@@ -53,7 +53,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     /**
      * number of axes in a 3-D vector
      */
-    final private static int numAxes = 3;
+    final protected static int numAxes = 3;
     /**
      * number of vertices per triangle
      */
