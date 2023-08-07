@@ -415,13 +415,14 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     // new protected methods
 
     /**
-     * Create a buffer for putting vertex indices.
+     * Replace any existing index buffer with a new one containing the specified
+     * indices.
      *
-     * @param capacity the desired capacity (in indices, &ge;0)
+     * @param indices the desired vertex indices (not null, unaffected)
      * @return a new IndexBuffer with the specified capacity
      */
-    protected IndexBuffer createIndices(int capacity) {
-        this.indexBuffer = new IndexBuffer(vertexCount, capacity);
+    protected IndexBuffer createIndices(List<Integer> indices) {
+        this.indexBuffer = IndexBuffer.newInstance(indices);
         return indexBuffer;
     }
 
