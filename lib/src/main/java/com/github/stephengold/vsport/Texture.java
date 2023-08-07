@@ -116,10 +116,11 @@ public class Texture extends DeviceResource {
      * @param uri the URI from which the stream data originated (not null)
      * @param generateMipMaps true to generate MIP maps, false to skip MIP-map
      * generation
+     * @param flipAxes option for flipping axes (not null)
      * @return a new texture (not null)
      */
-    static Texture newInstance(
-            InputStream stream, URI uri, boolean generateMipMaps) {
+    static Texture newInstance(InputStream stream, URI uri,
+            boolean generateMipMaps, FlipAxes flipAxes) {
         ImageIO.setUseCache(false);
         BufferedImage image;
         try {
@@ -131,7 +132,7 @@ public class Texture extends DeviceResource {
             throw new RuntimeException(message, exception);
         }
 
-        Texture result = newInstance(image, generateMipMaps);
+        Texture result = newInstance(image, generateMipMaps, flipAxes);
         return result;
     }
 
@@ -367,10 +368,11 @@ public class Texture extends DeviceResource {
      * @param image the image to use (not null)
      * @param generateMipMaps true to generate MIP maps, false to skip MIP-map
      * generation
+     * @param flipAxes option for flipping axes (not null)
      * @return a new instance (not null)
      */
     private static Texture newInstance(
-            BufferedImage image, boolean generateMipMaps) {
+            BufferedImage image, boolean generateMipMaps, FlipAxes flipAxes) {
         /*
          * Note: loading with AWT instead of STB
          * (which doesn't handle InputStream input).
@@ -385,8 +387,18 @@ public class Texture extends DeviceResource {
                 /*
                  * Copy pixel-by-pixel from the BufferedImage, in row-major
                  * order, starting from uv=(0,0).
+                 *
+                 * In an AWT BufferedImage, xy=(0,0) is in the upper left, hence
+                 * we usually want FlipAxes.flipY.
                  */
-                for (int y = 0; y < h; ++y) { // row index
+                for (int uu = 0; uu < h; ++uu) { // row index starting from U=0
+                    int y;
+                    if (flipAxes == FlipAxes.flipY) {
+                        y = h - uu - 1;
+                    } else {
+                        y = uu;
+                    }
+
                     for (int x = 0; x < w; ++x) { // column index
                         int argb = image.getRGB(x, y);
                         int red = (argb >> 16) & 0xFF;

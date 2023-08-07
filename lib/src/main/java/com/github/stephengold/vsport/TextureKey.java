@@ -47,6 +47,14 @@ public class TextureKey {
     // fields
 
     /**
+     * option for flipping axes (not null)
+     */
+    final private FlipAxes flipAxes;
+    /**
+     * default setting for the {@code flipAxes} parameter (not null)
+     */
+    private static FlipAxes flipAxesDefault = FlipAxes.flipY;
+    /**
      * true to generate MIP maps, false to skip generating them
      */
     final private boolean mipmaps;
@@ -68,7 +76,7 @@ public class TextureKey {
      * empty)
      */
     public TextureKey(String uriString) {
-        this(uriString, mipmapsDefault);
+        this(uriString, mipmapsDefault, flipAxesDefault);
     }
 
     /**
@@ -76,9 +84,10 @@ public class TextureKey {
      *
      * @param uriString unparsed URI to load/generate image data (not null, not
      * empty)
-     * @param mipmaps true to generate MIP maps, false to skip (default=true)
+     * @param mipmaps true to generate MIP maps, false to skip
+     * @param flipAxes option for flipping axes (not null)
      */
-    public TextureKey(String uriString, boolean mipmaps) {
+    public TextureKey(String uriString, boolean mipmaps, FlipAxes flipAxes) {
         // It's better to report URI errors now than during load()!
         validateUriString(uriString);
 
@@ -89,6 +98,7 @@ public class TextureKey {
         }
 
         this.mipmaps = mipmaps;
+        this.flipAxes = flipAxes;
     }
     // *************************************************************************
     // new methods exposed
@@ -127,7 +137,7 @@ public class TextureKey {
                 }
             }
 
-            result = Texture.newInstance(stream, uri, mipmaps);
+            result = Texture.newInstance(stream, uri, mipmaps, flipAxes);
         }
 
         return result;
@@ -143,9 +153,18 @@ public class TextureKey {
     }
 
     /**
-     * Alter the default mipmaps setting for new texture keys.
+     * Alter the default {@code flipAxes} setting for new texture keys.
      *
-     * @param enable the setting to be assigned (default=true)
+     * @param flipAxes the setting to become the default (default=flipY)
+     */
+    public static void setDefaultFlip(FlipAxes flipAxes) {
+        flipAxesDefault = flipAxes;
+    }
+
+    /**
+     * Alter the default MIP-maps setting for new texture keys.
+     *
+     * @param enable the setting to become the default (default=true)
      */
     public static void setDefaultMipmaps(boolean enable) {
         mipmapsDefault = enable;
@@ -168,7 +187,9 @@ public class TextureKey {
         } else if (otherObject != null
                 && otherObject.getClass() == getClass()) {
             TextureKey otherKey = (TextureKey) otherObject;
-            result = uri.equals(otherKey.uri) && mipmaps == otherKey.mipmaps;
+            result = uri.equals(otherKey.uri)
+                    && mipmaps == otherKey.mipmaps
+                    && flipAxes == otherKey.flipAxes;
 
         } else {
             result = false;
@@ -186,6 +207,7 @@ public class TextureKey {
     public int hashCode() {
         int hash = uri.hashCode();
         hash = 707 * hash + (mipmaps ? 1 : 0);
+        hash = 707 * hash + flipAxes.hashCode();
 
         return hash;
     }
@@ -198,7 +220,8 @@ public class TextureKey {
     @Override
     public String toString() {
         String mm = mipmaps ? "+" : "-";
-        String result = String.format("TextureKey(%s%n %smipmaps)", uri, mm);
+        String result = String.format(
+                "TextureKey(%s%n %s %smipmaps)", uri, flipAxes, mm);
 
         return result;
     }
