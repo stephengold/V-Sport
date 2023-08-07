@@ -157,7 +157,7 @@ public class TextureKey {
      *
      * @param flipAxes the setting to become the default (default=flipY)
      */
-    public static void setDefaultFlip(FlipAxes flipAxes) {
+    public static void setDefaultFlipAxes(FlipAxes flipAxes) {
         flipAxesDefault = flipAxes;
     }
 
