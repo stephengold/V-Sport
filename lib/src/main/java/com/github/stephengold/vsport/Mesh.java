@@ -57,7 +57,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     /**
      * number of vertices per triangle
      */
-    final static int vpt = 3;
+    final public static int vpt = 3;
     // *************************************************************************
     // fields
 
