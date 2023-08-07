@@ -162,6 +162,58 @@ final public class IndexBuffer extends jme3utilities.lbj.IndexBuffer {
     }
 
     /**
+     * Create an IndexBuffer from an array of vertex indices.
+     *
+     * @param indices the desired indices (not null, unaffected)
+     * @return a new instance (not null)
+     */
+    static IndexBuffer newInstance(int[] indices) {
+        int numIndices = indices.length;
+        boolean staging = false;
+        int maxIndex = Utils.maxInt(indices);
+        int numVertices = 1 + maxIndex;
+
+        BufferResource resource;
+        int elementType;
+        Buffer data;
+        if (numVertices > (1 << 16)) {
+            elementType = VK10.VK_INDEX_TYPE_UINT32;
+            int numBytes = numIndices * Integer.BYTES;
+            resource = new BufferResource(
+                    numBytes, VK10.VK_BUFFER_USAGE_INDEX_BUFFER_BIT, staging) {
+                @Override
+                protected void fill(ByteBuffer destinationBuffer) {
+                    for (int vIndex : indices) {
+                        destinationBuffer.putInt(vIndex);
+                    }
+                }
+            };
+            ByteBuffer bytes = resource.getData();
+            bytes.flip();
+            data = bytes.asIntBuffer();
+
+        } else { // Use 16-bit indices to conserve memory:
+            elementType = VK10.VK_INDEX_TYPE_UINT16;
+            int numBytes = numIndices * Short.BYTES;
+            resource = new BufferResource(
+                    numBytes, VK10.VK_BUFFER_USAGE_INDEX_BUFFER_BIT, staging) {
+                @Override
+                protected void fill(ByteBuffer destinationBuffer) {
+                    for (int vIndex : indices) {
+                        destinationBuffer.putShort((short) vIndex);
+                    }
+                }
+            };
+            ByteBuffer bytes = resource.getData();
+            bytes.flip();
+            data = bytes.asShortBuffer();
+        }
+
+        IndexBuffer result = new IndexBuffer(data, elementType, resource);
+        return result;
+    }
+
+    /**
      * Create an IndexBuffer from a list of indices.
      *
      * @param indices the desired indices (not null, unaffected)
