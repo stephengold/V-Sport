@@ -31,6 +31,7 @@ package com.github.stephengold.vsport.test;
 
 import com.github.stephengold.vsport.AssimpUtils;
 import com.github.stephengold.vsport.BaseApplication;
+import com.github.stephengold.vsport.FlipAxes;
 import com.github.stephengold.vsport.Geometry;
 import com.github.stephengold.vsport.Mesh;
 import com.github.stephengold.vsport.TextureKey;
@@ -80,7 +81,8 @@ public class HelloVSport extends BaseApplication {
         Mesh mesh = Mesh.newInstance(vertices);
 
         TextureKey textureKey = new TextureKey(
-                "classpath:/Models/viking_room/viking_room.png");
+                "classpath:/Models/viking_room/viking_room.png",
+                true, FlipAxes.noFlip);
 
         Geometry geometry = new Geometry(mesh);
         geometry.setProgram("Unshaded/Texture");
