@@ -182,9 +182,9 @@ class CommandSequence {
     CommandSequence addBindIndexBuffer(IndexBuffer indexBuffer) {
         long bufferHandle = indexBuffer.handle();
         int startOffset = 0; // byte offset in VkBuffer
-        int elementType = indexBuffer.elementType();
+        int indexType = indexBuffer.indexType();
         VK10.vkCmdBindIndexBuffer(
-                vkCommandBuffer, bufferHandle, startOffset, elementType);
+                vkCommandBuffer, bufferHandle, startOffset, indexType);
 
         return this;
     }

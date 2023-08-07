@@ -54,7 +54,7 @@ final public class IndexBuffer extends jme3utilities.lbj.IndexBuffer {
      * Vulkan data type of the individual elements (either
      * {@code VK_INDEX_TYPE_UINT16} or {@code VK_INDEX_TYPE_UINT32})
      */
-    final private int elementType;
+    final private int indexType;
     // *************************************************************************
     // constructors
 
@@ -70,9 +70,9 @@ final public class IndexBuffer extends jme3utilities.lbj.IndexBuffer {
         Validate.nonNegative(capacity, "capacity");
 
         if (maxVertices > (1 << 16)) {
-            elementType = VK10.VK_INDEX_TYPE_UINT32;
+            indexType = VK10.VK_INDEX_TYPE_UINT32;
         } else { // Use 16-bit indices to conserve memory:
-            elementType = VK10.VK_INDEX_TYPE_UINT16;
+            indexType = VK10.VK_INDEX_TYPE_UINT16;
         }
     }
 
@@ -91,7 +91,7 @@ final public class IndexBuffer extends jme3utilities.lbj.IndexBuffer {
 
         assert elementType == VK10.VK_INDEX_TYPE_UINT16
                 || elementType == VK10.VK_INDEX_TYPE_UINT32 : elementType;
-        this.elementType = elementType;
+        this.indexType = elementType;
 
         assert bufferResource != null;
         this.bufferResource = bufferResource;
@@ -125,8 +125,8 @@ final public class IndexBuffer extends jme3utilities.lbj.IndexBuffer {
      * @return either {@code VK_INDEX_TYPE_UINT16} or
      * {@code VK_INDEX_TYPE_UINT32}
      */
-    int elementType() {
-        return elementType;
+    int indexType() {
+        return indexType;
     }
 
     /**
