@@ -46,7 +46,7 @@ public class BufferResource extends DeviceResource {
      * true to use a staging buffer during creation, false to create a
      * persistent mapping
      */
-    private boolean staging;
+    final private boolean staging;
     /**
      * mapped data buffer, or null if none
      */
@@ -54,12 +54,12 @@ public class BufferResource extends DeviceResource {
     /**
      * buffer size in bytes (&ge;0)
      */
-    private int numBytes;
+    final private int numBytes;
     /**
      * bitmask specifying the intended usage (index buffer, UBO, vertex buffer,
      * etcetera)
      */
-    private int usage;
+    final private int usage;
     /**
      * underlying VkBuffer and VkDeviceMemory
      */
