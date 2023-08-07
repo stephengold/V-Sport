@@ -239,4 +239,23 @@ final class Utils {
         int result = 31 - Integer.numberOfLeadingZeros(iValue);
         return result;
     }
+
+    /**
+     * Find the maximum of some int values.
+     *
+     * @param iValues the input values
+     * @return the most positive value
+     * @see Collections#max()
+     * @see java.lang.Math#max(int, int)
+     */
+    public static int maxInt(int... iValues) {
+        int result = Integer.MIN_VALUE;
+        for (int iValue : iValues) {
+            if (iValue > result) {
+                result = iValue;
+            }
+        }
+
+        return result;
+    }
 }
