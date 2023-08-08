@@ -507,6 +507,24 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
 
     /**
+     * Create a buffer for putting vertex normals.
+     *
+     * @return a new buffer with a capacity of 3 * vertexCount floats
+     */
+    protected FloatBuffer createNormals() {
+        int numBytes = vertexCount * 3 * Float.BYTES;
+        int usage = VK10.VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+        boolean staging = false;
+        this.normalBuffer = new BufferResource(numBytes, usage, staging);
+
+        ByteBuffer byteBuffer = normalBuffer.getData();
+        byteBuffer.rewind();
+        this.normalFloats = byteBuffer.asFloatBuffer();
+
+        return normalFloats;
+    }
+
+    /**
      * Create a buffer for putting vertex positions.
      *
      * @return a new buffer with a capacity of 3 * vertexCount floats
