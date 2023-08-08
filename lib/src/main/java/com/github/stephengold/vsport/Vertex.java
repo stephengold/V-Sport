@@ -31,7 +31,9 @@ package com.github.stephengold.vsport;
 
 import java.nio.ByteBuffer;
 import jme3utilities.Validate;
+import org.joml.Vector2f;
 import org.joml.Vector2fc;
+import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
 /**
@@ -49,41 +51,41 @@ public class Vertex {
     /**
      * texture coordinates (2 floats) or null if not present
      */
-    final private Vector2fc texCoords;
+    final private Vector2f texCoords;
     /**
      * vertex colors (3 floats) or null if not present
      */
-    final private Vector3fc color;
+    final private Vector3f color;
     /**
      * vertex normal in mesh coordinates (3 floats) or null if not present
      */
-    final private Vector3fc normal;
+    final private Vector3f normal;
     /**
      * vertex position in mesh coordinates (3 floats)
      */
-    final private Vector3fc position;
+    final private Vector3f position;
     // *************************************************************************
     // constructors
 
     /**
      * Instantiate a mesh vertex from attribute values.
      *
-     * @param position the desired location of the vertex (in model coordinates,
-     * not null, alias created)
-     * @param color the desired color of the vertex (alias created if not null))
-     * @param normal the desired normal direction at the vertex (alias created
-     * if not null))
-     * @param texCoords the desired texture coordinates of the vertex (alias
-     * created if not null)
+     * @param position the desired position (in mesh coordinates, not null,
+     * unaffected)
+     * @param color the desired color (may be null, unaffected)
+     * @param normal the desired normal direction (unit vector in mesh
+     * coordinates, may be null, unaffected)
+     * @param texCoords the desired texture coordinates (may be null,
+     * unaffected)
      */
     Vertex(Vector3fc position, Vector3fc color, Vector3fc normal,
             Vector2fc texCoords) {
         Validate.nonNull(position, "position");
 
-        this.position = position;
-        this.color = color;
-        this.normal = normal;
-        this.texCoords = texCoords;
+        this.position = new Vector3f(position);
+        this.color = (color == null) ? null : new Vector3f(color);
+        this.normal = (normal == null) ? null : new Vector3f(normal);
+        this.texCoords = (texCoords == null) ? null : new Vector2f(texCoords);
     }
     // *************************************************************************
     // new methods exposed
