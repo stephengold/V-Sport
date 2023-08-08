@@ -93,7 +93,7 @@ public class Vertex {
      *
      * @return true if present, otherwise false
      */
-    boolean hasColor() {
+    public boolean hasColor() {
         if (color == null) {
             return false;
         } else {
@@ -106,7 +106,7 @@ public class Vertex {
      *
      * @return true if present, otherwise false
      */
-    boolean hasNormal() {
+    public boolean hasNormal() {
         if (normal == null) {
             return false;
         } else {
@@ -119,7 +119,7 @@ public class Vertex {
      *
      * @return true if present, otherwise false
      */
-    boolean hasTexCoords() {
+    public boolean hasTexCoords() {
         if (texCoords == null) {
             return false;
         } else {
