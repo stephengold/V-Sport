@@ -720,8 +720,8 @@ public class Mesh implements jme3utilities.lbj.Mesh {
 
         for (int i = 0; i < numRendered; ++i) {
             if ((i % vpt) == 0) {
+                result.append(nl);
             }
-
             int vertexIndex = (indexBuffer == null) ? i : indexBuffer.get(i);
             result.append(vertexIndex);
             result.append(": ");
