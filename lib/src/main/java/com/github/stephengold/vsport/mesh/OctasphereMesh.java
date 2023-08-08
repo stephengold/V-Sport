@@ -31,14 +31,14 @@ package com.github.stephengold.vsport.mesh;
 
 import com.github.stephengold.vsport.Mesh;
 import com.jme3.math.FastMath;
-import com.jme3.math.Vector3f;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import jme3utilities.Validate;
-import jme3utilities.math.MyVector3f;
+import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 /**
  * A triangle mesh (with texture coordinates) that approximates a sphere,
@@ -96,7 +96,7 @@ public class OctasphereMesh extends Mesh {
     /**
      * vertex locations in a regular octahedron with radius=1
      */
-    final private static Vector3f[] octaLocations = {
+    final private static Vector3fc[] octaLocations = {
         new Vector3f(-1f, 0f, 0f), // [0]
         new Vector3f(+1f, 0f, 0f), // [1]
         new Vector3f(0f, -1f, 0f), // [2]
@@ -127,7 +127,7 @@ public class OctasphereMesh extends Mesh {
      * map vertex indices to location vectors in mesh coordinates, all with
      * length=1
      */
-    final private List<Vector3f> locations = new ArrayList<>(305);
+    final private List<Vector3fc> locations = new ArrayList<>(305);
     /**
      * cache to avoid duplicate vertices: map index pairs to midpoint indices
      */
@@ -301,9 +301,9 @@ public class OctasphereMesh extends Mesh {
      * @param uOverride U value if the vertex has Y=0, otherwise null
      * @return the index assigned to the new vertex (&ge;0)
      */
-    private int addVertex(Vector3f location, Float uOverride) {
+    private int addVertex(Vector3fc location, Float uOverride) {
         float length = location.length();
-        locations.add(location.mult(1f / length));
+        locations.add(new Vector3f(location).mul(1f / length));
         uOverrides.add(uOverride);
         assert locations.size() == uOverrides.size();
 
@@ -368,11 +368,11 @@ public class OctasphereMesh extends Mesh {
      * unaffected)
      * @return the north latitude in (in radians)
      */
-    private static float latitude(Vector3f input) {
+    private static float latitude(Vector3fc input) {
         float result;
         float length = input.length();
         if (length > 0f) {
-            result = (float) Math.asin(input.z / length);
+            result = (float) Math.asin(input.z() / length);
         } else {
             result = 0f;
         }
@@ -388,10 +388,10 @@ public class OctasphereMesh extends Mesh {
      * unaffected)
      * @return the west longitude (in radians)
      */
-    private static float longitude(Vector3f input) {
+    private static float longitude(Vector3fc input) {
         float result;
-        if (input.x != 0f || input.y != 0f) {
-            result = -FastMath.atan2(input.y, input.x);
+        if (input.x() != 0f || input.y() != 0f) {
+            result = -FastMath.atan2(input.y(), input.x());
         } else {
             result = 0f;
         }
@@ -418,12 +418,12 @@ public class OctasphereMesh extends Mesh {
         }
 
         // The midpoint vertex is not in the cache: calculate its location.
-        Vector3f loc1 = locations.get(p1);
-        Vector3f loc2 = locations.get(p2);
-        Vector3f middleLocation = MyVector3f.midpoint(loc1, loc2, null);
+        Vector3fc loc1 = locations.get(p1); // alias
+        Vector3fc loc2 = locations.get(p2); // alias
+        Vector3fc middleLocation = new Vector3f(loc1).add(loc2).div(2f);
 
         Float middleUOverride = null;
-        if (middleLocation.y == 0f) {
+        if (middleLocation.y() == 0f) {
             middleUOverride = uOverrides.get(p1);
             assert uOverrides.get(p2).equals(middleUOverride);
         } else {
@@ -445,12 +445,14 @@ public class OctasphereMesh extends Mesh {
      * @param vIndex the index of the vertex (&ge;0)
      */
     private void putVertex(int vIndex) {
-        Vector3f pos = locations.get(vIndex); // alias
-        posBuffer.put(pos.x).put(pos.y).put(pos.z);
+        Vector3fc pos = locations.get(vIndex); // alias
+        posBuffer.put(pos.x())
+                .put(pos.y())
+                .put(pos.z());
 
         float longitude = longitude(pos);
         float u;
-        if (pos.y == 0f) {
+        if (pos.y() == 0f) {
             u = uOverrides.get(vIndex); // alias
         } else {
             assert uOverrides.get(vIndex) == null;
