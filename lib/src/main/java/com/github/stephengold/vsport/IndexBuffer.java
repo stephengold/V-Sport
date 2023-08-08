@@ -33,7 +33,6 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.List;
-import jme3utilities.Validate;
 import org.lwjgl.vulkan.VK10;
 
 /**
@@ -57,24 +56,6 @@ final public class IndexBuffer extends jme3utilities.lbj.IndexBuffer {
     final private int indexType;
     // *************************************************************************
     // constructors
-
-    /**
-     * Instantiate an IndexBuffer with a new data buffer.
-     *
-     * @param maxVertices one more than the highest index value (&ge;0)
-     * @param capacity number of indices (&ge;0)
-     */
-    public IndexBuffer(int maxVertices, int capacity) {
-        super(maxVertices, capacity);
-        Validate.nonNegative(maxVertices, "max vertices");
-        Validate.nonNegative(capacity, "capacity");
-
-        if (maxVertices > (1 << 16)) {
-            indexType = VK10.VK_INDEX_TYPE_UINT32;
-        } else { // Use 16-bit indices to conserve memory:
-            indexType = VK10.VK_INDEX_TYPE_UINT16;
-        }
-    }
 
     /**
      * Instantiate an IndexBuffer by wrapping the specified Buffer.
