@@ -37,6 +37,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import jme3utilities.Validate;
+import org.joml.Vector2f;
+import org.joml.Vector2fc;
+import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.vulkan.VK10;
 import org.lwjgl.vulkan.VkVertexInputAttributeDescription;
@@ -217,6 +221,46 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
     // *************************************************************************
     // new methods exposed
+
+    /**
+     * Copy a single vertex from the mesh.
+     *
+     * @param vertexIndex the vertex index (&ge;0, &lt;vertexCount)
+     * @return a new vertex
+     */
+    Vertex copyVertex(int vertexIndex) {
+        Validate.inRange(vertexIndex, "vertex index", 0, vertexCount - 1);
+        float xPos = positionFloats.get(numAxes * vertexIndex);
+        float yPos = positionFloats.get(numAxes * vertexIndex + 1);
+        float zPos = positionFloats.get(numAxes * vertexIndex + 2);
+        Vector3fc position = new Vector3f(xPos, yPos, zPos);
+
+        Vector3fc color = null;
+        if (colorFloats != null) {
+            float red = colorFloats.get(3 * vertexIndex);
+            float green = colorFloats.get(3 * vertexIndex + 1);
+            float blue = colorFloats.get(3 * vertexIndex + 2);
+            color = new Vector3f(red, green, blue);
+        }
+
+        Vector3fc normal = null;
+        if (normalFloats != null) {
+            float x = normalFloats.get(numAxes * vertexIndex);
+            float y = normalFloats.get(numAxes * vertexIndex + 1);
+            float z = normalFloats.get(numAxes * vertexIndex + 2);
+            normal = new Vector3f(x, y, z);
+        }
+
+        Vector2fc texCoords = null;
+        if (texCoordsFloats != null) {
+            float u = texCoordsFloats.get(2 * vertexIndex);
+            float v = texCoordsFloats.get(2 * vertexIndex + 1);
+            texCoords = new Vector2f(u, v);
+        }
+
+        Vertex result = new Vertex(position, color, normal, texCoords);
+        return result;
+    }
 
     /**
      * Count how many attributes the mesh contains.
