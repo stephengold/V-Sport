@@ -582,7 +582,7 @@ public abstract class BaseApplication {
     }
 
     /**
-     * Alter the title of the main window.
+     * Alter the title of the window.
      *
      * @param text the desired text (in UTF-8 encoding)
      */
@@ -618,6 +618,7 @@ public abstract class BaseApplication {
         }
 
         try {
+            // Initialize this class:
             initializeGlfw(title);
 
             requiredDeviceExtensions
@@ -643,6 +644,7 @@ public abstract class BaseApplication {
             System.err.flush();
 
         } finally {
+            // Clean up this class.
             cleanUpBase();
         }
     }
@@ -720,8 +722,7 @@ public abstract class BaseApplication {
     }
 
     /**
-     * Cleanly terminate the application after the main window closes for any
-     * reason.
+     * Cleanly terminate the application after the window closes for any reason.
      */
     private void cleanUpBase() {
         if (logicalDevice != null) {
@@ -789,7 +790,7 @@ public abstract class BaseApplication {
     }
 
     /**
-     * Destroy the main window and terminate GLFW.
+     * Destroy the window and terminate GLFW.
      */
     private void cleanUpGlfw() {
         if (windowHandle != MemoryUtil.NULL) {
@@ -1395,7 +1396,7 @@ public abstract class BaseApplication {
             throw new RuntimeException("Failed to create a GLFW window");
         }
 
-        // Request callback when the frame buffer of the main window is resized:
+        // Request callback when the frame buffer is resized:
         GLFW.glfwSetFramebufferSizeCallback(
                 windowHandle, BaseApplication::frameBufferResizeCallback);
     }

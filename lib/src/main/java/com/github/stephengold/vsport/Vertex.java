@@ -55,7 +55,7 @@ public class Vertex {
      */
     final private Vector3fc color;
     /**
-     * vertex normal in mesh coordinates (3 floats)
+     * vertex normal in mesh coordinates (3 floats) or null if not present
      */
     final private Vector3fc normal;
     /**

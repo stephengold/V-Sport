@@ -101,7 +101,7 @@ public class HelloVSport extends BaseApplication {
         Mesh roomMesh = Mesh.newInstance(vertices);
 
         Mesh squareMesh = new RectangleMesh();
-        squareMesh.dropNormals();
+        squareMesh.dropNormals(); // TODO make this unnecessary
 
         // texture keys:
         TextureKey marsKey

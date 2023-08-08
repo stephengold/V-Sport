@@ -451,7 +451,7 @@ public class OctasphereMesh extends Mesh {
         float longitude = longitude(pos);
         float u;
         if (pos.y == 0f) {
-            u = uOverrides.get(vIndex);
+            u = uOverrides.get(vIndex); // alias
         } else {
             assert uOverrides.get(vIndex) == null;
             u = 0.5f + longitude / FastMath.TWO_PI;

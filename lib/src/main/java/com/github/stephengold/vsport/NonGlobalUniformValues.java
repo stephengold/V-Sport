@@ -57,7 +57,7 @@ class NonGlobalUniformValues {
      */
     final private Quaternionf modelRotation = new Quaternionf();
     /**
-     * mesh-to-world coordinate scale factor for each local axis
+     * mesh-to-world scale factor for each local axis
      */
     final private Vector3f modelScale = new Vector3f(1f);
     /**
