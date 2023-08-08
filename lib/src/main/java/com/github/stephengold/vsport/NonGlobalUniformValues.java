@@ -32,6 +32,7 @@ package com.github.stephengold.vsport;
 import java.nio.ByteBuffer;
 import jme3utilities.Validate;
 import org.joml.Matrix3f;
+import org.joml.Matrix3fc;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -146,6 +147,18 @@ class NonGlobalUniformValues {
     }
 
     /**
+     * Apply the specified rotation, without shifting the local origin.
+     *
+     * @param rotation the rotation to apply (not null, each row is a unit
+     * vector, unaffected)
+     */
+    void rotate(Matrix3fc rotation) {
+        Matrix3fc transpose = new Matrix3f(rotation).transpose();
+        Quaternionf q = new Quaternionf().setFromNormalized(transpose);
+        orientation.premul(q);
+    }
+
+    /**
      * Uniformly scale the model by the specified factor.
      *
      * @param factor the scaling factor
@@ -188,6 +201,18 @@ class NonGlobalUniformValues {
      */
     void setOrientation(float angle, float x, float y, float z) {
         orientation.fromAxisAngleRad(x, y, z, angle);
+    }
+
+    /**
+     * Alter the mesh-to-world coordinate rotation, without shifting the local
+     * origin.
+     *
+     * @param desiredOrientation the desired orientation (not null, each row is
+     * a unit vector, unaffected)
+     */
+    void setOrientation(Matrix3fc desiredOrientation) {
+        Matrix3fc transpose = new Matrix3f(desiredOrientation).transpose();
+        orientation.setFromNormalized(transpose);
     }
 
     /**
