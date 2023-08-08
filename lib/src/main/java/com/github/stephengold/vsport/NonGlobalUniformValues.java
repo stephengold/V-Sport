@@ -55,15 +55,15 @@ class NonGlobalUniformValues {
     /**
      * mesh-to-world coordinate rotation
      */
-    final private Quaternionf modelRotation = new Quaternionf();
+    final private Quaternionf orientation = new Quaternionf();
+    /**
+     * mesh-to-world coordinate offset (world location of the mesh origin)
+     */
+    final private Vector3f location = new Vector3f();
     /**
      * mesh-to-world scale factor for each local axis
      */
-    final private Vector3f modelScale = new Vector3f(1f);
-    /**
-     * mesh-to-world coordinate translation
-     */
-    final private Vector3f modelTranslation = new Vector3f();
+    final private Vector3f scale = new Vector3f(1f);
     /**
      * material color to use with ambient/diffuse lighting
      */
@@ -88,9 +88,9 @@ class NonGlobalUniformValues {
          * Conceptually, the order of application is: scale, then rotate, then
          * translate. However, matrices combine using post-multiplication ...
          */
-        storeResult.translation(modelTranslation);
-        storeResult.rotate(modelRotation);
-        storeResult.scale(modelScale);
+        storeResult.translation(location);
+        storeResult.rotate(orientation);
+        storeResult.scale(scale);
 
         return result;
     }
@@ -124,9 +124,9 @@ class NonGlobalUniformValues {
      * are the same.
      */
     void resetModelTransform() {
-        modelScale.set(1f);
-        modelRotation.identity();
-        modelTranslation.zero();
+        scale.set(1f);
+        orientation.identity();
+        location.zero();
     }
 
     /**
@@ -142,7 +142,7 @@ class NonGlobalUniformValues {
     void rotate(float angle, float x, float y, float z) {
         Quaternionf q = new Quaternionf();
         q.fromAxisAngleRad(x, y, z, angle);
-        modelRotation.premul(q);
+        orientation.premul(q);
     }
 
     /**
@@ -151,7 +151,7 @@ class NonGlobalUniformValues {
      * @param factor the scaling factor
      */
     void scale(float factor) {
-        modelScale.mul(factor);
+        scale.mul(factor);
     }
 
     /**
@@ -165,7 +165,7 @@ class NonGlobalUniformValues {
      * @param z the Z component of the rotation axis
      */
     void setOrientation(float angle, float x, float y, float z) {
-        modelRotation.fromAxisAngleRad(x, y, z, angle);
+        orientation.fromAxisAngleRad(x, y, z, angle);
     }
 
     /**
@@ -176,7 +176,7 @@ class NonGlobalUniformValues {
      * @param z the desired Z offset (in world coordinates)
      */
     void setTranslation(float x, float y, float z) {
-        modelTranslation.set(x, y, z);
+        location.set(x, y, z);
     }
 
     /**
@@ -186,7 +186,7 @@ class NonGlobalUniformValues {
      */
     void setTranslation(Vector3fc desiredOffset) {
         Validate.nonNull(desiredOffset, "desired offset");
-        modelTranslation.set(desiredOffset);
+        location.set(desiredOffset);
     }
 
     /**
@@ -210,7 +210,7 @@ class NonGlobalUniformValues {
 
         // mat3 modelRotationMatrix
         byteOffset = Utils.align(byteOffset, 16);
-        tmpMatrix3f.set(modelRotation);
+        tmpMatrix3f.set(orientation);
         tmpMatrix3f.get(byteOffset, target);
         byteOffset += 3 * 3 * Float.BYTES;
 
