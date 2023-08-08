@@ -155,20 +155,6 @@ class NonGlobalUniformValues {
     }
 
     /**
-     * Alter the mesh-to-world coordinate rotation.
-     * <p>
-     * The axis is assumed to be a unit vector.
-     *
-     * @param angle the desired rotation angle (in radians)
-     * @param x the X component of the rotation axis
-     * @param y the Y component of the rotation axis
-     * @param z the Z component of the rotation axis
-     */
-    void setOrientation(float angle, float x, float y, float z) {
-        orientation.fromAxisAngleRad(x, y, z, angle);
-    }
-
-    /**
      * Translate the mesh origin.
      *
      * @param x the desired X coordinate (in world coordinates)
@@ -188,6 +174,20 @@ class NonGlobalUniformValues {
     void setLocation(Vector3fc desiredLocation) {
         Validate.nonNull(desiredLocation, "desired location");
         location.set(desiredLocation);
+    }
+
+    /**
+     * Alter the mesh-to-world coordinate rotation.
+     * <p>
+     * The axis is assumed to be a unit vector.
+     *
+     * @param angle the desired rotation angle (in radians)
+     * @param x the X component of the rotation axis
+     * @param y the Y component of the rotation axis
+     * @param z the Z component of the rotation axis
+     */
+    void setOrientation(float angle, float x, float y, float z) {
+        orientation.fromAxisAngleRad(x, y, z, angle);
     }
 
     /**
