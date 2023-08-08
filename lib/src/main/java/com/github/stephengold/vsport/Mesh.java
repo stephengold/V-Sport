@@ -703,4 +703,33 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     public void setPositionsModified() {
         // TODO
     }
+    // *************************************************************************
+    // Object methods
+
+    /**
+     * Represent the mesh as a text string.
+     *
+     * @return a descriptive string of text (not null)
+     */
+    @Override
+    public String toString() {
+        String nl = System.lineSeparator();
+
+        int numRendered = countIndexedVertices();
+        StringBuilder result = new StringBuilder(80 * numRendered);
+
+        for (int i = 0; i < numRendered; ++i) {
+            if ((i % vpt) == 0) {
+            }
+
+            int vertexIndex = (indexBuffer == null) ? i : indexBuffer.get(i);
+            result.append(vertexIndex);
+            result.append(": ");
+            Vertex v = copyVertex(vertexIndex);
+            result.append(v);
+            result.append(nl);
+        }
+
+        return result.toString();
+    }
 }
