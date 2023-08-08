@@ -232,4 +232,59 @@ public class Vertex {
 
         return result;
     }
+    // *************************************************************************
+    // Object methods
+
+    /**
+     * Represent the vertex as a text string.
+     *
+     * @return a descriptive string of text (not null)
+     */
+    @Override
+    public String toString() {
+        StringBuilder result = new StringBuilder(80);
+
+        result.append("xyz=(");
+        result.append(position.x());
+        result.append(", ");
+        result.append(position.y());
+        result.append(", ");
+        result.append(position.z());
+        result.append(")");
+
+        if (color != null) {
+            result.append(" color=(");
+            result.append(color.x());
+            result.append(", ");
+
+            result.append(color.y());
+            result.append(", ");
+
+            result.append(color.z());
+            result.append(")");
+        }
+
+        if (normal != null) {
+            result.append(" normal=(");
+            result.append(normal.x());
+            result.append(", ");
+
+            result.append(normal.y());
+            result.append(", ");
+
+            result.append(normal.z());
+            result.append(")");
+        }
+
+        if (texCoords != null) {
+            result.append(" uv=(");
+            result.append(texCoords.x());
+            result.append(", ");
+
+            result.append(texCoords.y());
+            result.append(")");
+        }
+
+        return result.toString();
+    }
 }
