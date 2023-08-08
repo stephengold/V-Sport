@@ -31,6 +31,7 @@ package com.github.stephengold.vsport;
 
 import java.nio.ByteBuffer;
 import jme3utilities.Validate;
+import org.joml.Matrix3fc;
 import org.joml.Vector2f;
 import org.joml.Vector2fc;
 import org.joml.Vector3f;
@@ -126,6 +127,18 @@ public class Vertex {
             return false;
         } else {
             return true;
+        }
+    }
+
+    /**
+     * Apply the specified rotation.
+     *
+     * @param rotation the rotation matrix to apply (not null, unaffected)
+     */
+    public void rotate(Matrix3fc rotation) {
+        position.mulTranspose(rotation);
+        if (normal != null) {
+            normal.mulTranspose(rotation);
         }
     }
 
