@@ -233,7 +233,7 @@ public class Geometry {
      * @return the (modified) current instance (for chaining)
      */
     public Geometry setTranslation(float x, float y, float z) {
-        uniformValues.setTranslation(x, y, z);
+        uniformValues.setLocation(x, y, z);
         return this;
     }
 
@@ -245,7 +245,7 @@ public class Geometry {
      */
     public Geometry setTranslation(Vector3fc desiredOffset) {
         Validate.nonNull(desiredOffset, "desired offset");
-        uniformValues.setTranslation(desiredOffset);
+        uniformValues.setLocation(desiredOffset);
         return this;
     }
 

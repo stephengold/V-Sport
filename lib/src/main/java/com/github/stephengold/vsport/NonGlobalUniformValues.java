@@ -169,24 +169,25 @@ class NonGlobalUniformValues {
     }
 
     /**
-     * Alter the mesh-to-world offset.
+     * Translate the mesh origin.
      *
-     * @param x the desired X offset (in world coordinates)
-     * @param y the desired Y offset (in world coordinates)
-     * @param z the desired Z offset (in world coordinates)
+     * @param x the desired X coordinate (in world coordinates)
+     * @param y the desired Y coordinate (in world coordinates)
+     * @param z the desired Z coordinate (in world coordinates)
      */
-    void setTranslation(float x, float y, float z) {
+    void setLocation(float x, float y, float z) {
         location.set(x, y, z);
     }
 
     /**
-     * Alter the mesh-to-world offset.
+     * Translate the mesh origin.
      *
-     * @param desiredOffset the desired offset (in world coordinates, not null)
+     * @param desiredLocation the desired location (in world coordinates, not
+     * null, unaffected)
      */
-    void setTranslation(Vector3fc desiredOffset) {
-        Validate.nonNull(desiredOffset, "desired offset");
-        location.set(desiredOffset);
+    void setLocation(Vector3fc desiredLocation) {
+        Validate.nonNull(desiredLocation, "desired location");
+        location.set(desiredLocation);
     }
 
     /**
