@@ -208,12 +208,12 @@ public class Geometry {
     /**
      * Replace the current Mesh with the specified Mesh.
      *
-     * @param newMesh the desired Mesh (not null, alias created)
+     * @param desiredMesh the desired Mesh (not null, alias created)
      * @return the (modified) current geometry (for chaining)
      */
-    public Geometry setMesh(Mesh newMesh) {
-        Validate.nonNull(newMesh, "new mesh");
-        this.mesh = newMesh;
+    public Geometry setMesh(Mesh desiredMesh) {
+        Validate.nonNull(desiredMesh, "desired mesh");
+        this.mesh = desiredMesh;
         return this;
     }
 
