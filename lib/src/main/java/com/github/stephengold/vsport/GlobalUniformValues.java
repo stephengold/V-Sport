@@ -49,7 +49,7 @@ class GlobalUniformValues {
     /**
      * strength of the ambient light
      */
-    private float ambientStrength;
+    private float ambientStrength = 0.1f;
     /**
      * viewpoint for 3-D rendering
      */
@@ -65,7 +65,8 @@ class GlobalUniformValues {
     /**
      * direction to the directional light in world coordinates
      */
-    final private Vector3f lightDirectionWorldspace = new Vector3f();
+    final private Vector3f lightDirectionWorldspace
+            = new Vector3f(1f, 3f, 2f).normalize();
     /**
      * color of the lights
      */
