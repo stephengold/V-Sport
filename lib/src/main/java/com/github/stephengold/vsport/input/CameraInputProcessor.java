@@ -259,12 +259,14 @@ public class CameraInputProcessor extends InputProcessor {
             sum.mul(forwardSignal);
             sum.y += upSignal;
             sum.fma(rightSignal, rightDirection);
-            if (!sum.equals(0f, 0f, 0f)) {
+
+            float length = sum.length();
+            if (length > 0f) {
                 long nanoseconds = nanoTime - lastMove;
                 float seconds = 1e-9f * nanoseconds;
                 float distance = moveSpeed * seconds;
 
-                sum.normalize();
+                sum.div(length);
                 sum.mul(distance); // convert from direction to offset
                 camera.move(sum);
             }
