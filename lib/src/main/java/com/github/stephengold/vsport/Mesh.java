@@ -311,6 +311,14 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
 
     /**
+     * Remove the texture coordinates, if any.
+     */
+    public void dropTexCoords() {
+        this.texCoordsBuffer = null;
+        this.texCoordsFloats = null;
+    }
+
+    /**
      * Generate an attribute-description buffer.
      *
      * @param stack for memory allocation (not null)
