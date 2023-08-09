@@ -398,6 +398,16 @@ public abstract class BaseApplication {
     }
 
     /**
+     * Access the input manager.
+     *
+     * @return the pre-existing instance (not null)
+     */
+    public static InputManager getInputManager() {
+        assert inputManager != null;
+        return inputManager;
+    }
+
+    /**
      * Access the logical device for resource creation/destruction.
      *
      * @return the pre-existing instance (not null)
