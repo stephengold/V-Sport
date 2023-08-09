@@ -34,6 +34,7 @@ import jme3utilities.Validate;
 import org.joml.Matrix3fc;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
 /**
@@ -87,6 +88,18 @@ public class Geometry {
     }
     // *************************************************************************
     // new methods exposed
+
+    /**
+     * Return a copy of the location of the mesh origin.
+     *
+     * @param storeResult storage for the result (modified if not null)
+     * @return a location vector in world coordinates (either
+     * {@code storeResult} or a new vector null)
+     */
+    public Vector3f copyLocation(Vector3f storeResult) {
+        Vector3f result = uniformValues.copyLocation(storeResult);
+        return result;
+    }
 
     /**
      * Return a copy of the mesh-to-world coordinate rotation.

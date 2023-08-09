@@ -77,6 +77,21 @@ class NonGlobalUniformValues {
     // new methods exposed
 
     /**
+     * Return a copy of the location of the mesh origin.
+     *
+     * @param storeResult storage for the result (modified if not null)
+     * @return a location vector in world coordinates (either
+     * {@code storeResult} or a new vector, not null)
+     */
+    Vector3f copyLocation(Vector3f storeResult) {
+        if (storeResult == null) {
+            return new Vector3f(location);
+        } else {
+            return storeResult.set(location);
+        }
+    }
+
+    /**
      * Return a copy of the mesh-to-world coordinate rotation.
      *
      * @param storeResult storage for the result (modified if not null)
