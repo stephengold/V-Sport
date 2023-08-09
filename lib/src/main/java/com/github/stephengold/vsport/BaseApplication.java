@@ -29,6 +29,7 @@
  */
 package com.github.stephengold.vsport;
 
+import com.github.stephengold.vsport.input.InputManager;
 import java.io.PrintStream;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -151,6 +152,10 @@ public abstract class BaseApplication {
      * synchronization objects for frames in flight
      */
     private static Frame[] inFlightFrames;
+    /**
+     * convenient access to user input
+     */
+    private static InputManager inputManager;
     /**
      * index of the frame being rendered (among the inFlightFrames)
      */
@@ -580,6 +585,9 @@ public abstract class BaseApplication {
             // Initialize this class:
             initializeGlfw(title);
 
+            // Create and initialize the InputManager.
+            inputManager = new InputManager(windowHandle);
+
             requiredDeviceExtensions
                     .add(KHRSwapchain.VK_KHR_SWAPCHAIN_EXTENSION_NAME);
             if (enableDebugging) {
@@ -731,6 +739,10 @@ public abstract class BaseApplication {
         if (vkInstance != null) {
             VK10.vkDestroyInstance(vkInstance, defaultAllocator);
             vkInstance = null;
+        }
+
+        if (inputManager != null) {
+            inputManager = inputManager.destroy();
         }
 
         if (debugMessengerCallback != null) {
