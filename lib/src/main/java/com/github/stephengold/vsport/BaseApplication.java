@@ -866,9 +866,13 @@ public abstract class BaseApplication {
             guBinding.descriptorCount(1);
             guBinding.descriptorType(VK10.VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
             guBinding.pImmutableSamplers(null);
-
-            // The global UBO will be used only by the vertex-shader stage:
-            guBinding.stageFlags(VK10.VK_SHADER_STAGE_VERTEX_BIT);
+            /*
+             * The global UBO will be used only by the fragment-shader and
+             * vertex-shader stage:
+             */
+            int stageFlags = VK10.VK_SHADER_STAGE_FRAGMENT_BIT
+                    | VK10.VK_SHADER_STAGE_VERTEX_BIT;
+            guBinding.stageFlags(stageFlags);
 
             // Define a binding for the 2nd descriptor set (the non-global UBO):
             VkDescriptorSetLayoutBinding nguBinding = pBindings.get(1);
@@ -876,9 +880,11 @@ public abstract class BaseApplication {
             nguBinding.descriptorCount(1);
             nguBinding.descriptorType(VK10.VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
             nguBinding.pImmutableSamplers(null);
-
-            // The non-global UBO will be used only by the vertex-shader stage:
-            nguBinding.stageFlags(VK10.VK_SHADER_STAGE_VERTEX_BIT);
+            /*
+             * The non-global UBO will be used only by the fragment-shader and
+             * vertex-shader stage:
+             */
+            nguBinding.stageFlags(stageFlags);
 
             // Define a binding for the 3rd descriptor set (the sampler):
             VkDescriptorSetLayoutBinding samplerBinding = pBindings.get(2);
