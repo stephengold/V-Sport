@@ -36,6 +36,7 @@ import java.net.URI;
 import java.nio.ByteBuffer;
 import javax.imageio.ImageIO;
 import jme3utilities.MyString;
+import jme3utilities.Validate;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.vulkan.VK10;
 import org.lwjgl.vulkan.VkImageBlit;
@@ -198,6 +199,22 @@ public class Texture extends DeviceResource {
     // private methods
 
     /**
+     * Copy the data from the specified buffer to the specified 2-D image.
+     *
+     * @param sourceBuffer the source buffer (not null)
+     * @param destinationImage the destination image (not null)
+     */
+    private static void copyBufferToImage(
+            MappableBuffer sourceBuffer, DeviceImage destinationImage) {
+        Validate.nonNull(sourceBuffer, "source buffer");
+        Validate.nonNull(destinationImage, "destination image");
+
+        SingleUse commandSequence = new SingleUse();
+        commandSequence.addCopyBufferToImage(sourceBuffer, destinationImage);
+        commandSequence.submitToGraphicsQueue();
+    }
+
+    /**
      * Create the underlying resources: the device image and the image view.
      */
     private void create() {
@@ -232,7 +249,7 @@ public class Texture extends DeviceResource {
                 VK10.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, numMipLevels);
 
         // Copy the data from the staging buffer the new image:
-        BaseApplication.copyBufferToImage(stagingBuffer, deviceImage);
+        copyBufferToImage(stagingBuffer, deviceImage);
         generateMipLevels();
 
         // Destroy the staging buffer and free its memory:

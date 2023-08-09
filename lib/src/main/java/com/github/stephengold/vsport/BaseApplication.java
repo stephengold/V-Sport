@@ -366,22 +366,6 @@ public abstract class BaseApplication {
     }
 
     /**
-     * Copy the data from the specified buffer to the specified 2-D image.
-     *
-     * @param sourceBuffer the source buffer (not null)
-     * @param destinationImage the destination image (not null)
-     */
-    static void copyBufferToImage(
-            MappableBuffer sourceBuffer, DeviceImage destinationImage) {
-        Validate.nonNull(sourceBuffer, "source buffer");
-        Validate.nonNull(destinationImage, "destination image");
-
-        SingleUse commandSequence = new SingleUse();
-        commandSequence.addCopyBufferToImage(sourceBuffer, destinationImage);
-        commandSequence.submitToGraphicsQueue();
-    }
-
-    /**
      * Return the allocator for direct buffers.
      *
      * @return the pre-existing instance, or null to use the default allocator
