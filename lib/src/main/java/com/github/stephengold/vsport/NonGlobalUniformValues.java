@@ -104,9 +104,9 @@ class NonGlobalUniformValues {
          * Conceptually, the order of application is: scale, then rotate, then
          * translate. However, matrices combine using post-multiplication ...
          */
-        storeResult.translation(location);
-        storeResult.rotate(orientation);
-        storeResult.scale(scale);
+        result.translation(location);
+        result.rotate(orientation);
+        result.scale(scale);
 
         return result;
     }
