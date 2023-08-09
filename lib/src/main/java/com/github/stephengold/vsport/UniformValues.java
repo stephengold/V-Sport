@@ -75,6 +75,16 @@ class UniformValues {
     // new methods exposed
 
     /**
+     * Access the camera.
+     *
+     * @return the pre-existing instance
+     */
+    Camera getCamera() {
+        assert camera != null;
+        return camera;
+    }
+
+    /**
      * Return the size of the UBO.
      *
      * @return the size (in bytes, &ge;0)
