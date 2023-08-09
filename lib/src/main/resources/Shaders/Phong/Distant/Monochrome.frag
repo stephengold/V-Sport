@@ -7,7 +7,7 @@
 layout(binding = 0) uniform Global { // global uniforms:
     float ambientStrength;
     vec3 LightDirection_worldspace;
-    vec4 LightColor;
+    vec3 LightColor;
     mat4 viewMatrix;
     mat4 projectionMatrix;
 } global;
@@ -56,5 +56,5 @@ void main() {
 
     vec3 color = (global.ambientStrength + cosTheta) * ubo.BaseMaterialColor.rgb;
     color = color + cosAlpha8 * ubo.SpecularMaterialColor.rgb;
-    fragColor = color * global.LightColor.rgb;
+    fragColor = color * global.LightColor;
 }

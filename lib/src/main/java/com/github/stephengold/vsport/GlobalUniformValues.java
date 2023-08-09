@@ -69,7 +69,7 @@ class GlobalUniformValues {
     /**
      * color of the lights
      */
-    final private Vector4f lightColor = new Vector4f();
+    final private Vector3f lightColor = new Vector3f(1f, 1f, 1f);
     // *************************************************************************
     // new methods exposed
 
@@ -98,8 +98,8 @@ class GlobalUniformValues {
         result = Utils.align(result, 16);
         result += 3 * Float.BYTES;
 
-        // vec4 LightColor
-        result += 4 * Float.BYTES;
+        // vec3 LightColor
+        result += 3 * Float.BYTES;
 
         // mat4 viewMatrix
         result = Utils.align(result, 16);
@@ -143,9 +143,9 @@ class GlobalUniformValues {
         lightDirectionWorldspace.get(byteOffset, target);
         byteOffset += 3 * Float.BYTES;
 
-        // vec4 LightColor
+        // vec3 LightColor
         lightColor.get(byteOffset, target);
-        byteOffset += 4 * Float.BYTES;
+        byteOffset += 3 * Float.BYTES;
 
         // mat4 viewMatrix
         byteOffset = Utils.align(byteOffset, 16);

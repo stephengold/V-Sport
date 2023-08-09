@@ -7,7 +7,7 @@
 layout(binding = 0) uniform Global { // global uniforms:
     float ambientStrength;
     vec3 LightDirection_worldspace;
-    vec4 LightColor;
+    vec3 LightColor;
     mat4 viewMatrix;
     mat4 projectionMatrix;
 } global;
