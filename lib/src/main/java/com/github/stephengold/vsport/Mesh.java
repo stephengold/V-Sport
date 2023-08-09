@@ -460,6 +460,26 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
 
     /**
+     * Generate normals on a vertex-by-vertex basis for an outward-facing
+     * sphere. Any pre-existing normals are discarded.
+     *
+     * @return the (modified) current instance (for chaining)
+     */
+    public Mesh generateSphereNormals() {
+        createNormals();
+
+        Vector3f tmpVector = new Vector3f();
+        for (int vertexIndex = 0; vertexIndex < vertexCount; ++vertexIndex) {
+            int bufferPosition = vertexIndex * numAxes;
+            tmpVector.set(bufferPosition, positionFloats);
+            tmpVector.normalize();
+            tmpVector.get(bufferPosition, normalFloats);
+        }
+
+        return this;
+    }
+
+    /**
      * Test whether this Mesh is indexed.
      *
      * @return true if indexed, otherwise false
