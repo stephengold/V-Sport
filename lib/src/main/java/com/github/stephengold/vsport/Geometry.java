@@ -59,7 +59,7 @@ public class Geometry {
      */
     private ShaderProgram program;
     /**
-     * color material texture
+     * primary texture, or null if none
      */
     private Texture texture;
     // *************************************************************************
@@ -126,6 +126,15 @@ public class Geometry {
     }
 
     /**
+     * Access the primary texture, if any.
+     *
+     * @return the pre-existing instance (may be null)
+     */
+    Texture findTexture() {
+        return texture;
+    }
+
+    /**
      * Access the Mesh.
      *
      * @return the pre-existing object (not null)
@@ -143,16 +152,6 @@ public class Geometry {
     ShaderProgram getProgram() {
         assert program != null;
         return program;
-    }
-
-    /**
-     * Access the Texture.
-     *
-     * @return the pre-existing instance (not null)
-     */
-    Texture getTexture() {
-        assert texture != null;
-        return texture;
     }
 
     /**

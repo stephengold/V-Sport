@@ -175,18 +175,31 @@ class Draw {
             long nguHandle = nonGlobalUbo.handle();
             nguDbi.buffer(nguHandle);
 
-            VkDescriptorImageInfo.Buffer pImageInfo
-                    = VkDescriptorImageInfo.calloc(1, stack);
-            pImageInfo.imageLayout(
-                    VK10.VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-            Texture texture = geometry.getTexture();
-            long viewHandle = texture.viewHandle();
-            pImageInfo.imageView(viewHandle);
-            pImageInfo.sampler(samplerHandle);
+            int numWrites;
+            VkDescriptorImageInfo.Buffer pImageInfo;
+            ShaderProgram program = geometry.getProgram();
+            if (program.requiresTexCoords()) {
+                numWrites = 2;
+                pImageInfo = VkDescriptorImageInfo.calloc(1, stack);
+                pImageInfo.imageLayout(
+                        VK10.VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+                Texture texture = geometry.findTexture();
+                if (texture == null) {
+                    throw new IllegalStateException(
+                            "Geometry cannot be rendered because the " + program
+                            + " program requires a texture.");
+                }
+                long viewHandle = texture.viewHandle();
+                pImageInfo.imageView(viewHandle);
+                pImageInfo.sampler(samplerHandle);
+            } else {
+                numWrites = 1;
+                pImageInfo = null;
+            }
 
             // Configure the descriptors to be written:
             VkWriteDescriptorSet.Buffer pWrites
-                    = VkWriteDescriptorSet.calloc(2, stack);
+                    = VkWriteDescriptorSet.calloc(numWrites, stack);
 
             VkWriteDescriptorSet uboWrite = pWrites.get(0);
             uboWrite.sType(VK10.VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET);
@@ -198,16 +211,18 @@ class Draw {
             uboWrite.dstSet(descriptorSetHandle);
             uboWrite.pBufferInfo(pBufferInfo);
 
-            VkWriteDescriptorSet samplerWrite = pWrites.get(1);
-            samplerWrite.sType(VK10.VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET);
+            if (program.requiresTexCoords()) {
+                VkWriteDescriptorSet samplerWrite = pWrites.get(1);
+                samplerWrite.sType(VK10.VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET);
 
-            samplerWrite.descriptorCount(1);
-            samplerWrite.descriptorType(
-                    VK10.VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-            samplerWrite.dstArrayElement(0);
-            samplerWrite.dstBinding(2);
-            samplerWrite.dstSet(descriptorSetHandle);
-            samplerWrite.pImageInfo(pImageInfo);
+                samplerWrite.descriptorCount(1);
+                samplerWrite.descriptorType(
+                        VK10.VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
+                samplerWrite.dstArrayElement(0);
+                samplerWrite.dstBinding(2);
+                samplerWrite.dstSet(descriptorSetHandle);
+                samplerWrite.pImageInfo(pImageInfo);
+            }
 
             VkDevice vkDevice = BaseApplication.getVkDevice();
             VkCopyDescriptorSet.Buffer pCopies = null;
