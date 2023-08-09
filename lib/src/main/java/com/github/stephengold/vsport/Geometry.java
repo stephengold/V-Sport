@@ -251,27 +251,27 @@ public class Geometry {
     }
 
     /**
-     * Alter the mesh-to-world offset.
+     * Translate the mesh origin to the specified location.
      *
-     * @param x the desired X offset (in world coordinates)
-     * @param y the desired Y offset (in world coordinates)
-     * @param z the desired Z offset (in world coordinates)
+     * @param x the desired X coordinate (in world coordinates)
+     * @param y the desired Y coordinate (in world coordinates)
+     * @param z the desired Z coordinate (in world coordinates)
      * @return the (modified) current instance (for chaining)
      */
-    public Geometry setTranslation(float x, float y, float z) {
+    public Geometry setLocation(float x, float y, float z) {
         uniformValues.setLocation(x, y, z);
         return this;
     }
 
     /**
-     * Alter the mesh-to-world offset.
+     * Translate the mesh origin to the specified location.
      *
-     * @param desiredOffset the desired offset (in world coordinates, not null)
+     * @param desiredLocation the desired location (in world coordinates, not
      * @return the (modified) current instance (for chaining)
      */
-    public Geometry setTranslation(Vector3fc desiredOffset) {
-        Validate.nonNull(desiredOffset, "desired offset");
-        uniformValues.setLocation(desiredOffset);
+    public Geometry setLocation(Vector3fc desiredLocation) {
+        Validate.nonNull(desiredLocation, "desired location");
+        uniformValues.setLocation(desiredLocation);
         return this;
     }
 

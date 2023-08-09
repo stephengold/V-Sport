@@ -117,13 +117,13 @@ public class HelloVSport extends BaseApplication {
         mars.setProgram("Unshaded/Texture");
         mars.setTexture(marsKey);
         mars.scale(0.4f);
-        mars.setTranslation(1f, 0f, 0.2f);
+        mars.setLocation(1f, 0f, 0.2f);
 
         Geometry photo = new Geometry(squareMesh);
         photo.setProgram("Unshaded/Texture");
         photo.setTexture(photoKey);
         photo.setOrientation(FastMath.PI, 0f, 0f, 1f);
-        photo.setTranslation(1f, 1.4f, -0.2f);
+        photo.setLocation(1f, 1.4f, -0.2f);
 
         Geometry room = new Geometry(roomMesh);
         room.setProgram("Unshaded/Texture");
