@@ -1138,6 +1138,7 @@ public abstract class BaseApplication {
                     vkInstance, windowHandle, defaultAllocator, pHandle);
             Utils.checkForError(retCode, "create window surface");
             surfaceHandle = pHandle.get(0);
+            assert surfaceHandle != VK10.VK_NULL_HANDLE;
         }
     }
 

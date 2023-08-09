@@ -75,11 +75,15 @@ class SurfaceSummary {
      *
      * @param physicalDevice the physical device to be used (not null,
      * unaffected)
-     * @param surfaceHandle the handle of the surface to be analyzed
+     * @param surfaceHandle the handle of the {@code VkSurfaceKHR} to analyze
+     * (not null)
      * @param stack for memory allocation (not null)
      */
     SurfaceSummary(VkPhysicalDevice physicalDevice, long surfaceHandle,
             MemoryStack stack) {
+        Validate.nonNull(physicalDevice, "physical device");
+        Validate.nonZero(surfaceHandle, "surface handle");
+
         this.surfaceHandle = surfaceHandle;
 
         // Obtain the capabilities of the VkSurfaceKHR:

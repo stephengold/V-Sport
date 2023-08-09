@@ -35,6 +35,7 @@ import java.nio.IntBuffer;
 import java.util.Set;
 import java.util.TreeSet;
 import jme3utilities.MyString;
+import jme3utilities.Validate;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.vulkan.KHRSurface;
@@ -87,13 +88,15 @@ class PhysicalDevice {
     /**
      * Create a logical device based on this physical device.
      *
-     * @param surfaceHandle the handle of the surface to use
+     * @param surfaceHandle the handle of the {@code VkSurfaceKHR} for
+     * presentation (not null)
      * @param enableDebugging true to produce debug output, false to suppress it
      * @return a new instance
      */
     VkDevice createLogicalDevice(long surfaceHandle, boolean enableDebugging) {
-        QueueFamilySummary queueFamilies = summarizeFamilies(surfaceHandle);
+        Validate.nonZero(surfaceHandle, "surface handle");
 
+        QueueFamilySummary queueFamilies = summarizeFamilies(surfaceHandle);
         try (MemoryStack stack = MemoryStack.stackPush()) {
             IntBuffer distinctFamilies = queueFamilies.pListDistinct(stack);
             int numDistinct = distinctFamilies.capacity();
@@ -262,12 +265,14 @@ class PhysicalDevice {
     /**
      * Rate the suitability of the device for graphics applications.
      *
-     * @param surfaceHandle the surface for graphics display
+     * @param surfaceHandle the handle of the {@code VkSurfaceKHR} for
+     * presentation (not null)
      * @param diagnose true to print diagnostic messages, otherwise false
      * @return a suitability score (&gt;0, larger is more suitable) or zero if
      * unsuitable
      */
     float suitability(long surfaceHandle, boolean diagnose) {
+        Validate.nonZero(surfaceHandle, "surface handle");
         if (diagnose) {
             System.out.println(" Rating suitability of device " + this + ":");
         }
@@ -314,10 +319,13 @@ class PhysicalDevice {
     /**
      * Summarize the queue families provided by the device.
      *
-     * @param surfaceHandle handle of the surface for presentation
+     * @param surfaceHandle the handle of the {@code VkSurfaceKHR} for
+     * presentation (not null)
      * @return a new instance (not null)
      */
     QueueFamilySummary summarizeFamilies(long surfaceHandle) {
+        Validate.nonZero(surfaceHandle, "surface handle");
+
         QueueFamilySummary result = new QueueFamilySummary();
         try (MemoryStack stack = MemoryStack.stackPush()) {
             // Count the available queue families:
@@ -357,11 +365,14 @@ class PhysicalDevice {
     /**
      * Summarize the properties of the specified surface on this device.
      *
-     * @param surfaceHandle the handle of the surface to analyze
+     * @param surfaceHandle the handle of the {@code VkSurfaceKHR} to analyze
+     * (not null)
      * @param stack for memory allocation (not null)
      * @return a new instance containing temporary buffers (not null)
      */
     SurfaceSummary summarizeSurface(long surfaceHandle, MemoryStack stack) {
+        Validate.nonZero(surfaceHandle, "surface handle");
+
         SurfaceSummary result = new SurfaceSummary(
                 vkPhysicalDevice, surfaceHandle, stack);
         return result;
@@ -417,12 +428,15 @@ class PhysicalDevice {
     /**
      * Test whether the device has adequate swap-chain support.
      *
-     * @param surfaceHandle the surface to test against (not null)
+     * @param surfaceHandle the handle of the {@code VkSurfaceKHR} to for
+     * presentation (not null)
      * @param diagnose true to print diagnostic messages, otherwise false
      * @return true if the support is adequate, otherwise false
      */
     private boolean hasAdequateSwapChainSupport(
             long surfaceHandle, boolean diagnose) {
+        Validate.nonZero(surfaceHandle, "surface handle");
+
         try (MemoryStack stack = MemoryStack.stackPush()) {
             SurfaceSummary surface = new SurfaceSummary(
                     vkPhysicalDevice, surfaceHandle, stack);
