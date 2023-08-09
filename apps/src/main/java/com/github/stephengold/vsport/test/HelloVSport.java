@@ -110,7 +110,7 @@ public class HelloVSport extends BaseApplication {
         Mesh globeMesh = OctasphereMesh.getMesh(numRefineSteps);
 
         String modelName = "/Models/viking_room/viking_room.obj";
-        int postFlags = Assimp.aiProcess_DropNormals | Assimp.aiProcess_FlipUVs;
+        int postFlags = Assimp.aiProcess_FlipUVs;
         List<Integer> indices = null;
         List<Vertex> vertices = new ArrayList<>();
         AssimpUtils.extractTriangles(modelName, postFlags, indices, vertices);
@@ -120,7 +120,6 @@ public class HelloVSport extends BaseApplication {
         Mesh roomMesh = Mesh.newInstance(vertices);
 
         Mesh squareMesh = new RectangleMesh();
-        squareMesh.dropNormals(); // TODO make this unnecessary
 
         // texture keys:
         TextureKey marsKey
