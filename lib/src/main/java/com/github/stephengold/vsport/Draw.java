@@ -34,8 +34,12 @@ import jme3utilities.Validate;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.vulkan.VK10;
 import org.lwjgl.vulkan.VkAllocationCallbacks;
+import org.lwjgl.vulkan.VkCopyDescriptorSet;
+import org.lwjgl.vulkan.VkDescriptorBufferInfo;
+import org.lwjgl.vulkan.VkDescriptorImageInfo;
 import org.lwjgl.vulkan.VkDescriptorSetAllocateInfo;
 import org.lwjgl.vulkan.VkDevice;
+import org.lwjgl.vulkan.VkWriteDescriptorSet;
 
 /**
  * Resources required to generate the commands for a single draw: a non-global
@@ -142,6 +146,73 @@ class Draw {
         }
 
         this.pipelineHandle = handle;
+    }
+
+    /**
+     * Update the descriptor set for rendering.
+     *
+     * @param geometry the geometry to be rendered (not null)
+     * @param samplerHandle the handle of the VkSampler for textures (not null)
+     * @param globalUbo the global UBO (not null)
+     */
+    void updateDescriptorSet(
+            Geometry geometry, long samplerHandle, BufferResource globalUbo) {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            VkDescriptorBufferInfo.Buffer pBufferInfo
+                    = VkDescriptorBufferInfo.calloc(2, stack);
+
+            VkDescriptorBufferInfo guDbi = pBufferInfo.get(0);
+            guDbi.offset(0);
+            int numBytes = UniformValues.numBytes();
+            guDbi.range(numBytes);
+            long guHandle = globalUbo.handle();
+            guDbi.buffer(guHandle);
+
+            VkDescriptorBufferInfo nguDbi = pBufferInfo.get(1);
+            nguDbi.offset(0);
+            numBytes = NonGlobalUniformValues.numBytes();
+            nguDbi.range(numBytes);
+            long nguHandle = nonGlobalUbo.handle();
+            nguDbi.buffer(nguHandle);
+
+            VkDescriptorImageInfo.Buffer pImageInfo
+                    = VkDescriptorImageInfo.calloc(1, stack);
+            pImageInfo.imageLayout(
+                    VK10.VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+            Texture texture = geometry.getTexture();
+            long viewHandle = texture.viewHandle();
+            pImageInfo.imageView(viewHandle);
+            pImageInfo.sampler(samplerHandle);
+
+            // Configure the descriptors to be written:
+            VkWriteDescriptorSet.Buffer pWrites
+                    = VkWriteDescriptorSet.calloc(2, stack);
+
+            VkWriteDescriptorSet uboWrite = pWrites.get(0);
+            uboWrite.sType(VK10.VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET);
+
+            uboWrite.descriptorCount(2); // 2 UBOs
+            uboWrite.descriptorType(VK10.VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
+            uboWrite.dstArrayElement(0);
+            uboWrite.dstBinding(0);
+            uboWrite.dstSet(descriptorSetHandle);
+            uboWrite.pBufferInfo(pBufferInfo);
+
+            VkWriteDescriptorSet samplerWrite = pWrites.get(1);
+            samplerWrite.sType(VK10.VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET);
+
+            samplerWrite.descriptorCount(1);
+            samplerWrite.descriptorType(
+                    VK10.VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
+            samplerWrite.dstArrayElement(0);
+            samplerWrite.dstBinding(2);
+            samplerWrite.dstSet(descriptorSetHandle);
+            samplerWrite.pImageInfo(pImageInfo);
+
+            VkDevice vkDevice = BaseApplication.getVkDevice();
+            VkCopyDescriptorSet.Buffer pCopies = null;
+            VK10.vkUpdateDescriptorSets(vkDevice, pWrites, pCopies);
+        }
     }
     // *************************************************************************
     // new methods exposed
