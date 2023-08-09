@@ -163,7 +163,7 @@ class Draw {
 
             VkDescriptorBufferInfo guDbi = pBufferInfo.get(0);
             guDbi.offset(0);
-            int numBytes = UniformValues.numBytes();
+            int numBytes = GlobalUniformValues.numBytes();
             guDbi.range(numBytes);
             long guHandle = globalUbo.handle();
             guDbi.buffer(guHandle);

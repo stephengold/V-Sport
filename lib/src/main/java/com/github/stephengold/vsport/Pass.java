@@ -111,7 +111,7 @@ class Pass {
         this.descriptorSetLayoutHandle = dsLayoutHandle;
 
         int usage = VK10.VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
-        int numBytes = UniformValues.numBytes();
+        int numBytes = GlobalUniformValues.numBytes();
         boolean staging = false;
         this.globalUbo = new BufferResource(numBytes, usage, staging);
 

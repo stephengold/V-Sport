@@ -42,7 +42,7 @@ import org.joml.Vector4f;
  * Derived from the UniformBufferObject class in Cristian Herrera's
  * Vulkan-Tutorial-Java project.
  */
-class UniformValues {
+class GlobalUniformValues {
     // *************************************************************************
     // fields
 

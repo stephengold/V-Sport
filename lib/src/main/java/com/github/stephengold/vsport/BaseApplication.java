@@ -235,7 +235,8 @@ public abstract class BaseApplication {
     /**
      * values to be written to the global UBO
      */
-    final private static UniformValues uniformValues = new UniformValues();
+    final private static GlobalUniformValues uniformValues
+            = new GlobalUniformValues();
     /**
      * logical device for resource creation/destruction
      */
