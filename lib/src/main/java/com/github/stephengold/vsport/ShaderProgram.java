@@ -231,7 +231,7 @@ public class ShaderProgram extends DeviceResource {
     boolean requiresColor() {
         switch (programName) {
             case "Debug/LocalNormals":
-            case "PhongDistant/Monochrome":
+            case "Phong/Distant/Monochrome":
             case "Unshaded/Texture":
                 return false;
 
@@ -248,7 +248,7 @@ public class ShaderProgram extends DeviceResource {
     boolean requiresNormal() {
         switch (programName) {
             case "Debug/LocalNormals":
-            case "PhongDistant/Monochrome":
+            case "Phong/Distant/Monochrome":
                 return true;
 
             case "Unshaded/Texture":
@@ -267,7 +267,7 @@ public class ShaderProgram extends DeviceResource {
     boolean requiresTexCoords() {
         switch (programName) {
             case "Debug/LocalNormals":
-            case "PhongDistant/Monochrome":
+            case "Phong/Distant/Monochrome":
                 return false;
 
             case "Unshaded/Texture":
