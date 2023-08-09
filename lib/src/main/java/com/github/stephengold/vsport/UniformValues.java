@@ -52,6 +52,10 @@ class UniformValues {
      */
     private float ambientStrength;
     /**
+     * viewpoint for 3-D rendering
+     */
+    final private Camera camera = new Camera();
+    /**
      * view-to-clip coordinate transform
      */
     final private Matrix4f projectionMatrix = new Matrix4f();
@@ -74,10 +78,11 @@ class UniformValues {
      * Instantiate a sample value set.
      */
     UniformValues() {
+        camera.setZClip(0.1f, 10f);
+
         Vector3fc eye = new Vector3f(2f, 2f, 2f);
-        Vector3fc origin = new Vector3f(0f, 0f, 0f);
-        Vector3fc up = new Vector3f(0f, 1f, 0f);  // +Y axis
-        viewMatrix.lookAt(eye, origin, up);
+        Vector3fc target = new Vector3f(0f, 0f, 0f);
+        camera.reposition(eye, target);
     }
     // *************************************************************************
     // new methods exposed
@@ -148,11 +153,13 @@ class UniformValues {
 
         // mat4 viewMatrix
         byteOffset = Utils.align(byteOffset, 16);
+        camera.updateViewMatrix(viewMatrix);
         viewMatrix.get(byteOffset, target);
         byteOffset += 4 * 4 * Float.BYTES;
 
         // mat4 projectionMatrix
         byteOffset = Utils.align(byteOffset, 16);
+        camera.updateProjectionMatrix(projectionMatrix);
         projectionMatrix.get(byteOffset, target);
         byteOffset += 4 * 4 * Float.BYTES;
 
