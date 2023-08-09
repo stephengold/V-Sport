@@ -423,6 +423,17 @@ public abstract class BaseApplication {
     }
 
     /**
+     * Access the current camera for rendering.
+     *
+     * @return the pre-existing instance (not null)
+     */
+    public static Camera getCamera() {
+        Camera result = uniformValues.getCamera();
+        assert result != null;
+        return result;
+    }
+
+    /**
      * Access the graphics queue for commands.
      *
      * @return the pre-existing instance (not null)
