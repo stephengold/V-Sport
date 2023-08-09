@@ -77,6 +77,21 @@ class NonGlobalUniformValues {
     // new methods exposed
 
     /**
+     * Return a copy of the mesh-to-world coordinate rotation.
+     *
+     * @param storeResult storage for the result (modified if not null)
+     * @return the rotation (either {@code storeResult} or a new quaternion, not
+     * null)
+     */
+    public Quaternionf copyOrientation(Quaternionf storeResult) {
+        if (storeResult == null) {
+            return new Quaternionf(orientation);
+        } else {
+            return storeResult.set(orientation);
+        }
+    }
+
+    /**
      * Return a copy of the mesh-to-world coordinate transform.
      *
      * @param storeResult storage for the result (modified if not null)

@@ -33,6 +33,7 @@ import java.nio.ByteBuffer;
 import jme3utilities.Validate;
 import org.joml.Matrix3fc;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3fc;
 
 /**
@@ -86,6 +87,18 @@ public class Geometry {
     }
     // *************************************************************************
     // new methods exposed
+
+    /**
+     * Return a copy of the mesh-to-world coordinate rotation.
+     *
+     * @param storeResult storage for the result (modified if not null)
+     * @return the rotation (either {@code storeResult} or a new quaternion, not
+     * null)
+     */
+    public Quaternionf copyOrientation(Quaternionf storeResult) {
+        Quaternionf result = uniformValues.copyOrientation(storeResult);
+        return result;
+    }
 
     /**
      * Return a copy of the mesh-to-world coordinate transform.
