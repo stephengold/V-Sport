@@ -465,7 +465,7 @@ public class Camera {
     @Override
     public String toString() {
         String result = String.format("loc[%g %g %g] az=%.2f upAng=%.2f"
-                + " fovy=%.2f near=%.2f far=%g%nlook[%.2f %.2f %.2f]"
+                + " fovy=%.2f near=%.2f far=%g%n look[%.2f %.2f %.2f]"
                 + " up[%.2f %.2f %.2f] right[%.2f %.2f %.2f]",
                 eyeLocation.x(), eyeLocation.y(), eyeLocation.z(),
                 azimuthRadians, upAngleRadians, fovy, zNear, zFar,
