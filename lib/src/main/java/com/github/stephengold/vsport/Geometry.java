@@ -218,23 +218,6 @@ public class Geometry {
     }
 
     /**
-     * Replace the shader program with the named ShaderProgram, or if the name
-     * is null, replace it with the default program.
-     *
-     * @param name the name of the desired program (may be null)
-     * @return the (modified) current geometry (for chaining)
-     */
-    public Geometry setProgram(String name) {
-        if (name == null) {
-            this.program = getDefaultProgram();
-        } else {
-            this.program = BaseApplication.getProgram(name);
-        }
-
-        return this;
-    }
-
-    /**
      * Alter the mesh-to-world coordinate rotation.
      * <p>
      * The axis is assumed to be a unit vector.
@@ -260,6 +243,23 @@ public class Geometry {
      */
     public Geometry setOrientation(Matrix3fc desiredOrientation) {
         uniformValues.setOrientation(desiredOrientation);
+        return this;
+    }
+
+    /**
+     * Replace the shader program with the named ShaderProgram, or if the name
+     * is null, replace it with the default program.
+     *
+     * @param name the name of the desired program (may be null)
+     * @return the (modified) current geometry (for chaining)
+     */
+    public Geometry setProgram(String name) {
+        if (name == null) {
+            this.program = getDefaultProgram();
+        } else {
+            this.program = BaseApplication.getProgram(name);
+        }
+
         return this;
     }
 
