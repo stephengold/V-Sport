@@ -37,6 +37,8 @@ import com.github.stephengold.vsport.Geometry;
 import com.github.stephengold.vsport.Mesh;
 import com.github.stephengold.vsport.TextureKey;
 import com.github.stephengold.vsport.Vertex;
+import com.github.stephengold.vsport.input.CameraInputProcessor;
+import com.github.stephengold.vsport.input.RotateMode;
 import com.github.stephengold.vsport.mesh.OctasphereMesh;
 import com.github.stephengold.vsport.mesh.RectangleMesh;
 import java.util.ArrayList;
@@ -156,6 +158,10 @@ public class HelloVSport extends BaseApplication {
         Vector3fc eye = new Vector3f(2f, 2f, 2f);
         Vector3fc target = new Vector3f(0f, 0f, 0f);
         camera.reposition(eye, target);
+
+        CameraInputProcessor cip = getCameraInputProcessor();
+        cip.setMoveSpeed(2f);
+        cip.setRotationMode(RotateMode.DragLMB);
     }
 
     /**
