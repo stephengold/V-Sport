@@ -76,7 +76,7 @@ class UniformValues {
     UniformValues() {
         Vector3fc eye = new Vector3f(2f, 2f, 2f);
         Vector3fc origin = new Vector3f(0f, 0f, 0f);
-        Vector3fc up = new Vector3f(0f, 0f, 1f);  // +Z axis
+        Vector3fc up = new Vector3f(0f, 1f, 0f);  // +Y axis
         viewMatrix.lookAt(eye, origin, up);
     }
     // *************************************************************************

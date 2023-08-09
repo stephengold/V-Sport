@@ -38,9 +38,10 @@ import com.github.stephengold.vsport.TextureKey;
 import com.github.stephengold.vsport.Vertex;
 import com.github.stephengold.vsport.mesh.OctasphereMesh;
 import com.github.stephengold.vsport.mesh.RectangleMesh;
-import com.jme3.math.FastMath;
 import java.util.ArrayList;
 import java.util.List;
+import org.joml.Matrix3f;
+import org.joml.Matrix3fc;
 import org.lwjgl.assimp.Assimp;
 
 /**
@@ -49,6 +50,16 @@ import org.lwjgl.assimp.Assimp;
  * @author Stephen Gold sgold@sonic.net
  */
 public class HelloVSport extends BaseApplication {
+    // *************************************************************************
+    // constants
+
+    /**
+     * rotation matrix to transform Z-up coordinates to Y-up coordinates
+     */
+    final private static Matrix3fc zupToYup = new Matrix3f(
+            0f, 1f, 0f,
+            0f, 0f, 1f,
+            1f, 0f, 0f);
     // *************************************************************************
     // fields
 
@@ -98,6 +109,9 @@ public class HelloVSport extends BaseApplication {
         List<Integer> indices = null;
         List<Vertex> vertices = new ArrayList<>();
         AssimpUtils.extractTriangles(modelName, postFlags, indices, vertices);
+        for (Vertex v : vertices) {
+            v.rotate(zupToYup);
+        }
         Mesh roomMesh = Mesh.newInstance(vertices);
 
         Mesh squareMesh = new RectangleMesh();
@@ -117,13 +131,16 @@ public class HelloVSport extends BaseApplication {
         mars.setProgram("Unshaded/Texture");
         mars.setTexture(marsKey);
         mars.scale(0.4f);
-        mars.setLocation(1f, 0f, 0.2f);
+        mars.setLocation(0f, 0.2f, 1f);
 
         Geometry photo = new Geometry(squareMesh);
+        photo.setOrientation(new Matrix3f(
+                0f, -1f, 0f,
+                0f, 0f, 1f,
+                -1f, 0f, 0f));
         photo.setProgram("Unshaded/Texture");
         photo.setTexture(photoKey);
-        photo.setOrientation(FastMath.PI, 0f, 0f, 1f);
-        photo.setLocation(1f, 1.4f, -0.2f);
+        photo.setLocation(1.4f, -0.2f, 1f);
 
         Geometry room = new Geometry(roomMesh);
         room.setProgram("Unshaded/Texture");
@@ -139,6 +156,7 @@ public class HelloVSport extends BaseApplication {
             long nanoseconds = System.nanoTime() - startTime;
             float rotationAngle = 2e-10f * nanoseconds; // in radians
             mars.setOrientation(rotationAngle, 0f, 0f, 1f);
+            mars.rotate(zupToYup);
         }
 
         super.render();
