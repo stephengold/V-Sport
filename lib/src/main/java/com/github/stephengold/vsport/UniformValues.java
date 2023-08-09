@@ -72,19 +72,6 @@ class UniformValues {
      */
     final private Vector4f lightColor = new Vector4f();
     // *************************************************************************
-    // constructors
-
-    /**
-     * Instantiate a sample value set.
-     */
-    UniformValues() {
-        camera.setZClip(0.1f, 10f);
-
-        Vector3fc eye = new Vector3f(2f, 2f, 2f);
-        Vector3fc target = new Vector3f(0f, 0f, 0f);
-        camera.reposition(eye, target);
-    }
-    // *************************************************************************
     // new methods exposed
 
     /**
