@@ -139,7 +139,7 @@ public class CameraInputProcessor extends InputProcessor {
     /**
      * Poll each camera-movement key and move the camera accordingly.
      */
-    void update() {
+    public void update() {
         int forwardSignal = 0;
         int rightSignal = 0;
         int upSignal = 0;

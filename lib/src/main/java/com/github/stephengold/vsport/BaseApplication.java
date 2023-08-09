@@ -29,6 +29,7 @@
  */
 package com.github.stephengold.vsport;
 
+import com.github.stephengold.vsport.input.CameraInputProcessor;
 import com.github.stephengold.vsport.input.InputManager;
 import com.github.stephengold.vsport.input.InputProcessor;
 import java.io.PrintStream;
@@ -140,6 +141,10 @@ public abstract class BaseApplication {
      * not created
      */
     private static Callback debugMessengerCallback;
+    /**
+     * process user input for the camera
+     */
+    private static CameraInputProcessor cameraInputProcessor;
     /**
      * resources that depend on the swap chain
      */
@@ -388,6 +393,16 @@ public abstract class BaseApplication {
     }
 
     /**
+     * Access the camera's input processor.
+     *
+     * @return the pre-existing instance (not null)
+     */
+    public static CameraInputProcessor getCameraInputProcessor() {
+        assert cameraInputProcessor != null;
+        return cameraInputProcessor;
+    }
+
+    /**
      * Access the graphics queue for commands.
      *
      * @return the pre-existing instance (not null)
@@ -607,6 +622,9 @@ public abstract class BaseApplication {
 
             int appVersion = VK10.VK_MAKE_VERSION(appMajor, appMinor, appPatch);
             initializeVulkan(appName, appVersion);
+
+            cameraInputProcessor = new CameraInputProcessor(windowHandle);
+            inputManager.add(cameraInputProcessor);
 
             inputManager.add(new InputProcessor() {
                 @Override
@@ -1774,6 +1792,7 @@ public abstract class BaseApplication {
     private void updateBase() {
         render();
         GLFW.glfwPollEvents();
+        cameraInputProcessor.update();
 
         Frame frame = inFlightFrames[currentFrameIndex];
         renderFrame(frame);
