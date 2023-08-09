@@ -212,7 +212,7 @@ public class Vertex {
                 result = (color != null && color.equals(otherVertex.color));
             }
             if (result && normal != otherVertex.normal) {
-                result = (normal != null && color.equals(otherVertex.normal));
+                result = (normal != null && normal.equals(otherVertex.normal));
             }
             if (result && texCoords != otherVertex.texCoords) {
                 result = (texCoords != null
