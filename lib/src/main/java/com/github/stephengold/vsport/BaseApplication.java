@@ -30,6 +30,7 @@
 package com.github.stephengold.vsport;
 
 import com.github.stephengold.vsport.input.InputManager;
+import com.github.stephengold.vsport.input.InputProcessor;
 import java.io.PrintStream;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -596,6 +597,31 @@ public abstract class BaseApplication {
 
             int appVersion = VK10.VK_MAKE_VERSION(appMajor, appMinor, appPatch);
             initializeVulkan(appName, appVersion);
+
+            inputManager.add(new InputProcessor() {
+                @Override
+                public void onKeyboard(int keyId, boolean isPress) {
+                    if (keyId == GLFW.GLFW_KEY_ESCAPE) { // stop the application
+                        GLFW.glfwSetWindowShouldClose(windowHandle, true);
+                        return;
+                    }
+                    super.onKeyboard(keyId, isPress);
+                }
+            });
+            inputManager.add(new InputProcessor() {
+                @Override
+                public void onKeyboard(int keyId, boolean isPressed) {
+                    if (keyId == GLFW.GLFW_KEY_C) {
+                        if (isPressed) { // print camera state
+                            Camera cam = getCamera();
+                            System.out.println(cam);
+                            System.out.flush();
+                        }
+                        return;
+                    }
+                    super.onKeyboard(keyId, isPressed);
+                }
+            });
 
             // Initialize the subclass.
             initialize();
