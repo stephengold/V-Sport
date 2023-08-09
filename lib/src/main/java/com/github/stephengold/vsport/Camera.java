@@ -189,7 +189,7 @@ public class Camera {
      * @param offset the desired offset (in world coordinates, not null,
      * unaffected)
      */
-    public void move(Vector3f offset) {
+    public void move(Vector3fc offset) {
         eyeLocation.add(offset);
     }
 
