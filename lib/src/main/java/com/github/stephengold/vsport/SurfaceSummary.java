@@ -30,6 +30,7 @@
 package com.github.stephengold.vsport;
 
 import java.nio.IntBuffer;
+import jme3utilities.Validate;
 import jme3utilities.math.MyMath;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.vulkan.KHRSurface;
