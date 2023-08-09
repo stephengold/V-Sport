@@ -366,23 +366,6 @@ public abstract class BaseApplication {
     }
 
     /**
-     * Copy the contents of one buffer object to another.
-     *
-     * @param source the source buffer (not null)
-     * @param destination the destination buffer (not null, same capacity as
-     * source)
-     */
-    static void copyBuffer(MappableBuffer source, MappableBuffer destination) {
-        Validate.nonNull(source, "source");
-        Validate.nonNull(destination, "destination");
-        assert destination.numBytes() == source.numBytes();
-
-        SingleUse commandSequence = new SingleUse();
-        commandSequence.addCopyBufferToBuffer(source, destination);
-        commandSequence.submitToGraphicsQueue();
-    }
-
-    /**
      * Copy the data from the specified buffer to the specified 2-D image.
      *
      * @param sourceBuffer the source buffer (not null)

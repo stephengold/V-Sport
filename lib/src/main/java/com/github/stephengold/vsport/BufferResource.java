@@ -30,6 +30,7 @@
 package com.github.stephengold.vsport;
 
 import java.nio.ByteBuffer;
+import jme3utilities.Validate;
 import org.lwjgl.vulkan.VK10;
 
 /**
@@ -153,6 +154,24 @@ public class BufferResource extends DeviceResource {
     // private methods
 
     /**
+     * Copy the contents of one buffer object to another.
+     *
+     * @param source the source buffer (not null)
+     * @param destination the destination buffer (not null, same capacity as
+     * source)
+     */
+    private static void copyBuffer(
+            MappableBuffer source, MappableBuffer destination) {
+        Validate.nonNull(source, "source");
+        Validate.nonNull(destination, "destination");
+        assert destination.numBytes() == source.numBytes();
+
+        SingleUse commandSequence = new SingleUse();
+        commandSequence.addCopyBufferToBuffer(source, destination);
+        commandSequence.submitToGraphicsQueue();
+    }
+
+    /**
      * Create the underlying resources.
      */
     private void create() {
@@ -186,7 +205,7 @@ public class BufferResource extends DeviceResource {
         this.mappableBuffer = logicalDevice.createMappable(
                 numBytes, createUsage, properties);
 
-        BaseApplication.copyBuffer(stagingBuffer, mappableBuffer);
+        copyBuffer(stagingBuffer, mappableBuffer);
 
         // Destroy the staging buffer and free its memory:
         stagingBuffer.destroy();
