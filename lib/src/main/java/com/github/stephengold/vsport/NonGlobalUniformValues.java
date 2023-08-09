@@ -83,7 +83,7 @@ class NonGlobalUniformValues {
      * @return the rotation (either {@code storeResult} or a new quaternion, not
      * null)
      */
-    public Quaternionf copyOrientation(Quaternionf storeResult) {
+    Quaternionf copyOrientation(Quaternionf storeResult) {
         if (storeResult == null) {
             return new Quaternionf(orientation);
         } else {
