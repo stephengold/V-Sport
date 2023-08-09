@@ -210,12 +210,14 @@ class CommandSequence {
      * @return the (modified) current sequence (for chaining)
      */
     CommandSequence addBindVertexBuffers(Geometry geometry) {
-        Mesh mesh = geometry.getMesh();
-        int numAttributes = mesh.countAttributes();
-
         try (MemoryStack stack = MemoryStack.stackPush()) {
+            Mesh mesh = geometry.getMesh();
+            ShaderProgram program = geometry.getProgram();
+            LongBuffer pBufferHandles
+                    = mesh.generateBufferHandles(program, stack);
+
             int firstBinding = 0;
-            LongBuffer pBufferHandles = mesh.generateBufferHandles(stack);
+            int numAttributes = pBufferHandles.capacity();
             LongBuffer pOffsets = stack.callocLong(numAttributes);
             VK10.vkCmdBindVertexBuffers(
                     vkCommandBuffer, firstBinding, pBufferHandles, pOffsets);

@@ -319,139 +319,42 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
 
     /**
-     * Generate an attribute-description buffer.
-     *
-     * @param stack for memory allocation (not null)
-     * @return a new temporary buffer
-     */
-    VkVertexInputAttributeDescription.Buffer
-            generateAttributeDescriptions(MemoryStack stack) {
-        int numAttributes = countAttributes();
-        VkVertexInputAttributeDescription.Buffer result
-                = VkVertexInputAttributeDescription.calloc(
-                        numAttributes, stack);
-
-        int slotIndex = 0; // current binding/slot
-        int offset = 0;
-
-        // position attribute (3 signed floats in slot 0)
-        VkVertexInputAttributeDescription posDescription
-                = result.get(slotIndex);
-        posDescription.binding(slotIndex);
-        posDescription.format(VK10.VK_FORMAT_R32G32B32_SFLOAT);
-        posDescription.location(slotIndex); // slot 0 (see the vertex shader)
-        posDescription.offset(offset); // start offset in bytes
-
-        if (colorBuffer != null) {
-            // color attribute (3 signed floats)
-            ++slotIndex;
-            VkVertexInputAttributeDescription colorDescription
-                    = result.get(slotIndex);
-            colorDescription.binding(slotIndex);
-            colorDescription.format(VK10.VK_FORMAT_R32G32B32_SFLOAT);
-            colorDescription.location(slotIndex);
-            colorDescription.offset(offset); // start offset in bytes
-        }
-
-        if (normalBuffer != null) {
-            // normal attribute (3 signed floats)
-            ++slotIndex;
-            VkVertexInputAttributeDescription normalDescription
-                    = result.get(slotIndex);
-            normalDescription.binding(slotIndex);
-            normalDescription.format(VK10.VK_FORMAT_R32G32B32_SFLOAT);
-            normalDescription.location(slotIndex);
-            normalDescription.offset(offset); // start offset in bytes
-        }
-
-        if (texCoordsBuffer != null) {
-            // texCoords attribute (2 signed floats)
-            ++slotIndex;
-            VkVertexInputAttributeDescription texCoordsDescription
-                    = result.get(slotIndex);
-            texCoordsDescription.binding(slotIndex);
-            texCoordsDescription.format(VK10.VK_FORMAT_R32G32_SFLOAT);
-            texCoordsDescription.location(slotIndex);
-            texCoordsDescription.offset(offset); // start offset in bytes
-        }
-
-        return result;
-    }
-
-    /**
-     * Generate a binding-description buffer.
-     *
-     * @param stack for memory allocation (not null)
-     * @return a new temporary buffer
-     */
-    VkVertexInputBindingDescription.Buffer
-            generateBindingDescription(MemoryStack stack) {
-        int numAttributes = countAttributes();
-        VkVertexInputBindingDescription.Buffer result
-                = VkVertexInputBindingDescription.calloc(numAttributes, stack);
-
-        int slotIndex = 0; // current binding/slot
-
-        // position attribute (3 signed floats in slot 0)
-        VkVertexInputBindingDescription posDescription = result.get(0);
-        posDescription.binding(slotIndex);
-        posDescription.inputRate(VK10.VK_VERTEX_INPUT_RATE_VERTEX);
-        posDescription.stride(numAxes * Float.BYTES);
-
-        if (colorBuffer != null) {
-            // color attribute (3 signed floats)
-            ++slotIndex;
-            VkVertexInputBindingDescription colorDescription
-                    = result.get(slotIndex);
-            colorDescription.binding(slotIndex);
-            colorDescription.inputRate(VK10.VK_VERTEX_INPUT_RATE_VERTEX);
-            colorDescription.stride(3 * Float.BYTES);
-        }
-
-        if (normalBuffer != null) {
-            // normal attribute (3 signed floats)
-            ++slotIndex;
-            VkVertexInputBindingDescription normalDescription
-                    = result.get(slotIndex);
-            normalDescription.binding(slotIndex);
-            normalDescription.inputRate(VK10.VK_VERTEX_INPUT_RATE_VERTEX);
-            normalDescription.stride(numAxes * Float.BYTES);
-        }
-
-        if (texCoordsBuffer != null) {
-            // texture-coordinates attribute (2 signed floats)
-            ++slotIndex;
-            VkVertexInputBindingDescription tcDescription
-                    = result.get(slotIndex);
-            tcDescription.binding(slotIndex);
-            tcDescription.inputRate(VK10.VK_VERTEX_INPUT_RATE_VERTEX);
-            tcDescription.stride(2 * Float.BYTES);
-        }
-
-        return result;
-    }
-
-    /**
      * Generate buffer handles for the BindVertexBuffers command.
      *
+     * @param program the shader program to be run (not null, unaffected)
      * @param stack for memory allocation (not null)
      * @return a new temporary buffer
      */
-    LongBuffer generateBufferHandles(MemoryStack stack) {
-        int numAttributes = countAttributes();
+    LongBuffer generateBufferHandles(ShaderProgram program, MemoryStack stack) {
+        int numAttributes = program.countAttributes();
         LongBuffer result = stack.mallocLong(numAttributes);
 
         int slotIndex = 0;
         result.put(slotIndex, positionBuffer.handle());
-        if (colorBuffer != null) {
+        if (program.requiresColor()) {
+            if (colorBuffer == null) {
+                throw new IllegalStateException(
+                        "Geometry cannot be rendered because the " + program
+                        + " program requires vertex colors.");
+            }
             ++slotIndex;
             result.put(slotIndex, colorBuffer.handle());
         }
-        if (normalBuffer != null) {
+        if (program.requiresNormal()) {
+            if (normalBuffer == null) {
+                throw new IllegalStateException(
+                        "Geometry cannot be rendered because the " + program
+                        + " program requires vertex normals.");
+            }
             ++slotIndex;
             result.put(slotIndex, normalBuffer.handle());
         }
-        if (texCoordsBuffer != null) {
+        if (program.requiresTexCoords()) {
+            if (texCoordsBuffer == null) {
+                throw new IllegalStateException(
+                        "Geometry cannot be rendered because the " + program
+                        + " program requires texture coordinates.");
+            }
             ++slotIndex;
             result.put(slotIndex, texCoordsBuffer.handle());
         }

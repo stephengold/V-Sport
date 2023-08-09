@@ -1068,13 +1068,12 @@ public abstract class BaseApplication {
                     VK10.VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO
             );
 
-            Mesh mesh = geometry.getMesh();
             VkVertexInputBindingDescription.Buffer pBindingDesc
-                    = mesh.generateBindingDescription(stack);
+                    = shaderProgram.generateBindingDescription(stack);
             visCreateInfo.pVertexBindingDescriptions(pBindingDesc);
 
             VkVertexInputAttributeDescription.Buffer pAttributeDesc
-                    = mesh.generateAttributeDescriptions(stack);
+                    = shaderProgram.generateAttributeDescriptions(stack);
             visCreateInfo.pVertexAttributeDescriptions(pAttributeDesc);
 
             // viewport location and dimensions:
