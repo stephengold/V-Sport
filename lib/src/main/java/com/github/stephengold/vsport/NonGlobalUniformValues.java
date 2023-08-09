@@ -66,11 +66,12 @@ class NonGlobalUniformValues {
      */
     final private Vector3f scale = new Vector3f(1f);
     /**
-     * material color to use with ambient/diffuse lighting
+     * material color (in the Linear colorspace) to use with ambient/diffuse
+     * lighting
      */
     final private Vector4f baseMaterialColor = new Vector4f(1f);
     /**
-     * material color to use with specular reflections
+     * material color (in the Linear colorspace) to use in specular reflections
      */
     final private Vector4f specularMaterialColor = new Vector4f(1f);
     // *************************************************************************

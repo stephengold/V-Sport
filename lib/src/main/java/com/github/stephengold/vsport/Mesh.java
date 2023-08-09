@@ -301,7 +301,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
 
     /**
-     * Remove the normals from the mesh.
+     * Remove the normals, if any.
      */
     public void dropNormals() {
         this.normalBuffer = null;

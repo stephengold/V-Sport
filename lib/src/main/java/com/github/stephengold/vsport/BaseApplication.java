@@ -233,7 +233,7 @@ public abstract class BaseApplication {
      */
     final private static Set<String> requiredLayers = new HashSet<>();
     /**
-     * values to be written to the global UBO
+     * values to be written to global UBOs
      */
     final private static GlobalUniformValues uniformValues
             = new GlobalUniformValues();
@@ -973,7 +973,7 @@ public abstract class BaseApplication {
             cbsCreateInfo.logicOpEnable(false); // no logic operation blend
             cbsCreateInfo.pAttachments(cbaState);
 
-            // depth-stencil state:
+            // depth/stencil state:
             VkPipelineDepthStencilStateCreateInfo dssCreateInfo
                     = VkPipelineDepthStencilStateCreateInfo.calloc(stack);
             dssCreateInfo.sType(

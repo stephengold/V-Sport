@@ -63,7 +63,7 @@ class GlobalUniformValues {
      */
     final private Matrix4f viewMatrix = new Matrix4f();
     /**
-     * direction to the directional light in world coordinates
+     * direction to the directional light (in world coordinates)
      */
     final private Vector3f lightDirectionWorldspace
             = new Vector3f(1f, 3f, 2f).normalize();
