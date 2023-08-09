@@ -186,10 +186,11 @@ public class Camera {
      * Teleport the eye by the specified offset without changing its
      * orientation.
      *
-     * @param offset the desired offset (in world coordinates, not null,
+     * @param offset the desired offset (in world coordinates, not null, finite,
      * unaffected)
      */
     public void move(Vector3fc offset) {
+        Validate.require(offset.isFinite(), "a finite offset");
         eyeLocation.add(offset);
     }
 
@@ -198,12 +199,15 @@ public class Camera {
      * {@code targetLocation}.
      *
      * @param eyeLocation the desired eye location (in world coordinates, not
-     * null, unaffected)
+     * null, finite, unaffected)
      * @param targetLocation the location to look at (in world coordinates, not
-     * null, unaffected)
+     * null, finite, unaffected)
      * @return the (modified) current instance (for chaining)
      */
     public Camera reposition(Vector3fc eyeLocation, Vector3fc targetLocation) {
+        Validate.require(eyeLocation.isFinite(), "a finite eye location");
+        Validate.require(targetLocation.isFinite(), "a finite target location");
+
         this.eyeLocation.set(eyeLocation);
 
         Vector3f offset = new Vector3f(targetLocation).sub(eyeLocation);
@@ -306,10 +310,11 @@ public class Camera {
      * orientation.
      *
      * @param newLocation the desired location (in world coordinates, not null,
-     * unaffected)
+     * finite, unaffected)
      * @return the (modified) current instance (for chaining)
      */
     public Camera setLocation(Vector3fc newLocation) {
+        Validate.require(newLocation.isFinite(), "a finite new location");
         eyeLocation.set(newLocation);
         return this;
     }
