@@ -31,6 +31,7 @@ package com.github.stephengold.vsport;
 
 import java.nio.ByteBuffer;
 import jme3utilities.Validate;
+import org.joml.Matrix3fc;
 import org.joml.Matrix4f;
 import org.joml.Vector3fc;
 
@@ -156,6 +157,18 @@ public class Geometry {
     }
 
     /**
+     * Apply the specified rotation, without shifting the local origin.
+     *
+     * @param rotation the rotation to apply (not null, each row is a unit
+     * vector, unaffected)
+     * @return the (modified) current instance (for chaining)
+     */
+    public Geometry rotate(Matrix3fc rotation) {
+        uniformValues.rotate(rotation);
+        return this;
+    }
+
+    /**
      * Replace the geometry's Mesh with the specified Mesh.
      *
      * @param newMesh the desired Mesh (not null, alias created)
@@ -208,6 +221,19 @@ public class Geometry {
      */
     public Geometry setOrientation(float angle, float x, float y, float z) {
         uniformValues.setOrientation(angle, x, y, z);
+        return this;
+    }
+
+    /**
+     * Alter the mesh-to-world coordinate rotation, without shifting the local
+     * origin.
+     *
+     * @param desiredOrientation the desired orientation (not null, each row is
+     * a unit vector, unaffected)
+     * @return the (modified) current instance (for chaining)
+     */
+    public Geometry setOrientation(Matrix3fc desiredOrientation) {
+        uniformValues.setOrientation(desiredOrientation);
         return this;
     }
 
