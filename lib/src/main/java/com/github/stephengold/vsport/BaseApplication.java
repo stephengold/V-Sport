@@ -58,7 +58,6 @@ import org.lwjgl.vulkan.KHRSwapchain;
 import org.lwjgl.vulkan.VK10;
 import org.lwjgl.vulkan.VkAllocationCallbacks;
 import org.lwjgl.vulkan.VkApplicationInfo;
-import org.lwjgl.vulkan.VkCommandPoolCreateInfo;
 import org.lwjgl.vulkan.VkCopyDescriptorSet;
 import org.lwjgl.vulkan.VkDebugUtilsMessengerCallbackDataEXT;
 import org.lwjgl.vulkan.VkDebugUtilsMessengerCreateInfoEXT;
@@ -180,10 +179,6 @@ public abstract class BaseApplication {
      * logical device for resource creation/destruction
      */
     private static LogicalDevice logicalDevice;
-    /**
-     * {@code VkCommandPool} handle
-     */
-    private static long commandPoolHandle = VK10.VK_NULL_HANDLE;
     /**
      * {@code VkDescriptorSetLayout} handle
      */
@@ -368,16 +363,6 @@ public abstract class BaseApplication {
 
         assert ratio > 0f : ratio;
         return ratio;
-    }
-
-    /**
-     * Access the command pool.
-     *
-     * @return the handle of the pre-existing {@code VkCommandPool} (not null)
-     */
-    static long commandPoolHandle() {
-        assert commandPoolHandle != VK10.VK_NULL_HANDLE;
-        return commandPoolHandle;
     }
 
     /**
@@ -766,13 +751,6 @@ public abstract class BaseApplication {
             samplerHandle = VK10.VK_NULL_HANDLE;
         }
 
-        // Destroy the command pool and its buffers:
-        if (commandPoolHandle != VK10.VK_NULL_HANDLE) {
-            VK10.vkDestroyCommandPool(
-                    vkDevice, commandPoolHandle, defaultAllocator);
-            commandPoolHandle = VK10.VK_NULL_HANDLE;
-        }
-
         // Destroy the logical device:
         vkDevice = null;
         if (logicalDevice != null) {
@@ -844,31 +822,6 @@ public abstract class BaseApplication {
     }
 
     /**
-     * Create an (empty) command-buffer pool for the main window.
-     */
-    private static void createCommandPool() {
-        QueueFamilySummary queueFamilies
-                = physicalDevice.summarizeFamilies(surfaceHandle);
-        int familyIndex = queueFamilies.graphics();
-
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            VkCommandPoolCreateInfo createInfo
-                    = VkCommandPoolCreateInfo.calloc(stack);
-            createInfo.sType(VK10.VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO);
-
-            createInfo.flags(
-                    VK10.VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT);
-            createInfo.queueFamilyIndex(familyIndex);
-
-            LongBuffer pHandle = stack.mallocLong(1);
-            int retCode = VK10.vkCreateCommandPool(
-                    vkDevice, createInfo, defaultAllocator, pHandle);
-            Utils.checkForError(retCode, "create command-buffer pool");
-            commandPoolHandle = pHandle.get(0);
-        }
-    }
-
-    /**
      * Create the descriptor-set layout.
      */
     private static void createDescriptorSetLayout() {
@@ -927,9 +880,8 @@ public abstract class BaseApplication {
      * Create a logical device in the application's main window.
      */
     private static void createLogicalDevice() {
-        vkDevice = physicalDevice.createLogicalDevice(
-                surfaceHandle, enableDebugging);
-        logicalDevice = new LogicalDevice(vkDevice);
+        logicalDevice = new LogicalDevice(physicalDevice, surfaceHandle);
+        vkDevice = logicalDevice.getVkDevice();
         QueueFamilySummary queueFamilies
                 = physicalDevice.summarizeFamilies(surfaceHandle);
 
@@ -1428,8 +1380,6 @@ public abstract class BaseApplication {
         System.out.println("numSamples = " + numMsaaSamples);
 
         createLogicalDevice();
-        createCommandPool();
-
         createTextureSampler(); // depends on the logical device
         createDescriptorSetLayout(); // depends on the logical device
         pipelineLayoutHandle = createPipelineLayout();

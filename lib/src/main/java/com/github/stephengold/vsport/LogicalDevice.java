@@ -42,6 +42,7 @@ import org.lwjgl.vulkan.VkAllocationCallbacks;
 import org.lwjgl.vulkan.VkBufferCreateInfo;
 import org.lwjgl.vulkan.VkCommandBuffer;
 import org.lwjgl.vulkan.VkCommandBufferAllocateInfo;
+import org.lwjgl.vulkan.VkCommandPoolCreateInfo;
 import org.lwjgl.vulkan.VkComponentMapping;
 import org.lwjgl.vulkan.VkDevice;
 import org.lwjgl.vulkan.VkImageCreateInfo;
@@ -65,6 +66,10 @@ public class LogicalDevice {
     // fields
 
     /**
+     * {@code VkCommandPool} handle for allocating command buffers
+     */
+    private long commandPoolHandle = VK10.VK_NULL_HANDLE;
+    /**
      * all device-dependent resources
      */
     final private static Collection<DeviceResource> resourceSet
@@ -80,9 +85,24 @@ public class LogicalDevice {
     // *************************************************************************
     // constructors
 
-    LogicalDevice(VkDevice vkDevice) {
-        this.vkDevice = vkDevice;
+    /**
+     * Instantiate a logical device, create a command-buffer pool, and update
+     * all device resources.
+     *
+     * @param physicalDevice the underlying physical device (not null)
+     * @param surfaceHandle the handle of the {@code VkSurfaceKHR} for
+     * presentation (not null)
+     */
+    LogicalDevice(PhysicalDevice physicalDevice, long surfaceHandle) {
+        Validate.nonZero(surfaceHandle, "surface handle");
+
+        boolean enableDebugging = BaseApplication.isDebuggingEnabled();
+        this.vkDevice = physicalDevice
+                .createLogicalDevice(surfaceHandle, enableDebugging);
+
         this.allocator = BaseApplication.findAllocator();
+        this.commandPoolHandle
+                = createCommandPool(physicalDevice, surfaceHandle);
 
         for (DeviceResource resource : resourceSet) {
             resource.updateLogicalDevice(this);
@@ -361,6 +381,12 @@ public class LogicalDevice {
             resource.updateLogicalDevice(null);
         }
 
+        // Destroy the command pool and its buffers:
+        if (commandPoolHandle != VK10.VK_NULL_HANDLE) {
+            VK10.vkDestroyCommandPool(vkDevice, commandPoolHandle, allocator);
+            this.commandPoolHandle = VK10.VK_NULL_HANDLE;
+        }
+
         if (vkDevice != null) {
             VK10.vkDestroyDevice(vkDevice, allocator);
             this.vkDevice = null;
@@ -452,6 +478,20 @@ public class LogicalDevice {
         }
 
         return VK10.VK_NULL_HANDLE;
+    }
+
+    /**
+     * Free the specified command buffer, if any.
+     *
+     * @param commandBuffer the command buffer to free (may be null)
+     * @return null
+     */
+    VkCommandBuffer freeCommandBuffer(VkCommandBuffer commandBuffer) {
+        if (commandBuffer != null) {
+            VK10.vkFreeCommandBuffers(
+                    vkDevice, commandPoolHandle, commandBuffer);
+        }
+        return null;
     }
 
     /**
@@ -593,7 +633,6 @@ public class LogicalDevice {
         allocInfo.commandBufferCount(numBuffersNeeded);
         allocInfo.level(VK10.VK_COMMAND_BUFFER_LEVEL_PRIMARY);
 
-        long commandPoolHandle = BaseApplication.commandPoolHandle();
         allocInfo.commandPool(commandPoolHandle);
 
         PointerBuffer result = stack.mallocPointer(numBuffersNeeded);
@@ -602,5 +641,41 @@ public class LogicalDevice {
         Utils.checkForError(retCode, "allocate command buffers");
 
         return result;
+    }
+
+    /**
+     * Create an (empty) command-buffer pool for graphics queues.
+     *
+     * @param physicalDevice the underlying physical device (not null)
+     * @param surfaceHandle the handle of the {@code VkSurfaceKHR} for
+     * presentation (not null)
+     *
+     * @return the handle of a new, empty {@code VkCommandPool}
+     */
+    private long createCommandPool(
+            PhysicalDevice physicalDevice, long surfaceHandle) {
+        Validate.nonZero(surfaceHandle, "surface handle");
+
+        QueueFamilySummary queueFamilies
+                = physicalDevice.summarizeFamilies(surfaceHandle);
+        int familyIndex = queueFamilies.graphics();
+
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            VkCommandPoolCreateInfo createInfo
+                    = VkCommandPoolCreateInfo.calloc(stack);
+            createInfo.sType(VK10.VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO);
+
+            createInfo.flags(
+                    VK10.VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT);
+            createInfo.queueFamilyIndex(familyIndex);
+
+            LongBuffer pHandle = stack.mallocLong(1);
+            int retCode = VK10.vkCreateCommandPool(
+                    vkDevice, createInfo, allocator, pHandle);
+            Utils.checkForError(retCode, "create a command-buffer pool");
+            long result = pHandle.get(0);
+
+            return result;
+        }
     }
 }

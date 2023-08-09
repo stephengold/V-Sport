@@ -356,10 +356,9 @@ class CommandSequence {
      * @return null
      */
     CommandSequence destroy() {
-        VkDevice vkDevice = BaseApplication.getVkDevice();
-        long commandPoolHandle = BaseApplication.commandPoolHandle();
-        VK10.vkFreeCommandBuffers(vkDevice, commandPoolHandle, vkCommandBuffer);
-        this.vkCommandBuffer = null;
+        LogicalDevice logicalDevice = BaseApplication.getLogicalDevice();
+        this.vkCommandBuffer
+                = logicalDevice.freeCommandBuffer(vkCommandBuffer);
 
         return null;
     }
