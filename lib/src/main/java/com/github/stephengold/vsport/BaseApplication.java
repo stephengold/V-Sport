@@ -199,7 +199,7 @@ public abstract class BaseApplication {
      */
     private static long samplerHandle = VK10.VK_NULL_HANDLE;
     /**
-     * handle of the surface for the main window
+     * handle of the {@code VkSurfaceKHR} for presentation
      */
     private static long surfaceHandle = VK10.VK_NULL_HANDLE;
     /**
@@ -388,6 +388,7 @@ public abstract class BaseApplication {
      */
     public static Camera getCamera() {
         Camera result = uniformValues.getCamera();
+
         assert result != null;
         return result;
     }

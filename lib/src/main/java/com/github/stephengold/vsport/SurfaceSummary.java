@@ -57,7 +57,7 @@ class SurfaceSummary {
      */
     final private IntBuffer presentationModes;
     /**
-     * handle of the VkSurfaceKHR being analyzed
+     * handle of the {@code VkSurfaceKHR} being analyzed
      */
     final private long surfaceHandle;
     /**

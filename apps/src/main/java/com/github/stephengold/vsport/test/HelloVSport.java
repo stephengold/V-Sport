@@ -151,7 +151,7 @@ public class HelloVSport extends BaseApplication {
         room.setProgram("Unshaded/Texture");
         room.setTexture(roomKey);
 
-        // camera
+        // camera:
         Camera camera = getCamera();
         camera.setZClip(0.1f, 10f);
 
