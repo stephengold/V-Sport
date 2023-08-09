@@ -38,6 +38,8 @@ import org.lwjgl.vulkan.VK10;
 import org.lwjgl.vulkan.VkAllocationCallbacks;
 import org.lwjgl.vulkan.VkDevice;
 import org.lwjgl.vulkan.VkShaderModuleCreateInfo;
+import org.lwjgl.vulkan.VkVertexInputAttributeDescription;
+import org.lwjgl.vulkan.VkVertexInputBindingDescription;
 
 /**
  * Encapsulate a vertex shader and a fragment shader that are used together.
@@ -75,6 +77,26 @@ public class ShaderProgram extends DeviceResource {
     // new methods exposed
 
     /**
+     * Count how many attributes the program requires.
+     *
+     * @return the count (&gt;0)
+     */
+    int countAttributes() {
+        int result = 1; // The position attribute is always required.
+        if (requiresColor()) {
+            ++result;
+        }
+        if (requiresNormal()) {
+            ++result;
+        }
+        if (requiresTexCoords()) {
+            ++result;
+        }
+
+        return result;
+    }
+
+    /**
      * Return the fragment shader.
      *
      * @return the handle of a {@code VkShaderModule} (not null)
@@ -86,6 +108,174 @@ public class ShaderProgram extends DeviceResource {
 
         assert fragModuleHandle != VK10.VK_NULL_HANDLE;
         return fragModuleHandle;
+    }
+
+    /**
+     * Generate an attribute-description buffer.
+     *
+     * @param stack for memory allocation (not null)
+     * @return a new temporary buffer
+     */
+    VkVertexInputAttributeDescription.Buffer
+            generateAttributeDescriptions(MemoryStack stack) {
+        int numAttributes = countAttributes();
+        VkVertexInputAttributeDescription.Buffer result
+                = VkVertexInputAttributeDescription.calloc(
+                        numAttributes, stack);
+
+        int slotIndex = 0; // current binding/slot
+        int offset = 0;
+
+        // position attribute (3 signed floats in slot 0)
+        VkVertexInputAttributeDescription posDescription
+                = result.get(slotIndex);
+        posDescription.binding(slotIndex);
+        posDescription.format(VK10.VK_FORMAT_R32G32B32_SFLOAT);
+        posDescription.location(slotIndex); // slot 0 (see the vertex shader)
+        posDescription.offset(offset); // start offset in bytes
+
+        if (requiresColor()) {
+            // color attribute (3 signed floats)
+            ++slotIndex;
+            VkVertexInputAttributeDescription colorDescription
+                    = result.get(slotIndex);
+            colorDescription.binding(slotIndex);
+            colorDescription.format(VK10.VK_FORMAT_R32G32B32_SFLOAT);
+            colorDescription.location(slotIndex);
+            colorDescription.offset(offset); // start offset in bytes
+        }
+
+        if (requiresNormal()) {
+            // normal attribute (3 signed floats)
+            ++slotIndex;
+            VkVertexInputAttributeDescription normalDescription
+                    = result.get(slotIndex);
+            normalDescription.binding(slotIndex);
+            normalDescription.format(VK10.VK_FORMAT_R32G32B32_SFLOAT);
+            normalDescription.location(slotIndex);
+            normalDescription.offset(offset); // start offset in bytes
+        }
+
+        if (requiresTexCoords()) {
+            // texCoords attribute (2 signed floats)
+            ++slotIndex;
+            VkVertexInputAttributeDescription texCoordsDescription
+                    = result.get(slotIndex);
+            texCoordsDescription.binding(slotIndex);
+            texCoordsDescription.format(VK10.VK_FORMAT_R32G32_SFLOAT);
+            texCoordsDescription.location(slotIndex);
+            texCoordsDescription.offset(offset); // start offset in bytes
+        }
+
+        return result;
+    }
+
+    /**
+     * Generate a binding-description buffer.
+     *
+     * @param stack for memory allocation (not null)
+     * @return a new temporary buffer
+     */
+    VkVertexInputBindingDescription.Buffer
+            generateBindingDescription(MemoryStack stack) {
+        int numAttributes = countAttributes();
+        VkVertexInputBindingDescription.Buffer result
+                = VkVertexInputBindingDescription.calloc(numAttributes, stack);
+
+        int slotIndex = 0; // current binding/slot
+
+        // position attribute (3 signed floats in slot 0)
+        VkVertexInputBindingDescription posDescription = result.get(0);
+        posDescription.binding(slotIndex);
+        posDescription.inputRate(VK10.VK_VERTEX_INPUT_RATE_VERTEX);
+        posDescription.stride(Mesh.numAxes * Float.BYTES);
+
+        if (requiresColor()) {
+            // color attribute (3 signed floats)
+            ++slotIndex;
+            VkVertexInputBindingDescription colorDescription
+                    = result.get(slotIndex);
+            colorDescription.binding(slotIndex);
+            colorDescription.inputRate(VK10.VK_VERTEX_INPUT_RATE_VERTEX);
+            colorDescription.stride(Mesh.numAxes * Float.BYTES);
+        }
+
+        if (requiresNormal()) {
+            // normal attribute (3 signed floats)
+            ++slotIndex;
+            VkVertexInputBindingDescription normalDescription
+                    = result.get(slotIndex);
+            normalDescription.binding(slotIndex);
+            normalDescription.inputRate(VK10.VK_VERTEX_INPUT_RATE_VERTEX);
+            normalDescription.stride(Mesh.numAxes * Float.BYTES);
+        }
+
+        if (requiresTexCoords()) {
+            // texture-coordinates attribute (2 signed floats)
+            ++slotIndex;
+            VkVertexInputBindingDescription tcDescription
+                    = result.get(slotIndex);
+            tcDescription.binding(slotIndex);
+            tcDescription.inputRate(VK10.VK_VERTEX_INPUT_RATE_VERTEX);
+            tcDescription.stride(2 * Float.BYTES);
+        }
+
+        return result;
+    }
+
+    /**
+     * Test whether the vertex shader requires vertex-color input.
+     *
+     * @return true if required, otherwise false
+     */
+    boolean requiresColor() {
+        switch (programName) {
+            case "Debug/LocalNormals":
+            case "PhongDistant/Monochrome":
+            case "Unshaded/Texture":
+                return false;
+
+            default:
+                throw new IllegalStateException("programName = " + programName);
+        }
+    }
+
+    /**
+     * Test whether the vertex shader requires vertex-normal input.
+     *
+     * @return true if required, otherwise false
+     */
+    boolean requiresNormal() {
+        switch (programName) {
+            case "Debug/LocalNormals":
+            case "PhongDistant/Monochrome":
+                return true;
+
+            case "Unshaded/Texture":
+                return false;
+
+            default:
+                throw new IllegalStateException("programName = " + programName);
+        }
+    }
+
+    /**
+     * Test whether the vertex shader requires texture-coordinate input.
+     *
+     * @return true if required, otherwise false
+     */
+    boolean requiresTexCoords() {
+        switch (programName) {
+            case "Debug/LocalNormals":
+            case "PhongDistant/Monochrome":
+                return false;
+
+            case "Unshaded/Texture":
+                return true;
+
+            default:
+                throw new IllegalStateException("programName = " + programName);
+        }
     }
 
     /**
