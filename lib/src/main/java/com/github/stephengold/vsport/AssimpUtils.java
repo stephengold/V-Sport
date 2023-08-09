@@ -181,6 +181,7 @@ final public class AssimpUtils {
             if (pAiColors != null) {
                 AIColor4D aiColor = pAiColors.get(vertexIndex);
                 color = new Vector3f(aiColor.r(), aiColor.g(), aiColor.b());
+                // Note:  alpha gets dropped
             }
 
             Vector3fc normal = null;

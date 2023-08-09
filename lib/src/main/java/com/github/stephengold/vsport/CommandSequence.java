@@ -91,7 +91,7 @@ class CommandSequence {
      * @param sourceStages a bitmask specifying the source pipeline stages
      * @param destStages a bitmask specifying the destination pipeline stages
      * @param pImBarriers the image-memory pipeline barriers to use
-     * @return the current sequence (for chaining)
+     * @return the (modified) current sequence (for chaining)
      */
     CommandSequence addBarrier(int sourceStages, int destStages,
             VkImageMemoryBarrier.Buffer pImBarriers) {
@@ -109,7 +109,7 @@ class CommandSequence {
      *
      * @param chainResources (not null)
      * @param pass (not null)
-     * @return the current sequence (for chaining)
+     * @return the (modified) current sequence (for chaining)
      */
     CommandSequence addBeginRenderPass(
             ChainResources chainResources, Pass pass) {
@@ -152,7 +152,7 @@ class CommandSequence {
      *
      * @param draw the draw resources (not null)
      * @param pipelineLayoutHandle the handle of the pipeline layout (not null)
-     * @return the current sequence (for chaining)
+     * @return the (modified) current sequence (for chaining)
      */
     CommandSequence addBindDescriptors(Draw draw, long pipelineLayoutHandle) {
         Validate.nonNull(draw, "draw");
@@ -177,7 +177,7 @@ class CommandSequence {
      * Append a command to bind an index buffer for drawing.
      *
      * @param indexBuffer (not null)
-     * @return the current sequence (for chaining)
+     * @return the (modified) current sequence (for chaining)
      */
     CommandSequence addBindIndexBuffer(IndexBuffer indexBuffer) {
         long bufferHandle = indexBuffer.handle();
@@ -193,7 +193,7 @@ class CommandSequence {
      * Append a command to bind a graphics pipeline for drawing.
      *
      * @param draw (not null)
-     * @return the current sequence (for chaining)
+     * @return the (modified) current sequence (for chaining)
      */
     CommandSequence addBindPipeline(Draw draw) {
         long pipelineHandle = draw.pipelineHandle();
@@ -207,7 +207,7 @@ class CommandSequence {
      * Append a command to bind vertex buffers for drawing.
      *
      * @param geometry (not null)
-     * @return the current sequence (for chaining)
+     * @return the (modified) current sequence (for chaining)
      */
     CommandSequence addBindVertexBuffers(Geometry geometry) {
         Mesh mesh = geometry.getMesh();
@@ -230,7 +230,7 @@ class CommandSequence {
      *
      * @param image the source/destination image (not null)
      * @param pBlits the regions to be blitted
-     * @return the current sequence (for chaining)
+     * @return the (modified) current sequence (for chaining)
      */
     CommandSequence addBlit(DeviceImage image, VkImageBlit.Buffer pBlits) {
         long imageHandle = image.imageHandle();
@@ -248,7 +248,7 @@ class CommandSequence {
      * @param source the source buffer (not null)
      * @param destination the destination buffer (not null, same capacity as
      * source)
-     * @return the current sequence (for chaining)
+     * @return the (modified) current sequence (for chaining)
      */
     CommandSequence addCopyBufferToBuffer(
             MappableBuffer source, MappableBuffer destination) {
@@ -277,7 +277,7 @@ class CommandSequence {
      *
      * @param source the source buffer (not null)
      * @param destination the destination image (not null)
-     * @return the current sequence (for chaining)
+     * @return the (modified) current sequence (for chaining)
      */
     CommandSequence addCopyBufferToImage(
             MappableBuffer source, DeviceImage destination) {
@@ -317,7 +317,7 @@ class CommandSequence {
      * Append a draw command to the sequence.
      *
      * @param geometry the geometry to draw (not null, unaffected)
-     * @return the current sequence (for chaining)
+     * @return the (modified) current sequence (for chaining)
      */
     CommandSequence addDraw(Geometry geometry) {
         Mesh mesh = geometry.getMesh();
@@ -343,7 +343,7 @@ class CommandSequence {
     /**
      * Append a command to terminate the current render pass.
      *
-     * @return the current sequence (for chaining)
+     * @return the (modified) current sequence (for chaining)
      */
     CommandSequence addEndRenderPass() {
         VK10.vkCmdEndRenderPass(vkCommandBuffer);
@@ -367,7 +367,7 @@ class CommandSequence {
     /**
      * Terminate the recorded sequence, but don't submit it yet.
      *
-     * @return the modified sequence, for chaining
+     * @return the (modified) current sequence (for chaining)
      */
     CommandSequence end() {
         int retCode = VK10.vkEndCommandBuffer(vkCommandBuffer);
@@ -379,7 +379,7 @@ class CommandSequence {
     /**
      * Begin recording a new series of commands.
      *
-     * @return the modified sequence, for chaining
+     * @return the (modified) current sequence (for chaining)
      */
     CommandSequence reset() {
         reset(0x0);
@@ -390,7 +390,7 @@ class CommandSequence {
      * Begin recording a new series of commands.
      *
      * @param flags the flags to pass to {@code vkBeginCommandBuffer()}
-     * @return the modified sequence, for chaining
+     * @return the (modified) current sequence (for chaining)
      */
     CommandSequence reset(int flags) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
@@ -412,7 +412,7 @@ class CommandSequence {
      * complete.
      *
      * @param queue the queue to submit to (not null)
-     * @return the current sequence, for chaining
+     * @return the current sequence (for chaining)
      */
     CommandSequence submitTo(VkQueue queue) {
         Validate.nonNull(queue, "queue");
@@ -444,7 +444,7 @@ class CommandSequence {
      *
      * @param queue (not null)
      * @param frame the resource for frame synchronization (not null)
-     * @return the current sequence, for chaining
+     * @return the current sequence (for chaining)
      */
     CommandSequence submitWithSynch(VkQueue queue, Frame frame) {
         Validate.nonNull(queue, "queue");
@@ -477,8 +477,8 @@ class CommandSequence {
             VK10.vkResetFences(vkDevice, fenceHandle);
 
             int retCode = VK10.vkQueueSubmit(queue, submitInfo, fenceHandle);
-            Utils.checkForError(retCode,
-                    "submit a command sequence to a queue");
+            Utils.checkForError(
+                    retCode, "submit a command sequence to a queue");
 
             return this;
         }

@@ -133,7 +133,7 @@ public class Geometry {
      * Reset the model transform so that mesh coordinates and world coordinates
      * are the same.
      *
-     * @return the (modified) current instance (for chaining)
+     * @return the (modified) current geometry (for chaining)
      */
     public Geometry resetModelTransform() {
         uniformValues.resetModelTransform();
@@ -141,7 +141,8 @@ public class Geometry {
     }
 
     /**
-     * Rotate the model by the specified angle around the specified axis.
+     * Rotate the model by the specified angle around the specified axis,
+     * without shifting the local origin.
      * <p>
      * The rotation axis is assumed to be a unit vector.
      *
@@ -149,7 +150,7 @@ public class Geometry {
      * @param x the X component of the rotation axis
      * @param y the Y component of the rotation axis
      * @param z the Z component of the rotation axis
-     * @return the (modified) current instance (for chaining)
+     * @return the (modified) current geometry (for chaining)
      */
     public Geometry rotate(float angle, float x, float y, float z) {
         uniformValues.rotate(angle, x, y, z);
@@ -161,7 +162,7 @@ public class Geometry {
      *
      * @param rotation the rotation to apply (not null, each row is a unit
      * vector, unaffected)
-     * @return the (modified) current instance (for chaining)
+     * @return the (modified) current geometry (for chaining)
      */
     public Geometry rotate(Matrix3fc rotation) {
         uniformValues.rotate(rotation);
@@ -172,7 +173,7 @@ public class Geometry {
      * Scale the model by the specified factor.
      *
      * @param factor the scaling factor (1 = no effect)
-     * @return the (modified) current instance (for chaining)
+     * @return the (modified) current geometry (for chaining)
      */
     public Geometry scale(float factor) {
         uniformValues.scale(factor);
@@ -185,7 +186,7 @@ public class Geometry {
      * @param x the desired X coordinate (in world coordinates)
      * @param y the desired Y coordinate (in world coordinates)
      * @param z the desired Z coordinate (in world coordinates)
-     * @return the (modified) current instance (for chaining)
+     * @return the (modified) current geometry (for chaining)
      */
     public Geometry setLocation(float x, float y, float z) {
         uniformValues.setLocation(x, y, z);
@@ -196,7 +197,7 @@ public class Geometry {
      * Translate the mesh origin to the specified location.
      *
      * @param desiredLocation the desired location (in world coordinates, not
-     * @return the (modified) current instance (for chaining)
+     * @return the (modified) current geometry (for chaining)
      */
     public Geometry setLocation(Vector3fc desiredLocation) {
         Validate.nonNull(desiredLocation, "desired location");
@@ -205,10 +206,10 @@ public class Geometry {
     }
 
     /**
-     * Replace the geometry's Mesh with the specified Mesh.
+     * Replace the current Mesh with the specified Mesh.
      *
      * @param newMesh the desired Mesh (not null, alias created)
-     * @return the (modified) current instance (for chaining)
+     * @return the (modified) current geometry (for chaining)
      */
     public Geometry setMesh(Mesh newMesh) {
         Validate.nonNull(newMesh, "new mesh");
@@ -217,11 +218,11 @@ public class Geometry {
     }
 
     /**
-     * Replace the geometry's shader program with the named ShaderProgram, or if
-     * the name is null, replace it with the default program.
+     * Replace the shader program with the named ShaderProgram, or if the name
+     * is null, replace it with the default program.
      *
-     * @param name (may be null)
-     * @return the (modified) current instance (for chaining)
+     * @param name the name of the desired program (may be null)
+     * @return the (modified) current geometry (for chaining)
      */
     public Geometry setProgram(String name) {
         if (name == null) {
@@ -242,7 +243,7 @@ public class Geometry {
      * @param x the X component of the rotation axis
      * @param y the Y component of the rotation axis
      * @param z the Z component of the rotation axis
-     * @return the (modified) current instance (for chaining)
+     * @return the (modified) current geometry (for chaining)
      */
     public Geometry setOrientation(float angle, float x, float y, float z) {
         uniformValues.setOrientation(angle, x, y, z);
@@ -255,7 +256,7 @@ public class Geometry {
      *
      * @param desiredOrientation the desired orientation (not null, each row is
      * a unit vector, unaffected)
-     * @return the (modified) current instance (for chaining)
+     * @return the (modified) current geometry (for chaining)
      */
     public Geometry setOrientation(Matrix3fc desiredOrientation) {
         uniformValues.setOrientation(desiredOrientation);
@@ -263,11 +264,10 @@ public class Geometry {
     }
 
     /**
-     * Replace the geometry's primary Texture with one obtained using the
-     * specified key.
+     * Replace the primary texture with one obtained using the specified key.
      *
      * @param textureKey a key to obtain the desired texture (not null)
-     * @return the (modified) current instance (for chaining)
+     * @return the (modified) current geometry (for chaining)
      */
     public Geometry setTexture(TextureKey textureKey) {
         Validate.nonNull(textureKey, "texture key");

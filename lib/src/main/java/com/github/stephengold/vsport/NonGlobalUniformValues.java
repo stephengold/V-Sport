@@ -77,7 +77,7 @@ class NonGlobalUniformValues {
     // new methods exposed
 
     /**
-     * Return the mesh-to-world coordinate transform.
+     * Return a copy of the mesh-to-world coordinate transform.
      *
      * @param storeResult storage for the result (modified if not null)
      * @return the transform (either {@code storeResult} or a new matrix, not
@@ -131,7 +131,8 @@ class NonGlobalUniformValues {
     }
 
     /**
-     * Rotate the model by the specified angle around the specified axis.
+     * Rotate the model by the specified angle around the specified axis,
+     * without shifting the local origin.
      * <p>
      * The rotation axis is assumed to be a unit vector.
      *
@@ -161,7 +162,7 @@ class NonGlobalUniformValues {
     /**
      * Uniformly scale the model by the specified factor.
      *
-     * @param factor the scaling factor
+     * @param factor the scaling factor (1 = no effect)
      */
     void scale(float factor) {
         scale.mul(factor);
