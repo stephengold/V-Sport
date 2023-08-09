@@ -837,8 +837,6 @@ public abstract class BaseApplication {
                     pipelineLayoutHandle);
             frameBufferHeight = chainResources.framebufferHeight();
             frameBufferWidth = chainResources.framebufferWidth();
-            VkExtent2D framebufferExtent
-                    = chainResources.framebufferExtent(stack);
 
             int numImages = chainResources.countImages();
             createSyncObjects(numImages);
