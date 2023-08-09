@@ -169,6 +169,42 @@ public class Geometry {
     }
 
     /**
+     * Scale the model by the specified factor.
+     *
+     * @param factor the scaling factor (1 = no effect)
+     * @return the (modified) current instance (for chaining)
+     */
+    public Geometry scale(float factor) {
+        uniformValues.scale(factor);
+        return this;
+    }
+
+    /**
+     * Translate the mesh origin to the specified location.
+     *
+     * @param x the desired X coordinate (in world coordinates)
+     * @param y the desired Y coordinate (in world coordinates)
+     * @param z the desired Z coordinate (in world coordinates)
+     * @return the (modified) current instance (for chaining)
+     */
+    public Geometry setLocation(float x, float y, float z) {
+        uniformValues.setLocation(x, y, z);
+        return this;
+    }
+
+    /**
+     * Translate the mesh origin to the specified location.
+     *
+     * @param desiredLocation the desired location (in world coordinates, not
+     * @return the (modified) current instance (for chaining)
+     */
+    public Geometry setLocation(Vector3fc desiredLocation) {
+        Validate.nonNull(desiredLocation, "desired location");
+        uniformValues.setLocation(desiredLocation);
+        return this;
+    }
+
+    /**
      * Replace the geometry's Mesh with the specified Mesh.
      *
      * @param newMesh the desired Mesh (not null, alias created)
@@ -194,17 +230,6 @@ public class Geometry {
             this.program = BaseApplication.getProgram(name);
         }
 
-        return this;
-    }
-
-    /**
-     * Scale the model by the specified factor.
-     *
-     * @param factor the scaling factor (1 = no effect)
-     * @return the (modified) current instance (for chaining)
-     */
-    public Geometry scale(float factor) {
-        uniformValues.scale(factor);
         return this;
     }
 
@@ -247,31 +272,6 @@ public class Geometry {
     public Geometry setTexture(TextureKey textureKey) {
         Validate.nonNull(textureKey, "texture key");
         this.texture = BaseApplication.getTexture(textureKey);
-        return this;
-    }
-
-    /**
-     * Translate the mesh origin to the specified location.
-     *
-     * @param x the desired X coordinate (in world coordinates)
-     * @param y the desired Y coordinate (in world coordinates)
-     * @param z the desired Z coordinate (in world coordinates)
-     * @return the (modified) current instance (for chaining)
-     */
-    public Geometry setLocation(float x, float y, float z) {
-        uniformValues.setLocation(x, y, z);
-        return this;
-    }
-
-    /**
-     * Translate the mesh origin to the specified location.
-     *
-     * @param desiredLocation the desired location (in world coordinates, not
-     * @return the (modified) current instance (for chaining)
-     */
-    public Geometry setLocation(Vector3fc desiredLocation) {
-        Validate.nonNull(desiredLocation, "desired location");
-        uniformValues.setLocation(desiredLocation);
         return this;
     }
 
