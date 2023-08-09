@@ -99,6 +99,7 @@ class GlobalUniformValues {
         result += 3 * Float.BYTES;
 
         // vec3 LightColor
+        result = Utils.align(result, 16);
         result += 3 * Float.BYTES;
 
         // mat4 viewMatrix
@@ -144,6 +145,7 @@ class GlobalUniformValues {
         byteOffset += 3 * Float.BYTES;
 
         // vec3 LightColor
+        byteOffset = Utils.align(byteOffset, 16);
         lightColor.get(byteOffset, target);
         byteOffset += 3 * Float.BYTES;
 
