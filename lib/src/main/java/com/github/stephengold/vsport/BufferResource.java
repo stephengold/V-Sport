@@ -184,7 +184,7 @@ public class BufferResource extends DeviceResource {
 
     private void createByStaging() {
         // Create a temporary MappableBuffer for staging:
-        LogicalDevice logicalDevice = BaseApplication.getLogicalDevice();
+        LogicalDevice logicalDevice = Internals.getLogicalDevice();
         int createUsage = VK10.VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
         int properties = VK10.VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
                 | VK10.VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
@@ -212,7 +212,7 @@ public class BufferResource extends DeviceResource {
     }
 
     private void createWithPersistentMapping() {
-        LogicalDevice logicalDevice = BaseApplication.getLogicalDevice();
+        LogicalDevice logicalDevice = Internals.getLogicalDevice();
         int properties = VK10.VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
                 | VK10.VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
         this.mappableBuffer = logicalDevice.createMappable(

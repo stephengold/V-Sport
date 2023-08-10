@@ -101,7 +101,7 @@ class Attachment {
             throw new IllegalArgumentException("aspect = " + aspectMask);
         }
 
-        LogicalDevice logicalDevice = BaseApplication.getLogicalDevice();
+        LogicalDevice logicalDevice = Internals.getLogicalDevice();
         this.deviceImage = logicalDevice.createImage(
                 width, height, numMipLevels, numSamples, format, tiling,
                 usage, VK10.VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
@@ -111,7 +111,7 @@ class Attachment {
                 imageHandle, format, aspectMask, numMipLevels);
 
         // Immediately transition the image to an optimal layout:
-        BaseApplication.alterImageLayout(deviceImage, format,
+        Internals.alterImageLayout(deviceImage, format,
                 VK10.VK_IMAGE_LAYOUT_UNDEFINED, finalLayout, numMipLevels);
     }
     // *************************************************************************
@@ -143,7 +143,7 @@ class Attachment {
      * @return null
      */
     Attachment destroy() {
-        LogicalDevice logicalDevice = BaseApplication.getLogicalDevice();
+        LogicalDevice logicalDevice = Internals.getLogicalDevice();
         this.viewHandle = logicalDevice.destroyImageView(viewHandle);
         if (deviceImage != null) {
             this.deviceImage = deviceImage.destroy();

@@ -108,7 +108,7 @@ class Draw {
         }
 
         if (pipelineHandle != VK10.VK_NULL_HANDLE) {
-            LogicalDevice logicalDevice = BaseApplication.getLogicalDevice();
+            LogicalDevice logicalDevice = Internals.getLogicalDevice();
             this.pipelineHandle = logicalDevice.destroyPipeline(pipelineHandle);
         }
     }
@@ -140,8 +140,8 @@ class Draw {
      */
     void setPipeline(long handle) {
         if (pipelineHandle != VK10.VK_NULL_HANDLE) {
-            VkDevice vkDevice = BaseApplication.getVkDevice();
-            VkAllocationCallbacks allocator = BaseApplication.findAllocator();
+            VkDevice vkDevice = Internals.getVkDevice();
+            VkAllocationCallbacks allocator = Internals.findAllocator();
             VK10.vkDestroyPipeline(vkDevice, pipelineHandle, allocator);
         }
 
@@ -224,7 +224,7 @@ class Draw {
                 samplerWrite.pImageInfo(pImageInfo);
             }
 
-            VkDevice vkDevice = BaseApplication.getVkDevice();
+            VkDevice vkDevice = Internals.getVkDevice();
             VkCopyDescriptorSet.Buffer pCopies = null;
             VK10.vkUpdateDescriptorSets(vkDevice, pWrites, pCopies);
         }
@@ -256,7 +256,7 @@ class Draw {
             LongBuffer pLayouts = stack.longs(layoutHandle);
             allocInfo.pSetLayouts(pLayouts);
 
-            VkDevice vkDevice = BaseApplication.getVkDevice();
+            VkDevice vkDevice = Internals.getVkDevice();
             LongBuffer pSetHandles = stack.mallocLong(1);
             int retCode = VK10.vkAllocateDescriptorSets(
                     vkDevice, allocInfo, pSetHandles);

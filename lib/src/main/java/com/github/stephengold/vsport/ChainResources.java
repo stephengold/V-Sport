@@ -137,7 +137,7 @@ class ChainResources {
         VkSurfaceFormatKHR surfaceFormat = surface.chooseSurfaceFormat();
         this.imageFormat = surfaceFormat.format();
 
-        PhysicalDevice physicalDevice = BaseApplication.getPhysicalDevice();
+        PhysicalDevice physicalDevice = Internals.getPhysicalDevice();
         long surfaceHandle = surface.handle();
         QueueFamilySummary queueFamilies
                 = physicalDevice.summarizeFamilies(surfaceHandle);
@@ -145,7 +145,7 @@ class ChainResources {
         surface.chooseFramebufferExtent(
                 desiredWidth, desiredHeight, framebufferExtent);
 
-        int numSamples = BaseApplication.numMsaaSamples();
+        int numSamples = Internals.countMsaaSamples();
         if (numSamples == 1) { // render directly to a presentation image:
             this.colorAttachment = null;
         } else {
@@ -200,8 +200,8 @@ class ChainResources {
      * Destroy all resources owned by this instance.
      */
     void destroy() {
-        VkDevice vkDevice = BaseApplication.getVkDevice();
-        VkAllocationCallbacks allocator = BaseApplication.findAllocator();
+        VkDevice vkDevice = Internals.getVkDevice();
+        VkAllocationCallbacks allocator = Internals.findAllocator();
 
         // Destroy resources in the reverse of the order they were created:
         for (Pass pass : passList) {
@@ -386,8 +386,8 @@ class ChainResources {
             int presentMode = surface.choosePresentationMode();
             createInfo.presentMode(presentMode);
 
-            VkDevice vkDevice = BaseApplication.getVkDevice();
-            VkAllocationCallbacks allocator = BaseApplication.findAllocator();
+            VkDevice vkDevice = Internals.getVkDevice();
+            VkAllocationCallbacks allocator = Internals.findAllocator();
             LongBuffer pHandle = stack.mallocLong(1);
             int retCode = KHRSwapchain.vkCreateSwapchainKHR(
                     vkDevice, createInfo, allocator, pHandle);
@@ -521,8 +521,8 @@ class ChainResources {
             createInfo.pDependencies(pDependency);
             createInfo.pSubpasses(subpasses);
 
-            VkDevice vkDevice = BaseApplication.getVkDevice();
-            VkAllocationCallbacks allocator = BaseApplication.findAllocator();
+            VkDevice vkDevice = Internals.getVkDevice();
+            VkAllocationCallbacks allocator = Internals.findAllocator();
             LongBuffer pHandle = stack.mallocLong(1);
             int retCode = VK10.vkCreateRenderPass(
                     vkDevice, createInfo, allocator, pHandle);
@@ -566,8 +566,8 @@ class ChainResources {
             createInfo.maxSets(poolSize);
             createInfo.pPoolSizes(pPoolSizes);
 
-            VkDevice vkDevice = BaseApplication.getVkDevice();
-            VkAllocationCallbacks allocator = BaseApplication.findAllocator();
+            VkDevice vkDevice = Internals.getVkDevice();
+            VkAllocationCallbacks allocator = Internals.findAllocator();
             LongBuffer pHandle = stack.mallocLong(1);
             int retCode = VK10.vkCreateDescriptorPool(
                     vkDevice, createInfo, allocator, pHandle);
@@ -588,7 +588,7 @@ class ChainResources {
     private static long[] listImages(long chainHandle) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             // Count the images:
-            VkDevice vkDevice = BaseApplication.getVkDevice();
+            VkDevice vkDevice = Internals.getVkDevice();
             IntBuffer pCount = stack.mallocInt(1);
             int retCode = KHRSwapchain.vkGetSwapchainImagesKHR(
                     vkDevice, chainHandle, pCount, null);

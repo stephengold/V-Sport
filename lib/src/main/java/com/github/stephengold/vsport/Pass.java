@@ -115,7 +115,7 @@ class Pass {
         boolean staging = false;
         this.globalUbo = new BufferResource(numBytes, usage, staging);
 
-        LogicalDevice logicalDevice = BaseApplication.getLogicalDevice();
+        LogicalDevice logicalDevice = Internals.getLogicalDevice();
         int numMipLevels = 1;
         this.presentViewHandle = logicalDevice.createImageView(imageHandle,
                 imageFormat, VK10.VK_IMAGE_ASPECT_COLOR_BIT, numMipLevels);
@@ -138,14 +138,14 @@ class Pass {
         }
         drawList.clear();
 
-        VkAllocationCallbacks allocator = BaseApplication.findAllocator();
-        VkDevice vkDevice = BaseApplication.getVkDevice();
+        VkAllocationCallbacks allocator = Internals.findAllocator();
+        VkDevice vkDevice = Internals.getVkDevice();
         if (framebufferHandle != VK10.VK_NULL_HANDLE) {
             VK10.vkDestroyFramebuffer(vkDevice, framebufferHandle, allocator);
             this.framebufferHandle = VK10.VK_NULL_HANDLE;
         }
 
-        LogicalDevice logicalDevice = BaseApplication.getLogicalDevice();
+        LogicalDevice logicalDevice = Internals.getLogicalDevice();
         this.presentViewHandle
                 = logicalDevice.destroyImageView(presentViewHandle);
 
@@ -249,8 +249,8 @@ class Pass {
             }
             createInfo.pAttachments(pAttachmentHandles);
 
-            VkDevice vkDevice = BaseApplication.getVkDevice();
-            VkAllocationCallbacks allocator = BaseApplication.findAllocator();
+            VkDevice vkDevice = Internals.getVkDevice();
+            VkAllocationCallbacks allocator = Internals.findAllocator();
             LongBuffer pHandle = stack.mallocLong(1);
             int retCode = VK10.vkCreateFramebuffer(
                     vkDevice, createInfo, allocator, pHandle);

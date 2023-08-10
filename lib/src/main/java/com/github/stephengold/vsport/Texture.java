@@ -166,7 +166,7 @@ public class Texture extends DeviceResource {
      */
     @Override
     protected void destroy() {
-        LogicalDevice logicalDevice = BaseApplication.getLogicalDevice();
+        LogicalDevice logicalDevice = Internals.getLogicalDevice();
         this.viewHandle = logicalDevice.destroyImageView(viewHandle);
 
         if (deviceImage != null) {
@@ -184,7 +184,7 @@ public class Texture extends DeviceResource {
      */
     @Override
     void updateLogicalDevice(LogicalDevice nextDevice) {
-        LogicalDevice logicalDevice = BaseApplication.getLogicalDevice();
+        LogicalDevice logicalDevice = Internals.getLogicalDevice();
         this.viewHandle = logicalDevice.destroyImageView(viewHandle);
 
         if (deviceImage != null) {
@@ -223,7 +223,7 @@ public class Texture extends DeviceResource {
         int properties = VK10.VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
                 | VK10.VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
 
-        LogicalDevice logicalDevice = BaseApplication.getLogicalDevice();
+        LogicalDevice logicalDevice = Internals.getLogicalDevice();
         MappableBuffer stagingBuffer = logicalDevice.createMappable(
                 numBytes, createUsage, properties);
 
@@ -244,7 +244,7 @@ public class Texture extends DeviceResource {
                 width, height, numMipLevels, numSamples, imageFormat,
                 VK10.VK_IMAGE_TILING_OPTIMAL, createUsage, properties);
 
-        BaseApplication.alterImageLayout(deviceImage, imageFormat,
+        Internals.alterImageLayout(deviceImage, imageFormat,
                 VK10.VK_IMAGE_LAYOUT_UNDEFINED,
                 VK10.VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, numMipLevels);
 
@@ -267,7 +267,7 @@ public class Texture extends DeviceResource {
      * of the image will be left in SHADER_READ_ONLY layout.
      */
     private void generateMipLevels() {
-        PhysicalDevice physicalDevice = BaseApplication.getPhysicalDevice();
+        PhysicalDevice physicalDevice = Internals.getPhysicalDevice();
         if (!physicalDevice.supportsLinearBlit(imageFormat)) {
             throw new RuntimeException(
                     "Texture image format does not support linear blitting.");

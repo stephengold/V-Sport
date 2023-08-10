@@ -77,15 +77,15 @@ class Frame {
 
             fenceCreateInfo.flags(VK10.VK_FENCE_CREATE_SIGNALED_BIT);
 
-            VkDevice vkDevice = BaseApplication.getVkDevice();
-            VkAllocationCallbacks allocator = BaseApplication.findAllocator();
+            VkDevice vkDevice = Internals.getVkDevice();
+            VkAllocationCallbacks allocator = Internals.findAllocator();
             int retCode = VK10.vkCreateFence(
                     vkDevice, fenceCreateInfo, allocator, pHandle);
             Utils.checkForError(retCode, "create fence");
             this.fenceHandle = pHandle.get(0);
             assert fenceHandle != VK10.VK_NULL_HANDLE;
 
-            LogicalDevice logicalDevice = BaseApplication.getLogicalDevice();
+            LogicalDevice logicalDevice = Internals.getLogicalDevice();
             this.imageAvailableSemaphoreHandle
                     = logicalDevice.createSemaphore();
             this.renderFinishedSemaphoreHandle
@@ -99,15 +99,15 @@ class Frame {
      * Destroy the synchronization objects.
      */
     void destroy() {
-        VkDevice vkDevice = BaseApplication.getVkDevice();
-        VkAllocationCallbacks allocator = BaseApplication.findAllocator();
+        VkDevice vkDevice = Internals.getVkDevice();
+        VkAllocationCallbacks allocator = Internals.findAllocator();
 
         if (fenceHandle != VK10.VK_NULL_HANDLE) {
             VK10.vkDestroyFence(vkDevice, fenceHandle, allocator);
             this.fenceHandle = VK10.VK_NULL_HANDLE;
         }
 
-        LogicalDevice logicalDevice = BaseApplication.getLogicalDevice();
+        LogicalDevice logicalDevice = Internals.getLogicalDevice();
         this.imageAvailableSemaphoreHandle
                 = logicalDevice.destroySemaphore(imageAvailableSemaphoreHandle);
         this.renderFinishedSemaphoreHandle
@@ -148,10 +148,10 @@ class Frame {
      * Make the host wait for the GPU to signal the fence.
      */
     void waitForFence() {
-        VkDevice vkDevice = BaseApplication.getVkDevice();
+        VkDevice vkDevice = Internals.getVkDevice();
         boolean waitAll = true;
-        int retCode = VK10.vkWaitForFences(vkDevice, fenceHandle, waitAll,
-                BaseApplication.noTimeout);
+        int retCode = VK10.vkWaitForFences(
+                vkDevice, fenceHandle, waitAll, Internals.noTimeout);
         Utils.checkForError(retCode, "wait for fence");
     }
 }

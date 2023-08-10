@@ -102,7 +102,7 @@ class DeviceImage {
      * @return null
      */
     DeviceImage destroy() {
-        LogicalDevice logicalDevice = BaseApplication.getLogicalDevice();
+        LogicalDevice logicalDevice = Internals.getLogicalDevice();
         this.imageHandle = logicalDevice.destroyImage(imageHandle);
         this.memoryHandle = logicalDevice.freeMemory(memoryHandle);
 

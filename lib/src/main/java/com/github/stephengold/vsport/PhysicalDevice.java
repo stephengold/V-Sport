@@ -136,13 +136,12 @@ class PhysicalDevice {
                  * Ensure compatibility with older implementations that
                  * distinguish device-specific layers from instance layers.
                  */
-                PointerBuffer layerNames
-                        = BaseApplication.listRequiredLayers(stack);
+                PointerBuffer layerNames = Internals.listRequiredLayers(stack);
                 createInfo.ppEnabledLayerNames(layerNames);
             }
 
             // Create the logical device:
-            VkAllocationCallbacks allocator = BaseApplication.findAllocator();
+            VkAllocationCallbacks allocator = Internals.findAllocator();
             PointerBuffer pPointer = stack.mallocPointer(1);
             int retCode = VK10.vkCreateDevice(
                     vkPhysicalDevice, createInfo, allocator, pPointer);
@@ -279,8 +278,7 @@ class PhysicalDevice {
 
         // Does the device support all required extensions?
         Set<String> extensions = listAvailableExtensions();
-        String[] requiredExtensions
-                = BaseApplication.listRequiredDeviceExtensions();
+        String[] requiredExtensions = Internals.listRequiredDeviceExtensions();
         for (String name : requiredExtensions) {
             if (!extensions.contains(name)) {
                 if (diagnose) {
@@ -514,8 +512,7 @@ class PhysicalDevice {
      */
     private static PointerBuffer listRequiredDeviceExtensions(
             MemoryStack stack) {
-        String[] requiredExtensions
-                = BaseApplication.listRequiredDeviceExtensions();
+        String[] requiredExtensions = Internals.listRequiredDeviceExtensions();
         int numLayers = requiredExtensions.length;
         PointerBuffer result = stack.mallocPointer(numLayers);
         for (String extensionName : requiredExtensions) {

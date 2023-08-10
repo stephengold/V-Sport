@@ -310,7 +310,7 @@ public class ShaderProgram extends DeviceResource {
      */
     @Override
     void updateLogicalDevice(LogicalDevice nextDevice) {
-        LogicalDevice logicalDevice = BaseApplication.getLogicalDevice();
+        LogicalDevice logicalDevice = Internals.getLogicalDevice();
         this.fragModuleHandle
                 = logicalDevice.destroyShaderModule(fragModuleHandle);
         this.vertModuleHandle
@@ -345,8 +345,8 @@ public class ShaderProgram extends DeviceResource {
             createInfo.sType(VK10.VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO);
             createInfo.pCode(spirvCode);
 
-            VkDevice vkDevice = BaseApplication.getVkDevice();
-            VkAllocationCallbacks allocator = BaseApplication.findAllocator();
+            VkDevice vkDevice = Internals.getVkDevice();
+            VkAllocationCallbacks allocator = Internals.findAllocator();
             LongBuffer pHandle = stack.mallocLong(1);
             int retCode = VK10.vkCreateShaderModule(
                     vkDevice, createInfo, allocator, pHandle);

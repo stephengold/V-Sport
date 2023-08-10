@@ -80,7 +80,7 @@ class CommandSequence {
      * default pool.
      */
     CommandSequence() {
-        LogicalDevice logicalDevice = BaseApplication.getLogicalDevice();
+        LogicalDevice logicalDevice = Internals.getLogicalDevice();
         this.vkCommandBuffer = logicalDevice.allocateCommandBuffer();
     }
     // *************************************************************************
@@ -124,7 +124,7 @@ class CommandSequence {
 
             VkClearValue.Buffer pClearValues = VkClearValue.calloc(2, stack);
             VkClearColorValue colorClearValue = pClearValues.get(0).color();
-            FloatBuffer float32 = BaseApplication.backgroundColor(stack);
+            FloatBuffer float32 = Internals.copyBackgroudColor(stack);
             colorClearValue.float32(float32);
             VkClearDepthStencilValue dsClearValue
                     = pClearValues.get(1).depthStencil();
@@ -360,7 +360,7 @@ class CommandSequence {
      * @return null
      */
     CommandSequence destroy() {
-        LogicalDevice logicalDevice = BaseApplication.getLogicalDevice();
+        LogicalDevice logicalDevice = Internals.getLogicalDevice();
         this.vkCommandBuffer
                 = logicalDevice.freeCommandBuffer(vkCommandBuffer);
 
@@ -475,7 +475,7 @@ class CommandSequence {
             LongBuffer pWaitSemaphores = stack.longs(waitSemaphoreHandle);
             submitInfo.pWaitSemaphores(pWaitSemaphores);
 
-            VkDevice vkDevice = BaseApplication.getVkDevice();
+            VkDevice vkDevice = Internals.getVkDevice();
             long fenceHandle = frame.fenceHandle();
             VK10.vkResetFences(vkDevice, fenceHandle);
 

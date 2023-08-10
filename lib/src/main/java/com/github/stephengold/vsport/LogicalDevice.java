@@ -100,7 +100,7 @@ public class LogicalDevice {
         this.vkDevice = physicalDevice
                 .createLogicalDevice(surfaceHandle, enableDebugging);
 
-        this.allocator = BaseApplication.findAllocator();
+        this.allocator = Internals.findAllocator();
         this.commandPoolHandle
                 = createCommandPool(physicalDevice, surfaceHandle);
 
@@ -214,7 +214,7 @@ public class LogicalDevice {
             long allocationBytes = memRequirements.size();
             allocInfo.allocationSize(allocationBytes);
 
-            PhysicalDevice physicalDevice = BaseApplication.getPhysicalDevice();
+            PhysicalDevice physicalDevice = Internals.getPhysicalDevice();
             int memoryTypeIndex = physicalDevice.findMemoryType(
                     memRequirements.memoryTypeBits(), requiredProperties);
             allocInfo.memoryTypeIndex(memoryTypeIndex);
@@ -325,7 +325,7 @@ public class LogicalDevice {
             long allocationBytes = memRequirements.size();
             allocInfo.allocationSize(allocationBytes);
 
-            PhysicalDevice physicalDevice = BaseApplication.getPhysicalDevice();
+            PhysicalDevice physicalDevice = Internals.getPhysicalDevice();
             int typeFilter = memRequirements.memoryTypeBits();
             int memoryTypeIndex = physicalDevice.findMemoryType(
                     typeFilter, requiredProperties);

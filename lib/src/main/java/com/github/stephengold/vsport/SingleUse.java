@@ -59,7 +59,7 @@ class SingleUse extends CommandSequence {
      */
     void submitToGraphicsQueue() {
         end();
-        VkQueue graphicsQueue = BaseApplication.getGraphicsQueue();
+        VkQueue graphicsQueue = Internals.getGraphicsQueue();
         super.submitTo(graphicsQueue);
         destroy();
     }

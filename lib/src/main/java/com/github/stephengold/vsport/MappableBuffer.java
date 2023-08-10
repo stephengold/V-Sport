@@ -95,7 +95,7 @@ class MappableBuffer {
      * @return null
      */
     MappableBuffer destroy() {
-        LogicalDevice logicalDevice = BaseApplication.getLogicalDevice();
+        LogicalDevice logicalDevice = Internals.getLogicalDevice();
         this.vkBufferHandle = logicalDevice.destroyBuffer(vkBufferHandle);
         this.memoryHandle = logicalDevice.freeMemory(memoryHandle);
 
