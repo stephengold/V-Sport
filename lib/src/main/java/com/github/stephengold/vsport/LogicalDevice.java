@@ -814,6 +814,7 @@ public class LogicalDevice {
             Utils.checkForError(retCode, "create a command-buffer pool");
             long result = pHandle.get(0);
 
+            assert result != VK10.VK_NULL_HANDLE;
             return result;
         }
     }
