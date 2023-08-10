@@ -99,7 +99,7 @@ final class Internals {
      * true to enable debugging output and optional runtime checks, or false to
      * disable them
      */
-    final private static boolean enableDebugging = true;
+    final private static boolean enableDebugging = false;
     /**
      * maximum number of frames in flight
      */
