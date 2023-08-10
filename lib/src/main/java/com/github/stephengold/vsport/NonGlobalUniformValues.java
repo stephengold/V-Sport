@@ -40,7 +40,8 @@ import org.joml.Vector3fc;
 import org.joml.Vector4f;
 
 /**
- * Values to be written to a per-geometry uniform buffer object (UBO).
+ * Shader parameters to be written to per-geometry Uniform Buffer Objects
+ * (UBOs).
  *
  * @author Stephen Gold sgold@sonic.net
  */

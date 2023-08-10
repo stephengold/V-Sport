@@ -157,7 +157,7 @@ class SurfaceSummary {
     }
 
     /**
-     * Choose a presentation mode for the swap chain of the main window.
+     * Choose a presentation mode for the swap chain.
      *
      * @return the selected mode
      */
@@ -177,7 +177,7 @@ class SurfaceSummary {
     }
 
     /**
-     * Choose a surface format for the swap chain of the main window.
+     * Choose a surface format for the swap chain.
      *
      * @return the selected format (not null)
      */

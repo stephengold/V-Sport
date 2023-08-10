@@ -182,7 +182,7 @@ final class Internals {
      */
     private static Map<Integer, Frame> framesInFlight;
     /**
-     * physical device to display the main window
+     * physical device to display the window
      */
     private static PhysicalDevice physicalDevice;
     /**

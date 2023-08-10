@@ -284,7 +284,7 @@ abstract public class BaseApplication {
     }
 
     /**
-     * Test whether debugging aids are enabled.
+     * Test whether the debugging aids are enabled.
      *
      * @return true if enabled, otherwise false
      */
@@ -316,7 +316,8 @@ abstract public class BaseApplication {
     /**
      * Alter the background color of the window.
      *
-     * @param desiredColor the desired color (not null, default=black)
+     * @param desiredColor the desired color (not null, unaffected,
+     * default=black)
      */
     public static void setBackgroundColor(Vector4fc desiredColor) {
         Internals.setBackgroundColor(desiredColor);
@@ -359,7 +360,6 @@ abstract public class BaseApplication {
         }
 
         try {
-            // Initialize this class:
             initializeGlfw(title);
 
             // Create and initialize the InputManager.
@@ -381,6 +381,7 @@ abstract public class BaseApplication {
                     super.onKeyboard(keyId, isPress);
                 }
             });
+
             inputManager.add(new InputProcessor() {
                 @Override
                 public void onKeyboard(int keyId, boolean isPressed) {
@@ -485,13 +486,14 @@ abstract public class BaseApplication {
                 "window=" + window + " handle=" + windowHandle;
         /*
          * For drivers/platforms that don't return VK_ERROR_OUT_OF_DATE_KHR
-         * after a window resize, we use this fallback mechanism.
+         * or VK_SUBOPTIMAL_KHR after a window resize,
+         * we use this fallback mechanism.
          */
         Internals.setNeedsResize();
     }
 
     /**
-     * Initialize GLFW and create a main window for the application.
+     * Initialize GLFW and create a window for the application.
      *
      * @param initialTitle the initial text for the window's title bar (not
      * null)
@@ -520,7 +522,7 @@ abstract public class BaseApplication {
         GLFW.glfwWindowHint(GLFW.GLFW_CLIENT_API, GLFW.GLFW_NO_API);
         GLFW.glfwWindowHint(GLFW.GLFW_RESIZABLE, GLFW.GLFW_TRUE);
 
-        // Create the main window:
+        // Create the window:
         int width = Internals.framebufferWidth();
         int height = Internals.framebufferHeight();
         windowHandle = GLFW.glfwCreateWindow(

@@ -41,7 +41,7 @@ import org.lwjgl.vulkan.VkExtent2D;
 import org.lwjgl.vulkan.VkFramebufferCreateInfo;
 
 /**
- * Resources required to generate the commands for a render pass.
+ * Resources used to generate the commands for a render pass.
  *
  * @author Stephen Gold sgold@sonic.net
  */

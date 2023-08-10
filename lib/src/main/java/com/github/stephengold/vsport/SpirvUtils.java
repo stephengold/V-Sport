@@ -33,7 +33,7 @@ import org.lwjgl.system.MemoryUtil;
 import org.lwjgl.util.shaderc.Shaderc;
 
 /**
- * Utility methods used internally by the V-Sport library.
+ * Utility methods to compile GLSL shaders using SPIR-V.
  *
  * @author Stephen Gold sgold@sonic.net
  *

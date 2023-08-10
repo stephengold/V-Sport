@@ -44,7 +44,7 @@ import org.lwjgl.vulkan.KHRSwapchain;
 import org.lwjgl.vulkan.VK10;
 
 /**
- * Utility methods used internally by the V-Sport library.
+ * Public utility methods in the V-Sport library.
  *
  * @author Stephen Gold sgold@sonic.net
  */

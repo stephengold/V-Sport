@@ -789,7 +789,7 @@ public class LogicalDevice {
      * @param surfaceHandle the handle of the {@code VkSurfaceKHR} for
      * presentation (not null)
      *
-     * @return the handle of a new, empty {@code VkCommandPool}
+     * @return the handle of a new, empty {@code VkCommandPool} (not null)
      */
     private long createCommandPool(
             PhysicalDevice physicalDevice, long surfaceHandle) {

@@ -76,8 +76,8 @@ class CommandSequence {
     // constructors
 
     /**
-     * Instantiate a new sequence, allocating the command buffer from the
-     * default pool.
+     * Instantiate a new sequence on a command buffer allocated from the default
+     * pool.
      */
     CommandSequence() {
         LogicalDevice logicalDevice = Internals.getLogicalDevice();

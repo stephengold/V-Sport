@@ -56,7 +56,8 @@ import org.lwjgl.vulkan.VkPhysicalDeviceProperties;
 import org.lwjgl.vulkan.VkQueueFamilyProperties;
 
 /**
- * Encapsulate a Vulkan physical device, typically a graphics adapter.
+ * Encapsulate a Vulkan physical device, which typically represents a GPU or
+ * graphics adapter.
  *
  * @author Stephen Gold sgold@sonic.net
  *

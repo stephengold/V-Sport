@@ -35,7 +35,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 /**
- * Values to be written to a global Uniform Buffer Object (UBO).
+ * Shader parameters to be written to a global Uniform Buffer Objects (UBOs).
  *
  * @author Stephen Gold sgold@sonic.net
  *
