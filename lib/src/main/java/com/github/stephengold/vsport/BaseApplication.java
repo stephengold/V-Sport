@@ -41,9 +41,11 @@ import org.joml.Vector4fc;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWFramebufferSizeCallback;
+import org.lwjgl.system.Callback;
 import org.lwjgl.system.Configuration;
 import org.lwjgl.system.MemoryUtil;
 import org.lwjgl.vulkan.VK10;
+import org.lwjgl.vulkan.VkAllocationCallbacks;
 
 /**
  * A single-window, 3-D visualization application using LWJGL v3, GLFW, and
@@ -65,7 +67,7 @@ abstract public class BaseApplication {
     /**
      * version of the V-Sport graphics engine
      */
-    final private static int engineVersion = VK10.VK_MAKE_VERSION(0, 1, 0);
+    final static int engineVersion = VK10.VK_MAKE_VERSION(0, 1, 0);
     /**
      * maximum number of frames in flight
      */
