@@ -44,13 +44,17 @@ import org.lwjgl.vulkan.VkCommandBuffer;
 import org.lwjgl.vulkan.VkCommandBufferAllocateInfo;
 import org.lwjgl.vulkan.VkCommandPoolCreateInfo;
 import org.lwjgl.vulkan.VkComponentMapping;
+import org.lwjgl.vulkan.VkDescriptorSetLayoutBinding;
+import org.lwjgl.vulkan.VkDescriptorSetLayoutCreateInfo;
 import org.lwjgl.vulkan.VkDevice;
 import org.lwjgl.vulkan.VkImageCreateInfo;
 import org.lwjgl.vulkan.VkImageSubresourceRange;
 import org.lwjgl.vulkan.VkImageViewCreateInfo;
 import org.lwjgl.vulkan.VkMemoryAllocateInfo;
 import org.lwjgl.vulkan.VkMemoryRequirements;
+import org.lwjgl.vulkan.VkPipelineLayoutCreateInfo;
 import org.lwjgl.vulkan.VkQueue;
+import org.lwjgl.vulkan.VkSamplerCreateInfo;
 import org.lwjgl.vulkan.VkSemaphoreCreateInfo;
 
 /**
@@ -152,6 +156,72 @@ public class LogicalDevice {
             long pointer = pPointer.get(0);
             VkCommandBuffer result = new VkCommandBuffer(pointer, vkDevice);
 
+            return result;
+        }
+    }
+
+    /**
+     * Create a descriptor-set layout.
+     *
+     * @return the handle of the new {@code VkDescriptorSetLayout} (not null)
+     */
+    long createDescriptorSetLayout() {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            VkDescriptorSetLayoutBinding.Buffer pBindings
+                    = VkDescriptorSetLayoutBinding.calloc(3, stack);
+
+            // Define a binding for the first descriptor set (the global UBO):
+            VkDescriptorSetLayoutBinding guBinding = pBindings.get(0);
+            guBinding.binding(0);
+            guBinding.descriptorCount(1);
+            guBinding.descriptorType(VK10.VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
+            guBinding.pImmutableSamplers(null);
+            /*
+             * The global UBO will be used only by the fragment-shader and
+             * vertex-shader stage:
+             */
+            int stageFlags = VK10.VK_SHADER_STAGE_FRAGMENT_BIT
+                    | VK10.VK_SHADER_STAGE_VERTEX_BIT;
+            guBinding.stageFlags(stageFlags);
+
+            // Define a binding for the 2nd descriptor set (the non-global UBO):
+            VkDescriptorSetLayoutBinding nguBinding = pBindings.get(1);
+            nguBinding.binding(1);
+            nguBinding.descriptorCount(1);
+            nguBinding.descriptorType(VK10.VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
+            nguBinding.pImmutableSamplers(null);
+            /*
+             * The non-global UBO will be used only by the fragment-shader and
+             * vertex-shader stage:
+             */
+            nguBinding.stageFlags(stageFlags);
+
+            // Define a binding for the 3rd descriptor set (the sampler):
+            VkDescriptorSetLayoutBinding samplerBinding = pBindings.get(2);
+            samplerBinding.binding(2);
+            samplerBinding.descriptorCount(1); // a single sampler
+            samplerBinding.descriptorType(
+                    VK10.VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
+            samplerBinding.pImmutableSamplers(null);
+
+            // The sampler will be used only by the fragment-shader stage:
+            samplerBinding.stageFlags(VK10.VK_SHADER_STAGE_FRAGMENT_BIT);
+
+            // Create the descriptor-set layout:
+            LongBuffer pHandle = stack.mallocLong(1);
+            VkDescriptorSetLayoutCreateInfo createInfo
+                    = VkDescriptorSetLayoutCreateInfo.calloc(stack);
+            createInfo.sType(
+                    VK10.VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO);
+
+            createInfo.pBindings(pBindings);
+
+            int retCode = VK10.vkCreateDescriptorSetLayout(
+                    vkDevice, createInfo, allocator, pHandle);
+            Utils.checkForError(retCode, "create descriptor-set layout");
+            long result = pHandle.get(0);
+
+            assert result != VK10.VK_NULL_HANDLE;
             return result;
         }
     }
@@ -344,6 +414,75 @@ public class LogicalDevice {
                     vkDevice, bufferHandle, memoryHandle, offset);
             Utils.checkForError(retCode, "bind memory to a buffer");
 
+            return result;
+        }
+    }
+
+    /**
+     * Create the graphics-pipeline layout.
+     *
+     * @param descriptorSetLayoutHandle the handle of the
+     * {@code VkDescriptorSetLayout} to use
+     * @return the handle of the new {@code VkPipelineLayout} (not null)
+     */
+    long createPipelineLayout(long descriptorSetLayoutHandle) {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            // Create the pipeline layout:
+            VkPipelineLayoutCreateInfo plCreateInfo
+                    = VkPipelineLayoutCreateInfo.calloc(stack);
+            plCreateInfo.sType(
+                    VK10.VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO);
+
+            plCreateInfo.pPushConstantRanges(null);
+
+            LongBuffer pSetLayouts = stack.longs(descriptorSetLayoutHandle);
+            plCreateInfo.pSetLayouts(pSetLayouts);
+            plCreateInfo.setLayoutCount(1);
+
+            LongBuffer pHandle = stack.mallocLong(1);
+            int retCode = VK10.vkCreatePipelineLayout(
+                    vkDevice, plCreateInfo, allocator, pHandle);
+            Utils.checkForError(retCode, "create pipeline layout");
+            long result = pHandle.get(0);
+
+            assert result != VK10.VK_NULL_HANDLE;
+            return result;
+        }
+    }
+
+    /**
+     * Create a texture sampler for the current logical device.
+     *
+     * @return the handle of the new {@code VkSampler} (not null)
+     */
+    long createSampler() {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            VkSamplerCreateInfo samplerInfo = VkSamplerCreateInfo.calloc(stack);
+            samplerInfo.sType(VK10.VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO);
+
+            samplerInfo.addressModeU(VK10.VK_SAMPLER_ADDRESS_MODE_REPEAT);
+            samplerInfo.addressModeV(VK10.VK_SAMPLER_ADDRESS_MODE_REPEAT);
+            samplerInfo.addressModeW(VK10.VK_SAMPLER_ADDRESS_MODE_REPEAT);
+            samplerInfo.anisotropyEnable(true);
+            samplerInfo.borderColor(VK10.VK_BORDER_COLOR_INT_OPAQUE_BLACK);
+            samplerInfo.compareEnable(false);
+            samplerInfo.compareOp(VK10.VK_COMPARE_OP_ALWAYS);
+            samplerInfo.magFilter(VK10.VK_FILTER_LINEAR);
+            samplerInfo.maxAnisotropy(16f);
+            samplerInfo.maxLod(31f);
+            samplerInfo.minFilter(VK10.VK_FILTER_LINEAR);
+            samplerInfo.minLod(0f);
+            samplerInfo.mipLodBias(0f);
+            samplerInfo.mipmapMode(VK10.VK_SAMPLER_MIPMAP_MODE_LINEAR);
+            samplerInfo.unnormalizedCoordinates(false);
+
+            LongBuffer pTextureSampler = stack.mallocLong(1);
+            int retCode = VK10.vkCreateSampler(
+                    vkDevice, samplerInfo, allocator, pTextureSampler);
+            Utils.checkForError(retCode, "create texture sampler");
+            long result = pTextureSampler.get(0);
+
+            assert result != VK10.VK_NULL_HANDLE;
             return result;
         }
     }

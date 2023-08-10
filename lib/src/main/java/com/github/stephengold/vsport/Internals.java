@@ -58,8 +58,6 @@ import org.lwjgl.vulkan.VkAllocationCallbacks;
 import org.lwjgl.vulkan.VkApplicationInfo;
 import org.lwjgl.vulkan.VkDebugUtilsMessengerCallbackDataEXT;
 import org.lwjgl.vulkan.VkDebugUtilsMessengerCreateInfoEXT;
-import org.lwjgl.vulkan.VkDescriptorSetLayoutBinding;
-import org.lwjgl.vulkan.VkDescriptorSetLayoutCreateInfo;
 import org.lwjgl.vulkan.VkDevice;
 import org.lwjgl.vulkan.VkExtent2D;
 import org.lwjgl.vulkan.VkGraphicsPipelineCreateInfo;
@@ -73,7 +71,6 @@ import org.lwjgl.vulkan.VkPipelineColorBlendAttachmentState;
 import org.lwjgl.vulkan.VkPipelineColorBlendStateCreateInfo;
 import org.lwjgl.vulkan.VkPipelineDepthStencilStateCreateInfo;
 import org.lwjgl.vulkan.VkPipelineInputAssemblyStateCreateInfo;
-import org.lwjgl.vulkan.VkPipelineLayoutCreateInfo;
 import org.lwjgl.vulkan.VkPipelineMultisampleStateCreateInfo;
 import org.lwjgl.vulkan.VkPipelineRasterizationStateCreateInfo;
 import org.lwjgl.vulkan.VkPipelineShaderStageCreateInfo;
@@ -82,7 +79,6 @@ import org.lwjgl.vulkan.VkPipelineViewportStateCreateInfo;
 import org.lwjgl.vulkan.VkPresentInfoKHR;
 import org.lwjgl.vulkan.VkQueue;
 import org.lwjgl.vulkan.VkRect2D;
-import org.lwjgl.vulkan.VkSamplerCreateInfo;
 import org.lwjgl.vulkan.VkVertexInputAttributeDescription;
 import org.lwjgl.vulkan.VkVertexInputBindingDescription;
 import org.lwjgl.vulkan.VkViewport;
@@ -520,9 +516,10 @@ final class Internals {
         System.out.println("numSamples = " + numMsaaSamples);
 
         createLogicalDevice();
-        samplerHandle = createTextureSampler();
-        descriptorSetLayoutHandle = createDescriptorSetLayout();
-        pipelineLayoutHandle = createPipelineLayout();
+        samplerHandle = logicalDevice.createSampler();
+        descriptorSetLayoutHandle = logicalDevice.createDescriptorSetLayout();
+        pipelineLayoutHandle
+                = logicalDevice.createPipelineLayout(descriptorSetLayoutHandle);
 
         createChainResources();
     }
@@ -733,73 +730,7 @@ final class Internals {
     }
 
     /**
-     * Create a descriptor-set layout.
-     *
-     * @return the handle of the new {@code VkDescriptorSetLayout} (not null)
-     */
-    private static long createDescriptorSetLayout() {
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            VkDescriptorSetLayoutBinding.Buffer pBindings
-                    = VkDescriptorSetLayoutBinding.calloc(3, stack);
-
-            // Define a binding for the first descriptor set (the global UBO):
-            VkDescriptorSetLayoutBinding guBinding = pBindings.get(0);
-            guBinding.binding(0);
-            guBinding.descriptorCount(1);
-            guBinding.descriptorType(VK10.VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
-            guBinding.pImmutableSamplers(null);
-            /*
-             * The global UBO will be used only by the fragment-shader and
-             * vertex-shader stage:
-             */
-            int stageFlags = VK10.VK_SHADER_STAGE_FRAGMENT_BIT
-                    | VK10.VK_SHADER_STAGE_VERTEX_BIT;
-            guBinding.stageFlags(stageFlags);
-
-            // Define a binding for the 2nd descriptor set (the non-global UBO):
-            VkDescriptorSetLayoutBinding nguBinding = pBindings.get(1);
-            nguBinding.binding(1);
-            nguBinding.descriptorCount(1);
-            nguBinding.descriptorType(VK10.VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
-            nguBinding.pImmutableSamplers(null);
-            /*
-             * The non-global UBO will be used only by the fragment-shader and
-             * vertex-shader stage:
-             */
-            nguBinding.stageFlags(stageFlags);
-
-            // Define a binding for the 3rd descriptor set (the sampler):
-            VkDescriptorSetLayoutBinding samplerBinding = pBindings.get(2);
-            samplerBinding.binding(2);
-            samplerBinding.descriptorCount(1); // a single sampler
-            samplerBinding.descriptorType(
-                    VK10.VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-            samplerBinding.pImmutableSamplers(null);
-
-            // The sampler will be used only by the fragment-shader stage:
-            samplerBinding.stageFlags(VK10.VK_SHADER_STAGE_FRAGMENT_BIT);
-
-            // Create the descriptor-set layout:
-            LongBuffer pHandle = stack.mallocLong(1);
-            VkDescriptorSetLayoutCreateInfo createInfo
-                    = VkDescriptorSetLayoutCreateInfo.calloc(stack);
-            createInfo.sType(
-                    VK10.VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO);
-
-            createInfo.pBindings(pBindings);
-
-            int retCode = VK10.vkCreateDescriptorSetLayout(
-                    vkDevice, createInfo, defaultAllocator, pHandle);
-            Utils.checkForError(retCode, "create descriptor-set layout");
-            long result = pHandle.get(0);
-
-            assert result != VK10.VK_NULL_HANDLE;
-            return result;
-        }
-    }
-
-    /**
-     * Create a logical device in the application's main window.
+     * Create the logical device for resource creation/destruction.
      */
     private static void createLogicalDevice() {
         logicalDevice = new LogicalDevice(physicalDevice, surfaceHandle);
@@ -1019,38 +950,7 @@ final class Internals {
     }
 
     /**
-     * Create the graphics-pipeline layout.
-     *
-     * @return the handle of the new {@code VkPipelineLayout} (not null)
-     */
-    private static long createPipelineLayout() {
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            // Create the pipeline layout:
-            VkPipelineLayoutCreateInfo plCreateInfo
-                    = VkPipelineLayoutCreateInfo.calloc(stack);
-            plCreateInfo.sType(
-                    VK10.VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO);
-
-            plCreateInfo.pPushConstantRanges(null);
-
-            LongBuffer pSetLayouts = stack.longs(descriptorSetLayoutHandle);
-            plCreateInfo.pSetLayouts(pSetLayouts);
-            plCreateInfo.setLayoutCount(1);
-
-            LongBuffer pHandle = stack.mallocLong(1);
-            int retCode = VK10.vkCreatePipelineLayout(
-                    vkDevice, plCreateInfo, defaultAllocator, pHandle);
-            Utils.checkForError(retCode, "create pipeline layout");
-            long result = pHandle.get(0);
-
-            assert result != VK10.VK_NULL_HANDLE;
-            return result;
-        }
-    }
-
-    /**
-     * Create a display surface in the application's main window. TODO move to
-     * LogicalDevice
+     * Create a display surface in the application's window.
      *
      * @return the handle of the new {@code VkSurfaceKHR} (not null)
      */
@@ -1079,44 +979,6 @@ final class Internals {
 
         for (int i = 0; i < maxFramesInFlight; ++i) {
             inFlightFrames[i] = new Frame();
-        }
-    }
-
-    /**
-     * Create a texture sampler for the current logical device. TODO move to
-     * LogicalDevice
-     *
-     * @return the handle of the new {@code VkSampler} (not null)
-     */
-    private static long createTextureSampler() {
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            VkSamplerCreateInfo samplerInfo = VkSamplerCreateInfo.calloc(stack);
-            samplerInfo.sType(VK10.VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO);
-
-            samplerInfo.addressModeU(VK10.VK_SAMPLER_ADDRESS_MODE_REPEAT);
-            samplerInfo.addressModeV(VK10.VK_SAMPLER_ADDRESS_MODE_REPEAT);
-            samplerInfo.addressModeW(VK10.VK_SAMPLER_ADDRESS_MODE_REPEAT);
-            samplerInfo.anisotropyEnable(true);
-            samplerInfo.borderColor(VK10.VK_BORDER_COLOR_INT_OPAQUE_BLACK);
-            samplerInfo.compareEnable(false);
-            samplerInfo.compareOp(VK10.VK_COMPARE_OP_ALWAYS);
-            samplerInfo.magFilter(VK10.VK_FILTER_LINEAR);
-            samplerInfo.maxAnisotropy(16f);
-            samplerInfo.maxLod(31f);
-            samplerInfo.minFilter(VK10.VK_FILTER_LINEAR);
-            samplerInfo.minLod(0f);
-            samplerInfo.mipLodBias(0f);
-            samplerInfo.mipmapMode(VK10.VK_SAMPLER_MIPMAP_MODE_LINEAR);
-            samplerInfo.unnormalizedCoordinates(false);
-
-            LongBuffer pTextureSampler = stack.mallocLong(1);
-            int retCode = VK10.vkCreateSampler(
-                    vkDevice, samplerInfo, defaultAllocator, pTextureSampler);
-            Utils.checkForError(retCode, "create texture sampler");
-            long result = pTextureSampler.get(0);
-
-            assert result != VK10.VK_NULL_HANDLE;
-            return result;
         }
     }
 
