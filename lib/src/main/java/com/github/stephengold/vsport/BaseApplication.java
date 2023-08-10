@@ -34,6 +34,7 @@ import com.github.stephengold.vsport.input.InputManager;
 import com.github.stephengold.vsport.input.InputProcessor;
 import java.io.PrintStream;
 import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.util.Collection;
@@ -46,6 +47,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import jme3utilities.Validate;
+import org.joml.Vector4f;
+import org.joml.Vector4fc;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
@@ -238,6 +241,11 @@ public abstract class BaseApplication {
     final private static GlobalUniformValues uniformValues
             = new GlobalUniformValues();
     /**
+     * current background color
+     */
+    final private static Vector4f backgroundColor
+            = new Vector4f(0f, 0f, 0f, 1f);
+    /**
      * logical device for resource creation/destruction
      */
     private static VkDevice vkDevice;
@@ -380,6 +388,19 @@ public abstract class BaseApplication {
      */
     static VkAllocationCallbacks findAllocator() {
         return defaultAllocator;
+    }
+
+    /**
+     * Copy the current background color to a new FloatBuffer.
+     *
+     * @param stack for allocating temporary buffers (not null)
+     * @return a new temporary buffer (not null)
+     */
+    static FloatBuffer backgroundColor(MemoryStack stack) {
+        FloatBuffer result = stack.mallocFloat(4);
+        backgroundColor.get(result);
+
+        return result;
     }
 
     /**
@@ -571,6 +592,15 @@ public abstract class BaseApplication {
      */
     static int numMsaaSamples() {
         return numMsaaSamples;
+    }
+
+    /**
+     * Alter the background color of the window.
+     *
+     * @param desiredColor the desired color (not null, default=black)
+     */
+    public static void setBackgroundColor(Vector4fc desiredColor) {
+        backgroundColor.set(desiredColor);
     }
 
     /**

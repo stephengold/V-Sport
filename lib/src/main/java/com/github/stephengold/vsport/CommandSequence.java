@@ -29,6 +29,7 @@
  */
 package com.github.stephengold.vsport;
 
+import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import jme3utilities.Validate;
@@ -123,7 +124,8 @@ class CommandSequence {
 
             VkClearValue.Buffer pClearValues = VkClearValue.calloc(2, stack);
             VkClearColorValue colorClearValue = pClearValues.get(0).color();
-            colorClearValue.float32(stack.floats(0f, 0f, 0f, 1f));
+            FloatBuffer float32 = BaseApplication.backgroundColor(stack);
+            colorClearValue.float32(float32);
             VkClearDepthStencilValue dsClearValue
                     = pClearValues.get(1).depthStencil();
             dsClearValue.set(1f, 0);
