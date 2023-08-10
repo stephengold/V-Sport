@@ -305,7 +305,7 @@ class PhysicalDevice {
         }
 
         // Does the device support anisotropic sampling of textures?
-        if (!hasAnisotropySupport()) {
+        if (!supportsAnisotropicSampling()) {
             if (diagnose) {
                 System.out.println(
                         "  doesn't support anisotropic sampling of textures");
@@ -464,23 +464,6 @@ class PhysicalDevice {
     }
 
     /**
-     * Test whether the device supports anisotropic sampling of textures.
-     *
-     * @return true if supported, otherwise false
-     */
-    private boolean hasAnisotropySupport() {
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            VkPhysicalDeviceFeatures supportedFeatures
-                    = VkPhysicalDeviceFeatures.malloc(stack);
-            VK10.vkGetPhysicalDeviceFeatures(
-                    vkPhysicalDevice, supportedFeatures);
-            boolean result = supportedFeatures.samplerAnisotropy();
-
-            return result;
-        }
-    }
-
-    /**
      * Enumerate all available extensions for the device.
      *
      * @return a new set of extension names (not null)
@@ -532,6 +515,23 @@ class PhysicalDevice {
         result.rewind();
 
         return result;
+    }
+
+    /**
+     * Test whether the device supports anisotropic sampling of textures.
+     *
+     * @return true if supported, otherwise false
+     */
+    private boolean supportsAnisotropicSampling() {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            VkPhysicalDeviceFeatures supportedFeatures
+                    = VkPhysicalDeviceFeatures.malloc(stack);
+            VK10.vkGetPhysicalDeviceFeatures(
+                    vkPhysicalDevice, supportedFeatures);
+            boolean result = supportedFeatures.samplerAnisotropy();
+
+            return result;
+        }
     }
 
     /**
