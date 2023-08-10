@@ -162,6 +162,11 @@ abstract public class BaseApplication {
      */
     private static Frame[] inFlightFrames;
     /**
+     * values to write to global UBOs
+     */
+    final private static GlobalUniformValues uniformValues
+            = new GlobalUniformValues();
+    /**
      * convenient access to user input
      */
     private static InputManager inputManager;
@@ -235,11 +240,6 @@ abstract public class BaseApplication {
      * names of validation layers to enable during initialization
      */
     final private static Set<String> requiredLayers = new HashSet<>();
-    /**
-     * values to be written to global UBOs
-     */
-    final private static GlobalUniformValues uniformValues
-            = new GlobalUniformValues();
     /**
      * current background color
      */
