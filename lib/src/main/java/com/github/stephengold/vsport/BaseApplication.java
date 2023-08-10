@@ -103,7 +103,7 @@ import org.lwjgl.vulkan.VkViewport;
  *
  * Derived from Cristian Herrera's Vulkan-Tutorial-Java project.
  */
-public abstract class BaseApplication {
+abstract public class BaseApplication {
     // *************************************************************************
     // constants
 
