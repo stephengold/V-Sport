@@ -272,6 +272,18 @@ public class Geometry {
     }
 
     /**
+     * Alter the mesh-to-world coordinate scaling.
+     *
+     * @param factor the desired mesh-to-world scale factor for all axes
+     * (default=1)
+     * @return the (modified) current geometry (for chaining)
+     */
+    public Geometry setScale(float factor) {
+        uniformValues.setScale(factor);
+        return this;
+    }
+
+    /**
      * Replace the shader program with the named ShaderProgram, or if the name
      * is null, replace it with the default program.
      *

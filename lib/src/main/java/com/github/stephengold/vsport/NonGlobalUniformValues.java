@@ -248,6 +248,16 @@ class NonGlobalUniformValues {
     }
 
     /**
+     * Alter the mesh-to-world coordinate scaling.
+     *
+     * @param factor the desired mesh-to-world scale factor for all axes
+     * (default=1)
+     */
+    void setScale(float factor) {
+        scale.set(factor);
+    }
+
+    /**
      * Write the data to the specified ByteBuffer (starting at the current
      * buffer position) and advance the buffer position.
      *
