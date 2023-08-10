@@ -41,7 +41,7 @@ import org.joml.Vector3f;
  * Derived from the UniformBufferObject class in Cristian Herrera's
  * Vulkan-Tutorial-Java project.
  */
-class GlobalUniformValues {
+public class GlobalUniformValues {
     // *************************************************************************
     // fields
 
@@ -111,6 +111,34 @@ class GlobalUniformValues {
         result += 4 * 4 * Float.BYTES;
 
         return result;
+    }
+
+    /**
+     * Alter the strength of the ambient light.
+     *
+     * @param newStrength the desired strength (default=0.1)
+     */
+    public void setAmbientStrength(float newStrength) {
+        this.ambientStrength = newStrength;
+    }
+
+    /**
+     * Alter the color of lights.
+     *
+     * @param newColor the desired color (not null, unaffected, default=(1,1,1))
+     */
+    public void setLightColor(Vector3f newColor) {
+        lightColor.set(newColor);
+    }
+
+    /**
+     * Alter the direction to the directional light.
+     *
+     * @param newDirection the desired direction (in world coordinates, not
+     * null, not zero)
+     */
+    public void setLightDirection(Vector3f newDirection) {
+        lightDirectionWorldspace.set(newDirection).normalize();
     }
 
     /**
