@@ -36,6 +36,7 @@ import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
+import org.lwjgl.vulkan.VK10;
 
 /**
  * A 3-D object to be rendered by V-Sport, including a Mesh, a Texture, and a
@@ -45,6 +46,10 @@ public class Geometry {
     // *************************************************************************
     // fields
 
+    /**
+     * true to enable wireframe rendering, false to disable it
+     */
+    private boolean wireframe;
     /**
      * draw mode and vertex data for visualization
      */
@@ -152,6 +157,28 @@ public class Geometry {
     ShaderProgram getProgram() {
         assert program != null;
         return program;
+    }
+
+    /**
+     * Test whether wireframe mode is enabled.
+     *
+     * @return true if enabled, otherwise false
+     */
+    public boolean isWireframe() {
+        return wireframe;
+    }
+
+    /**
+     * Return the polygon mode for rasterization.
+     *
+     * @return the {@code VkPolygonMode} value
+     */
+    int polygonMode() {
+        if (wireframe) {
+            return VK10.VK_POLYGON_MODE_LINE;
+        } else {
+            return VK10.VK_POLYGON_MODE_FILL;
+        }
     }
 
     /**
@@ -309,6 +336,17 @@ public class Geometry {
     public Geometry setTexture(TextureKey textureKey) {
         Validate.nonNull(textureKey, "texture key");
         this.texture = BaseApplication.getTexture(textureKey);
+        return this;
+    }
+
+    /**
+     * Enable or disable wireframe mode.
+     *
+     * @param newSetting true to enable, false to disable (default=false)
+     * @return the (modified) current geometry (for chaining)
+     */
+    public Geometry setWireframe(boolean newSetting) {
+        this.wireframe = newSetting;
         return this;
     }
 

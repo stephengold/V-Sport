@@ -846,8 +846,10 @@ final class Internals {
             rsCreateInfo.depthClampEnable(false);
             rsCreateInfo.frontFace(VK10.VK_FRONT_FACE_COUNTER_CLOCKWISE);
             rsCreateInfo.lineWidth(1f); // in fragments
-            rsCreateInfo.polygonMode(VK10.VK_POLYGON_MODE_FILL);
             rsCreateInfo.rasterizerDiscardEnable(false);
+
+            int polygonMode = geometry.polygonMode();
+            rsCreateInfo.polygonMode(polygonMode);
 
             VkPipelineShaderStageCreateInfo.Buffer stageCreateInfos
                     = VkPipelineShaderStageCreateInfo.calloc(2, stack);

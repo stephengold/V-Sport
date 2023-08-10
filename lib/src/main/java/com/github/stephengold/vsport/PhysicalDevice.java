@@ -120,6 +120,7 @@ class PhysicalDevice {
             // device features:
             VkPhysicalDeviceFeatures deviceFeatures
                     = VkPhysicalDeviceFeatures.calloc(stack);
+            deviceFeatures.fillModeNonSolid(true);
             deviceFeatures.samplerAnisotropy(true);
 
             // logical-device creation information:
@@ -308,6 +309,14 @@ class PhysicalDevice {
             if (diagnose) {
                 System.out.println(
                         "  doesn't support anisotropic sampling of textures");
+            }
+            return 0f;
+        }
+
+        if (!supportsNonSolidFill()) {
+            if (diagnose) {
+                System.out.println("  doesn't support polygon fill modes"
+                        + " other than solid");
             }
             return 0f;
         }
@@ -523,5 +532,22 @@ class PhysicalDevice {
         result.rewind();
 
         return result;
+    }
+
+    /**
+     * Test whether the device supports polygon fill modes other than solid.
+     *
+     * @return true if supported, otherwise false
+     */
+    private boolean supportsNonSolidFill() {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            VkPhysicalDeviceFeatures supportedFeatures
+                    = VkPhysicalDeviceFeatures.malloc(stack);
+            VK10.vkGetPhysicalDeviceFeatures(
+                    vkPhysicalDevice, supportedFeatures);
+            boolean result = supportedFeatures.fillModeNonSolid();
+
+            return result;
+        }
     }
 }
