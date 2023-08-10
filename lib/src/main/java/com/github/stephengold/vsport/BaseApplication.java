@@ -41,11 +41,9 @@ import org.joml.Vector4fc;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWFramebufferSizeCallback;
-import org.lwjgl.system.Callback;
 import org.lwjgl.system.Configuration;
 import org.lwjgl.system.MemoryUtil;
 import org.lwjgl.vulkan.VK10;
-import org.lwjgl.vulkan.VkAllocationCallbacks;
 
 /**
  * A single-window, 3-D visualization application using LWJGL v3, GLFW, and
@@ -60,18 +58,9 @@ abstract public class BaseApplication {
     // constants
 
     /**
-     * true to enable debugging output and optional runtime checks, or false to
-     * disable them
-     */
-    final private static boolean enableDebugging = false;
-    /**
      * version of the V-Sport graphics engine
      */
     final static int engineVersion = VK10.VK_MAKE_VERSION(0, 1, 0);
-    /**
-     * maximum number of frames in flight
-     */
-    final private static int maxFramesInFlight = 2;
     /**
      * timeout period for synchronization (in nanoseconds)
      */
@@ -80,96 +69,26 @@ abstract public class BaseApplication {
      * name of the graphics engine
      */
     final public static String engineName = "V-Sport";
-    /**
-     * use the default allocator for persistent resources
-     */
-    final private static VkAllocationCallbacks defaultAllocator = null;
     // *************************************************************************
     // fields
 
     /**
-     * true if the frame buffer needs to be resized
-     */
-    private static boolean needsResize = false;
-    /**
-     * print Vulkan debugging information (typically to the console) or null if
-     * not created
-     */
-    private static Callback debugMessengerCallback;
-    /**
      * process user input for the camera
      */
     private static CameraInputProcessor cameraInputProcessor;
-    /**
-     * resources that depend on the swap chain
-     */
-    private static ChainResources chainResources;
     /**
      * all visible geometries
      */
     private static final Collection<Geometry> visibleGeometries
             = new HashSet<>(256);
     /**
-     * synchronization objects for frames in flight
-     */
-    private static Frame[] inFlightFrames;
-    /**
-     * values to write to global UBOs
-     */
-    final private static GlobalUniformValues uniformValues
-            = new GlobalUniformValues();
-    /**
      * convenient access to user input
      */
     private static InputManager inputManager;
     /**
-     * index of the frame being rendered (among the inFlightFrames)
-     */
-    private static int currentFrameIndex;
-    /**
-     * image format for the depth buffer
-     */
-    private static int depthBufferFormat;
-    /**
-     * height of the displayed frame buffer (in pixels)
-     */
-    private static int frameBufferHeight = 600;
-    /**
-     * width of the displayed frame buffer (in pixels)
-     */
-    private static int frameBufferWidth = 800;
-    /**
-     * samples per framebuffer pixel for multi-sample anti-aliasing (MSAA)
-     */
-    private static int numMsaaSamples;
-    /**
-     * logical device for resource creation/destruction
-     */
-    private static LogicalDevice logicalDevice;
-    /**
-     * {@code VkDescriptorSetLayout} handle
-     */
-    private static long descriptorSetLayoutHandle = VK10.VK_NULL_HANDLE;
-    /**
-     * handle of the graphics-pipeline layout
-     */
-    private static long pipelineLayoutHandle = VK10.VK_NULL_HANDLE;
-    /**
-     * handle of the {@code VkSampler} for sampling textures
-     */
-    private static long samplerHandle = VK10.VK_NULL_HANDLE;
-    /**
-     * handle of the {@code VkSurfaceKHR} for presentation
-     */
-    private static long surfaceHandle = VK10.VK_NULL_HANDLE;
-    /**
      * GLFW handle of the window used to render geometries
      */
     private static long windowHandle = VK10.VK_NULL_HANDLE;
-    /**
-     * map indices to frames
-     */
-    private static Map<Integer, Frame> framesInFlight;
     /**
      * map program names to programs
      */
