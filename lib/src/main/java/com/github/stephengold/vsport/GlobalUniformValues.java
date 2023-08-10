@@ -29,6 +29,7 @@
  */
 package com.github.stephengold.vsport;
 
+import com.jme3.math.FastMath;
 import java.nio.ByteBuffer;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -52,7 +53,8 @@ public class GlobalUniformValues {
     /**
      * viewpoint for 3-D rendering
      */
-    final private Camera camera = new Camera();
+    final private Camera camera
+            = new Camera(new Vector3f(0f, 0f, 10f), -FastMath.HALF_PI, 0f);
     /**
      * view-to-clip coordinate transform
      */
