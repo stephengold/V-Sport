@@ -52,7 +52,8 @@ import org.lwjgl.vulkan.VkSurfaceFormatKHR;
 import org.lwjgl.vulkan.VkSwapchainCreateInfoKHR;
 
 /**
- * Encapsulate Vulkan resources that depend on the swap chain.
+ * Encapsulate Vulkan resources that depend on the swap chain (and thus,
+ * indirectly, on the logical device).
  *
  * @author Stephen Gold sgold@sonic.net
  *

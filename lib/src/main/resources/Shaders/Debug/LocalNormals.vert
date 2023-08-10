@@ -18,8 +18,8 @@ layout(binding = 1) uniform NonGlobal {
     vec4 SpecularMaterialColor;
 } ubo;
 
-layout(location = 0) in vec3 vertexPosition_modelspace;
-layout(location = 1) in vec3 vertexNormal_modelspace;
+layout(location = 0) in vec3 vertexPosition_modelspace; // positions from a vertex buffer
+layout(location = 1) in vec3 vertexNormal_modelspace; // normals from a vertex buffer
 
 layout(location = 1) out vec3 Normal_modelspace; // normals to the frag shader
 

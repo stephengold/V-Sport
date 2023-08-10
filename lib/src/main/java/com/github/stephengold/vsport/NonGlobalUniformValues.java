@@ -202,9 +202,9 @@ class NonGlobalUniformValues {
     /**
      * Translate the mesh origin.
      *
-     * @param x the desired X coordinate (in world coordinates)
-     * @param y the desired Y coordinate (in world coordinates)
-     * @param z the desired Z coordinate (in world coordinates)
+     * @param x the desired X coordinate (in world coordinates, default=0)
+     * @param y the desired Y coordinate (in world coordinates, default=0)
+     * @param z the desired Z coordinate (in world coordinates, default=0)
      */
     void setLocation(float x, float y, float z) {
         location.set(x, y, z);
@@ -214,7 +214,7 @@ class NonGlobalUniformValues {
      * Translate the mesh origin.
      *
      * @param desiredLocation the desired location (in world coordinates, not
-     * null, unaffected)
+     * null, unaffected, default=(0,0,0))
      */
     void setLocation(Vector3fc desiredLocation) {
         Validate.nonNull(desiredLocation, "desired location");
@@ -226,7 +226,7 @@ class NonGlobalUniformValues {
      * <p>
      * The axis is assumed to be a unit vector.
      *
-     * @param angle the desired rotation angle (in radians)
+     * @param angle the desired rotation angle (in radians, default=0)
      * @param x the X component of the rotation axis
      * @param y the Y component of the rotation axis
      * @param z the Z component of the rotation axis

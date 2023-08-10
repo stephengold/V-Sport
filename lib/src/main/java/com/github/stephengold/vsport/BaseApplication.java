@@ -129,7 +129,7 @@ abstract public class BaseApplication {
      */
     final public static String engineName = "V-Sport";
     /**
-     * use the default allocator for direct buffers
+     * use the default allocator for persistent resources
      */
     final private static VkAllocationCallbacks defaultAllocator = null;
     // *************************************************************************
