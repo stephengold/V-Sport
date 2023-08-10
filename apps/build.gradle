@@ -6,6 +6,9 @@ plugins {
 
 // tasks to run specific apps:
 
+tasks.register('AssimpTest', JavaExec) {
+    mainClass = 'com.github.stephengold.vsport.test.AssimpTest'
+}
 tasks.register('HelloVSport', JavaExec) {
     mainClass = 'com.github.stephengold.vsport.test.HelloVSport'
 }
