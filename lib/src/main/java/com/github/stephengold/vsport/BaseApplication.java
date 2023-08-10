@@ -88,7 +88,7 @@ abstract public class BaseApplication {
     /**
      * GLFW handle of the window used to render geometries
      */
-    private static long windowHandle = VK10.VK_NULL_HANDLE;
+    private static long windowHandle = MemoryUtil.NULL;
     /**
      * map program names to programs
      */
