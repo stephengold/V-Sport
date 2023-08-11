@@ -41,6 +41,7 @@ import org.joml.Vector2f;
 import org.joml.Vector2fc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
+import org.joml.Vector4fc;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.vulkan.VK10;
 
@@ -419,6 +420,40 @@ public class Mesh implements jme3utilities.lbj.Mesh {
 
         Mesh result = new Mesh(tempIndices, tempVertices);
         return result;
+    }
+
+    /**
+     * Transform all texture coordinates using the specified coefficients. Note
+     * that the Z components of the coefficients are currently unused.
+     *
+     * @param uCoefficients the coefficients for calculating new Us (not null,
+     * unaffected)
+     * @param vCoefficients the coefficients for calculating new Vs (not null,
+     * unaffected)
+     * @return the (modified) current instance (for chaining)
+     */
+    public Mesh transformUvs(Vector4fc uCoefficients, Vector4fc vCoefficients) {
+        if (texCoordsBuffer == null) {
+            throw new IllegalStateException("There are no UVs in the mesh.");
+        }
+
+        for (int vIndex = 0; vIndex < vertexCount; ++vIndex) {
+            int startPosition = 2 * vIndex;
+            float oldU = texCoordsFloats.get(startPosition);
+            float oldV = texCoordsFloats.get(startPosition + 1);
+
+            float newU = uCoefficients.w()
+                    + uCoefficients.x() * oldU
+                    + uCoefficients.y() * oldV;
+            float newV = vCoefficients.w()
+                    + vCoefficients.x() * oldU
+                    + vCoefficients.y() * oldV;
+
+            texCoordsFloats.put(startPosition, newU);
+            texCoordsFloats.put(startPosition + 1, newV);
+        }
+
+        return this;
     }
     // *************************************************************************
     // new protected methods
