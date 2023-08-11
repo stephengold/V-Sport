@@ -145,9 +145,10 @@ class NonGlobalUniformValues {
 
         // mat3 modelRotationMatrix
         result = Utils.align(result, 16);
-        result += 3 * 3 * Float.BYTES;
+        result += 11 * Float.BYTES;
 
         // vec4 SpecularMaterialColor
+        result = Utils.align(result, 16);
         result += 4 * Float.BYTES;
 
         return result;
@@ -279,12 +280,11 @@ class NonGlobalUniformValues {
         byteOffset += 4 * 4 * Float.BYTES;
 
         // mat3 modelRotationMatrix
-        byteOffset = Utils.align(byteOffset, 16);
-        tmpMatrix3f.set(orientation);
-        tmpMatrix3f.get(byteOffset, target);
-        byteOffset += 3 * 3 * Float.BYTES;
+        tmpMatrix3f.rotation(orientation);
+        byteOffset = Utils.getToBuffer(tmpMatrix3f, byteOffset, target);
 
         // vec4 SpecularMaterialColor
+        byteOffset = Utils.align(byteOffset, 16);
         specularMaterialColor.get(byteOffset, target);
         byteOffset += 4 * Float.BYTES;
 
