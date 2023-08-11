@@ -36,6 +36,7 @@ import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
+import org.joml.Vector4fc;
 import org.lwjgl.vulkan.VK10;
 
 /**
@@ -229,6 +230,18 @@ public class Geometry {
      */
     public Geometry scale(float factor) {
         uniformValues.scale(factor);
+        return this;
+    }
+
+    /**
+     * Alter the base material color.
+     *
+     * @param desiredColor the desired color (not null, unaffected)
+     * @return the (modified) current geometry (for chaining)
+     */
+    public Geometry setColor(Vector4fc desiredColor) {
+        Validate.nonNull(desiredColor, "desired color");
+        uniformValues.setBaseMaterialColor(desiredColor);
         return this;
     }
 

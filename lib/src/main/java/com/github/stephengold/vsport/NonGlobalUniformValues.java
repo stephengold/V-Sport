@@ -38,6 +38,7 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector4f;
+import org.joml.Vector4fc;
 
 /**
  * Shader parameters to be written to per-geometry Uniform Buffer Objects
@@ -200,6 +201,16 @@ class NonGlobalUniformValues {
      */
     void scale(float factor) {
         scale.mul(factor);
+    }
+
+    /**
+     * Alter the base material color.
+     *
+     * @param desiredColor the desired color (not null, unaffected)
+     */
+    void setBaseMaterialColor(Vector4fc desiredColor) {
+        Validate.nonNull(desiredColor, "desired color");
+        baseMaterialColor.set(desiredColor);
     }
 
     /**
