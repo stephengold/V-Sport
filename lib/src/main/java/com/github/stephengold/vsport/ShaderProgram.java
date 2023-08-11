@@ -233,6 +233,7 @@ public class ShaderProgram extends DeviceResource {
             case "Debug/LocalNormals":
             case "Debug/WorldNormals":
             case "Phong/Distant/Monochrome":
+            case "Phong/Distant/Texture":
             case "Unshaded/Texture":
                 return false;
 
@@ -251,6 +252,7 @@ public class ShaderProgram extends DeviceResource {
             case "Debug/LocalNormals":
             case "Debug/WorldNormals":
             case "Phong/Distant/Monochrome":
+            case "Phong/Distant/Texture":
                 return true;
 
             case "Unshaded/Texture":
@@ -273,6 +275,7 @@ public class ShaderProgram extends DeviceResource {
             case "Phong/Distant/Monochrome":
                 return false;
 
+            case "Phong/Distant/Texture":
             case "Unshaded/Texture":
                 return true;
 
