@@ -12,6 +12,9 @@ tasks.register('AssimpTest', JavaExec) {
 tasks.register('HelloVSport', JavaExec) {
     mainClass = 'com.github.stephengold.vsport.test.HelloVSport'
 }
+tasks.register('OctasphereTest', JavaExec) {
+    mainClass = 'com.github.stephengold.vsport.test.OctasphereTest'
+}
 
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 OperatingSystem os = DefaultNativePlatform.currentOperatingSystem
