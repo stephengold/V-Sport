@@ -149,6 +149,7 @@ class NonGlobalUniformValues {
 
         // vec4 SpecularMaterialColor
         result += 4 * Float.BYTES;
+
         return result;
     }
 
@@ -288,6 +289,6 @@ class NonGlobalUniformValues {
         byteOffset += 4 * Float.BYTES;
 
         assert byteOffset == numBytes() :
-                "byteOffset=" + byteOffset + " numBytes = " + numBytes();
+                "byteOffset=" + byteOffset + " numBytes=" + numBytes();
     }
 }
