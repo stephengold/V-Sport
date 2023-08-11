@@ -40,6 +40,7 @@ import javax.imageio.ImageIO;
 import jme3utilities.MyString;
 import jme3utilities.Validate;
 import jme3utilities.math.MyMath;
+import org.joml.Matrix3f;
 import org.lwjgl.vulkan.KHRSwapchain;
 import org.lwjgl.vulkan.VK10;
 
@@ -101,6 +102,35 @@ final class Utils {
                     "Failed to %s, retCode=%d", description, returnCode);
             throw new RuntimeException(message);
         }
+    }
+
+    /**
+     * Write the specified 3x3 matrix to the specified buffer in column-major
+     * order, aligning each column to 16 bytes.
+     *
+     * @param matrix the matrix to write (not null, unaffected)
+     * @param startOffset the buffer offset at which to start writing (in bytes)
+     * @param target the buffer to write to (not null, limit/mark/position
+     * unaffected)
+     * @return the offset of the first unwritten byte after the write
+     */
+    static int getToBuffer(
+            Matrix3f matrix, int startOffset, ByteBuffer target) {
+        int offset = Utils.align(startOffset, 16);
+        target.putFloat(offset, matrix.m00());
+        target.putFloat(offset + 4, matrix.m01());
+        target.putFloat(offset + 8, matrix.m02());
+
+        target.putFloat(offset + 16, matrix.m10());
+        target.putFloat(offset + 20, matrix.m11());
+        target.putFloat(offset + 24, matrix.m12());
+
+        target.putFloat(offset + 32, matrix.m20());
+        target.putFloat(offset + 36, matrix.m21());
+        target.putFloat(offset + 40, matrix.m22());
+
+        int result = offset + 44;
+        return result;
     }
 
     /**
