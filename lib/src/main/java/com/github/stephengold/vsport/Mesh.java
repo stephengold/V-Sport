@@ -693,13 +693,45 @@ public class Mesh implements jme3utilities.lbj.Mesh {
      */
     @Override
     public String toString() {
+        // Determine how many vertices to describe:
+        int numToDescribe = countIndexedVertices();
+        if (numToDescribe > 12) {
+            numToDescribe = 12;
+        }
+
+        StringBuilder result = new StringBuilder(80 * (1 + numToDescribe));
+        if (indexBuffer == null) {
+            result.append("non");
+        } else {
+            int indexType = indexBuffer.indexType();
+            String elementString = Utils.describeIndexType(indexType);
+            result.append(elementString);
+        }
+        result.append("-indexed triangle mesh (");
+        result.append(vertexCount);
+        if (vertexCount == 1) {
+            result.append(" vertex");
+        } else {
+            result.append(" vertices");
+        }
+
+        if (indexBuffer != null) {
+            result.append(", ");
+            int numIndices = indexBuffer.capacity();
+            result.append(numIndices);
+            if (numIndices == 1) {
+                result.append(" index");
+            } else {
+                result.append(" indices");
+            }
+        }
+        result.append(")");
+
+        int linesPerGroup = vpt;
         String nl = System.lineSeparator();
 
-        int numRendered = countIndexedVertices();
-        StringBuilder result = new StringBuilder(80 * numRendered);
-
-        for (int i = 0; i < numRendered; ++i) {
-            if ((i % vpt) == 0) {
+        for (int i = 0; i < numToDescribe; ++i) {
+            if ((i % linesPerGroup) == 0) {
                 result.append(nl);
             }
 
@@ -708,6 +740,10 @@ public class Mesh implements jme3utilities.lbj.Mesh {
             result.append(": ");
             Vertex v = copyVertex(vertexIndex);
             result.append(v);
+            result.append(nl);
+        }
+        if (countIndexedVertices() > numToDescribe) {
+            result.append("...");
             result.append(nl);
         }
 
