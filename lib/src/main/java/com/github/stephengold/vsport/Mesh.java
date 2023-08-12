@@ -443,11 +443,9 @@ public class Mesh implements jme3utilities.lbj.Mesh {
             float oldV = texCoordsFloats.get(startPosition + 1);
 
             float newU = uCoefficients.w()
-                    + uCoefficients.x() * oldU
-                    + uCoefficients.y() * oldV;
+                    + uCoefficients.x() * oldU + uCoefficients.y() * oldV;
             float newV = vCoefficients.w()
-                    + vCoefficients.x() * oldU
-                    + vCoefficients.y() * oldV;
+                    + vCoefficients.x() * oldU + vCoefficients.y() * oldV;
 
             texCoordsFloats.put(startPosition, newU);
             texCoordsFloats.put(startPosition + 1, newV);
@@ -704,6 +702,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
             if ((i % vpt) == 0) {
                 result.append(nl);
             }
+
             int vertexIndex = (indexBuffer == null) ? i : indexBuffer.get(i);
             result.append(vertexIndex);
             result.append(": ");
