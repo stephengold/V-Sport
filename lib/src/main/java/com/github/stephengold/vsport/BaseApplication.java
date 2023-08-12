@@ -64,10 +64,6 @@ abstract public class BaseApplication {
      */
     final static int engineVersion = VK10.VK_MAKE_VERSION(0, 1, 0);
     /**
-     * timeout period for synchronization (in nanoseconds)
-     */
-    final public static long noTimeout = 0xFFFFFFFFFFFFFFFFL;
-    /**
      * name of the graphics engine
      */
     final public static String engineName = "V-Sport";
