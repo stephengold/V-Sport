@@ -93,8 +93,7 @@ public class Texture extends DeviceResource {
      * @param generateMipMaps true to generate MIP maps, false to skip MIP-map
      * generation
      */
-    private Texture(
-            int numBytes, int width, int height, boolean generateMipMaps) {
+    Texture(int numBytes, int width, int height, boolean generateMipMaps) {
         this.numBytes = numBytes;
         this.width = width;
         this.height = height;
