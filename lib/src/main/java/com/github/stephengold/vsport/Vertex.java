@@ -79,7 +79,7 @@ public class Vertex {
      * @param texCoords the desired texture coordinates (may be null,
      * unaffected)
      */
-    Vertex(Vector3fc position, Vector3fc color, Vector3fc normal,
+    public Vertex(Vector3fc position, Vector3fc color, Vector3fc normal,
             Vector2fc texCoords) {
         Validate.nonNull(position, "position");
 
