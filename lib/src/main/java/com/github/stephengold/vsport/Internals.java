@@ -711,6 +711,41 @@ final class Internals {
     }
 
     /**
+     * Configure a shader-stage creation buffer for the specified geometry.
+     *
+     * @param createInfo the buffer containing 2 structs to configure (not null,
+     * modified)
+     * @param geometry the geometry to configure for (not null, unaffected)
+     * @param stack for allocating temporary host buffers (not null)
+     */
+    private static void configureShaderStages(
+            VkPipelineShaderStageCreateInfo.Buffer createInfo,
+            Geometry geometry, MemoryStack stack) {
+        ByteBuffer entryPoint = stack.UTF8("main");
+
+        // [0] vertex shader:
+        VkPipelineShaderStageCreateInfo vertCreateInfo = createInfo.get(0);
+        vertCreateInfo.sType(
+                VK10.VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO);
+
+        ShaderProgram shaderProgram = geometry.getProgram();
+        long vertModuleHandle = shaderProgram.vertModuleHandle();
+        vertCreateInfo.module(vertModuleHandle);
+        vertCreateInfo.pName(entryPoint);
+        vertCreateInfo.stage(VK10.VK_SHADER_STAGE_VERTEX_BIT);
+
+        // [1] - fragment shader:
+        VkPipelineShaderStageCreateInfo fragCreateInfo = createInfo.get(1);
+        fragCreateInfo.sType(
+                VK10.VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO);
+
+        long fragModuleHandle = shaderProgram.fragModuleHandle();
+        fragCreateInfo.module(fragModuleHandle);
+        fragCreateInfo.pName(entryPoint);
+        fragCreateInfo.stage(VK10.VK_SHADER_STAGE_FRAGMENT_BIT);
+    }
+
+    /**
      * Create the main swapchain and all resources that depend on it.
      */
     private static void createChainResources() {
@@ -853,31 +888,7 @@ final class Internals {
 
             VkPipelineShaderStageCreateInfo.Buffer stageCreateInfos
                     = VkPipelineShaderStageCreateInfo.calloc(2, stack);
-
-            // shader stage 0 - vertex shader:
-            VkPipelineShaderStageCreateInfo vertCreateInfo
-                    = stageCreateInfos.get(0);
-            vertCreateInfo.sType(
-                    VK10.VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO);
-
-            ByteBuffer entryPoint = stack.UTF8("main");
-
-            ShaderProgram shaderProgram = geometry.getProgram();
-            long vertModuleHandle = shaderProgram.vertModuleHandle();
-            vertCreateInfo.module(vertModuleHandle);
-            vertCreateInfo.pName(entryPoint);
-            vertCreateInfo.stage(VK10.VK_SHADER_STAGE_VERTEX_BIT);
-
-            // shader stage 1 - fragment shader:
-            VkPipelineShaderStageCreateInfo fragCreateInfo
-                    = stageCreateInfos.get(1);
-            fragCreateInfo.sType(
-                    VK10.VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO);
-
-            long fragModuleHandle = shaderProgram.fragModuleHandle();
-            fragCreateInfo.module(fragModuleHandle);
-            fragCreateInfo.pName(entryPoint);
-            fragCreateInfo.stage(VK10.VK_SHADER_STAGE_FRAGMENT_BIT);
+            configureShaderStages(stageCreateInfos, geometry, stack);
 
             // vertex-input state - describes format of vertex data:
             VkPipelineVertexInputStateCreateInfo visCreateInfo
@@ -886,6 +897,7 @@ final class Internals {
                     VK10.VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO
             );
 
+            ShaderProgram shaderProgram = geometry.getProgram();
             VkVertexInputBindingDescription.Buffer pBindingDesc
                     = shaderProgram.generateBindingDescription(stack);
             visCreateInfo.pVertexBindingDescriptions(pBindingDesc);
