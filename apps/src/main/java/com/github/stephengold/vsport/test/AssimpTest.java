@@ -101,7 +101,7 @@ public class AssimpTest extends BaseApplication {
             v.rotate(zupToYup);
         }
 
-        // De-duplicate the list of vertices as we create the mesh:
+        // De-duplicate vertices and generate indices while creating the mesh:
         Mesh roomMesh = Mesh.newInstance(vertices);
 
         TextureKey roomKey = new TextureKey(

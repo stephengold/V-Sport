@@ -203,7 +203,7 @@ final class Internals {
      */
     private static VkDevice vkDevice;
     /**
-     * link this application to the lwjgl-vulkan library
+     * link the application to the lwjgl-vulkan library
      */
     private static VkInstance vkInstance;
     /**
@@ -391,7 +391,7 @@ final class Internals {
     /**
      * Copy the current background color to a new FloatBuffer.
      *
-     * @param stack for allocating temporary buffers (not null)
+     * @param stack for allocating temporary host buffers (not null)
      * @return a new temporary buffer (not null)
      */
     static FloatBuffer copyBackgroudColor(MemoryStack stack) {
@@ -534,7 +534,7 @@ final class Internals {
     }
 
     /**
-     * Enumerate all device extensions required by this application.
+     * Enumerate all device extensions required by the application.
      *
      * @return a new array of extension names (no duplicates, not null)
      */
@@ -554,8 +554,8 @@ final class Internals {
     /**
      * Enumerate all required validation layers.
      *
-     * @param stack for memory allocation (not null)
-     * @return the names of the validation layers required by this application
+     * @param stack for allocating temporary host buffers (not null)
+     * @return a temporary buffer containing the names of the validation layers
      */
     static PointerBuffer listRequiredLayers(MemoryStack stack) {
         int numLayers = requiredLayers.size();
@@ -664,7 +664,7 @@ final class Internals {
      * Add debug-messenger information to the specified VkInstanceCreateInfo.
      *
      * @param createInfo the info to modify (not null, modified)
-     * @param stack for memory allocation (not null)
+     * @param stack for allocating temporary host buffers (not null)
      */
     private static void addDebugMessengerCreateInfo(
             VkInstanceCreateInfo createInfo, MemoryStack stack) {
@@ -1133,9 +1133,9 @@ final class Internals {
     /**
      * Enumerate all required instance extensions.
      *
-     * @param stack for memory allocation (not null)
+     * @param stack for allocating temporary host buffers (not null)
      * @return a temporary buffer containing the names of all instance
-     * extensions required by this application
+     * extensions required by the application
      */
     private static PointerBuffer
             listRequiredInstanceExtensions(MemoryStack stack) {

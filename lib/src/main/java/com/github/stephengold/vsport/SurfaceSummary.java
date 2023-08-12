@@ -78,7 +78,7 @@ class SurfaceSummary {
      * unaffected)
      * @param surfaceHandle the handle of the {@code VkSurfaceKHR} to analyze
      * (not null)
-     * @param stack for memory allocation (not null)
+     * @param stack for allocating temporary host buffers (not null)
      */
     SurfaceSummary(VkPhysicalDevice physicalDevice, long surfaceHandle,
             MemoryStack stack) {

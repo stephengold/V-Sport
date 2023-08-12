@@ -235,7 +235,7 @@ class ChainResources {
     /**
      * Return the extent of each framebuffer.
      *
-     * @param stack for memory allocation (not null)
+     * @param stack for allocating temporary host buffers (not null)
      * @return a temporary VkExtent2D
      */
     VkExtent2D framebufferExtent(MemoryStack stack) {

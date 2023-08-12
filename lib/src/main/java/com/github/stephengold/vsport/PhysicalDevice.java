@@ -375,7 +375,7 @@ class PhysicalDevice {
      *
      * @param surfaceHandle the handle of the {@code VkSurfaceKHR} to analyze
      * (not null)
-     * @param stack for memory allocation (not null)
+     * @param stack for allocating temporary host buffers (not null)
      * @return a new instance containing temporary buffers (not null)
      */
     SurfaceSummary summarizeSurface(long surfaceHandle, MemoryStack stack) {
@@ -499,9 +499,9 @@ class PhysicalDevice {
     /**
      * Enumerate all required device extensions.
      *
-     * @param stack for memory allocation (not null)
+     * @param stack for allocating temporary host buffers (not null)
      * @return a temporary buffer containing the names of all device extensions
-     * required by this application
+     * required by the application
      */
     private static PointerBuffer listRequiredDeviceExtensions(
             MemoryStack stack) {

@@ -758,7 +758,7 @@ public class LogicalDevice {
      * Allocate a block of command buffers.
      *
      * @param numBuffersNeeded the number of buffers to allocate (&gt;0)
-     * @param stack for memory allocation (not null)
+     * @param stack for allocating temporary host buffers (not null)
      * @return a buffer containing pointers to new command buffers (not null)
      */
     private PointerBuffer allocateCommandBuffersInternal(

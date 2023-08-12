@@ -78,7 +78,7 @@ class QueueFamilySummary {
     /**
      * Enumerate the distinct queue families used by the application.
      *
-     * @param stack for memory allocation (not null)
+     * @param stack for allocating temporary host buffers (not null)
      * @return a new temporary buffer of queue-family indices (not null, not
      * empty)
      */

@@ -321,7 +321,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
      * Generate buffer handles for the BindVertexBuffers command.
      *
      * @param program the shader program to be run (not null, unaffected)
-     * @param stack for memory allocation (not null)
+     * @param stack for allocating temporary host buffers (not null)
      * @return a new temporary buffer
      */
     LongBuffer generateBufferHandles(ShaderProgram program, MemoryStack stack) {
@@ -649,7 +649,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
 
     /**
-     * Test whether the draw mode is GL_LINES. Indexing is allowed.
+     * Test whether the draw mode is GL_LINES. Indexing is ignored.
      *
      * @return true if pure lines, otherwise false
      */
@@ -659,7 +659,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
 
     /**
-     * Test whether the draw mode is GL_TRIANGLES.
+     * Test whether the draw mode is GL_TRIANGLES. Indexing is ignored.
      *
      * @return true if pure triangles, otherwise false
      */

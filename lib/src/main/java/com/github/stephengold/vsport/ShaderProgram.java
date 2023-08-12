@@ -113,7 +113,7 @@ public class ShaderProgram extends DeviceResource {
     /**
      * Generate an attribute-description buffer.
      *
-     * @param stack for memory allocation (not null)
+     * @param stack for allocating temporary host buffers (not null)
      * @return a new temporary buffer
      */
     VkVertexInputAttributeDescription.Buffer
@@ -173,7 +173,7 @@ public class ShaderProgram extends DeviceResource {
     /**
      * Generate a binding-description buffer.
      *
-     * @param stack for memory allocation (not null)
+     * @param stack for allocating temporary host buffers (not null)
      * @return a new temporary buffer
      */
     VkVertexInputBindingDescription.Buffer
