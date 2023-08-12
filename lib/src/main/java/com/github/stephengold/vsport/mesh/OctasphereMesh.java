@@ -51,16 +51,17 @@ import org.joml.Vector3fc;
  * <p>
  * Texture coordinates are generated for an equirectangular projection:
  * <ul>
- * <li>U is the azimuthal angle in revs. It ranges from 0 to 1.
- * <li>V is the polar angle, measured (in half revs) from the -Z axis. It ranges
- * from 0 to 1.
+ * <li>U is the azimuthal angle, measured (in half revs) from the +X axis to the
+ * projection of the vector onto the X-Y plane. It ranges from -1 to +1.
+ * <li>V is the polar angle, measured (in half revs) from the +Z axis. It ranges
+ * from 0 (at Z=+1) to 1 (at Z=-1).
  * </ul>
  * <p>
  * Vertices with Y=0 and X&lt;1 lie on the seam. Those vertices are doubled and
- * can have either U=0 or U=1.
+ * can have either U=-1 or U=+1.
  * <p>
  * Vertices with X=0 and Y=0 lie at the poles. Those vertices are trebled and
- * can have U=0 or 0.5 or 1.
+ * can have U=-1 or 0 or +1.
  * <p>
  * Derived from Icosphere by jayfella.
  *
@@ -75,23 +76,23 @@ public class OctasphereMesh extends Mesh {
      * triangles with right-handed winding)
      * <p>
      * Vertices [0] and [6] occupy (-1, 0, 0) in mesh space. In order to create
-     * a seam, vertex [0] will have U=0 and vertex [6] will have U=1.
+     * a seam, vertex [0] will have U=-1 and vertex [6] will have U=+1.
      * <p>
      * Vertices [4, 7, 9] occupy (0, 0, -1) in mesh space. Vertex [4] will have
-     * U=0.5, vertex [7] will have U=1, and vertex [9] will have U=0.
+     * U=-1, vertex [7] will have U=+1, and vertex [9] will have U=0.
      * <p>
-     * Vertices [5, 8, 10] occupy (0, 0, 1) in mesh space. Vertex [5] will have
-     * U=0.5, vertex [8] will have U=1, and vertex [10] will have U=0.
+     * Vertices [5, 8, 10] occupy (0, 0, +1) in mesh space. Vertex [5] will have
+     * U=-1, vertex [8] will have U=+1, and vertex [10] will have U=0.
      */
     final private static int[] octaIndices = {
-        6, 2, 8, //  -X -Y +Z face
-        1, 4, 3, //  +X +Y -Z face
-        0, 3, 9, //  -X +Y -Z face
-        1, 5, 2, //  +X -Y +Z face
-        6, 7, 2, //  -X -Y -Z face
-        1, 3, 5, //  +X +Y +Z face
-        0, 10, 3, // -X +Y +Z face
-        1, 2, 4 //   +X -Y -Z face
+        0, 2, 5, //  -X -Y +Z face
+        1, 9, 3, //  +X +Y -Z face
+        6, 3, 7, //  -X +Y -Z face
+        1, 10, 2, // +X -Y +Z face
+        0, 4, 2, //  -X -Y -Z face
+        1, 3, 10, // +X +Y +Z face
+        6, 8, 3, //  -X +Y +Z face
+        1, 2, 9 //   +X -Y -Z face
     };
     /**
      * vertex locations in a regular octahedron with radius=1
@@ -181,17 +182,17 @@ public class OctasphereMesh extends Mesh {
         int numVertices = super.countVertices();
 
         // Add the 6 vertices of a regular octahedron with radius=1.
-        addVertex(octaLocations[0], 0f); //   [0]
-        addVertex(octaLocations[1], 0.5f); // [1]
+        addVertex(octaLocations[0], -1f); //  [0]
+        addVertex(octaLocations[1], 0f); //   [1]
         addVertex(octaLocations[2], null); // [2]
         addVertex(octaLocations[3], null); // [3]
-        addVertex(octaLocations[4], 0.5f); // [4]
-        addVertex(octaLocations[5], 0.5f); // [5]
+        addVertex(octaLocations[4], -1f); //  [4]
+        addVertex(octaLocations[5], -1f); //  [5]
 
-        // Add duplicate vertices with U=1.
-        addVertex(octaLocations[0], 1f); // [6]
-        addVertex(octaLocations[4], 1f); // [7]
-        addVertex(octaLocations[5], 1f); // [8]
+        // Add duplicate vertices with U=+1.
+        addVertex(octaLocations[0], +1f); // [6]
+        addVertex(octaLocations[4], +1f); // [7]
+        addVertex(octaLocations[5], +1f); // [8]
 
         // Add triplicate polar vertices with U=0.
         addVertex(octaLocations[4], 0f); // [9]
@@ -393,12 +394,12 @@ public class OctasphereMesh extends Mesh {
      * @param input the location to transform (y = distance east of the plane of
      * the zero meridian, z=distance north of the equatorial plane, not null,
      * unaffected)
-     * @return the west longitude (in radians)
+     * @return the east longitude (in radians)
      */
     private static float longitude(Vector3fc input) {
         float result;
         if (input.x() != 0f || input.y() != 0f) {
-            result = -FastMath.atan2(input.y(), input.x());
+            result = FastMath.atan2(input.y(), input.x());
         } else {
             result = 0f;
         }
@@ -460,17 +461,17 @@ public class OctasphereMesh extends Mesh {
                 .put(pos.y())
                 .put(pos.z());
 
-        float longitude = longitude(pos);
         float u;
         if (pos.y() == 0f) {
             u = uOverrides.get(vIndex); // alias
         } else {
             assert uOverrides.get(vIndex) == null;
-            u = 0.5f + longitude / FastMath.TWO_PI;
+            float longitude = longitude(pos);
+            u = longitude / FastMath.PI;
         }
 
         float latitude = latitude(pos);
-        float v = 0.5f + latitude / FastMath.PI;
+        float v = 0.5f - latitude / FastMath.PI;
         uvBuffer.put(u).put(v);
     }
 }

@@ -47,6 +47,8 @@ import org.joml.Matrix3f;
 import org.joml.Matrix3fc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
+import org.joml.Vector4f;
+import org.joml.Vector4fc;
 import org.lwjgl.assimp.Assimp;
 
 /**
@@ -108,6 +110,10 @@ public class HelloVSport extends BaseApplication {
         // meshes:
         int numRefineSteps = 5;
         Mesh globeMesh = OctasphereMesh.getMesh(numRefineSteps);
+
+        Vector4fc uCoefficients = new Vector4f(0.5f, 0f, 0f, 0.5f);
+        Vector4fc vCoefficients = new Vector4f(0f, -1f, 0f, 0f); // flip
+        globeMesh.transformUvs(uCoefficients, vCoefficients);
 
         String modelName = "/Models/viking_room/viking_room.obj";
         int postFlags = Assimp.aiProcess_FlipUVs;

@@ -31,14 +31,13 @@ package com.github.stephengold.vsport.test;
 
 import com.github.stephengold.vsport.BaseApplication;
 import com.github.stephengold.vsport.Constants;
+import com.github.stephengold.vsport.FlipAxes;
 import com.github.stephengold.vsport.Geometry;
 import com.github.stephengold.vsport.Mesh;
 import com.github.stephengold.vsport.TextureKey;
 import com.github.stephengold.vsport.input.RotateMode;
 import com.github.stephengold.vsport.mesh.OctasphereMesh;
 import com.jme3.math.FastMath;
-import org.joml.Vector4f;
-import org.joml.Vector4fc;
 
 /**
  * A simple graphics test: apply a texture to a sphere.
@@ -78,9 +77,6 @@ public class OctasphereTest extends BaseApplication {
         setBackgroundColor(Constants.SKY_BLUE);
 
         Mesh sphereMesh = OctasphereMesh.getMesh(4); // unit sphere
-        Vector4fc uCoefficients = new Vector4f(-2f, 0f, 0f, 2f);
-        Vector4fc vCoefficients = new Vector4f(0f, 1f, 0f, 0f); // no change
-        sphereMesh.transformUvs(uCoefficients, vCoefficients);
 
         float radius = 3f;
         float xRotation = -FastMath.HALF_PI;
@@ -90,7 +86,8 @@ public class OctasphereTest extends BaseApplication {
                 .setScale(radius);
 
         String resourceName = "/Textures/TextureTest.png";
-        TextureKey textureKey = new TextureKey("classpath://" + resourceName);
+        TextureKey textureKey = new TextureKey(
+                "classpath://" + resourceName, true, FlipAxes.noFlip);
         sphereGeometry.setTexture(textureKey);
 
         // Add a red wireframe to visualize the underlying mesh.
