@@ -49,7 +49,7 @@ import org.lwjgl.vulkan.VK10;
  *
  * @author Stephen Gold sgold@sonic.net
  */
-final class Utils {
+final public class Utils {
     // *************************************************************************
     // constructors
 
