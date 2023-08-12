@@ -30,6 +30,7 @@
 package com.github.stephengold.vsport.test;
 
 import com.github.stephengold.vsport.BaseApplication;
+import com.github.stephengold.vsport.Constants;
 import com.github.stephengold.vsport.Geometry;
 import com.github.stephengold.vsport.Mesh;
 import com.github.stephengold.vsport.TextureKey;
@@ -74,7 +75,7 @@ public class OctasphereTest extends BaseApplication {
     @Override
     public void initialize() {
         getCameraInputProcessor().setRotationMode(RotateMode.DragLMB);
-        setBackgroundColor(new Vector4f(0.1f, 0.2f, 0.4f, 1f));
+        setBackgroundColor(Constants.SKY_BLUE);
 
         Mesh sphereMesh = OctasphereMesh.getMesh(4); // unit sphere
         Vector4fc uCoefficients = new Vector4f(-2f, 0f, 0f, 2f);
@@ -95,7 +96,7 @@ public class OctasphereTest extends BaseApplication {
         // Add a red wireframe to visualize the underlying mesh.
         Vector4fc red = new Vector4f(1f, 0f, 0f, 0f);
         new Geometry(sphereMesh)
-                .setColor(red)
+                .setColor(Constants.RED)
                 .setOrientation(xRotation, 1f, 0f, 0f)
                 .setProgram("Unshaded/Monochrome")
                 .setScale(radius)
