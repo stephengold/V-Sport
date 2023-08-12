@@ -68,6 +68,7 @@ This project has made use of the following libraries and software tools:
   + [the Lightweight Java Gaming Library][lwjgl]
   + the [Markdown] document-conversion tool
   + the [NetBeans] integrated development environment
+  + [the Open Asset Import (Assimp) Library][assimp]
   + [the shaderc project][shaderc]
   + Microsoft Windows
   + the [Vulkan] API
@@ -83,6 +84,7 @@ correct the situation: sgold@sonic.net
 
 
 [adoptium]: https://adoptium.net/releases.html "Adoptium Project"
+[assimp]: https://www.assimp.org/ "The Asset Importer Library"
 [firefox]: https://www.mozilla.org/en-US/firefox "Firefox"
 [git]: https://git-scm.com "Git"
 [github]: https://github.com "GitHub"
