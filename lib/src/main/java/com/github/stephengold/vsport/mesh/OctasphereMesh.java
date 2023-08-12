@@ -244,7 +244,9 @@ public class OctasphereMesh extends Mesh {
         }
 
         // System.out.println("numRefineSteps  = " + numRefineSteps);
-        // System.out.println("numVertices     = " + locations.size());
+        // System.out.println("withIndices     = " + withIndices);
+        // System.out.println("numVertices     = " + numVertices);
+        // System.out.println("numLocations    = " + locations.size());
         // System.out.println("numFaces        = " + faces.size() / vpt);
         // System.out.println("numCacheEntries = " + midpointCache.size());
         // System.out.println();
@@ -377,7 +379,7 @@ public class OctasphereMesh extends Mesh {
      * @param input the location to transform (y = distance east of the plane of
      * the zero meridian, z=distance north of the equatorial plane, not null,
      * unaffected)
-     * @return the north latitude in (in radians)
+     * @return the location's north latitude (in radians)
      */
     private static float latitude(Vector3fc input) {
         float result;
@@ -397,7 +399,7 @@ public class OctasphereMesh extends Mesh {
      * @param input the location to transform (y = distance east of the plane of
      * the zero meridian, z=distance north of the equatorial plane, not null,
      * unaffected)
-     * @return the east longitude (in radians)
+     * @return the location's east longitude (in radians)
      */
     private static float longitude(Vector3fc input) {
         float result;
@@ -475,6 +477,7 @@ public class OctasphereMesh extends Mesh {
 
         float latitude = latitude(pos);
         float v = 0.5f - latitude / FastMath.PI;
+
         uvBuffer.put(u).put(v);
     }
 }
