@@ -35,7 +35,11 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.ByteBuffer;
+import java.util.HashMap;
+import java.util.Map;
 import jme3utilities.MyString;
+import org.lwjgl.system.MemoryStack;
 
 /**
  * Used to load and cache textures. Note: immutable.
@@ -229,6 +233,62 @@ public class TextureKey {
     // private methods
 
     /**
+     * Generate a square texture for a 2-by-2 checkerboard pattern.
+     *
+     * @param argMap to map argument names to values (not null, unaffected)
+     * @return a new instance
+     */
+    private Texture synthesizeCheckerboard(Map<String, String> argMap) {
+        String sizeDecimal = argMap.get("size");
+        if (sizeDecimal == null) {
+            sizeDecimal = "64";
+        }
+        int size = Integer.parseInt(sizeDecimal);
+        if (size < 1) {
+            throw new IllegalArgumentException("size = " + size);
+        }
+
+        String c0Arg = argMap.get("color0");
+        if (c0Arg == null) {
+            c0Arg = "000000ff"; // black
+        }
+
+        String c1Arg = argMap.get("color1");
+        if (c1Arg == null) {
+            c1Arg = "ffffffff"; // white
+        }
+
+        int halfSize = size / 2;
+        int bytesPerTexel = 4;
+        int numBytes = size * size * bytesPerTexel;
+
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            ByteBuffer color0 = Utils.hexToBytes(c0Arg, stack);
+            ByteBuffer color1 = Utils.hexToBytes(c1Arg, stack);
+
+            Texture result = new Texture(numBytes, size, size, mipmaps) {
+                @Override
+                protected void fill(ByteBuffer pixels) {
+                    for (int y = 0; y < size; ++y) {
+                        int ySide = y / halfSize;
+                        for (int x = 0; x < size; ++x) {
+                            int xSide = x / halfSize;
+                            int colorIndex = (xSide + ySide) % 2;
+                            ByteBuffer color
+                                    = (colorIndex == 0) ? color0 : color1;
+                            color.rewind();
+                            pixels.put(color);
+                        }
+                    }
+                }
+            };
+
+            return result;
+        }
+
+    }
+
+    /**
      * Synthesize a texture using parameters encoded in a path string and a
      * query string.
      *
@@ -237,11 +297,31 @@ public class TextureKey {
      * @return a new texture (not null)
      */
     private Texture synthesizeTexture(String path, String query) {
-        // TODO checkerboard
-        String qPath = MyString.quote(path);
-        String qQuery = MyString.quote(query);
-        throw new IllegalArgumentException(
-                "path = " + qPath + " query = " + qQuery);
+        Map<String, String> queryMap = new HashMap<>(16);
+        if (query != null) {
+            String[] assignments = query.split("&");
+            for (String assignment : assignments) {
+                String[] terms = assignment.split("=", 2);
+                String name = terms[0];
+                String value = terms[1];
+                queryMap.put(name, value);
+            }
+        }
+
+        Texture result;
+        switch (path) {
+            case "/checkerboard":
+                result = synthesizeCheckerboard(queryMap);
+                break;
+
+            default:
+                String qPath = MyString.quote(path);
+                String qQuery = MyString.quote(query);
+                throw new IllegalArgumentException(
+                        "path=" + qPath + ", query=" + qQuery);
+        }
+
+        return result;
     }
 
     /**
