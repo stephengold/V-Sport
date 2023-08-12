@@ -127,16 +127,16 @@ public class OctasphereMesh extends Mesh {
     /**
      * map vertex indices to U coordinates for vertices with Y=0
      */
-    final private List<Float> uOverrides = new ArrayList<>(305);
+    final private List<Float> uOverrides;
     /**
      * map vertex indices to location vectors in mesh coordinates, all with
      * length=1
      */
-    final private List<Vector3fc> locations = new ArrayList<>(305);
+    final private List<Vector3fc> locations;
     /**
      * cache to avoid duplicate vertices: map index pairs to midpoint indices
      */
-    final private Map<Long, Integer> midpointCache = new HashMap<>(294);
+    final private Map<Long, Integer> midpointCache;
     /**
      * map number of refinement steps to shared mesh
      */
@@ -180,6 +180,9 @@ public class OctasphereMesh extends Mesh {
         Validate.inRange(numRefineSteps, "number of refinement steps", 0, 13);
 
         int numVertices = super.countVertices();
+        this.uOverrides = new ArrayList<>(numVertices);
+        this.locations = new ArrayList<>(numVertices);
+        this.midpointCache = new HashMap<>(numVertices);
 
         // Add the 6 vertices of a regular octahedron with radius=1.
         addVertex(octaLocations[0], -1f); //  [0]
