@@ -41,6 +41,7 @@ import jme3utilities.MyString;
 import jme3utilities.Validate;
 import jme3utilities.math.MyMath;
 import org.joml.Matrix3f;
+import org.lwjgl.system.MemoryStack;
 import org.lwjgl.vulkan.KHRSwapchain;
 import org.lwjgl.vulkan.VK10;
 
@@ -166,6 +167,30 @@ final public class Utils {
             default:
                 return false;
         }
+    }
+
+    /**
+     * Parse a hexadecimal string to a ByteBuffer.
+     *
+     * @param hexString a hexadecimal string up to 8 characters long (not null,
+     * not empty)
+     * @param stack for allocating temporary host buffers (not null)
+     * @return a new temporary buffer (with limit=capacity=4, most-significant
+     * byte in position 0, least-significant byte in position 3)
+     *
+     * @throws NumberFormatException if {@code hexString} fails to parse
+     */
+    static ByteBuffer hexToBytes(String hexString, MemoryStack stack) {
+        int iValue = Integer.parseUnsignedInt(hexString, 16);
+        byte b0 = (byte) (iValue >> 24);
+        byte b1 = (byte) (iValue >> 16);
+        byte b2 = (byte) (iValue >> 8);
+        byte b3 = (byte) iValue;
+
+        ByteBuffer result = stack.bytes(b0, b1, b2, b3);
+        result.limit(4);
+
+        return result;
     }
 
     /**
