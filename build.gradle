@@ -27,6 +27,10 @@ tasks.register('AssimpTest') {
     dependsOn ':apps:AssimpTest'
     description 'Runs the Assimp test app.'
 }
+tasks.register('checkstyle') {
+    dependsOn ':apps:checkstyleMain', ':lib:checkstyleMain'
+    description 'Checks the style of all Java sourcecode.'
+}
 tasks.register('HelloVSport') {
     dependsOn ':apps:HelloVSport'
     description 'Runs the HelloVSport tutorial app.'
