@@ -113,7 +113,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
      * @param indices the vertex indices to use (unaffected) or null if none
      * @param vertices the vertex data to use (not null, unaffected)
      */
-    Mesh(List<Integer> indices, List<Vertex> vertices) {
+    public Mesh(List<Integer> indices, List<Vertex> vertices) {
         if (indices == null) {
             this.indexBuffer = null;
         } else {
