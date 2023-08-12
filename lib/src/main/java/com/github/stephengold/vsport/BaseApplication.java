@@ -32,11 +32,13 @@ package com.github.stephengold.vsport;
 import com.github.stephengold.vsport.input.CameraInputProcessor;
 import com.github.stephengold.vsport.input.InputManager;
 import com.github.stephengold.vsport.input.InputProcessor;
+import com.jme3.math.FastMath;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import org.joml.Vector3f;
 import org.joml.Vector4fc;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
@@ -72,6 +74,11 @@ abstract public class BaseApplication {
     // *************************************************************************
     // fields
 
+    /**
+     * viewpoint for 3-D rendering
+     */
+    protected static Camera cam
+            = new Camera(new Vector3f(0f, 0f, 10f), -FastMath.HALF_PI, 0f);
     /**
      * process user input for the camera
      */
@@ -122,11 +129,8 @@ abstract public class BaseApplication {
      * @return the pre-existing instance (not null)
      */
     public static Camera getCamera() {
-        GlobalUniformValues guv = Internals.getGlobalUniformValues();
-        Camera result = guv.getCamera();
-
-        assert result != null;
-        return result;
+        assert cam != null;
+        return cam;
     }
 
     /**

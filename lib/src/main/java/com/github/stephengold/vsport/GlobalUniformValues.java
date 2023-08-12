@@ -29,7 +29,6 @@
  */
 package com.github.stephengold.vsport;
 
-import com.jme3.math.FastMath;
 import java.nio.ByteBuffer;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -51,11 +50,6 @@ public class GlobalUniformValues {
      */
     private float ambientStrength = 0.1f;
     /**
-     * viewpoint for 3-D rendering
-     */
-    final private Camera camera
-            = new Camera(new Vector3f(0f, 0f, 10f), -FastMath.HALF_PI, 0f);
-    /**
      * view-to-clip coordinate transform
      */
     final private Matrix4f projectionMatrix = new Matrix4f();
@@ -74,16 +68,6 @@ public class GlobalUniformValues {
     final private Vector3f lightColor = new Vector3f(1f, 1f, 1f);
     // *************************************************************************
     // new methods exposed
-
-    /**
-     * Access the camera.
-     *
-     * @return the pre-existing instance
-     */
-    Camera getCamera() {
-        assert camera != null;
-        return camera;
-    }
 
     /**
      * Return the size of the UBO.
@@ -181,6 +165,7 @@ public class GlobalUniformValues {
 
         // mat4 viewMatrix
         byteOffset = Utils.align(byteOffset, 16);
+        Camera camera = BaseApplication.getCamera();
         camera.updateViewMatrix(viewMatrix);
         viewMatrix.get(byteOffset, target);
         byteOffset += 4 * 4 * Float.BYTES;
