@@ -51,7 +51,7 @@ You can restore the project to a pristine state:
 
 ## Acknowledgments
 
-Much of the V-Sport Project is derived from [Vulkan-Tutorial-Java][vtj]
+Portions of the V-Sport Project are derived from [Vulkan-Tutorial-Java][vtj]
 by Cristian Herrera, which was in turn ported from
 [Alexander Overvoorde's Vulkan tutorial][vt].
 I am deeply grateful for all the work that went into these invaluable tutorials.
@@ -64,7 +64,7 @@ This project has made use of the following libraries and software tools:
   + the [GLFW] library
   + the [Gradle] build tool
   + the [Java] compiler, standard doclet, and runtime environment
-  + the [Java OpenGL Math Library][joml]
+  + [the Java OpenGL Math Library][joml]
   + [the Lightweight Java Gaming Library][lwjgl]
   + the [Markdown] document-conversion tool
   + the [NetBeans] integrated development environment
