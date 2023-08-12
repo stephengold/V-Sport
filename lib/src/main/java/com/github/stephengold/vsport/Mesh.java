@@ -292,8 +292,8 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
 
     /**
-     * Count how many vertices the mesh contains, based on VertexBuffer
-     * capacities, unmodified by draw mode and indexing.
+     * Count how many vertices the mesh contains, based on buffer capacities,
+     * unmodified by draw mode and indexing.
      *
      * @return the count (&ge;0)
      */
