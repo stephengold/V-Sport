@@ -29,7 +29,6 @@
  */
 package com.github.stephengold.vsport.test;
 
-import com.github.stephengold.vsport.AssimpUtils;
 import com.github.stephengold.vsport.BaseApplication;
 import com.github.stephengold.vsport.Camera;
 import com.github.stephengold.vsport.FlipAxes;
@@ -37,6 +36,7 @@ import com.github.stephengold.vsport.Geometry;
 import com.github.stephengold.vsport.Mesh;
 import com.github.stephengold.vsport.TextureKey;
 import com.github.stephengold.vsport.Vertex;
+import com.github.stephengold.vsport.importers.AssimpUtils;
 import com.github.stephengold.vsport.input.CameraInputProcessor;
 import com.github.stephengold.vsport.input.RotateMode;
 import com.github.stephengold.vsport.mesh.OctasphereMesh;

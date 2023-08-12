@@ -27,8 +27,11 @@
  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.github.stephengold.vsport;
+package com.github.stephengold.vsport.importers;
 
+import com.github.stephengold.vsport.Mesh;
+import com.github.stephengold.vsport.Utils;
+import com.github.stephengold.vsport.Vertex;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.List;
