@@ -94,7 +94,6 @@ public class OctasphereTest extends BaseApplication {
         sphereGeometry.setTexture(textureKey);
 
         // Add a red wireframe to visualize the underlying mesh.
-        Vector4fc red = new Vector4f(1f, 0f, 0f, 0f);
         new Geometry(sphereMesh)
                 .setColor(Constants.RED)
                 .setOrientation(xRotation, 1f, 0f, 0f)
