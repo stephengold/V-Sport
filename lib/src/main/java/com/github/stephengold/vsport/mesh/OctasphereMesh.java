@@ -314,7 +314,7 @@ public class OctasphereMesh extends Mesh {
      */
     private int addVertex(Vector3fc location, Float uOverride) {
         float length = location.length();
-        locations.add(new Vector3f(location).mul(1f / length));
+        locations.add(new Vector3f(location).div(length));
         uOverrides.add(uOverride);
         assert locations.size() == uOverrides.size();
 
