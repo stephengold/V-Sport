@@ -474,7 +474,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
      * @return a new buffer with a capacity of 3 * vertexCount floats
      */
     protected FloatBuffer createNormals() {
-        int numBytes = vertexCount * 3 * Float.BYTES;
+        int numBytes = vertexCount * numAxes * Float.BYTES;
         int usage = VK10.VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
         boolean staging = false;
         this.normalBuffer = new BufferResource(numBytes, usage, staging);
@@ -492,7 +492,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
      * @return a new buffer with a capacity of 3 * vertexCount floats
      */
     protected FloatBuffer createPositions() {
-        int numBytes = vertexCount * 3 * Float.BYTES;
+        int numBytes = vertexCount * numAxes * Float.BYTES;
         int usage = VK10.VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
         boolean staging = false;
         this.positionBuffer = new BufferResource(numBytes, usage, staging);
