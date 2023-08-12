@@ -105,6 +105,24 @@ final class Utils {
     }
 
     /**
+     * Convert the specified VK_INDEX_TYPE_... code to text.
+     *
+     * @param code the code to decipher
+     * @return a descriptive string of text
+     */
+    static String describeIndexType(int code) {
+        switch (code) {
+            case VK10.VK_INDEX_TYPE_UINT16:
+                return "UINT16";
+            case VK10.VK_INDEX_TYPE_UINT32:
+                return "UINT32";
+
+            default:
+                return "unknown" + code;
+        }
+    }
+
+    /**
      * Write the specified 3x3 matrix to the specified buffer in column-major
      * order, aligning each column to 16 bytes.
      *
