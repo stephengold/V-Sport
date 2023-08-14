@@ -312,6 +312,44 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
 
     /**
+     * Count how many line primitives the mesh contains.
+     *
+     * @return the count (&ge;0)
+     */
+    public int countLines() {
+        int result;
+        int vpp = topology.vpp();
+        if (vpp == 2) {
+            int numIndices = countIndexedVertices();
+            int numShared = topology.numShared();
+            result = (numIndices - numShared) / (vpp - numShared);
+        } else {
+            result = 0;
+        }
+
+        return result;
+    }
+
+    /**
+     * Count how many triangle primitives the mesh contains.
+     *
+     * @return the count (&ge;0)
+     */
+    public int countTriangles() {
+        int result;
+        int vpp = topology.vpp();
+        if (vpp == 3) {
+            int numIndices = countIndexedVertices();
+            int numShared = topology.numShared();
+            result = (numIndices - numShared) / (vpp - numShared);
+        } else {
+            result = 0;
+        }
+
+        return result;
+    }
+
+    /**
      * Count how many vertices the mesh contains, based on buffer capacities,
      * unmodified by draw mode and indexing.
      *
