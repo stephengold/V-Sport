@@ -893,13 +893,13 @@ final class Internals {
             );
 
             ShaderProgram shaderProgram = geometry.getProgram();
-            VkVertexInputBindingDescription.Buffer pBindingDesc
-                    = shaderProgram.generateBindingDescription(stack);
-            visCreateInfo.pVertexBindingDescriptions(pBindingDesc);
-
             VkVertexInputAttributeDescription.Buffer pAttributeDesc
                     = shaderProgram.generateAttributeDescriptions(stack);
             visCreateInfo.pVertexAttributeDescriptions(pAttributeDesc);
+
+            VkVertexInputBindingDescription.Buffer pBindingDesc
+                    = shaderProgram.generateBindingDescription(stack);
+            visCreateInfo.pVertexBindingDescriptions(pBindingDesc);
 
             // viewport location and dimensions:
             int height = framebufferExtent.height();
