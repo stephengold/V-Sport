@@ -109,7 +109,7 @@ final public class Utils {
      * Convert the specified VK_INDEX_TYPE_... code to text.
      *
      * @param code the code to decipher
-     * @return a descriptive string of text
+     * @return a descriptive string of text (not null, not empty)
      */
     static String describeIndexType(int code) {
         switch (code) {

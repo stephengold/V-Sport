@@ -223,8 +223,9 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
 
     /**
-     * Instantiate a mesh with the specified number of vertices, but no indices,
-     * positions, colors, normals, or texture coordinates.
+     * Instantiate an incomplete mesh with the specified topology and number of
+     * vertices, but no indices, positions, colors, normals, or texture
+     * coordinates.
      *
      * @param topology the desired primitive topology (not null)
      * @param vertexCount number of vertices (&ge;0)
@@ -247,6 +248,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
      */
     Vertex copyVertex(int vertexIndex) {
         Validate.inRange(vertexIndex, "vertex index", 0, vertexCount - 1);
+
         float xPos = positionFloats.get(numAxes * vertexIndex);
         float yPos = positionFloats.get(numAxes * vertexIndex + 1);
         float zPos = positionFloats.get(numAxes * vertexIndex + 2);
@@ -681,7 +683,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
 
     /**
-     * Access the positions data buffer.
+     * Access the positions data buffer for writing.
      *
      * @return the pre-existing buffer (not null)
      */

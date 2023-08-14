@@ -31,7 +31,7 @@ package com.github.stephengold.vsport;
 
 /**
  * Enumerate options for flipping axes while loading textures. This is used to
- * avoid boolean arguments in classes and methods.
+ * avoid boolean fields and method arguments.
  *
  * @author Stephen Gold sgold@sonic.net
  */

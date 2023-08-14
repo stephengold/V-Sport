@@ -40,8 +40,8 @@ import org.joml.Vector4fc;
 import org.lwjgl.vulkan.VK10;
 
 /**
- * A 3-D object to be rendered by V-Sport, including a Mesh, a Texture, and a
- * ShaderProgram.
+ * A 3-D object to be rendered by V-Sport, including a mesh, a texture, and a
+ * shader program.
  */
 public class Geometry {
     // *************************************************************************
@@ -65,7 +65,7 @@ public class Geometry {
      */
     private ShaderProgram program;
     /**
-     * primary texture, or null if none
+     * primary texture (typically diffuse color) or null if none
      */
     private Texture texture;
     // *************************************************************************
@@ -151,7 +151,7 @@ public class Geometry {
     }
 
     /**
-     * Access the ShaderProgram.
+     * Access the shader program.
      *
      * @return the pre-existing instance (not null)
      */
@@ -246,7 +246,7 @@ public class Geometry {
     }
 
     /**
-     * Translate the mesh origin to the specified location.
+     * Alter the location of the mesh origin.
      *
      * @param x the desired X coordinate (in world coordinates)
      * @param y the desired Y coordinate (in world coordinates)
@@ -271,9 +271,9 @@ public class Geometry {
     }
 
     /**
-     * Replace the current Mesh with the specified Mesh.
+     * Replace the geometry's current mesh with the specified one.
      *
-     * @param desiredMesh the desired Mesh (not null, alias created)
+     * @param desiredMesh the desired mesh (not null, alias created)
      * @return the (modified) current geometry (for chaining)
      */
     public Geometry setMesh(Mesh desiredMesh) {
@@ -324,8 +324,8 @@ public class Geometry {
     }
 
     /**
-     * Replace the shader program with the named ShaderProgram, or if the name
-     * is null, replace it with the default program.
+     * Replace the geometry's current shader program with the named program, or
+     * if the name is null, replace it with the default program.
      *
      * @param name the name of the desired program (may be null)
      * @return the (modified) current geometry (for chaining)

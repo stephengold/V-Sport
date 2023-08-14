@@ -36,8 +36,8 @@ import com.github.stephengold.vsport.Topology;
  * An indexed TriangleList mesh that renders an axis-aligned rectangle in the
  * X-Y plane.
  * <p>
- * In mesh coordinates, the rectangle extends from (x0,y0,0) uv=(0,0) to
- * (x2,y2,0) uv=(1,1).
+ * In mesh space, the rectangle extends from (x0,y0,0) uv=(0,0) to (x2,y2,0)
+ * uv=(1,1).
  *
  * @author Stephen Gold sgold@sonic.net
  */

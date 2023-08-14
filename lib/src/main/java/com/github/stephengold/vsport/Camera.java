@@ -37,7 +37,7 @@ import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
 /**
- * A viewpoint for 3-D rendering, including its eye location, look direction,
+ * A viewpoint for 3-D rendering, including its eye location, "look" direction,
  * (vertical) field-of-view and near/far clipping planes.
  * <p>
  * Intended for a Y-up environment. When the camera's azimuth and up angle are
@@ -48,7 +48,7 @@ public class Camera {
     // fields
 
     /**
-     * rightward angle of the X-Z component of the look direction relative to
+     * rightward angle of the X-Z component of the "look" direction relative to
      * the world +X axis (in radians)
      */
     private float azimuthRadians;
@@ -58,7 +58,7 @@ public class Camera {
      */
     private float fovy = MyMath.toRadians(45f);
     /**
-     * angle of the look direction above the world X-Z plane (in radians)
+     * angle of the "look" direction above the world X-Z plane (in radians)
      */
     private float upAngleRadians;
     /**
@@ -74,11 +74,11 @@ public class Camera {
      */
     final private Vector3f eyeLocation = new Vector3f(0f, 0f, 10f);
     /**
-     * look direction (unit vector in world coordinates)
+     * "look" direction (unit vector in world coordinates)
      */
     final private Vector3f lookDirection = new Vector3f(0f, 0f, -1f);
     /**
-     * right direction (unit vector in world coordinates)
+     * "right" direction (unit vector in world coordinates)
      */
     final private Vector3f rightDirection = new Vector3f(1f, 0f, 0f);
     /**
@@ -124,7 +124,7 @@ public class Camera {
     }
 
     /**
-     * Return the eye location.
+     * Return a copy of the eye location.
      *
      * @param storeResult storage for the result (modified if not null)
      * @return a location vector in world coordinates (either
@@ -139,7 +139,7 @@ public class Camera {
     }
 
     /**
-     * Return the look direction.
+     * Return a copy of the "look" direction.
      *
      * @param storeResult storage for the result (modified if not null)
      * @return a unit vector in world coordinates (either {@code storeResult} or
@@ -165,7 +165,7 @@ public class Camera {
     }
 
     /**
-     * Return the look direction. This is a convenience method.
+     * Return a copy of the "look" direction. This is a convenience method.
      *
      * @return a new unit vector in world coordinates
      */
@@ -174,7 +174,7 @@ public class Camera {
     }
 
     /**
-     * Return the eye location. This is a convenience method.
+     * Return a copy of the eye location. This is a convenience method.
      *
      * @return a new location vector in world coordinates
      */
@@ -217,7 +217,7 @@ public class Camera {
     }
 
     /**
-     * Return the right direction.
+     * Return the camera's "right" direction.
      *
      * @param storeResult storage for the result (modified if not null)
      * @return a unit vector in world coordinates (either {@code storeResult} or
@@ -259,7 +259,7 @@ public class Camera {
      * Alter the azimuth/heading/yaw angle.
      *
      * @param newAzimuthInRadians the desired rightward angle of the X-Z
-     * component of the look direction relative to the +X axis (in radians)
+     * component of the "look" direction relative to the +X axis (in radians)
      * @return the (modified) current instance (for chaining)
      */
     public Camera setAzimuth(float newAzimuthInRadians) {
@@ -273,7 +273,7 @@ public class Camera {
      * Alter the azimuth/heading/yaw angle.
      *
      * @param newAzimuthInDegrees the desired rightward angle of the X-Z
-     * component of the look direction relative to the +X axis (in degrees)
+     * component of the "look" direction relative to the +X axis (in degrees)
      * @return the (modified) current instance (for chaining)
      */
     public Camera setAzimuthDegrees(float newAzimuthInDegrees) {
@@ -337,8 +337,8 @@ public class Camera {
     /**
      * Alter the altitude/climb/elevation/pitch angle.
      *
-     * @param newUpAngleInRadians the desired upward angle of the look direction
-     * (in radians)
+     * @param newUpAngleInRadians the desired upward angle of the "look"
+     * direction (in radians)
      * @return the (modified) current instance (for chaining)
      */
     public Camera setUpAngle(float newUpAngleInRadians) {
@@ -351,8 +351,8 @@ public class Camera {
     /**
      * Alter the altitude/climb/elevation/pitch angle.
      *
-     * @param newUpAngleInDegrees the desired upward angle of the look direction
-     * (in degrees)
+     * @param newUpAngleInDegrees the desired upward angle of the "look"
+     * direction (in degrees)
      * @return the (modified) current instance (for chaining)
      */
     public Camera setUpAngleDegrees(float newUpAngleInDegrees) {
@@ -396,7 +396,7 @@ public class Camera {
     /**
      * Return the altitude/climb/elevation/pitch angle.
      *
-     * @return the upward angle of the look direction (in radians)
+     * @return the upward angle of the "look" direction (in radians)
      */
     public float upAngle() {
         return upAngleRadians;
@@ -428,7 +428,7 @@ public class Camera {
     }
 
     /**
-     * Return the "up" direction.
+     * Return the camera's "up" direction.
      *
      * @param storeResult storage for the result (modified if not null)
      * @return a unit vector in world coordinates (either {@code storeResult} or
@@ -463,9 +463,9 @@ public class Camera {
     // Object methods
 
     /**
-     * Represent the camera as a string of text.
+     * Describe the camera in a string of text.
      *
-     * @return descriptive string of text (not null, not empty)
+     * @return a descriptive string of text (not null, not empty)
      */
     @Override
     public String toString() {
