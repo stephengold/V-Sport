@@ -467,6 +467,25 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
 
     /**
+     * Alter the primitive topology of the mesh.
+     *
+     * @param desiredTopology the desired enum value (not null)
+     */
+    public void setTopology(Topology desiredTopology) {
+        this.topology = desiredTopology;
+    }
+
+    /**
+     * Return the primitive topology of the mesh.
+     *
+     * @return the enum value (not null)
+     */
+    public Topology topology() {
+        assert topology != null;
+        return topology;
+    }
+
+    /**
      * Transform all texture coordinates using the specified coefficients. Note
      * that the Z components of the coefficients are currently unused.
      *
