@@ -153,8 +153,31 @@ public class Mesh implements jme3utilities.lbj.Mesh {
         byteBuffer.flip();
         this.positionFloats = byteBuffer.asFloatBuffer();
 
-        // normal buffer:
         Vertex representativeVertex = vertices.get(0);
+
+        // color buffer:
+        boolean hasColor = representativeVertex.hasColor();
+        if (hasColor) {
+            numBytes = vertexCount * 3 * Float.BYTES;
+            this.colorBuffer = new BufferResource(numBytes, usage, staging) {
+                @Override
+                protected void fill(ByteBuffer destinationBuffer) {
+                    for (Vertex vertex : vertices) {
+                        vertex.writeColorTo(destinationBuffer);
+                    }
+                }
+            };
+
+            byteBuffer = colorBuffer.getData();
+            byteBuffer.flip();
+            this.colorFloats = byteBuffer.asFloatBuffer();
+
+        } else {
+            this.colorBuffer = null;
+            this.colorFloats = null;
+        }
+
+        // normal buffer:
         boolean hasNormal = representativeVertex.hasNormal();
         if (hasNormal) {
             numBytes = vertexCount * numAxes * Float.BYTES;
@@ -197,28 +220,6 @@ public class Mesh implements jme3utilities.lbj.Mesh {
         } else {
             this.texCoordsBuffer = null;
             this.texCoordsFloats = null;
-        }
-
-        // color buffer:
-        boolean hasColor = representativeVertex.hasColor();
-        if (hasColor) {
-            numBytes = vertexCount * 3 * Float.BYTES;
-            this.colorBuffer = new BufferResource(numBytes, usage, staging) {
-                @Override
-                protected void fill(ByteBuffer destinationBuffer) {
-                    for (Vertex vertex : vertices) {
-                        vertex.writeColorTo(destinationBuffer);
-                    }
-                }
-            };
-
-            byteBuffer = colorBuffer.getData();
-            byteBuffer.flip();
-            this.colorFloats = byteBuffer.asFloatBuffer();
-
-        } else {
-            this.colorBuffer = null;
-            this.colorFloats = null;
         }
     }
 
