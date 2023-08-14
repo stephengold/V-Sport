@@ -831,6 +831,26 @@ public class Mesh implements jme3utilities.lbj.Mesh {
                 result.append(" indices");
             }
         }
+
+        int numTriangles = countTriangles();
+        if (numTriangles > 0) {
+            result.append(", ");
+            result.append(numTriangles);
+            result.append(" triangle");
+            if (numTriangles != 1) {
+                result.append("s");
+            }
+        }
+
+        int numLines = countLines();
+        if (numLines > 0) {
+            result.append(", ");
+            result.append(numLines);
+            result.append(" line");
+            if (numLines != 1) {
+                result.append("s");
+            }
+        }
         result.append(")");
         String nl = System.lineSeparator();
         result.append(nl);
