@@ -30,9 +30,11 @@
 package com.github.stephengold.vsport.mesh;
 
 import com.github.stephengold.vsport.Mesh;
+import com.github.stephengold.vsport.Topology;
 
 /**
- * An indexed mesh that renders an axis-aligned rectangle in the X-Y plane.
+ * An indexed TriangleList mesh that renders an axis-aligned rectangle in the
+ * X-Y plane.
  * <p>
  * In mesh coordinates, the rectangle extends from (x0,y0,0) uv=(0,0) to
  * (x2,y2,0) uv=(1,1).
@@ -63,7 +65,8 @@ public class RectangleMesh extends Mesh {
      */
     public RectangleMesh(
             float x0, float x2, float y0, float y2, float normalZ) {
-        super(4);
+        super(Topology.TriangleList, 4);
+        // TODO use TriangleFan
 
         super.setPositions(
                 x0, y0, 0f,

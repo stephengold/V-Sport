@@ -44,6 +44,7 @@ import org.joml.Vector3fc;
 import org.joml.Vector4fc;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.vulkan.VK10;
+import org.lwjgl.vulkan.VkPipelineInputAssemblyStateCreateInfo;
 
 /**
  * A mesh composed of triangles, with optional indices, vertex colors, normals,
@@ -108,23 +109,32 @@ public class Mesh implements jme3utilities.lbj.Mesh {
      * number of vertices (based on buffer sizes, unmodified by indexing)
      */
     final private int vertexCount;
+    /**
+     * how vertices are organized into primitives (not null)
+     */
+    private Topology topology;
     // *************************************************************************
     // constructors
 
     /**
      * Instantiate a mesh from vertices and optional indices.
      *
+     * @param topology the desired primitive topology (not null)
      * @param indices the vertex indices to use (unaffected) or null if none
      * @param vertices the vertex data to use (not null, unaffected)
      */
-    public Mesh(List<Integer> indices, List<Vertex> vertices) {
+    public Mesh(
+            Topology topology, List<Integer> indices, List<Vertex> vertices) {
+        Validate.nonNull(topology, "topology");
+
+        this.topology = topology;
+        this.vertexCount = vertices.size();
         if (indices == null) {
             this.indexBuffer = null;
         } else {
             this.indexBuffer = IndexBuffer.newInstance(indices);
         }
 
-        this.vertexCount = vertices.size();
         int usage = VK10.VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
         boolean staging = false;
 
@@ -216,10 +226,14 @@ public class Mesh implements jme3utilities.lbj.Mesh {
      * Instantiate a mesh with the specified number of vertices, but no indices,
      * positions, colors, normals, or texture coordinates.
      *
+     * @param topology the desired primitive topology (not null)
      * @param vertexCount number of vertices (&ge;0)
      */
-    protected Mesh(int vertexCount) {
+    protected Mesh(Topology topology, int vertexCount) {
+        Validate.nonNull(topology, "topology");
         Validate.nonNegative(vertexCount, "vertex count");
+
+        this.topology = topology;
         this.vertexCount = vertexCount;
     }
     // *************************************************************************
@@ -366,6 +380,27 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
 
     /**
+     * Generate create info for the input assembly state of a graphics pipeline.
+     *
+     * @param stack for allocating temporary host buffers (not null)
+     * @return a new, temporary struct (not null)
+     */
+    VkPipelineInputAssemblyStateCreateInfo
+            generateIasCreateInfo(MemoryStack stack) {
+        VkPipelineInputAssemblyStateCreateInfo result
+                = VkPipelineInputAssemblyStateCreateInfo.calloc(stack);
+        result.sType(
+                VK10.VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO
+        );
+
+        result.primitiveRestartEnable(false);
+        int topologyCode = topology.code();
+        result.topology(topologyCode);
+
+        return result;
+    }
+
+    /**
      * Generate normals on a vertex-by-vertex basis for an outward-facing
      * sphere. Any pre-existing normals are discarded.
      *
@@ -401,10 +436,13 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     /**
      * Create a mesh by de-duplicating a list of vertices.
      *
+     * @param topology the desired primitive topology (not null)
      * @param vertices the vertex data to use (not null, unaffected)
      * @return a new instance
      */
-    public static Mesh newInstance(List<Vertex> vertices) {
+    public static Mesh newInstance(Topology topology, List<Vertex> vertices) {
+        Validate.nonNull(topology, "topology");
+
         int count = vertices.size();
         List<Integer> tempIndices = new ArrayList<>(count);
         List<Vertex> tempVertices = new ArrayList<>(count);
@@ -422,7 +460,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
             }
         }
 
-        Mesh result = new Mesh(tempIndices, tempVertices);
+        Mesh result = new Mesh(topology, tempIndices, tempVertices);
         return result;
     }
 
@@ -653,23 +691,25 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
 
     /**
-     * Test whether the draw mode is GL_LINES. Indexing is ignored.
+     * Test whether the draw mode is LineList. Indexing is ignored.
      *
      * @return true if pure lines, otherwise false
      */
     @Override
     public boolean isPureLines() {
-        return false;
+        boolean result = (topology == Topology.LineList);
+        return result;
     }
 
     /**
-     * Test whether the draw mode is GL_TRIANGLES. Indexing is ignored.
+     * Test whether the draw mode is TriangleList. Indexing is ignored.
      *
      * @return true if pure triangles, otherwise false
      */
     @Override
     public boolean isPureTriangles() {
-        return true;
+        boolean result = (topology == Topology.TriangleList);
+        return result;
     }
 
     /**
@@ -711,7 +751,9 @@ public class Mesh implements jme3utilities.lbj.Mesh {
             String elementString = Utils.describeIndexType(indexType);
             result.append(elementString);
         }
-        result.append("-indexed triangle mesh (");
+        result.append("-indexed ");
+        result.append(topology);
+        result.append(" mesh (");
         result.append(vertexCount);
         if (vertexCount == 1) {
             result.append(" vertex");
@@ -730,12 +772,17 @@ public class Mesh implements jme3utilities.lbj.Mesh {
             }
         }
         result.append(")");
-
-        int linesPerGroup = vpt;
         String nl = System.lineSeparator();
+        result.append(nl);
+        /*
+         * In the body of the description, vertices are grouped into primitives,
+         * separated by empty lines.
+         */
+        int vpp = topology.vpp();
+        int numShared = topology.numShared();
 
         for (int i = 0; i < numToDescribe; ++i) {
-            if ((i % linesPerGroup) == 0) {
+            if (i >= vpp && ((i - numShared) % (vpp - numShared)) == 0) {
                 result.append(nl);
             }
 

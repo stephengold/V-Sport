@@ -34,6 +34,7 @@ import com.github.stephengold.vsport.Camera;
 import com.github.stephengold.vsport.Geometry;
 import com.github.stephengold.vsport.Mesh;
 import com.github.stephengold.vsport.TextureKey;
+import com.github.stephengold.vsport.Topology;
 import com.github.stephengold.vsport.Vertex;
 import com.github.stephengold.vsport.importers.AssimpUtils;
 import com.github.stephengold.vsport.input.CameraInputProcessor;
@@ -102,7 +103,7 @@ public class AssimpTest extends BaseApplication {
         }
 
         // De-duplicate vertices and generate indices while creating the mesh:
-        Mesh roomMesh = Mesh.newInstance(vertices);
+        Mesh roomMesh = Mesh.newInstance(Topology.TriangleList, vertices);
         System.out.println(roomMesh);
 
         TextureKey roomKey = new TextureKey(

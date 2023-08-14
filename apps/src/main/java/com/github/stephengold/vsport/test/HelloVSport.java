@@ -35,6 +35,7 @@ import com.github.stephengold.vsport.FlipAxes;
 import com.github.stephengold.vsport.Geometry;
 import com.github.stephengold.vsport.Mesh;
 import com.github.stephengold.vsport.TextureKey;
+import com.github.stephengold.vsport.Topology;
 import com.github.stephengold.vsport.Vertex;
 import com.github.stephengold.vsport.importers.AssimpUtils;
 import com.github.stephengold.vsport.input.CameraInputProcessor;
@@ -123,7 +124,7 @@ public class HelloVSport extends BaseApplication {
         for (Vertex v : vertices) {
             v.rotate(zupToYup);
         }
-        Mesh roomMesh = Mesh.newInstance(vertices);
+        Mesh roomMesh = Mesh.newInstance(Topology.TriangleList, vertices);
 
         Mesh squareMesh = new RectangleMesh();
 

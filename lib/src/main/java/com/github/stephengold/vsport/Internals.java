@@ -839,17 +839,12 @@ final class Internals {
             dssCreateInfo.maxDepthBounds(1f); // optional
             dssCreateInfo.stencilTestEnable(false);
 
-            // input-assembly state:
-            //    1. what kind of mesh to build (mesh mode/topology)
-            //    2. whether primitive restart should be enabled
+            // input-assembly state indicates:
+            //  1. how to assemble vertices into primitives (topology)
+            //  2. whether primitive restart should be enabled
+            Mesh mesh = geometry.getMesh();
             VkPipelineInputAssemblyStateCreateInfo iasCreateInfo
-                    = VkPipelineInputAssemblyStateCreateInfo.calloc(stack);
-            iasCreateInfo.sType(
-                    VK10.VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO
-            );
-
-            iasCreateInfo.primitiveRestartEnable(false);
-            iasCreateInfo.topology(VK10.VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
+                    = mesh.generateIasCreateInfo(stack);
 
             // multisample state:
             VkPipelineMultisampleStateCreateInfo msCreateInfo
