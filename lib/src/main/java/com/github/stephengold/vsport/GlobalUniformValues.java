@@ -166,7 +166,7 @@ public class GlobalUniformValues {
         // mat4 viewMatrix
         byteOffset = Utils.align(byteOffset, 16);
         Camera camera = BaseApplication.getCamera();
-        camera.updateMatrix(viewMatrix);
+        camera.updateViewMatrix(viewMatrix);
         viewMatrix.get(byteOffset, target);
         byteOffset += 4 * 4 * Float.BYTES;
 
