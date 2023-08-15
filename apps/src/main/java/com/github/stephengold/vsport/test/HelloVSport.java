@@ -30,7 +30,6 @@
 package com.github.stephengold.vsport.test;
 
 import com.github.stephengold.vsport.BaseApplication;
-import com.github.stephengold.vsport.Camera;
 import com.github.stephengold.vsport.FlipAxes;
 import com.github.stephengold.vsport.Geometry;
 import com.github.stephengold.vsport.Mesh;
@@ -158,12 +157,11 @@ public class HelloVSport extends BaseApplication {
         room.setTexture(roomKey);
 
         // camera:
-        Camera camera = getCamera();
-        camera.setZClip(0.1f, 10f);
+        getProjection().setZClip(0.1f, 10f);
 
         Vector3fc eye = new Vector3f(2f, 2f, 2f);
         Vector3fc target = new Vector3f(0f, 0f, 0f);
-        camera.reposition(eye, target);
+        getCamera().reposition(eye, target);
 
         CameraInputProcessor cip = getCameraInputProcessor();
         cip.setMoveSpeed(2f);

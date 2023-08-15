@@ -30,7 +30,6 @@
 package com.github.stephengold.vsport.test;
 
 import com.github.stephengold.vsport.BaseApplication;
-import com.github.stephengold.vsport.Camera;
 import com.github.stephengold.vsport.Geometry;
 import com.github.stephengold.vsport.Mesh;
 import com.github.stephengold.vsport.TextureKey;
@@ -44,7 +43,6 @@ import java.util.List;
 import org.joml.Matrix3f;
 import org.joml.Matrix3fc;
 import org.joml.Vector3f;
-import org.joml.Vector3fc;
 
 /**
  * Test loading a 3-D mesh using Assimp.
@@ -114,12 +112,11 @@ public class AssimpTest extends BaseApplication {
         room.setTexture(roomKey);
 
         // Configure the camera:
-        Camera camera = getCamera();
-        camera.setZClip(0.1f, 10f);
+        getProjection().setZClip(0.1f, 10f);
 
-        Vector3fc eye = new Vector3f(2f, 2f, 2f);
-        Vector3fc target = new Vector3f(0f, 0f, 0f);
-        camera.reposition(eye, target);
+        Vector3f eye = new Vector3f(2f, 2f, 2f);
+        Vector3f target = new Vector3f(0f, 0f, 0f);
+        getCamera().reposition(eye, target);
 
         CameraInputProcessor cip = getCameraInputProcessor();
         cip.setMoveSpeed(2f);

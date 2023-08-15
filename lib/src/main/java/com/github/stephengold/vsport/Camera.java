@@ -37,8 +37,8 @@ import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
 /**
- * A viewpoint for 3-D rendering, including its eye location, "look" direction,
- * (vertical) field-of-view and near/far clipping planes.
+ * A viewpoint for 3-D rendering, including an eye location, "look" direction,
+ * and "up" direction.
  * <p>
  * Intended for a Y-up environment. When the camera's azimuth and up angle are
  * both zero, it looks in the +X direction.
@@ -53,22 +53,9 @@ public class Camera {
      */
     private float azimuthRadians;
     /**
-     * vertical field-of-view angle (between the bottom plane and the top plane,
-     * in radians, &gt;0, &lt;PI)
-     */
-    private float fovy = MyMath.toRadians(45f);
-    /**
      * angle of the "look" direction above the world X-Z plane (in radians)
      */
     private float upAngleRadians;
-    /**
-     * distance from the camera to the far clipping plane (in world units)
-     */
-    private float zFar = 1000f;
-    /**
-     * distance from the camera to the near clipping plane (in world units)
-     */
-    private float zNear = 1f;
     /**
      * eye location (in world coordinates)
      */
@@ -151,17 +138,6 @@ public class Camera {
         } else {
             return storeResult.set(lookDirection);
         }
-    }
-
-    /**
-     * Return the vertical field-of-view angle.
-     *
-     * @return the angle (in radians, &gt;0, &lt;PI)
-     */
-    public float fovy() {
-        assert fovy > 0f : fovy;
-        assert fovy < FastMath.PI : fovy;
-        return fovy;
     }
 
     /**
@@ -272,36 +248,12 @@ public class Camera {
     /**
      * Alter the azimuth/heading/yaw angle.
      *
-     * @param newAzimuthInDegrees the desired rightward angle of the X-Z
-     * component of the "look" direction relative to the +X axis (in degrees)
+     * @param azimuthDegrees the desired rightward angle of the X-Z component of
+     * the "look" direction relative to the +X axis (in degrees)
      * @return the (modified) current instance (for chaining)
      */
-    public Camera setAzimuthDegrees(float newAzimuthInDegrees) {
-        setAzimuth(MyMath.toRadians(newAzimuthInDegrees));
-        return this;
-    }
-
-    /**
-     * Alter the vertical field-of-view angle.
-     *
-     * @param newFovy the desired angle (in radians, &gt;0, &lt;PI)
-     * @return the (modified) current instance (for chaining)
-     */
-    public Camera setFovy(float newFovy) {
-        Validate.inRange(newFovy, "new fovy", Float.MIN_VALUE, FastMath.PI);
-        this.fovy = newFovy;
-        return this;
-    }
-
-    /**
-     * Alter the vertical field-of-view angle.
-     *
-     * @param newFovyInDegrees the desired angle (in degrees, &gt;0, &lt;180)
-     * @return the (modified) current instance (for chaining)
-     */
-    public Camera setFovyDegrees(float newFovyInDegrees) {
-        Validate.inRange(newFovyInDegrees, "new fovy", Float.MIN_VALUE, 180f);
-        setFovy(MyMath.toRadians(newFovyInDegrees));
+    public Camera setAzimuthDegrees(float azimuthDegrees) {
+        setAzimuth(MyMath.toRadians(azimuthDegrees));
         return this;
     }
 
@@ -361,60 +313,12 @@ public class Camera {
     }
 
     /**
-     * Alter both the near and far clipping planes.
-     *
-     * @param newZNear (&gt;0, &lt;zFar, default=1)
-     * @param newZFar (&gt;zFar, default=1000)
-     */
-    public void setZClip(float newZNear, float newZFar) {
-        Validate.inRange(newZNear, "new zNear", Float.MIN_VALUE, newZFar);
-
-        this.zNear = newZNear;
-        this.zFar = newZFar;
-    }
-
-    /**
-     * Alter the distance from the camera to the far clipping plane.
-     *
-     * @param newZFar (in world units, &gt;zNear, default=1000)
-     */
-    public void setZFar(float newZFar) {
-        Validate.inRange(newZFar, "new zFar", zNear, Float.MAX_VALUE);
-        this.zFar = newZFar;
-    }
-
-    /**
-     * Alter the distance from the camera to the near clipping plane.
-     *
-     * @param newZNear (in world units, &gt;0, &lt;zFar, default=1)
-     */
-    public void setZNear(float newZNear) {
-        Validate.inRange(newZNear, "new zNear", Float.MIN_VALUE, zNear);
-        this.zNear = newZNear;
-    }
-
-    /**
      * Return the altitude/climb/elevation/pitch angle.
      *
      * @return the upward angle of the "look" direction (in radians)
      */
     public float upAngle() {
         return upAngleRadians;
-    }
-
-    /**
-     * Update the specified projection matrix.
-     *
-     * @param projMatrix the matrix to update (not null, modified)
-     */
-    void updateProjectionMatrix(Matrix4f projMatrix) {
-        float aspectRatio = BaseApplication.aspectRatio();
-        boolean zeroToOne = true;
-        projMatrix.setPerspective(fovy, aspectRatio, zNear, zFar, zeroToOne);
-
-        // In Vulkan's clip space, the Y axis increases downward, not upward:
-        float m11 = projMatrix.m11();
-        projMatrix.m11(-m11);
     }
 
     /**
@@ -441,24 +345,6 @@ public class Camera {
             return storeResult.set(upDirection);
         }
     }
-
-    /**
-     * Return the distance from the camera to the far clipping plane.
-     *
-     * @return the distance (in world units, &gt;0)
-     */
-    public float zFar() {
-        return zFar;
-    }
-
-    /**
-     * Return the distance from the camera to the near clipping plane.
-     *
-     * @return the distance (in world units, &gt;0)
-     */
-    public float zNear() {
-        return zNear;
-    }
     // *************************************************************************
     // Object methods
 
@@ -469,11 +355,11 @@ public class Camera {
      */
     @Override
     public String toString() {
-        String result = String.format("loc[%g %g %g] az=%.2f upAng=%.2f"
-                + " fovy=%.2f near=%.2f far=%g%n look[%.2f %.2f %.2f]"
-                + " up[%.2f %.2f %.2f] right[%.2f %.2f %.2f]",
+        String result = String.format("loc[%g %g %g] az=%.2f upAng=%.2f%n"
+                + " look[%.2f %.2f %.2f] up[%.2f %.2f %.2f]"
+                + " right[%.2f %.2f %.2f]",
                 eyeLocation.x(), eyeLocation.y(), eyeLocation.z(),
-                azimuthRadians, upAngleRadians, fovy, zNear, zFar,
+                azimuthRadians, upAngleRadians,
                 lookDirection.x(), lookDirection.y(), lookDirection.z(),
                 upDirection.x(), upDirection.y(), upDirection.z(),
                 rightDirection.x(), rightDirection.y(), rightDirection.z()

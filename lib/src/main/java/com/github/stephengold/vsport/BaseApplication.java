@@ -103,6 +103,10 @@ abstract public class BaseApplication {
      */
     final private static Map<TextureKey, Texture> textureMap
             = new HashMap<>(16);
+    /**
+     * view-to-clip coordinate transform for rendering
+     */
+    final private static Projection projection = new Projection(1f, 1_000f);
     // *************************************************************************
     // new methods exposed
 
@@ -166,6 +170,15 @@ abstract public class BaseApplication {
         ShaderProgram result = programMap.get(name);
         assert result != null;
         return result;
+    }
+
+    /**
+     * Access the view-to-clip transform for rendering.
+     *
+     * @return the pre-existing instance (not null)
+     */
+    public static Projection getProjection() {
+        return projection;
     }
 
     /**
