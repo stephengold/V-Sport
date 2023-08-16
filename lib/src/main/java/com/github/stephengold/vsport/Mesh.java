@@ -97,7 +97,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     /**
      * vertex positions (3 floats per vertex)
      */
-    private VertexBuffer positionBuffer;
+    private FloatBuffer positionFloats;
     /**
      * vertex texture coordinates (2 floats per vertex) or null if not present
      */
