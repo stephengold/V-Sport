@@ -146,8 +146,8 @@ public class OctasphereMesh extends Mesh {
     // constructors
 
     /**
-     * Instantiate an octasphere of radius=1 with indices, normals, and texture
-     * coordinates, using the specified number of refinement steps.
+     * Instantiate a mutable octasphere of radius=1 with indices, normals, and
+     * texture coordinates, using the specified number of refinement steps.
      *
      * @param numRefineSteps number of refinement steps (&ge;0, &le;13)
      */
@@ -156,7 +156,7 @@ public class OctasphereMesh extends Mesh {
     }
 
     /**
-     * Instantiate an octasphere of radius=1 with normals and texture
+     * Instantiate a mutable octasphere of radius=1 with normals and texture
      * coordinates, using the specified number of refinement steps:
      * <ul><li>
      * 0 steps &rarr; 11 unique vertices and 8 triangular faces
@@ -284,7 +284,8 @@ public class OctasphereMesh extends Mesh {
     }
 
     /**
-     * Return the shared mesh with the specified number of refinement steps.
+     * Return the immutable shared mesh with the specified number of refinement
+     * steps.
      *
      * @param numSteps number of refinement steps (&ge;0, &le;13)
      * @return the shared mesh (immutable)
@@ -294,6 +295,7 @@ public class OctasphereMesh extends Mesh {
 
         if (sharedMeshes[numSteps] == null) {
             sharedMeshes[numSteps] = new OctasphereMesh(numSteps);
+            sharedMeshes[numSteps].makeImmutable();
         }
 
         return sharedMeshes[numSteps];

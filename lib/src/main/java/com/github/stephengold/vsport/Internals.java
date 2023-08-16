@@ -858,6 +858,7 @@ final class Internals {
             //  1. how to assemble vertices into primitives (topology)
             //  2. whether primitive restart should be enabled
             Mesh mesh = geometry.getMesh();
+            mesh.makeImmutable();
             VkPipelineInputAssemblyStateCreateInfo iasCreateInfo
                     = mesh.generateIasCreateInfo(stack);
 

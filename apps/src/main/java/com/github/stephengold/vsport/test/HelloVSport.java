@@ -109,7 +109,7 @@ public class HelloVSport extends BaseApplication {
 
         // meshes:
         int numRefineSteps = 5;
-        Mesh globeMesh = OctasphereMesh.getMesh(numRefineSteps);
+        Mesh globeMesh = new OctasphereMesh(numRefineSteps);
 
         Vector4fc uCoefficients = new Vector4f(0.5f, 0f, 0f, 0.5f);
         Vector4fc vCoefficients = new Vector4f(0f, -1f, 0f, 0f); // flip
