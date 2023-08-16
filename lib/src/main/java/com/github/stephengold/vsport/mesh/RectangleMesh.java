@@ -37,7 +37,7 @@ import com.github.stephengold.vsport.Topology;
  * X-Y plane.
  * <p>
  * In mesh space, the rectangle extends from (x0,y0,0) uv=(0,0) to (x2,y2,0)
- * uv=(1,1).
+ * uv=(1,1), with normals set to (0,0,zNorm).
  *
  * @author Stephen Gold sgold@sonic.net
  */
@@ -61,7 +61,7 @@ public class RectangleMesh extends Mesh {
      * @param y0 the Y coordinate of the first vertex (in mesh coordinates)
      * @param y2 the Y coordinate of the 3rd vertex (in mesh coordinates)
      * @param normalZ the Z component of the normal vector (in mesh coordinates,
-     * must be +1 or -1)
+     * must be +1 or -1, default=+1)
      */
     public RectangleMesh(
             float x0, float x2, float y0, float y2, float normalZ) {

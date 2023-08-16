@@ -87,19 +87,19 @@ public class Mesh implements jme3utilities.lbj.Mesh {
      */
     private BufferResource texCoordsBuffer;
     /**
-     * vertex colors (3 floats per vertex) or null if none
+     * vertex colors (3 floats per vertex) or null if not present
      */
     private FloatBuffer colorFloats;
     /**
-     * vertex normals (3 floats per vertex) or null if none
+     * vertex normals (3 floats per vertex) or null if not present
      */
     private FloatBuffer normalFloats;
     /**
      * vertex positions (3 floats per vertex)
      */
-    private FloatBuffer positionFloats;
+    private VertexBuffer positionBuffer;
     /**
-     * vertex texture coordinates (2 floats per vertex) or null if none
+     * vertex texture coordinates (2 floats per vertex) or null if not present
      */
     private FloatBuffer texCoordsFloats;
     /**
@@ -353,7 +353,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
 
     /**
      * Count how many vertices the mesh contains, based on buffer capacities,
-     * unmodified by draw mode and indexing.
+     * unmodified by primitive topology and indexing.
      *
      * @return the count (&ge;0)
      */
@@ -463,7 +463,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
 
     /**
-     * Test whether this Mesh is indexed.
+     * Test whether the mesh is indexed.
      *
      * @return true if indexed, otherwise false
      */
@@ -540,9 +540,10 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
 
     /**
-     * Return the primitive topology of the mesh.
+     * Return the primitive topology, which indicates how mesh vertices/indices
+     * are organized into primitives.
      *
-     * @return the enum value (not null)
+     * @return an enum value (not null)
      */
     public Topology topology() {
         assert topology != null;
@@ -776,7 +777,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
 
     /**
-     * Test whether the draw mode is LineList. Indexing is ignored.
+     * Test whether the topology is LineList. Indexing is ignored.
      *
      * @return true if pure lines, otherwise false
      */
@@ -787,7 +788,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
 
     /**
-     * Test whether the draw mode is TriangleList. Indexing is ignored.
+     * Test whether the topology is TriangleList. Indexing is ignored.
      *
      * @return true if pure triangles, otherwise false
      */

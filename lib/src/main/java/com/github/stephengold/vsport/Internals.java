@@ -625,8 +625,7 @@ final class Internals {
                 Geometry geometry = geometryList.get(geometryI);
                 geometry.writeUniformValuesTo(nonGlobalUbo);
 
-                draw.updateDescriptorSet(
-                        geometry, samplerHandle, globalUbo);
+                draw.updateDescriptorSet(geometry, samplerHandle, globalUbo);
 
                 long pipelineHandle = createPipeline(pipelineLayoutHandle,
                         framebufferExtent, passHandle, geometry);
