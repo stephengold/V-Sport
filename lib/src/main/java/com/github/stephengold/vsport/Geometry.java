@@ -298,12 +298,12 @@ public class Geometry {
     /**
      * Alter the base color.
      *
-     * @param desiredColor the desired color (not null, unaffected)
+     * @param color the desired color (not null, unaffected)
      * @return the (modified) current geometry (for chaining)
      */
-    public Geometry setColor(Vector4fc desiredColor) {
-        Validate.nonNull(desiredColor, "desired color");
-        uniformValues.setBaseMaterialColor(desiredColor);
+    public Geometry setColor(Vector4fc color) {
+        Validate.nonNull(color, "color");
+        uniformValues.setBaseMaterialColor(color);
         return this;
     }
 
@@ -336,24 +336,24 @@ public class Geometry {
     /**
      * Translate the mesh origin to the specified location.
      *
-     * @param desiredLocation the desired location (in world coordinates, not
+     * @param location the desired location (in world coordinates, not
      * @return the (modified) current geometry (for chaining)
      */
-    public Geometry setLocation(Vector3fc desiredLocation) {
-        Validate.nonNull(desiredLocation, "desired location");
-        uniformValues.setLocation(desiredLocation);
+    public Geometry setLocation(Vector3fc location) {
+        Validate.nonNull(location, "location");
+        uniformValues.setLocation(location);
         return this;
     }
 
     /**
      * Replace the geometry's current mesh with the specified one.
      *
-     * @param desiredMesh the desired mesh (not null, alias created)
+     * @param mesh the desired mesh (not null, alias created)
      * @return the (modified) current geometry (for chaining)
      */
-    public Geometry setMesh(Mesh desiredMesh) {
-        Validate.nonNull(desiredMesh, "desired mesh");
-        this.mesh = desiredMesh;
+    public Geometry setMesh(Mesh mesh) {
+        Validate.nonNull(mesh, "mesh");
+        this.mesh = mesh;
         return this;
     }
 
@@ -390,13 +390,13 @@ public class Geometry {
     /**
      * Alter the orientation without shifting the mesh origin.
      *
-     * @param desiredOrientation the desired orientation (not null, each row is
-     * a unit vector, unaffected)
+     * @param orientation the desired orientation (not null, each row is a unit
+     * vector, unaffected)
      * @return the (modified) current geometry (for chaining)
      */
-    public Geometry setOrientation(Matrix3fc desiredOrientation) {
-        Validate.nonNull(desiredOrientation, "desired orientation");
-        uniformValues.setOrientation(desiredOrientation);
+    public Geometry setOrientation(Matrix3fc orientation) {
+        Validate.nonNull(orientation, "orientation");
+        uniformValues.setOrientation(orientation);
         return this;
     }
 
@@ -434,12 +434,12 @@ public class Geometry {
     /**
      * Alter the mesh-to-world scale factors.
      *
-     * @param newScale the desired mesh-to-world scale factor for all axes
+     * @param scaleFactor the desired mesh-to-world scale factor for all axes
      * (default=1)
      * @return the (modified) current geometry (for chaining)
      */
-    public Geometry setScale(float newScale) {
-        uniformValues.setScale(newScale);
+    public Geometry setScale(float scaleFactor) {
+        uniformValues.setScale(scaleFactor);
         return this;
     }
 
