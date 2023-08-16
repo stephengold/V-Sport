@@ -80,6 +80,37 @@ class NonGlobalUniformValues {
     // new methods exposed
 
     /**
+     * Return a copy of the mesh-to-world scale factors.
+     *
+     * @param storeResult storage for the result (modified if not null)
+     * @return a vector of scale factors (either {@code storeResult} or a new
+     * instance, not null)
+     */
+    Vector3f copyScale(Vector3f storeResult) {
+        if (storeResult == null) {
+            return new Vector3f(scale);
+        } else {
+            return storeResult.set(scale);
+        }
+    }
+
+    /**
+     * Return a copy of the mesh-to-world scale factors.
+     *
+     * @param storeResult storage for the result (modified if not null)
+     * @return a vector of scale factors (either {@code storeResult} or a new
+     * instance, not null)
+     */
+    public com.jme3.math.Vector3f copyScaleJme(
+            com.jme3.math.Vector3f storeResult) {
+        if (storeResult == null) {
+            return new com.jme3.math.Vector3f(scale.x(), scale.y(), scale.z());
+        } else {
+            return storeResult.set(scale.x(), scale.y(), scale.z());
+        }
+    }
+
+    /**
      * Return a copy of the mesh-to-world coordinate transform.
      *
      * @param storeResult storage for the result (modified if not null)
@@ -112,6 +143,42 @@ class NonGlobalUniformValues {
         } else {
             return storeResult.set(location);
         }
+    }
+
+    /**
+     * Return a copy of the location of the mesh origin.
+     *
+     * @param storeResult storage for the result (modified if not null)
+     * @return a location vector in world coordinates (either
+     * {@code storeResult} or a new vector, not null)
+     */
+    public com.jme3.math.Vector3f locationJme(
+            com.jme3.math.Vector3f storeResult) {
+        if (storeResult == null) {
+            return new com.jme3.math.Vector3f(
+                    location.x(), location.y(), location.z());
+        } else {
+            return storeResult.set(location.x(), location.y(), location.z());
+        }
+    }
+
+    /**
+     * Translate the model by the specified offsets without changing its
+     * orientation.
+     *
+     * @param xOffset the offset in the world +X direction (finite, 0&rarr;no
+     * effect)
+     * @param yOffset the offset in the world +Y direction (finite, 0&rarr;no
+     * effect)
+     * @param zOffset the offset in the world +Z direction (finite, 0&rarr;no
+     * effect)
+     */
+    void move(float xOffset, float yOffset, float zOffset) {
+        Validate.finite(xOffset, "x offset");
+        Validate.finite(yOffset, "y offset");
+        Validate.finite(zOffset, "z offset");
+
+        location.add(xOffset, yOffset, zOffset);
     }
 
     /**
@@ -205,6 +272,27 @@ class NonGlobalUniformValues {
     }
 
     /**
+     * Scale the model by the specified factors.
+     *
+     * @param xFactor the scale factor to apply to the mesh X axis (finite,
+     * &ge;0, 1&rarr;no effect)
+     * @param yFactor the scale factor to apply to the mesh Y axis (finite,
+     * &ge;0, 1&rarr;no effect)
+     * @param zFactor the scale factor to apply to the mesh Z axis (finite,
+     * &ge;0, 1&rarr;no effect)
+     */
+    void scale(float xFactor, float yFactor, float zFactor) {
+        Validate.finite(xFactor, "x factor");
+        Validate.finite(yFactor, "y factor");
+        Validate.finite(zFactor, "z factor");
+        Validate.nonNegative(xFactor, "x factor");
+        Validate.nonNegative(yFactor, "y factor");
+        Validate.nonNegative(zFactor, "z factor");
+
+        scale.mul(xFactor, yFactor, zFactor);
+    }
+
+    /**
      * Alter the base color.
      *
      * @param desiredColor the desired color (not null, unaffected)
@@ -212,6 +300,26 @@ class NonGlobalUniformValues {
     void setBaseMaterialColor(Vector4fc desiredColor) {
         Validate.nonNull(desiredColor, "desired color");
         baseMaterialColor.set(desiredColor);
+    }
+
+    /**
+     * Alter the base color.
+     *
+     * @param red the desired red component (in Linear colorspace, &ge;0, &le;1,
+     * default=1)
+     * @param green the desired green component (in Linear colorspace, &ge;0,
+     * &le;1, default=1)
+     * @param blue the desired blue component (in Linear colorspace, &ge;0,
+     * &le;1, default=1)
+     * @param alpha the desired alpha component (&ge;0, default=1)
+     */
+    void setColor(float red, float green, float blue, float alpha) {
+        Validate.fraction(red, "red");
+        Validate.fraction(green, "green");
+        Validate.fraction(blue, "blue");
+        Validate.fraction(alpha, "alpha");
+
+        baseMaterialColor.set(red, green, blue, alpha);
     }
 
     /**
@@ -234,6 +342,24 @@ class NonGlobalUniformValues {
     void setLocation(Vector3fc desiredLocation) {
         Validate.nonNull(desiredLocation, "desired location");
         location.set(desiredLocation);
+    }
+
+    /**
+     * Alter the orientation using Tait-Bryan angles and applying the rotations
+     * in x-z-y extrinsic order or y-z'-x" intrinsic order.
+     *
+     * @param xAngle the desired X-axis rotation angle (in radians, finite)
+     * @param yAngle the desired Y-axis rotation angle (in radians, finite)
+     * @param zAngle the desired Z-axis rotation angle (in radians, finite)
+     */
+    void setOrientation(float xAngle, float yAngle, float zAngle) {
+        Validate.finite(xAngle, "x angle");
+        Validate.finite(yAngle, "y angle");
+        Validate.finite(zAngle, "z angle");
+
+        orientation.rotationY(yAngle);
+        orientation.rotateZ(zAngle);
+        orientation.rotateX(xAngle);
     }
 
     /**
@@ -262,6 +388,49 @@ class NonGlobalUniformValues {
     }
 
     /**
+     * Alter the orientation without shifting the mesh origin.
+     * <p>
+     * The rotation axis is assumed to be a unit vector.
+     *
+     * @param angle the desired rotation angle (in radians, finite, default=0)
+     * @param axisX the X component of the rotation axis (&ge;-1, &le;1)
+     * @param axisY the Y component of the rotation axis (&ge;-1, &le;1)
+     * @param axisZ the Z component of the rotation axis (&ge;-1, &le;1)
+     */
+    void setOrientationAngleAxis(
+            float angle, float axisX, float axisY, float axisZ) {
+        Validate.finite(angle, "angle");
+        Validate.inRange(axisX, "axis x", -1f, 1f);
+        Validate.inRange(axisY, "axis y", -1f, 1f);
+        Validate.inRange(axisZ, "axis z", -1f, 1f);
+
+        orientation.fromAxisAngleRad(axisX, axisY, axisZ, angle);
+    }
+
+    /**
+     * Alter the orientation, without shifting the mesh origin.
+     * <p>
+     * The quaternion is assumed to be a unit quaternion.
+     *
+     * @param x the desired X component of the quaternion (&ge;-1, &le;1,
+     * default=0)
+     * @param y the desired Y component of the quaternion (&ge;-1, &le;1,
+     * default=0)
+     * @param z the desired Z component of the quaternion (&ge;-1, &le;1,
+     * default=0)
+     * @param w the desired W (real) component of the quaternion (&ge;-1, &le;1,
+     * default=1)
+     */
+    void setOrientationQuaternion(float x, float y, float z, float w) {
+        Validate.inRange(x, "x", -1f, 1f);
+        Validate.inRange(y, "y", -1f, 1f);
+        Validate.inRange(z, "z", -1f, 1f);
+        Validate.inRange(w, "w", -1f, 1f);
+
+        orientation.set(x, y, z, w);
+    }
+
+    /**
      * Alter the mesh-to-world scale factors.
      *
      * @param factor the desired mesh-to-world scale factor for all axes
@@ -269,6 +438,47 @@ class NonGlobalUniformValues {
      */
     void setScale(float factor) {
         scale.set(factor);
+    }
+
+    /**
+     * Alter the mesh-to-world scale factors.
+     *
+     * @param xFactor the desired scale factor for the mesh X axis (finite,
+     * &ge;0, default=1)
+     * @param yFactor the desired scale factor for the mesh Y axis (finite,
+     * &ge;0, default=1)
+     * @param zFactor the desired scale factor for the mesh Z axis (finite,
+     * &ge;0, default=1)
+     */
+    void setScale(float xFactor, float yFactor, float zFactor) {
+        Validate.finite(xFactor, "x factor");
+        Validate.finite(yFactor, "y factor");
+        Validate.finite(zFactor, "z factor");
+        Validate.nonNegative(xFactor, "x factor");
+        Validate.nonNegative(yFactor, "y factor");
+        Validate.nonNegative(zFactor, "z factor");
+
+        scale.set(xFactor, yFactor, zFactor);
+    }
+
+    /**
+     * Alter the specular color.
+     *
+     * @param red the desired red component (in Linear colorspace, &ge;0, &le;1,
+     * default=1)
+     * @param green the desired green component (in Linear colorspace, &ge;0,
+     * &le;1, default=1)
+     * @param blue the desired blue component (in Linear colorspace, &ge;0,
+     * &le;1, default=1)
+     * @param alpha the desired alpha component (&ge;0, default=1)
+     */
+    void setSpecularColor(float red, float green, float blue, float alpha) {
+        Validate.fraction(red, "red");
+        Validate.fraction(green, "green");
+        Validate.fraction(blue, "blue");
+        Validate.fraction(alpha, "alpha");
+
+        specularMaterialColor.set(red, green, blue, alpha);
     }
 
     /**
