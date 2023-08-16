@@ -277,9 +277,11 @@ public class Camera {
      * @return the (modified) current instance (for chaining)
      */
     public Camera setLookDirection(Vector3fc direction) {
-        this.azimuthRadians = FastMath.atan2(direction.z, direction.x);
-        float nxz = MyMath.hypotenuse(direction.x, direction.z);
-        this.upAngleRadians = FastMath.atan2(direction.y, nxz);
+        float y = direction.y();
+        float z = direction.z();
+        this.azimuthRadians = FastMath.atan2(z, direction.x());
+        float nxz = MyMath.hypotenuse(direction.x(), z);
+        this.upAngleRadians = FastMath.atan2(y, nxz);
         updateDirectionVectors();
 
         return this;
@@ -327,8 +329,11 @@ public class Camera {
      * @param storeMatrix the matrix to update (not null, modified)
      */
     void updateViewMatrix(Matrix4f storeMatrix) {
-        Vector3f tmpTarget = new Vector3f(eyeLocation).add(lookDirection);
-        storeMatrix.setLookAt(eyeLocation, tmpTarget, upDirection);
+        storeMatrix.setLookAt(eyeLocation.x, eyeLocation.y, eyeLocation.z,
+                eyeLocation.x + lookDirection.x,
+                eyeLocation.y + lookDirection.y,
+                eyeLocation.z + lookDirection.z,
+                upDirection.x, upDirection.y, upDirection.z);
     }
 
     /**
