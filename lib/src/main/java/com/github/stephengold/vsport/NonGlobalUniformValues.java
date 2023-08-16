@@ -99,7 +99,7 @@ class NonGlobalUniformValues {
      * @return a vector of scale factors (either {@code storeResult} or a new
      * instance, not null)
      */
-    public com.jme3.math.Vector3f copyScaleJme(
+    com.jme3.math.Vector3f copyScaleJme(
             com.jme3.math.Vector3f storeResult) {
         if (storeResult == null) {
             return new com.jme3.math.Vector3f(scale.x(), scale.y(), scale.z());
@@ -150,7 +150,7 @@ class NonGlobalUniformValues {
      * @return a location vector in world coordinates (either
      * {@code storeResult} or a new vector, not null)
      */
-    public com.jme3.math.Vector3f locationJme(
+    com.jme3.math.Vector3f locationJme(
             com.jme3.math.Vector3f storeResult) {
         if (storeResult == null) {
             return new com.jme3.math.Vector3f(
