@@ -36,9 +36,7 @@ import org.joml.Matrix3fc;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-import org.joml.Vector3fc;
 import org.joml.Vector4f;
-import org.joml.Vector4fc;
 
 /**
  * Shader parameters to be written to per-geometry Uniform Buffer Objects
@@ -270,15 +268,6 @@ class NonGlobalUniformValues {
     }
 
     /**
-     * Uniformly scale the model by the specified factor.
-     *
-     * @param factor the scaling factor (1 = no effect)
-     */
-    void scale(float factor) {
-        scale.mul(factor);
-    }
-
-    /**
      * Scale the model by the specified factors.
      *
      * @param xFactor the scale factor to apply to the mesh X axis (finite,
@@ -297,16 +286,6 @@ class NonGlobalUniformValues {
         Validate.nonNegative(zFactor, "z factor");
 
         scale.mul(xFactor, yFactor, zFactor);
-    }
-
-    /**
-     * Alter the base color.
-     *
-     * @param desiredColor the desired color (not null, unaffected)
-     */
-    void setBaseMaterialColor(Vector4fc desiredColor) {
-        Validate.nonNull(desiredColor, "desired color");
-        baseMaterialColor.set(desiredColor);
     }
 
     /**
@@ -345,17 +324,6 @@ class NonGlobalUniformValues {
     }
 
     /**
-     * Translate the mesh origin.
-     *
-     * @param desiredLocation the desired location (in world coordinates, not
-     * null, unaffected, default=(0,0,0))
-     */
-    void setLocation(Vector3fc desiredLocation) {
-        Validate.nonNull(desiredLocation, "desired location");
-        location.set(desiredLocation);
-    }
-
-    /**
      * Alter the orientation using Tait-Bryan angles and applying the rotations
      * in x-z-y extrinsic order or y-z'-x" intrinsic order.
      *
@@ -371,20 +339,6 @@ class NonGlobalUniformValues {
         orientation.rotationY(yAngle);
         orientation.rotateZ(zAngle);
         orientation.rotateX(xAngle);
-    }
-
-    /**
-     * Alter the mesh-to-world coordinate rotation.
-     * <p>
-     * The axis is assumed to be a unit vector.
-     *
-     * @param angle the desired rotation angle (in radians, default=0)
-     * @param x the X component of the rotation axis
-     * @param y the Y component of the rotation axis
-     * @param z the Z component of the rotation axis
-     */
-    void setOrientation(float angle, float x, float y, float z) {
-        orientation.fromAxisAngleRad(x, y, z, angle);
     }
 
     /**
@@ -441,16 +395,6 @@ class NonGlobalUniformValues {
         Validate.inRange(w, "w", -1f, 1f);
 
         orientation.set(x, y, z, w);
-    }
-
-    /**
-     * Alter the mesh-to-world scale factors.
-     *
-     * @param factor the desired mesh-to-world scale factor for all axes
-     * (default=1)
-     */
-    void setScale(float factor) {
-        scale.set(factor);
     }
 
     /**

@@ -291,7 +291,7 @@ public class Geometry {
      * @return the (modified) current geometry (for chaining)
      */
     public Geometry scale(float factor) {
-        uniformValues.scale(factor);
+        uniformValues.scale(factor, factor, factor);
         return this;
     }
 
@@ -304,7 +304,7 @@ public class Geometry {
      */
     public Geometry setColor(Vector4fc color) {
         Validate.nonNull(color, "color");
-        uniformValues.setBaseMaterialColor(color);
+        uniformValues.setColor(color.x(), color.y(), color.z(), color.w());
         return this;
     }
 
@@ -343,7 +343,7 @@ public class Geometry {
      */
     public Geometry setLocation(Vector3fc location) {
         Validate.nonNull(location, "location");
-        uniformValues.setLocation(location);
+        uniformValues.setLocation(location.x(), location.y(), location.z());
         return this;
     }
 
@@ -385,7 +385,7 @@ public class Geometry {
      * @return the (modified) current geometry (for chaining)
      */
     public Geometry setOrientation(float angle, float x, float y, float z) {
-        uniformValues.setOrientation(angle, x, y, z);
+        uniformValues.setOrientationAngleAxis(angle, x, y, z);
         return this;
     }
 
@@ -441,7 +441,7 @@ public class Geometry {
      * @return the (modified) current geometry (for chaining)
      */
     public Geometry setScale(float scaleFactor) {
-        uniformValues.setScale(scaleFactor);
+        uniformValues.setScale(scaleFactor, scaleFactor, scaleFactor);
         return this;
     }
 
