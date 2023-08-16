@@ -70,6 +70,10 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     // fields
 
     /**
+     * true for a mutable mesh, or false if immutable
+     */
+    private boolean mutable = true;
+    /**
      * vertex indices, or null if none
      */
     private IndexBuffer indexBuffer;
@@ -101,7 +105,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     // constructors
 
     /**
-     * Instantiate a mesh from vertices and optional indices.
+     * Instantiate a mutable mesh from vertices and optional indices.
      *
      * @param topology the desired primitive topology (not null)
      * @param indices the vertex indices to use (unaffected) or null if none
@@ -145,12 +149,14 @@ public class Mesh implements jme3utilities.lbj.Mesh {
         } else {
             this.texCoordsBuffer = null;
         }
+
+        assert mutable;
     }
 
     /**
-     * Instantiate an incomplete mesh with the specified topology and number of
-     * vertices, but no indices, positions, colors, normals, or texture
-     * coordinates.
+     * Instantiate an incomplete mutable mesh with the specified topology and
+     * number of vertices, but no indices, positions, colors, normals, or
+     * texture coordinates.
      *
      * @param topology the desired primitive topology (not null)
      * @param vertexCount number of vertices (&ge;0)
@@ -277,6 +283,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
      * Remove the normals, if any.
      */
     public void dropNormals() {
+        verifyMutable();
         this.normalBuffer = null;
     }
 
@@ -284,6 +291,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
      * Remove the texture coordinates, if any.
      */
     public void dropTexCoords() {
+        verifyMutable();
         this.texCoordsBuffer = null;
     }
 
@@ -359,6 +367,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
      * @return the (modified) current instance (for chaining)
      */
     public Mesh generateSphereNormals() {
+        verifyMutable();
         createNormals();
 
         Vector3f tmpVector = new Vector3f();
@@ -385,7 +394,31 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
 
     /**
-     * Create a mesh by de-duplicating a list of vertices.
+     * Make the mesh immutable.
+     *
+     * @return the (modified) current instance (for chaining)
+     */
+    public Mesh makeImmutable() {
+        this.mutable = false;
+        positionBuffer.makeImmutable();
+        if (indexBuffer != null) {
+            indexBuffer.makeImmutable();
+        }
+        if (colorBuffer != null) {
+            colorBuffer.makeImmutable();
+        }
+        if (normalBuffer != null) {
+            normalBuffer.makeImmutable();
+        }
+        if (texCoordsBuffer != null) {
+            texCoordsBuffer.makeImmutable();
+        }
+
+        return this;
+    }
+
+    /**
+     * Create a mutable mesh by de-duplicating a list of vertices.
      *
      * @param topology the desired primitive topology (not null)
      * @param vertices the vertex data to use (not null, unaffected)
@@ -427,6 +460,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
         if (xAngle == 0f && yAngle == 0f && zAngle == 0f) {
             return this;
         }
+        verifyMutable();
 
         Quaternion quaternion // TODO garbage
                 = new Quaternion().fromAngles(xAngle, yAngle, zAngle);
@@ -445,6 +479,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
      * @param desiredTopology the desired enum value (not null)
      */
     public void setTopology(Topology desiredTopology) {
+        verifyMutable();
         this.topology = desiredTopology;
     }
 
@@ -474,6 +509,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
             throw new IllegalStateException("There are no UVs in the mesh.");
         }
         Vector2f tmpVector = new Vector2f();
+        verifyMutable();
 
         for (int vIndex = 0; vIndex < vertexCount; ++vIndex) {
             texCoordsBuffer.get2f(vIndex, tmpVector);
@@ -502,6 +538,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
      * @return a new IndexBuffer with the specified capacity
      */
     protected IndexBuffer createIndices(List<Integer> indices) {
+        verifyMutable();
         this.indexBuffer = IndexBuffer.newInstance(indices);
         return indexBuffer;
     }
@@ -512,6 +549,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
      * @return a new buffer with a capacity of 3 * vertexCount floats
      */
     protected VertexBuffer createNormals() {
+        verifyMutable();
         this.normalBuffer = VertexBuffer.newInstance(numAxes, vertexCount);
         return normalBuffer;
     }
@@ -522,6 +560,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
      * @return a new buffer with a capacity of 3 * vertexCount floats
      */
     protected VertexBuffer createPositions() {
+        verifyMutable();
         this.positionBuffer = VertexBuffer.newInstance(numAxes, vertexCount);
         return positionBuffer;
     }
@@ -532,6 +571,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
      * @return a new buffer with a capacity of 2 * vertexCount floats
      */
     protected VertexBuffer createUvs() {
+        verifyMutable();
         this.texCoordsBuffer = VertexBuffer.newInstance(2, vertexCount);
         return texCoordsBuffer;
     }
@@ -542,6 +582,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
      * @param indexArray the vertex indices to use (not null, unaffected)
      */
     protected void setIndices(int... indexArray) {
+        verifyMutable();
         this.indexBuffer = IndexBuffer.newInstance(indexArray);
     }
 
@@ -554,6 +595,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     protected void setNormals(float... normalArray) {
         int numFloats = normalArray.length;
         Validate.require(numFloats == vertexCount * numAxes, "correct length");
+        verifyMutable();
 
         this.normalBuffer = VertexBuffer.newInstance(numAxes, normalArray);
     }
@@ -567,6 +609,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     protected void setPositions(float... positionArray) {
         int numFloats = positionArray.length;
         Validate.require(numFloats == vertexCount * numAxes, "correct length");
+        verifyMutable();
 
         this.positionBuffer = VertexBuffer.newInstance(numAxes, positionArray);
     }
@@ -580,6 +623,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     protected void setUvs(float... uvArray) {
         int numFloats = uvArray.length;
         Validate.require(numFloats == 2 * vertexCount, "correct length");
+        verifyMutable();
 
         this.texCoordsBuffer = VertexBuffer.newInstance(2, uvArray);
     }
@@ -746,5 +790,16 @@ public class Mesh implements jme3utilities.lbj.Mesh {
         }
 
         return result.toString();
+    }
+    // *************************************************************************
+    // private methods
+
+    /**
+     * Verify that the mesh is still mutable.
+     */
+    private void verifyMutable() {
+        if (!mutable) {
+            throw new IllegalStateException("The mesh is no longer mutable.");
+        }
     }
 }
