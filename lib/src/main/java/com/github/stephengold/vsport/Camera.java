@@ -111,21 +111,6 @@ public class Camera {
     }
 
     /**
-     * Return a copy of the eye location.
-     *
-     * @param storeResult storage for the result (modified if not null)
-     * @return a location vector in world coordinates (either
-     * {@code storeResult} or a new vector)
-     */
-    public Vector3f location(Vector3f storeResult) {
-        if (storeResult == null) {
-            return new Vector3f(eyeLocation);
-        } else {
-            return storeResult.set(eyeLocation);
-        }
-    }
-
-    /**
      * Return a copy of the "look" direction.
      *
      * @param storeResult storage for the result (modified if not null)
@@ -156,6 +141,21 @@ public class Camera {
      */
     public Vector3f getLocation() {
         return location(null);
+    }
+
+    /**
+     * Return a copy of the eye location.
+     *
+     * @param storeResult storage for the result (modified if not null)
+     * @return a location vector in world coordinates (either
+     * {@code storeResult} or a new vector)
+     */
+    public Vector3f location(Vector3f storeResult) {
+        if (storeResult == null) {
+            return new Vector3f(eyeLocation);
+        } else {
+            return storeResult.set(eyeLocation);
+        }
     }
 
     /**
