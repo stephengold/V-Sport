@@ -34,6 +34,7 @@ import jme3utilities.Validate;
 import org.joml.Matrix3fc;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
+import org.joml.Quaternionfc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector4fc;
@@ -96,6 +97,31 @@ public class Geometry {
     // new methods exposed
 
     /**
+     * Return a copy of the mesh-to-world scale factors.
+     *
+     * @param storeResult storage for the result (modified if not null)
+     * @return a vector of scale factors (either {@code storeResult} or a new
+     * instance, not null)
+     */
+    public Vector3f copyScale(Vector3f storeResult) {
+        Vector3f result = uniformValues.copyScale(storeResult);
+        return result;
+    }
+
+    /**
+     * Return a copy of the mesh-to-world scale factors.
+     *
+     * @param storeResult storage for the result (modified if not null)
+     * @return a vector of scale factors (either {@code storeResult} or a new
+     * instance, not null)
+     */
+    public com.jme3.math.Vector3f copyScaleJme(
+            com.jme3.math.Vector3f storeResult) {
+        com.jme3.math.Vector3f result = uniformValues.copyScaleJme(storeResult);
+        return result;
+    }
+
+    /**
      * Return a copy of the mesh-to-world coordinate transform.
      *
      * @param storeResult storage for the result (modified if not null)
@@ -155,6 +181,41 @@ public class Geometry {
     public Vector3f location(Vector3f storeResult) {
         Vector3f result = uniformValues.location(storeResult);
         return result;
+    }
+
+    /**
+     * Return a copy of the location of the mesh origin.
+     *
+     * @param storeResult storage for the result (modified if not null)
+     * @return a location vector in world coordinates (either
+     * {@code storeResult} or a new vector, not null)
+     */
+    public com.jme3.math.Vector3f locationJme(
+            com.jme3.math.Vector3f storeResult) {
+        com.jme3.math.Vector3f result = uniformValues.locationJme(storeResult);
+        return result;
+    }
+
+    /**
+     * Translate by the specified offset without changing the orientation.
+     *
+     * @param offset the offset (in world coordinates, not null, finite,
+     * unaffected)
+     */
+    public void move(com.jme3.math.Vector3f offset) {
+        Validate.finite(offset, "offset");
+        uniformValues.move(offset.x, offset.y, offset.z);
+    }
+
+    /**
+     * Translate by the specified offset without changing the orientation.
+     *
+     * @param offset the offset (in world coordinates, not null, finite,
+     * unaffected)
+     */
+    public void move(Vector3fc offset) {
+        Validate.require(offset.isFinite(), "a finite offset");
+        uniformValues.move(offset.x(), offset.y(), offset.z());
     }
 
     /**
@@ -261,6 +322,19 @@ public class Geometry {
     /**
      * Translate the mesh origin to the specified location.
      *
+     * @param location the desired location (in world coordinates, not null,
+     * finite, unaffected, default=(0,0,0))
+     * @return the (modified) current geometry (for chaining)
+     */
+    public Geometry setLocation(com.jme3.math.Vector3f location) {
+        Validate.finite(location, "location");
+        uniformValues.setLocation(location.x, location.y, location.z);
+        return this;
+    }
+
+    /**
+     * Translate the mesh origin to the specified location.
+     *
      * @param desiredLocation the desired location (in world coordinates, not
      * @return the (modified) current geometry (for chaining)
      */
@@ -279,6 +353,20 @@ public class Geometry {
     public Geometry setMesh(Mesh desiredMesh) {
         Validate.nonNull(desiredMesh, "desired mesh");
         this.mesh = desiredMesh;
+        return this;
+    }
+
+    /**
+     * Alter the orientation using Tait-Bryan angles, applying the rotations in
+     * x-z-y extrinsic order or y-z'-x" intrinsic order.
+     *
+     * @param xAngle the desired X angle (in radians, finite)
+     * @param yAngle the desired Y angle (in radians, finite)
+     * @param zAngle the desired Z angle (in radians, finite)
+     * @return the (modified) current geometry (for chaining)
+     */
+    public Geometry setOrientation(float xAngle, float yAngle, float zAngle) {
+        uniformValues.setOrientation(xAngle, yAngle, zAngle);
         return this;
     }
 
@@ -311,6 +399,20 @@ public class Geometry {
     }
 
     /**
+     * Alter the orientation, without shifting the mesh origin.
+     *
+     * @param orientation the desired orientation (not null, not zero,
+     * unaffected)
+     * @return the (modified) current geometry (for chaining)
+     */
+    public Geometry setOrientation(Quaternionfc orientation) {
+        Validate.nonNull(orientation, "orientation");
+        uniformValues.setOrientationQuaternion(orientation.x(), orientation.y(),
+                orientation.z(), orientation.w());
+        return this;
+    }
+
+    /**
      * Replace the geometry's current shader program with the named program, or
      * if the name is null, replace it with the default program.
      *
@@ -336,6 +438,48 @@ public class Geometry {
      */
     public Geometry setScale(float newScale) {
         uniformValues.setScale(newScale);
+        return this;
+    }
+
+    /**
+     * Alter the mesh-to-world scale factors.
+     *
+     * @param scaleFactors the desired scale factor for each mesh axis (not
+     * null, unaffected)
+     * @return the (modified) current geometry (for chaining)
+     */
+    public Geometry setScale(com.jme3.math.Vector3f scaleFactors) {
+        Validate.finite(scaleFactors, "scale factors");
+        uniformValues.setScale(
+                scaleFactors.x, scaleFactors.y, scaleFactors.z);
+        return this;
+    }
+
+    /**
+     * Alter the mesh-to-world scale factors.
+     *
+     * @param scaleFactors the desired scale factor for each mesh axis (not
+     * null, unaffected)
+     * @return the (modified) current geometry (for chaining)
+     */
+    public Geometry setScale(Vector3fc scaleFactors) {
+        Validate.nonNull(scaleFactors, "scale factors");
+        uniformValues.setScale(
+                scaleFactors.x(), scaleFactors.y(), scaleFactors.z());
+        return this;
+    }
+
+    /**
+     * Alter the specular color.
+     *
+     * @param color the desired color (in the Linear colorspace, not null,
+     * unaffected)
+     * @return the (modified) current geometry (for chaining)
+     */
+    public Geometry setSpecularColor(Vector4fc color) {
+        Validate.nonNull(color, "color");
+        uniformValues.setSpecularColor(
+                color.x(), color.y(), color.z(), color.w());
         return this;
     }
 
