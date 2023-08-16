@@ -85,17 +85,16 @@ public class Camera {
     /**
      * Instantiate a camera in the specified position.
      *
-     * @param initLocation the desired initial location (in world coordinates,
-     * not null)
-     * @param initAzimuthRadians the desired initial azimuth angle (in radians)
-     * @param initUpAngleRadians the desired initial altitude angle (in radians)
+     * @param location the desired eye location (in world coordinates, not null)
+     * @param azimuthRadians the desired azimuth angle (in radians)
+     * @param upAngleRadians the desired altitude angle (in radians)
      */
-    public Camera(Vector3f initLocation, float initAzimuthRadians,
-            float initUpAngleRadians) {
-        eyeLocation.set(initLocation);
+    public Camera(
+            Vector3f location, float azimuthRadians, float upAngleRadians) {
+        eyeLocation.set(location);
 
-        this.azimuthRadians = initAzimuthRadians;
-        this.upAngleRadians = initUpAngleRadians;
+        this.azimuthRadians = azimuthRadians;
+        this.upAngleRadians = upAngleRadians;
         updateDirectionVectors();
     }
     // *************************************************************************
@@ -234,12 +233,12 @@ public class Camera {
     /**
      * Alter the azimuth/heading/yaw angle.
      *
-     * @param newAzimuthInRadians the desired rightward angle of the X-Z
-     * component of the "look" direction relative to the +X axis (in radians)
+     * @param azimuthRadians the desired rightward angle of the X-Z component of
+     * the "look" direction relative to the +X axis (in radians)
      * @return the (modified) current instance (for chaining)
      */
-    public Camera setAzimuth(float newAzimuthInRadians) {
-        this.azimuthRadians = newAzimuthInRadians;
+    public Camera setAzimuth(float azimuthRadians) {
+        this.azimuthRadians = azimuthRadians;
         updateDirectionVectors();
 
         return this;
@@ -261,13 +260,13 @@ public class Camera {
      * Teleport the eye to the specified location without changing its
      * orientation.
      *
-     * @param newLocation the desired location (in world coordinates, not null,
+     * @param location the desired location (in world coordinates, not null,
      * finite, unaffected)
      * @return the (modified) current instance (for chaining)
      */
-    public Camera setLocation(Vector3fc newLocation) {
-        Validate.require(newLocation.isFinite(), "a finite new location");
-        eyeLocation.set(newLocation);
+    public Camera setLocation(Vector3fc location) {
+        Validate.require(location.isFinite(), "a finite location");
+        eyeLocation.set(location);
         return this;
     }
 
@@ -289,12 +288,12 @@ public class Camera {
     /**
      * Alter the altitude/climb/elevation/pitch angle.
      *
-     * @param newUpAngleInRadians the desired upward angle of the "look"
-     * direction (in radians)
+     * @param upAngleRadians the desired upward angle of the "look" direction
+     * (in radians)
      * @return the (modified) current instance (for chaining)
      */
-    public Camera setUpAngle(float newUpAngleInRadians) {
-        this.upAngleRadians = newUpAngleInRadians;
+    public Camera setUpAngle(float upAngleRadians) {
+        this.upAngleRadians = upAngleRadians;
         updateDirectionVectors();
 
         return this;
@@ -303,12 +302,12 @@ public class Camera {
     /**
      * Alter the altitude/climb/elevation/pitch angle.
      *
-     * @param newUpAngleInDegrees the desired upward angle of the "look"
-     * direction (in degrees)
+     * @param upAngleDegrees the desired upward angle of the "look" direction
+     * (in degrees)
      * @return the (modified) current instance (for chaining)
      */
-    public Camera setUpAngleDegrees(float newUpAngleInDegrees) {
-        setUpAngle(MyMath.toRadians(newUpAngleInDegrees));
+    public Camera setUpAngleDegrees(float upAngleDegrees) {
+        setUpAngle(MyMath.toRadians(upAngleDegrees));
         return this;
     }
 
@@ -325,11 +324,11 @@ public class Camera {
     /**
      * Update the specified view matrix.
      *
-     * @param viewMatrix the matrix to update (not null, modified)
+     * @param storeMatrix the matrix to update (not null, modified)
      */
-    void updateViewMatrix(Matrix4f viewMatrix) {
+    void updateViewMatrix(Matrix4f storeMatrix) {
         Vector3f tmpTarget = new Vector3f(eyeLocation).add(lookDirection);
-        viewMatrix.setLookAt(eyeLocation, tmpTarget, upDirection);
+        storeMatrix.setLookAt(eyeLocation, tmpTarget, upDirection);
     }
 
     /**
