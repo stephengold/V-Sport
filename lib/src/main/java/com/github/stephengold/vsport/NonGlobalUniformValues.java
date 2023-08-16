@@ -177,9 +177,9 @@ class NonGlobalUniformValues {
      * @param axisY the Y component of the rotation axis (&ge;-1, &le;1)
      * @param axisZ the Z component of the rotation axis (&ge;-1, &le;1)
      */
-    void rotateAngleAxis(float angle, float x, float y, float z) {
+    void rotateAngleAxis(float angle, float axisX, float axisY, float axisZ) {
         Quaternionf q = new Quaternionf();
-        q.fromAxisAngleRad(x, y, z, angle);
+        q.fromAxisAngleRad(axisX, axisY, axisZ, angle);
         orientation.premul(q);
     }
 
