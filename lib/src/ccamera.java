@@ -117,7 +117,7 @@ public class Camera {
      * @return a location vector in world coordinates (either
      * {@code storeResult} or a new vector)
      */
-    public Vector3f location(Vector3f storeResult) {
+    public Vector3f copyLocation(Vector3f storeResult) {
         if (storeResult == null) {
             return new Vector3f(eyeLocation);
         } else {
@@ -155,7 +155,7 @@ public class Camera {
      * @return a new location vector in world coordinates
      */
     public Vector3f getLocation() {
-        return location(null);
+        return copyLocation(null);
     }
 
     /**
