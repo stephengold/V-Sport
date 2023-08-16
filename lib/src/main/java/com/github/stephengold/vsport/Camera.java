@@ -276,7 +276,7 @@ public class Camera {
      * @param direction the desired direction (not null, unaffected)
      * @return the (modified) current instance (for chaining)
      */
-    public Camera setLookDirection(Vector3f direction) {
+    public Camera setLookDirection(Vector3fc direction) {
         this.azimuthRadians = FastMath.atan2(direction.z, direction.x);
         float nxz = MyMath.hypotenuse(direction.x, direction.z);
         this.upAngleRadians = FastMath.atan2(direction.y, nxz);
