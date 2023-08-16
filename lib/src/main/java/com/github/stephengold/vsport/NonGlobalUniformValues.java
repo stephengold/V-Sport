@@ -56,24 +56,24 @@ class NonGlobalUniformValues {
     final private static Matrix3f tmpMatrix3f = new Matrix3f();
     final private static Matrix4f tmpMatrix4f = new Matrix4f();
     /**
-     * mesh-to-world coordinate rotation
+     * mesh-to-world rotation
      */
     final private Quaternionf orientation = new Quaternionf();
     /**
-     * mesh-to-world coordinate offset (world location of the mesh origin)
+     * mesh-to-world offset (world location of the mesh origin)
      */
     final private Vector3f location = new Vector3f();
     /**
-     * mesh-to-world scale factor for each local axis
+     * mesh-to-world scale factor for each mesh axis
      */
     final private Vector3f scale = new Vector3f(1f);
     /**
-     * material color (in the Linear colorspace) to use with ambient/diffuse
+     * material color (in Linear colorspace) to use with ambient/diffuse
      * lighting
      */
     final private Vector4f baseMaterialColor = new Vector4f(1f);
     /**
-     * material color (in the Linear colorspace) to use in specular reflections
+     * material color (in Linear colorspace) to use in specular reflections
      */
     final private Vector4f specularMaterialColor = new Vector4f(1f);
     // *************************************************************************
@@ -167,14 +167,15 @@ class NonGlobalUniformValues {
 
     /**
      * Rotate the model by the specified angle around the specified axis,
-     * without shifting the local origin.
+     * without shifting the mesh origin.
      * <p>
      * The rotation axis is assumed to be a unit vector.
      *
-     * @param angle the rotation angle (in radians, 0 = no effect)
-     * @param x the X component of the rotation axis
-     * @param y the Y component of the rotation axis
-     * @param z the Z component of the rotation axis
+     * @param angle the rotation angle to apply (in radians, finite, 0&rarr;no
+     * effect)
+     * @param axisX the X component of the rotation axis (&ge;-1, &le;1)
+     * @param axisY the Y component of the rotation axis (&ge;-1, &le;1)
+     * @param axisZ the Z component of the rotation axis (&ge;-1, &le;1)
      */
     void rotate(float angle, float x, float y, float z) {
         Quaternionf q = new Quaternionf();
@@ -204,7 +205,7 @@ class NonGlobalUniformValues {
     }
 
     /**
-     * Alter the base material color.
+     * Alter the base color.
      *
      * @param desiredColor the desired color (not null, unaffected)
      */
@@ -214,11 +215,11 @@ class NonGlobalUniformValues {
     }
 
     /**
-     * Translate the mesh origin.
+     * Translate the mesh origin to the specified coordinates.
      *
-     * @param x the desired X coordinate (in world coordinates, default=0)
-     * @param y the desired Y coordinate (in world coordinates, default=0)
-     * @param z the desired Z coordinate (in world coordinates, default=0)
+     * @param x the desired world X coordinate (finite, default=0)
+     * @param y the desired world Y coordinate (finite, default=0)
+     * @param z the desired world Z coordinate (finite, default=0)
      */
     void setLocation(float x, float y, float z) {
         location.set(x, y, z);
@@ -250,8 +251,7 @@ class NonGlobalUniformValues {
     }
 
     /**
-     * Alter the mesh-to-world coordinate rotation, without shifting the local
-     * origin.
+     * Alter the orientation without shifting the mesh origin.
      *
      * @param desiredOrientation the desired orientation (not null, each row is
      * a unit vector, unaffected)
@@ -262,7 +262,7 @@ class NonGlobalUniformValues {
     }
 
     /**
-     * Alter the mesh-to-world coordinate scaling.
+     * Alter the mesh-to-world scale factors.
      *
      * @param factor the desired mesh-to-world scale factor for all axes
      * (default=1)

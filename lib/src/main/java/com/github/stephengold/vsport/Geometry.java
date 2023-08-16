@@ -195,11 +195,11 @@ public class Geometry {
 
     /**
      * Rotate the model by the specified angle around the specified axis,
-     * without shifting the local origin.
+     * without shifting the mesh origin.
      * <p>
      * The rotation axis is assumed to be a unit vector.
      *
-     * @param angle the rotation angle (in radians, 0 = no effect)
+     * @param angle the rotation angle (in radians, 0&rarr;no effect)
      * @param x the X component of the rotation axis
      * @param y the Y component of the rotation axis
      * @param z the Z component of the rotation axis
@@ -211,7 +211,7 @@ public class Geometry {
     }
 
     /**
-     * Apply the specified rotation, without shifting the local origin.
+     * Apply the specified rotation, without shifting the mesh origin.
      *
      * @param rotation the rotation to apply (not null, each row is a unit
      * vector, unaffected)
@@ -223,9 +223,9 @@ public class Geometry {
     }
 
     /**
-     * Scale the model by the specified factor.
+     * Uniformly scale the model by the specified factor.
      *
-     * @param factor the scaling factor (1 = no effect)
+     * @param factor the scaling factor (1&rarr;no effect)
      * @return the (modified) current geometry (for chaining)
      */
     public Geometry scale(float factor) {
@@ -234,7 +234,7 @@ public class Geometry {
     }
 
     /**
-     * Alter the base material color.
+     * Alter the base color.
      *
      * @param desiredColor the desired color (not null, unaffected)
      * @return the (modified) current geometry (for chaining)
@@ -248,9 +248,9 @@ public class Geometry {
     /**
      * Alter the location of the mesh origin.
      *
-     * @param x the desired X coordinate (in world coordinates)
-     * @param y the desired Y coordinate (in world coordinates)
-     * @param z the desired Z coordinate (in world coordinates)
+     * @param x the desired X coordinate (in world coordinates, default=0)
+     * @param y the desired Y coordinate (in world coordinates, default=0)
+     * @param z the desired Z coordinate (in world coordinates, default=0)
      * @return the (modified) current geometry (for chaining)
      */
     public Geometry setLocation(float x, float y, float z) {
@@ -283,9 +283,9 @@ public class Geometry {
     }
 
     /**
-     * Alter the mesh-to-world coordinate rotation.
+     * Alter the orientation without shifting the mesh origin.
      * <p>
-     * The axis is assumed to be a unit vector.
+     * The rotation axis is assumed to be a unit vector.
      *
      * @param angle the desired rotation angle (in radians)
      * @param x the X component of the rotation axis
@@ -299,8 +299,7 @@ public class Geometry {
     }
 
     /**
-     * Alter the mesh-to-world coordinate rotation, without shifting the local
-     * origin.
+     * Alter the orientation without shifting the mesh origin.
      *
      * @param desiredOrientation the desired orientation (not null, each row is
      * a unit vector, unaffected)
@@ -329,7 +328,7 @@ public class Geometry {
     }
 
     /**
-     * Alter the mesh-to-world coordinate scaling.
+     * Alter the mesh-to-world scale factors.
      *
      * @param newScale the desired mesh-to-world scale factor for all axes
      * (default=1)
