@@ -158,10 +158,10 @@ public class Camera {
     }
 
     /**
-     * Teleport the eye by the specified offset without changing its
+     * Translate the eye by the specified offset without changing its
      * orientation.
      *
-     * @param offset the desired offset (in world coordinates, not null, finite,
+     * @param offset the offset (in world coordinates, not null, finite,
      * unaffected)
      */
     public void move(Vector3fc offset) {
