@@ -239,6 +239,8 @@ class NonGlobalUniformValues {
      * vector, unaffected)
      */
     void rotate(Matrix3fc rotation) {
+        Validate.nonNull(rotation, "rotation");
+
         Matrix3fc transpose = new Matrix3f(rotation).transpose();
         Quaternionf q = new Quaternionf().setFromNormalized(transpose);
         orientation.premul(q);
@@ -257,6 +259,11 @@ class NonGlobalUniformValues {
      * @param axisZ the Z component of the rotation axis (&ge;-1, &le;1)
      */
     void rotateAngleAxis(float angle, float axisX, float axisY, float axisZ) {
+        Validate.finite(angle, "angle");
+        Validate.inRange(axisX, "axis x", -1f, 1f);
+        Validate.inRange(axisY, "axis y", -1f, 1f);
+        Validate.inRange(axisZ, "axis z", -1f, 1f);
+
         Quaternionf q = new Quaternionf();
         q.fromAxisAngleRad(axisX, axisY, axisZ, angle);
         orientation.premul(q);
@@ -330,6 +337,10 @@ class NonGlobalUniformValues {
      * @param z the desired world Z coordinate (finite, default=0)
      */
     void setLocation(float x, float y, float z) {
+        Validate.finite(x, "x");
+        Validate.finite(y, "y");
+        Validate.finite(z, "z");
+
         location.set(x, y, z);
     }
 
@@ -383,6 +394,8 @@ class NonGlobalUniformValues {
      * a unit vector, unaffected)
      */
     void setOrientation(Matrix3fc desiredOrientation) {
+        Validate.nonNull(desiredOrientation, "desired orientation");
+
         Matrix3fc transpose = new Matrix3f(desiredOrientation).transpose();
         orientation.setFromNormalized(transpose);
     }
