@@ -92,7 +92,7 @@ public class BufferResource extends DeviceResource {
      *
      * @return the pre-existing NIO buffer, or null if not mapped
      */
-    final ByteBuffer getData() {
+    final ByteBuffer findData() {
         return data;
     }
 

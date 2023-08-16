@@ -609,7 +609,7 @@ final class Internals {
 
         // Update the global UBO:
         BufferResource globalUbo = pass.getGlobalUbo();
-        ByteBuffer byteBuffer = globalUbo.getData();
+        ByteBuffer byteBuffer = globalUbo.findData();
         globalUniformValues.writeTo(byteBuffer);
 
         try (MemoryStack stack = MemoryStack.stackPush()) {

@@ -544,7 +544,7 @@ public class Geometry {
      * @param ubo the target resource (not null)
      */
     void writeUniformValuesTo(BufferResource ubo) {
-        ByteBuffer byteBuffer = ubo.getData();
+        ByteBuffer byteBuffer = ubo.findData();
         uniformValues.writeTo(byteBuffer);
     }
     // *************************************************************************

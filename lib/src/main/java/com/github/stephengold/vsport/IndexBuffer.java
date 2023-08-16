@@ -169,7 +169,7 @@ final public class IndexBuffer extends jme3utilities.lbj.IndexBuffer {
                     }
                 }
             };
-            ByteBuffer bytes = resource.getData();
+            ByteBuffer bytes = resource.findData();
             bytes.flip();
             data = bytes.asIntBuffer();
 
@@ -185,7 +185,7 @@ final public class IndexBuffer extends jme3utilities.lbj.IndexBuffer {
                     }
                 }
             };
-            ByteBuffer bytes = resource.getData();
+            ByteBuffer bytes = resource.findData();
             bytes.flip();
             data = bytes.asShortBuffer();
         }
@@ -221,7 +221,7 @@ final public class IndexBuffer extends jme3utilities.lbj.IndexBuffer {
                     }
                 }
             };
-            ByteBuffer bytes = resource.getData();
+            ByteBuffer bytes = resource.findData();
             bytes.flip();
             data = bytes.asIntBuffer();
 
@@ -237,7 +237,7 @@ final public class IndexBuffer extends jme3utilities.lbj.IndexBuffer {
                     }
                 }
             };
-            ByteBuffer bytes = resource.getData();
+            ByteBuffer bytes = resource.findData();
             bytes.flip();
             data = bytes.asShortBuffer();
         }

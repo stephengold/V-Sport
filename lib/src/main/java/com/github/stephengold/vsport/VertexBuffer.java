@@ -260,7 +260,7 @@ final public class VertexBuffer {
                 }
             }
         };
-        ByteBuffer byteBuffer = bufferResource.getData();
+        ByteBuffer byteBuffer = bufferResource.findData();
         byteBuffer.flip();
         FloatBuffer dataBuffer = byteBuffer.asFloatBuffer();
         VertexBuffer result = new VertexBuffer(dataBuffer, fpv, bufferResource);
@@ -288,7 +288,7 @@ final public class VertexBuffer {
                 }
             }
         };
-        ByteBuffer byteBuffer = bufferResource.getData();
+        ByteBuffer byteBuffer = bufferResource.findData();
         byteBuffer.flip();
         FloatBuffer dataBuffer = byteBuffer.asFloatBuffer();
         VertexBuffer result = new VertexBuffer(dataBuffer, fpv, bufferResource);
@@ -315,7 +315,7 @@ final public class VertexBuffer {
                 // do nothing
             }
         };
-        ByteBuffer byteBuffer = bufferResource.getData();
+        ByteBuffer byteBuffer = bufferResource.findData();
         byteBuffer.rewind();
         byteBuffer.limit(numBytes);
         FloatBuffer dataBuffer = byteBuffer.asFloatBuffer();
@@ -345,7 +345,7 @@ final public class VertexBuffer {
                 }
             }
         };
-        ByteBuffer byteBuffer = bufferResource.getData();
+        ByteBuffer byteBuffer = bufferResource.findData();
         byteBuffer.flip();
         FloatBuffer dataBuffer = byteBuffer.asFloatBuffer();
         VertexBuffer result = new VertexBuffer(dataBuffer, fpv, bufferResource);
@@ -374,7 +374,7 @@ final public class VertexBuffer {
                 }
             }
         };
-        ByteBuffer byteBuffer = bufferResource.getData();
+        ByteBuffer byteBuffer = bufferResource.findData();
         byteBuffer.flip();
         FloatBuffer dataBuffer = byteBuffer.asFloatBuffer();
         VertexBuffer result = new VertexBuffer(dataBuffer, fpv, bufferResource);
@@ -403,7 +403,7 @@ final public class VertexBuffer {
                 }
             }
         };
-        ByteBuffer byteBuffer = bufferResource.getData();
+        ByteBuffer byteBuffer = bufferResource.findData();
         byteBuffer.flip();
         FloatBuffer dataBuffer = byteBuffer.asFloatBuffer();
         VertexBuffer result = new VertexBuffer(dataBuffer, fpv, bufferResource);
