@@ -112,7 +112,7 @@ public class HelloVSport extends BaseApplication {
         Mesh globeMesh = new OctasphereMesh(numRefineSteps);
 
         Vector4fc uCoefficients = new Vector4f(0.5f, 0f, 0f, 0.5f);
-        Vector4fc vCoefficients = new Vector4f(0f, -1f, 0f, 0f); // flip
+        Vector4fc vCoefficients = new Vector4f(0f, 1f, 0f, 0f);
         globeMesh.transformUvs(uCoefficients, vCoefficients);
 
         String modelName = "/Models/viking_room/viking_room.obj";

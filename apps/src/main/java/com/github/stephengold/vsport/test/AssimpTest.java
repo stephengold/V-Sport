@@ -43,6 +43,7 @@ import java.util.List;
 import org.joml.Matrix3f;
 import org.joml.Matrix3fc;
 import org.joml.Vector3f;
+import org.lwjgl.assimp.Assimp;
 
 /**
  * Test loading a 3-D mesh using Assimp.
@@ -90,7 +91,7 @@ public class AssimpTest extends BaseApplication {
     public void initialize() {
         // Load the viking_room model using Assimp:
         String modelName = "/Models/viking_room/viking_room.obj";
-        int postFlags = 0x0;
+        int postFlags = Assimp.aiProcess_FlipUVs;
         List<Integer> indices = null;
         List<Vertex> vertices = new ArrayList<>();
         AssimpUtils.extractTriangles(modelName, postFlags, indices, vertices);

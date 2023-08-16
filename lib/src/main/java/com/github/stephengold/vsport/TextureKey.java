@@ -57,7 +57,7 @@ public class TextureKey {
     /**
      * default setting for the {@code flipAxes} parameter (not null)
      */
-    private static FlipAxes flipAxesDefault = FlipAxes.flipY;
+    private static FlipAxes flipAxesDefault = FlipAxes.noFlip;
     /**
      * true to generate MIP maps, false to skip generating them
      */
@@ -159,7 +159,7 @@ public class TextureKey {
     /**
      * Alter the default {@code flipAxes} setting for new texture keys.
      *
-     * @param flipAxes the setting to become the default (default=flipY)
+     * @param flipAxes the setting to become the default (default=noFlip)
      */
     public static void setDefaultFlipAxes(FlipAxes flipAxes) {
         flipAxesDefault = flipAxes;
