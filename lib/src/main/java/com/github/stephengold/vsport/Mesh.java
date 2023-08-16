@@ -552,6 +552,11 @@ public class Mesh implements jme3utilities.lbj.Mesh {
      */
     protected VertexBuffer createNormals() {
         verifyMutable();
+        if (countTriangles() == 0) {
+            throw new IllegalStateException(
+                    "The mesh doesn't contain any triangles.");
+        }
+
         this.normalBuffer = VertexBuffer.newInstance(numAxes, vertexCount);
         return normalBuffer;
     }
