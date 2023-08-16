@@ -309,6 +309,19 @@ public class Geometry {
     }
 
     /**
+     * Alter the base color.
+     *
+     * @param color the desired color (in the Linear colorspace, not null,
+     * unaffected)
+     * @return the (modified) current geometry (for chaining)
+     */
+    public Geometry setColor(Vector4fc color) {
+        Validate.nonNull(color, "color");
+        uniformValues.setColor(color.x(), color.y(), color.z(), color.w());
+        return this;
+    }
+
+    /**
      * Enable or disable depth testing.
      *
      * @param newSetting true to enable, false to disable (default=true)
@@ -320,19 +333,6 @@ public class Geometry {
             BaseApplication.updateDeferredQueue(this);
         }
 
-        return this;
-    }
-
-    /**
-     * Alter the base color.
-     *
-     * @param color the desired color (in the Linear colorspace, not null,
-     * unaffected)
-     * @return the (modified) current geometry (for chaining)
-     */
-    public Geometry setColor(Vector4fc color) {
-        Validate.nonNull(color, "color");
-        uniformValues.setColor(color.x(), color.y(), color.z(), color.w());
         return this;
     }
 
