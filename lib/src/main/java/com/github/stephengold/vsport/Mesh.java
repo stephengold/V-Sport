@@ -29,6 +29,7 @@
  */
 package com.github.stephengold.vsport;
 
+import com.jme3.math.Quaternion;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.LongBuffer;
@@ -503,6 +504,30 @@ public class Mesh implements jme3utilities.lbj.Mesh {
 
         Mesh result = new Mesh(topology, tempIndices, tempVertices);
         return result;
+    }
+
+    /**
+     * Apply the specified rotation to all vertices.
+     *
+     * @param xAngle the X rotation angle (in radians)
+     * @param yAngle the Y rotation angle (in radians)
+     * @param zAngle the Z rotation angle (in radians)
+     * @return the (modified) current instance (for chaining)
+     */
+    public Mesh rotate(float xAngle, float yAngle, float zAngle) {
+        if (xAngle == 0f && yAngle == 0f && zAngle == 0f) {
+            return this;
+        }
+
+        Quaternion quaternion // TODO garbage
+                = new Quaternion().fromAngles(xAngle, yAngle, zAngle);
+
+        positionBuffer.rotate(quaternion);
+        if (normalBuffer != null) {
+            normalBuffer.rotate(quaternion);
+        }
+
+        return this;
     }
 
     /**
