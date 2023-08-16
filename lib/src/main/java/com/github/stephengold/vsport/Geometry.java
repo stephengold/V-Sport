@@ -96,30 +96,6 @@ public class Geometry {
     // new methods exposed
 
     /**
-     * Return a copy of the location of the mesh origin.
-     *
-     * @param storeResult storage for the result (modified if not null)
-     * @return a location vector in world coordinates (either
-     * {@code storeResult} or a new vector null)
-     */
-    public Vector3f location(Vector3f storeResult) {
-        Vector3f result = uniformValues.location(storeResult);
-        return result;
-    }
-
-    /**
-     * Return a copy of the mesh-to-world coordinate rotation.
-     *
-     * @param storeResult storage for the result (modified if not null)
-     * @return the rotation (either {@code storeResult} or a new quaternion, not
-     * null)
-     */
-    public Quaternionf orientation(Quaternionf storeResult) {
-        Quaternionf result = uniformValues.orientation(storeResult);
-        return result;
-    }
-
-    /**
      * Return a copy of the mesh-to-world coordinate transform.
      *
      * @param storeResult storage for the result (modified if not null)
@@ -167,6 +143,30 @@ public class Geometry {
      */
     public boolean isWireframe() {
         return wireframe;
+    }
+
+    /**
+     * Return a copy of the location of the mesh origin.
+     *
+     * @param storeResult storage for the result (modified if not null)
+     * @return a location vector in world coordinates (either
+     * {@code storeResult} or a new vector null)
+     */
+    public Vector3f location(Vector3f storeResult) {
+        Vector3f result = uniformValues.location(storeResult);
+        return result;
+    }
+
+    /**
+     * Return a copy of the mesh-to-world coordinate rotation.
+     *
+     * @param storeResult storage for the result (modified if not null)
+     * @return the rotation (either {@code storeResult} or a new quaternion, not
+     * null)
+     */
+    public Quaternionf orientation(Quaternionf storeResult) {
+        Quaternionf result = uniformValues.orientation(storeResult);
+        return result;
     }
 
     /**
