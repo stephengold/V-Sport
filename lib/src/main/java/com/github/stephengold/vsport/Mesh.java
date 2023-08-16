@@ -98,7 +98,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
      */
     private VertexBuffer positionBuffer;
     /**
-     * texture coordinates (2 floats per vertex) or null if not present
+     * vertex texture coordinates (2 floats per vertex) or null if not present
      */
     private VertexBuffer texCoordsBuffer;
     // *************************************************************************
@@ -222,7 +222,8 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
 
     /**
-     * Count how many vertices the mesh renders, taking indexing into account.
+     * Count how many vertices the mesh renders, taking indexing into account,
+     * but not the topology.
      *
      * @return the count (&ge;0)
      */
@@ -340,7 +341,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
 
     /**
-     * Generate create info for the input assembly state of a graphics pipeline.
+     * Generate create info for the input-assembly state of a graphics pipeline.
      *
      * @param stack for allocating temporary host buffers (not null)
      * @return a new, temporary struct (not null)
@@ -474,7 +475,8 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
 
     /**
-     * Alter the primitive topology of the mesh.
+     * Alter the primitive topology, which determines how vertices/indices are
+     * organized into primitives.
      *
      * @param desiredTopology the desired enum value (not null)
      */
@@ -684,7 +686,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
 
     /**
-     * Indicate that the normals data has changed.
+     * Indicate that the normals data have changed.
      */
     @Override
     public void setNormalsModified() {
@@ -692,7 +694,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
 
     /**
-     * Indicate that the positions data has changed.
+     * Indicate that the positions data have changed.
      */
     @Override
     public void setPositionsModified() {
