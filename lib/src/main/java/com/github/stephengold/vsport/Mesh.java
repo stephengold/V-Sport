@@ -690,7 +690,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
      */
     @Override
     public void setNormalsModified() {
-        // TODO
+        normalBuffer.setModified();
     }
 
     /**
@@ -698,7 +698,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
      */
     @Override
     public void setPositionsModified() {
-        // TODO
+        positionBuffer.setModified();
     }
     // *************************************************************************
     // Object methods
