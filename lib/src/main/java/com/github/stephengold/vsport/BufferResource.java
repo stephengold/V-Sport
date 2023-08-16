@@ -29,8 +29,11 @@
  */
 package com.github.stephengold.vsport;
 
+import com.jme3.math.Quaternion;
 import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import jme3utilities.Validate;
+import jme3utilities.math.MyBuffer;
 import org.lwjgl.vulkan.VK10;
 
 /**
@@ -104,6 +107,22 @@ public class BufferResource extends DeviceResource {
     final long handle() {
         long result = mappableBuffer.vkBufferHandle();
         return result;
+    }
+
+    /**
+     * Rotate all mesh vertices.
+     *
+     * @param rotation the rotation to apply (not null, not zero, unaffected)
+     */
+    void rotate(Quaternion rotation) {
+        Validate.nonZero(rotation, "rotation");
+
+        data.rewind();
+        FloatBuffer floatBuffer = data.asFloatBuffer();
+
+        int startPosition = 0;
+        int endPosition = floatBuffer.capacity();
+        MyBuffer.rotate(floatBuffer, startPosition, endPosition, rotation);
     }
     // *************************************************************************
     // new protected methods
