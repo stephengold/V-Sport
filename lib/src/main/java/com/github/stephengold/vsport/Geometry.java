@@ -49,6 +49,10 @@ public class Geometry {
     // fields
 
     /**
+     * true to enable depth test, false to disable it
+     */
+    private boolean depthTest = true;
+    /**
      * true to enable wireframe rendering, false to disable it
      */
     private boolean wireframe;
@@ -160,6 +164,15 @@ public class Geometry {
     ShaderProgram getProgram() {
         assert program != null;
         return program;
+    }
+
+    /**
+     * Test whether depth test is enabled.
+     *
+     * @return true if enabled, otherwise false
+     */
+    public boolean isDepthTest() {
+        return depthTest;
     }
 
     /**
@@ -292,6 +305,21 @@ public class Geometry {
      */
     public Geometry scale(float factor) {
         uniformValues.scale(factor, factor, factor);
+        return this;
+    }
+
+    /**
+     * Enable or disable depth testing.
+     *
+     * @param newSetting true to enable, false to disable (default=true)
+     * @return the (modified) current geometry (for chaining)
+     */
+    public Geometry setDepthTest(boolean newSetting) {
+        if (newSetting != depthTest) {
+            this.depthTest = newSetting;
+            BaseApplication.updateDeferredQueue(this);
+        }
+
         return this;
     }
 

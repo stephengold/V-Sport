@@ -35,6 +35,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -584,12 +585,25 @@ final class Internals {
             return;
         }
 
-        // Copy visible geometries to the render pass:
-        Collection<Geometry> collection = BaseApplication.listVisible();
         Pass pass = chainResources.getPass(imageIndex);
         List<Geometry> geometryList = pass.getGeometryList();
         geometryList.clear();
-        for (Geometry geometry : collection) {
+
+        // List the depth-test geometries first:
+        Collection<Geometry> visibleGeometries = BaseApplication.listVisible();
+        Deque<Geometry> deferredQueue = BaseApplication.listDeferred();
+        for (Geometry geometry : visibleGeometries) {
+            if (geometry.isDepthTest()) {
+                geometryList.add(geometry);
+            } else {
+                assert deferredQueue.contains(geometry);
+            }
+        }
+
+        // List the no-depth-test geometries last, from back to front:
+        for (Geometry geometry : deferredQueue) {
+            assert visibleGeometries.contains(geometry);
+            assert !geometry.isDepthTest();
             geometryList.add(geometry);
         }
 
@@ -602,7 +616,7 @@ final class Internals {
             VkExtent2D framebufferExtent
                     = chainResources.framebufferExtent(stack);
 
-            int numGeometries = collection.size();
+            int numGeometries = visibleGeometries.size();
             long passHandle = chainResources.passHandle();
             for (int geometryI = 0; geometryI < numGeometries; ++geometryI) {
                 Draw draw = pass.getDraw(geometryI);
@@ -831,7 +845,9 @@ final class Internals {
                     VK10.VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO
             );
 
-            dssCreateInfo.depthTestEnable(true);
+            boolean depthTestEnable = geometry.isDepthTest();
+            dssCreateInfo.depthTestEnable(depthTestEnable);
+
             dssCreateInfo.depthWriteEnable(true);
             dssCreateInfo.depthCompareOp(VK10.VK_COMPARE_OP_LESS);
             dssCreateInfo.depthBoundsTestEnable(false);
