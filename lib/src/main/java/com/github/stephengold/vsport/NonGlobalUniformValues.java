@@ -86,7 +86,7 @@ class NonGlobalUniformValues {
      * @return a location vector in world coordinates (either
      * {@code storeResult} or a new vector, not null)
      */
-    Vector3f copyLocation(Vector3f storeResult) {
+    Vector3f location(Vector3f storeResult) {
         if (storeResult == null) {
             return new Vector3f(location);
         } else {
@@ -101,7 +101,7 @@ class NonGlobalUniformValues {
      * @return the rotation (either {@code storeResult} or a new quaternion, not
      * null)
      */
-    Quaternionf copyOrientation(Quaternionf storeResult) {
+    Quaternionf orientation(Quaternionf storeResult) {
         if (storeResult == null) {
             return new Quaternionf(orientation);
         } else {
@@ -177,7 +177,7 @@ class NonGlobalUniformValues {
      * @param axisY the Y component of the rotation axis (&ge;-1, &le;1)
      * @param axisZ the Z component of the rotation axis (&ge;-1, &le;1)
      */
-    void rotate(float angle, float x, float y, float z) {
+    void rotateAngleAxis(float angle, float x, float y, float z) {
         Quaternionf q = new Quaternionf();
         q.fromAxisAngleRad(x, y, z, angle);
         orientation.premul(q);

@@ -103,7 +103,7 @@ public class Geometry {
      * {@code storeResult} or a new vector null)
      */
     public Vector3f copyLocation(Vector3f storeResult) {
-        Vector3f result = uniformValues.copyLocation(storeResult);
+        Vector3f result = uniformValues.location(storeResult);
         return result;
     }
 
@@ -115,7 +115,7 @@ public class Geometry {
      * null)
      */
     public Quaternionf copyOrientation(Quaternionf storeResult) {
-        Quaternionf result = uniformValues.copyOrientation(storeResult);
+        Quaternionf result = uniformValues.orientation(storeResult);
         return result;
     }
 
@@ -206,7 +206,7 @@ public class Geometry {
      * @return the (modified) current geometry (for chaining)
      */
     public Geometry rotate(float angle, float x, float y, float z) {
-        uniformValues.rotate(angle, x, y, z);
+        uniformValues.rotateAngleAxis(angle, x, y, z);
         return this;
     }
 
