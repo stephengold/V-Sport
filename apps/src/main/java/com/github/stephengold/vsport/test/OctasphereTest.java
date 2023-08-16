@@ -81,7 +81,7 @@ public class OctasphereTest extends BaseApplication {
         float radius = 3f;
         float xRotation = -FastMath.HALF_PI;
         Geometry sphereGeometry = new Geometry(sphereMesh)
-                .setOrientation(xRotation, 1f, 0f, 0f)
+                .setOrientation(xRotation, 0f, 0f)
                 .setProgram("Unshaded/Texture")
                 .setScale(radius);
 
@@ -93,7 +93,7 @@ public class OctasphereTest extends BaseApplication {
         // Add a red wireframe to visualize the underlying mesh.
         new Geometry(sphereMesh)
                 .setColor(Constants.RED)
-                .setOrientation(xRotation, 1f, 0f, 0f)
+                .setOrientation(xRotation, 0f, 0f)
                 .setProgram("Unshaded/Monochrome")
                 .setScale(radius)
                 .setWireframe(true);
