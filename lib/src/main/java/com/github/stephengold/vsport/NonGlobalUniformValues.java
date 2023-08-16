@@ -80,36 +80,6 @@ class NonGlobalUniformValues {
     // new methods exposed
 
     /**
-     * Return a copy of the location of the mesh origin.
-     *
-     * @param storeResult storage for the result (modified if not null)
-     * @return a location vector in world coordinates (either
-     * {@code storeResult} or a new vector, not null)
-     */
-    Vector3f location(Vector3f storeResult) {
-        if (storeResult == null) {
-            return new Vector3f(location);
-        } else {
-            return storeResult.set(location);
-        }
-    }
-
-    /**
-     * Return a copy of the mesh-to-world coordinate rotation.
-     *
-     * @param storeResult storage for the result (modified if not null)
-     * @return the rotation (either {@code storeResult} or a new quaternion, not
-     * null)
-     */
-    Quaternionf orientation(Quaternionf storeResult) {
-        if (storeResult == null) {
-            return new Quaternionf(orientation);
-        } else {
-            return storeResult.set(orientation);
-        }
-    }
-
-    /**
      * Return a copy of the mesh-to-world coordinate transform.
      *
      * @param storeResult storage for the result (modified if not null)
@@ -127,6 +97,21 @@ class NonGlobalUniformValues {
         result.scale(scale);
 
         return result;
+    }
+
+    /**
+     * Return a copy of the location of the mesh origin.
+     *
+     * @param storeResult storage for the result (modified if not null)
+     * @return a location vector in world coordinates (either
+     * {@code storeResult} or a new vector, not null)
+     */
+    Vector3f location(Vector3f storeResult) {
+        if (storeResult == null) {
+            return new Vector3f(location);
+        } else {
+            return storeResult.set(location);
+        }
     }
 
     /**
@@ -156,6 +141,21 @@ class NonGlobalUniformValues {
     }
 
     /**
+     * Return a copy of the mesh-to-world coordinate rotation.
+     *
+     * @param storeResult storage for the result (modified if not null)
+     * @return the rotation (either {@code storeResult} or a new quaternion, not
+     * null)
+     */
+    Quaternionf orientation(Quaternionf storeResult) {
+        if (storeResult == null) {
+            return new Quaternionf(orientation);
+        } else {
+            return storeResult.set(orientation);
+        }
+    }
+
+    /**
      * Reset the model transform so that mesh coordinates and world coordinates
      * are the same.
      */
@@ -163,6 +163,18 @@ class NonGlobalUniformValues {
         scale.set(1f);
         orientation.identity();
         location.zero();
+    }
+
+    /**
+     * Apply the specified rotation, without shifting the local origin.
+     *
+     * @param rotation the rotation to apply (not null, each row is a unit
+     * vector, unaffected)
+     */
+    void rotate(Matrix3fc rotation) {
+        Matrix3fc transpose = new Matrix3f(rotation).transpose();
+        Quaternionf q = new Quaternionf().setFromNormalized(transpose);
+        orientation.premul(q);
     }
 
     /**
@@ -180,18 +192,6 @@ class NonGlobalUniformValues {
     void rotateAngleAxis(float angle, float axisX, float axisY, float axisZ) {
         Quaternionf q = new Quaternionf();
         q.fromAxisAngleRad(axisX, axisY, axisZ, angle);
-        orientation.premul(q);
-    }
-
-    /**
-     * Apply the specified rotation, without shifting the local origin.
-     *
-     * @param rotation the rotation to apply (not null, each row is a unit
-     * vector, unaffected)
-     */
-    void rotate(Matrix3fc rotation) {
-        Matrix3fc transpose = new Matrix3f(rotation).transpose();
-        Quaternionf q = new Quaternionf().setFromNormalized(transpose);
         orientation.premul(q);
     }
 
