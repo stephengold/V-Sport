@@ -239,8 +239,7 @@ class NonGlobalUniformValues {
     void rotate(Matrix3fc rotation) {
         Validate.nonNull(rotation, "rotation");
 
-        Matrix3fc transpose = new Matrix3f(rotation).transpose();
-        Quaternionf q = new Quaternionf().setFromNormalized(transpose);
+        Quaternionf q = new Quaternionf().setFromNormalized(rotation);
         orientation.premul(q);
     }
 
@@ -344,14 +343,12 @@ class NonGlobalUniformValues {
     /**
      * Alter the orientation without shifting the mesh origin.
      *
-     * @param desiredOrientation the desired orientation (not null, each row is
-     * a unit vector, unaffected)
+     * @param desiredOrientation the desired orientation (not null, each column
+     * is a unit vector, unaffected)
      */
     void setOrientation(Matrix3fc desiredOrientation) {
         Validate.nonNull(desiredOrientation, "desired orientation");
-
-        Matrix3fc transpose = new Matrix3f(desiredOrientation).transpose();
-        orientation.setFromNormalized(transpose);
+        orientation.setFromNormalized(desiredOrientation);
     }
 
     /**

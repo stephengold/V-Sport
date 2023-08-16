@@ -66,7 +66,7 @@ public class HelloVSport extends BaseApplication {
     final private static Matrix3fc zupToYup = new Matrix3f(
             0f, 1f, 0f,
             0f, 0f, 1f,
-            1f, 0f, 0f);
+            1f, 0f, 0f).transpose();
     // *************************************************************************
     // fields
 
