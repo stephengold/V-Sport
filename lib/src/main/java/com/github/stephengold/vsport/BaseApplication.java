@@ -35,8 +35,10 @@ import com.github.stephengold.vsport.input.InputProcessor;
 import com.jme3.math.FastMath;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Map;
 import org.joml.Vector3f;
 import org.joml.Vector4fc;
@@ -85,6 +87,11 @@ abstract public class BaseApplication {
      */
     private static final Collection<Geometry> visibleGeometries
             = new HashSet<>(256);
+    /**
+     * all visible geometries that omit depth testing, in the order they will be
+     * rendered (in other words, from back to front)
+     */
+    private static final Deque<Geometry> deferredQueue = new LinkedList<>();
     /**
      * convenient access to user input
      */
@@ -215,6 +222,7 @@ abstract public class BaseApplication {
      * @param geometries the geometries to de-visualize (not null, unaffected)
      */
     public static void hideAll(Collection<Geometry> geometries) {
+        deferredQueue.removeAll(geometries);
         visibleGeometries.removeAll(geometries);
     }
 
@@ -225,6 +233,16 @@ abstract public class BaseApplication {
      */
     public static boolean isDebuggingEnabled() {
         return Internals.isDebuggingEnabled();
+    }
+
+    /**
+     * Enumerate all visible geometries that omit depth testing, in the order
+     * they will be rendered.
+     *
+     * @return the pre-existing object (not null)
+     */
+    static Deque<Geometry> listDeferred() {
+        return deferredQueue;
     }
 
     /**
@@ -245,7 +263,11 @@ abstract public class BaseApplication {
         assert geometry.getMesh() != null;
         assert geometry.getProgram() != null;
 
-        visibleGeometries.add(geometry);
+        boolean previouslyHidden = !visibleGeometries.add(geometry);
+
+        if (previouslyHidden && !geometry.isDepthTest()) {
+            deferredQueue.addLast(geometry);
+        }
     }
 
     /**
@@ -348,6 +370,37 @@ abstract public class BaseApplication {
         } finally {
             // Clean up this class.
             cleanUpBase();
+        }
+    }
+
+    /**
+     * Update the deferred queue after setting the depth-test flag of the
+     * specified Geometry.
+     * <p>
+     * The specified Geometry is visible and performs depth testing, it is
+     * removed from the deferred queue. (It loses its place in the queue.) If it
+     * is visible and omits depth testing, it is appended to the queue (causing
+     * it to be rendered last).
+     * <p>
+     * This method has no effect on invisible geometries.
+     *
+     * @param geometry the Geometry to enqueue/dequeue (not null, alias possibly
+     * created)
+     */
+    static void updateDeferredQueue(Geometry geometry) {
+        assert geometry != null;
+
+        if (!visibleGeometries.contains(geometry)) { // invisible
+            return;
+        }
+
+        if (geometry.isDepthTest()) { // remove it from the queue
+            boolean wasInQueue = deferredQueue.remove(geometry);
+            assert wasInQueue;
+
+        } else { // append it to the queue
+            assert !deferredQueue.contains(geometry);
+            deferredQueue.addLast(geometry);
         }
     }
     // *************************************************************************
