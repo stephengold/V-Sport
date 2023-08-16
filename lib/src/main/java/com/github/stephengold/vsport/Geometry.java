@@ -41,8 +41,8 @@ import org.joml.Vector4fc;
 import org.lwjgl.vulkan.VK10;
 
 /**
- * A 3-D object to be rendered by V-Sport, including a mesh, a texture, and a
- * shader program.
+ * A 3-D object to be rendered by V-Sport, including a mesh, a texture, a shader
+ * program, and a coordinate transform.
  */
 public class Geometry {
     // *************************************************************************
@@ -73,8 +73,8 @@ public class Geometry {
     // constructors
 
     /**
-     * Instantiate a Geometry with the specified Mesh and default ShaderProgram
-     * and make it visible.
+     * Instantiate a geometry with the specified mesh and the default
+     * ShaderProgram and make it visible.
      *
      * @param mesh the desired Mesh (not null, alias created)
      */
@@ -87,8 +87,8 @@ public class Geometry {
     }
 
     /**
-     * Instantiate a Geometry with no Mesh and default ShaderProgram. Don't make
-     * it visible.
+     * Instantiate a geometry with no mesh and the default ShaderProgram. Don't
+     * make it visible.
      */
     protected Geometry() {
         this.program = getDefaultProgram();
@@ -176,7 +176,7 @@ public class Geometry {
      *
      * @param storeResult storage for the result (modified if not null)
      * @return a location vector in world coordinates (either
-     * {@code storeResult} or a new vector null)
+     * {@code storeResult} or a new vector, not null)
      */
     public Vector3f location(Vector3f storeResult) {
         Vector3f result = uniformValues.location(storeResult);
@@ -222,8 +222,8 @@ public class Geometry {
      * Return a copy of the mesh-to-world coordinate rotation.
      *
      * @param storeResult storage for the result (modified if not null)
-     * @return the rotation (either {@code storeResult} or a new quaternion, not
-     * null)
+     * @return a unit quaternion (either {@code storeResult} or a new
+     * quaternion)
      */
     public Quaternionf orientation(Quaternionf storeResult) {
         Quaternionf result = uniformValues.orientation(storeResult);
@@ -298,7 +298,8 @@ public class Geometry {
     /**
      * Alter the base color.
      *
-     * @param color the desired color (not null, unaffected)
+     * @param color the desired color (in the Linear colorspace, not null,
+     * unaffected)
      * @return the (modified) current geometry (for chaining)
      */
     public Geometry setColor(Vector4fc color) {
@@ -336,7 +337,8 @@ public class Geometry {
     /**
      * Translate the mesh origin to the specified location.
      *
-     * @param location the desired location (in world coordinates, not
+     * @param location the desired location (in world coordinates, not null,
+     * finite, unaffected, default=(0,0,0))
      * @return the (modified) current geometry (for chaining)
      */
     public Geometry setLocation(Vector3fc location) {
@@ -376,10 +378,10 @@ public class Geometry {
      * <p>
      * The rotation axis is assumed to be a unit vector.
      *
-     * @param angle the desired rotation angle (in radians)
-     * @param x the X component of the rotation axis
-     * @param y the Y component of the rotation axis
-     * @param z the Z component of the rotation axis
+     * @param angle the desired rotation angle (in radians, finite, default=0)
+     * @param x the X component of the rotation axis (&ge;-1, &le;1)
+     * @param y the Y component of the rotation axis (&ge;-1, &le;1)
+     * @param z the Z component of the rotation axis (&ge;-1, &le;1)
      * @return the (modified) current geometry (for chaining)
      */
     public Geometry setOrientation(float angle, float x, float y, float z) {

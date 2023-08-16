@@ -76,14 +76,14 @@ public class Camera {
     // constructors
 
     /**
-     * Instantiate a camera.
+     * Instantiate a camera in the default position.
      */
     public Camera() {
         updateDirectionVectors();
     }
 
     /**
-     * Instantiate a camera with the specified initial position.
+     * Instantiate a camera in the specified position.
      *
      * @param initLocation the desired initial location (in world coordinates,
      * not null)
@@ -171,7 +171,7 @@ public class Camera {
     }
 
     /**
-     * Teleport the eye to {@code newLocation} and re-orient it to look at
+     * Teleport the eye to {@code newLocation} and orient it to look at
      * {@code targetLocation}.
      *
      * @param eyeLocation the desired eye location (in world coordinates, not
@@ -193,7 +193,7 @@ public class Camera {
     }
 
     /**
-     * Return the camera's "right" direction.
+     * Return a copy of the camera's "right" direction.
      *
      * @param storeResult storage for the result (modified if not null)
      * @return a unit vector in world coordinates (either {@code storeResult} or
@@ -315,7 +315,8 @@ public class Camera {
     /**
      * Return the altitude/climb/elevation/pitch angle.
      *
-     * @return the upward angle of the "look" direction (in radians)
+     * @return the upward angle of the "look" direction (in radians,
+     * 0&rarr;horizontal)
      */
     public float upAngle() {
         return upAngleRadians;
@@ -332,7 +333,7 @@ public class Camera {
     }
 
     /**
-     * Return the camera's "up" direction.
+     * Return a copy of the camera's "up" direction.
      *
      * @param storeResult storage for the result (modified if not null)
      * @return a unit vector in world coordinates (either {@code storeResult} or

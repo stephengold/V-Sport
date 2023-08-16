@@ -125,7 +125,7 @@ abstract public class BaseApplication {
     }
 
     /**
-     * Access the current camera for rendering.
+     * Access the camera for rendering.
      *
      * @return the pre-existing instance (not null)
      */
