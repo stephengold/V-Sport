@@ -102,7 +102,7 @@ public class Geometry {
      * @return a location vector in world coordinates (either
      * {@code storeResult} or a new vector null)
      */
-    public Vector3f copyLocation(Vector3f storeResult) {
+    public Vector3f location(Vector3f storeResult) {
         Vector3f result = uniformValues.location(storeResult);
         return result;
     }
@@ -114,7 +114,7 @@ public class Geometry {
      * @return the rotation (either {@code storeResult} or a new quaternion, not
      * null)
      */
-    public Quaternionf copyOrientation(Quaternionf storeResult) {
+    public Quaternionf orientation(Quaternionf storeResult) {
         Quaternionf result = uniformValues.orientation(storeResult);
         return result;
     }
