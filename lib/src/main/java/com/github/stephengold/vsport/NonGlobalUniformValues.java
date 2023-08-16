@@ -231,7 +231,7 @@ class NonGlobalUniformValues {
     }
 
     /**
-     * Apply the specified rotation, without shifting the local origin.
+     * Apply the specified rotation, without shifting the mesh origin.
      *
      * @param rotation the rotation to apply (not null, each row is a unit
      * vector, unaffected)
