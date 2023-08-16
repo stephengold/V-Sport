@@ -31,8 +31,8 @@ package com.github.stephengold.vsport.mesh;
 
 import com.github.stephengold.vsport.Mesh;
 import com.github.stephengold.vsport.Topology;
+import com.github.stephengold.vsport.VertexBuffer;
 import com.jme3.math.FastMath;
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -110,18 +110,6 @@ public class OctasphereMesh extends Mesh {
     // fields
 
     /**
-     * vertex normals
-     */
-    private FloatBuffer normBuffer;
-    /**
-     * vertex positions
-     */
-    private FloatBuffer posBuffer;
-    /**
-     * vertex texture coordinates
-     */
-    private FloatBuffer uvBuffer;
-    /**
      * next vertex index to be assigned
      */
     private int nextVertexIndex = 0;
@@ -142,6 +130,18 @@ public class OctasphereMesh extends Mesh {
      * map number of refinement steps to shared mesh
      */
     final private static OctasphereMesh[] sharedMeshes = new OctasphereMesh[14];
+    /**
+     * vertex normals
+     */
+    private VertexBuffer normBuffer;
+    /**
+     * vertex positions
+     */
+    private VertexBuffer posBuffer;
+    /**
+     * vertex texture coordinates
+     */
+    private VertexBuffer uvBuffer;
     // *************************************************************************
     // constructors
 
@@ -278,13 +278,6 @@ public class OctasphereMesh extends Mesh {
                 putVertex(vertexIndex);
             }
         }
-
-        posBuffer.flip();
-        assert posBuffer.limit() == posBuffer.capacity();
-        normBuffer.flip();
-        assert normBuffer.limit() == normBuffer.capacity();
-        uvBuffer.flip();
-        assert uvBuffer.limit() == uvBuffer.capacity();
 
         locations.clear();
         uOverrides.clear();
@@ -461,12 +454,8 @@ public class OctasphereMesh extends Mesh {
      */
     private void putVertex(int vIndex) {
         Vector3fc pos = locations.get(vIndex); // alias
-        posBuffer.put(pos.x())
-                .put(pos.y())
-                .put(pos.z());
-        normBuffer.put(pos.x())
-                .put(pos.y())
-                .put(pos.z());
+        posBuffer.put3f(vIndex, pos);
+        normBuffer.put3f(vIndex, pos);
 
         float u;
         if (pos.y() == 0f) {
@@ -480,6 +469,6 @@ public class OctasphereMesh extends Mesh {
         float latitude = latitude(pos);
         float v = 0.5f - latitude / FastMath.PI;
 
-        uvBuffer.put(u).put(v);
+        uvBuffer.putArray(vIndex, u, v);
     }
 }

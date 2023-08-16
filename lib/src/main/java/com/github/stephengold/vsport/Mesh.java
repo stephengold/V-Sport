@@ -30,7 +30,6 @@
 package com.github.stephengold.vsport;
 
 import com.jme3.math.Quaternion;
-import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.LongBuffer;
 import java.util.ArrayList;
@@ -71,38 +70,6 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     // fields
 
     /**
-     * vertex colors (3 floats per vertex) or null if not present
-     */
-    private BufferResource colorBuffer;
-    /**
-     * vertex normals (3 floats per vertex) or null if not present
-     */
-    private BufferResource normalBuffer;
-    /**
-     * vertex positions (3 floats per vertex)
-     */
-    private BufferResource positionBuffer;
-    /**
-     * texture coordinates (2 floats per vertex) or null if not present
-     */
-    private BufferResource texCoordsBuffer;
-    /**
-     * vertex colors (3 floats per vertex) or null if not present
-     */
-    private FloatBuffer colorFloats;
-    /**
-     * vertex normals (3 floats per vertex) or null if not present
-     */
-    private FloatBuffer normalFloats;
-    /**
-     * vertex positions (3 floats per vertex)
-     */
-    private FloatBuffer positionFloats;
-    /**
-     * vertex texture coordinates (2 floats per vertex) or null if not present
-     */
-    private FloatBuffer texCoordsFloats;
-    /**
      * vertex indices, or null if none
      */
     private IndexBuffer indexBuffer;
@@ -114,6 +81,22 @@ public class Mesh implements jme3utilities.lbj.Mesh {
      * how vertices are organized into primitives (not null)
      */
     private Topology topology;
+    /**
+     * vertex colors (3 floats per vertex) or null if not present
+     */
+    private VertexBuffer colorBuffer;
+    /**
+     * vertex normals (3 floats per vertex) or null if not present
+     */
+    private VertexBuffer normalBuffer;
+    /**
+     * vertex positions (3 floats per vertex)
+     */
+    private VertexBuffer positionBuffer;
+    /**
+     * texture coordinates (2 floats per vertex) or null if not present
+     */
+    private VertexBuffer texCoordsBuffer;
     // *************************************************************************
     // constructors
 
@@ -136,91 +119,31 @@ public class Mesh implements jme3utilities.lbj.Mesh {
             this.indexBuffer = IndexBuffer.newInstance(indices);
         }
 
-        int usage = VK10.VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-        boolean staging = false;
-
-        // position buffer:
-        int numBytes = vertexCount * numAxes * Float.BYTES;
-        this.positionBuffer = new BufferResource(numBytes, usage, staging) {
-            @Override
-            protected void fill(ByteBuffer destinationBuffer) {
-                for (Vertex vertex : vertices) {
-                    vertex.writePositionTo(destinationBuffer);
-                }
-            }
-        };
-
-        ByteBuffer byteBuffer = positionBuffer.getData();
-        byteBuffer.flip();
-        this.positionFloats = byteBuffer.asFloatBuffer();
-
+        this.positionBuffer = VertexBuffer.newPosition(vertices);
         Vertex representativeVertex = vertices.get(0);
 
         // color buffer:
         boolean hasColor = representativeVertex.hasColor();
         if (hasColor) {
-            numBytes = vertexCount * 3 * Float.BYTES;
-            this.colorBuffer = new BufferResource(numBytes, usage, staging) {
-                @Override
-                protected void fill(ByteBuffer destinationBuffer) {
-                    for (Vertex vertex : vertices) {
-                        vertex.writeColorTo(destinationBuffer);
-                    }
-                }
-            };
-
-            byteBuffer = colorBuffer.getData();
-            byteBuffer.flip();
-            this.colorFloats = byteBuffer.asFloatBuffer();
-
+            this.colorBuffer = VertexBuffer.newColor(vertices);
         } else {
             this.colorBuffer = null;
-            this.colorFloats = null;
         }
 
         // normal buffer:
         boolean hasNormal = representativeVertex.hasNormal();
         if (hasNormal) {
-            numBytes = vertexCount * numAxes * Float.BYTES;
-            this.normalBuffer = new BufferResource(numBytes, usage, staging) {
-                @Override
-                protected void fill(ByteBuffer destinationBuffer) {
-                    for (Vertex vertex : vertices) {
-                        vertex.writeNormalTo(destinationBuffer);
-                    }
-                }
-            };
-
-            byteBuffer = normalBuffer.getData();
-            byteBuffer.flip();
-            this.normalFloats = byteBuffer.asFloatBuffer();
-
+            this.normalBuffer = VertexBuffer.newNormal(vertices);
         } else {
             this.normalBuffer = null;
-            this.normalFloats = null;
         }
 
         // texture-coordinates buffer:
         boolean hasTexCoords = representativeVertex.hasTexCoords();
         if (hasTexCoords) {
-            numBytes = vertexCount * 2 * Float.BYTES;
-            this.texCoordsBuffer = new BufferResource(
-                    numBytes, usage, staging) {
-                @Override
-                protected void fill(ByteBuffer destinationBuffer) {
-                    for (Vertex vertex : vertices) {
-                        vertex.writeTexCoordsTo(destinationBuffer);
-                    }
-                }
-            };
-
-            byteBuffer = texCoordsBuffer.getData();
-            byteBuffer.flip();
-            this.texCoordsFloats = byteBuffer.asFloatBuffer();
-
+            this.texCoordsBuffer = VertexBuffer.newTexCoords(vertices);
         } else {
             this.texCoordsBuffer = null;
-            this.texCoordsFloats = null;
         }
     }
 
@@ -251,32 +174,21 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     Vertex copyVertex(int vertexIndex) {
         Validate.inRange(vertexIndex, "vertex index", 0, vertexCount - 1);
 
-        float xPos = positionFloats.get(numAxes * vertexIndex);
-        float yPos = positionFloats.get(numAxes * vertexIndex + 1);
-        float zPos = positionFloats.get(numAxes * vertexIndex + 2);
-        Vector3fc position = new Vector3f(xPos, yPos, zPos);
+        Vector3fc position = positionBuffer.get3f(vertexIndex, null);
 
         Vector3fc color = null;
-        if (colorFloats != null) {
-            float red = colorFloats.get(3 * vertexIndex);
-            float green = colorFloats.get(3 * vertexIndex + 1);
-            float blue = colorFloats.get(3 * vertexIndex + 2);
-            color = new Vector3f(red, green, blue);
+        if (colorBuffer != null) {
+            color = colorBuffer.get3f(vertexIndex, null);
         }
 
         Vector3fc normal = null;
-        if (normalFloats != null) {
-            float x = normalFloats.get(numAxes * vertexIndex);
-            float y = normalFloats.get(numAxes * vertexIndex + 1);
-            float z = normalFloats.get(numAxes * vertexIndex + 2);
-            normal = new Vector3f(x, y, z);
+        if (normalBuffer != null) {
+            normal = normalBuffer.get3f(vertexIndex, null);
         }
 
         Vector2fc texCoords = null;
-        if (texCoordsFloats != null) {
-            float u = texCoordsFloats.get(2 * vertexIndex);
-            float v = texCoordsFloats.get(2 * vertexIndex + 1);
-            texCoords = new Vector2f(u, v);
+        if (texCoordsBuffer != null) {
+            texCoords = texCoordsBuffer.get2f(vertexIndex, null);
         }
 
         Vertex result = new Vertex(position, color, normal, texCoords);
@@ -366,7 +278,6 @@ public class Mesh implements jme3utilities.lbj.Mesh {
      */
     public void dropNormals() {
         this.normalBuffer = null;
-        this.normalFloats = null;
     }
 
     /**
@@ -374,7 +285,6 @@ public class Mesh implements jme3utilities.lbj.Mesh {
      */
     public void dropTexCoords() {
         this.texCoordsBuffer = null;
-        this.texCoordsFloats = null;
     }
 
     /**
@@ -453,10 +363,9 @@ public class Mesh implements jme3utilities.lbj.Mesh {
 
         Vector3f tmpVector = new Vector3f();
         for (int vertexIndex = 0; vertexIndex < vertexCount; ++vertexIndex) {
-            int bufferPosition = vertexIndex * numAxes;
-            tmpVector.set(bufferPosition, positionFloats);
+            positionBuffer.get3f(vertexIndex, tmpVector);
             tmpVector.normalize();
-            tmpVector.get(bufferPosition, normalFloats);
+            normalBuffer.put3f(vertexIndex, tmpVector);
         }
 
         return this;
@@ -564,19 +473,20 @@ public class Mesh implements jme3utilities.lbj.Mesh {
         if (texCoordsBuffer == null) {
             throw new IllegalStateException("There are no UVs in the mesh.");
         }
+        Vector2f tmpVector = new Vector2f();
 
         for (int vIndex = 0; vIndex < vertexCount; ++vIndex) {
-            int startPosition = 2 * vIndex;
-            float oldU = texCoordsFloats.get(startPosition);
-            float oldV = texCoordsFloats.get(startPosition + 1);
+            texCoordsBuffer.get2f(vIndex, tmpVector);
 
             float newU = uCoefficients.w()
-                    + uCoefficients.x() * oldU + uCoefficients.y() * oldV;
+                    + uCoefficients.x() * tmpVector.x
+                    + uCoefficients.y() * tmpVector.y;
             float newV = vCoefficients.w()
-                    + vCoefficients.x() * oldU + vCoefficients.y() * oldV;
+                    + vCoefficients.x() * tmpVector.x
+                    + vCoefficients.y() * tmpVector.y;
+            tmpVector.set(newU, newV);
 
-            texCoordsFloats.put(startPosition, newU);
-            texCoordsFloats.put(startPosition + 1, newV);
+            texCoordsBuffer.put2f(vIndex, tmpVector);
         }
 
         return this;
@@ -601,17 +511,9 @@ public class Mesh implements jme3utilities.lbj.Mesh {
      *
      * @return a new buffer with a capacity of 3 * vertexCount floats
      */
-    protected FloatBuffer createNormals() {
-        int numBytes = vertexCount * numAxes * Float.BYTES;
-        int usage = VK10.VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-        boolean staging = false;
-        this.normalBuffer = new BufferResource(numBytes, usage, staging);
-
-        ByteBuffer byteBuffer = normalBuffer.getData();
-        byteBuffer.rewind();
-        this.normalFloats = byteBuffer.asFloatBuffer();
-
-        return normalFloats;
+    protected VertexBuffer createNormals() {
+        this.normalBuffer = VertexBuffer.newInstance(numAxes, vertexCount);
+        return normalBuffer;
     }
 
     /**
@@ -619,17 +521,9 @@ public class Mesh implements jme3utilities.lbj.Mesh {
      *
      * @return a new buffer with a capacity of 3 * vertexCount floats
      */
-    protected FloatBuffer createPositions() {
-        int numBytes = vertexCount * numAxes * Float.BYTES;
-        int usage = VK10.VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-        boolean staging = false;
-        this.positionBuffer = new BufferResource(numBytes, usage, staging);
-
-        ByteBuffer byteBuffer = positionBuffer.getData();
-        byteBuffer.rewind();
-        this.positionFloats = byteBuffer.asFloatBuffer();
-
-        return positionFloats;
+    protected VertexBuffer createPositions() {
+        this.positionBuffer = VertexBuffer.newInstance(numAxes, vertexCount);
+        return positionBuffer;
     }
 
     /**
@@ -637,17 +531,9 @@ public class Mesh implements jme3utilities.lbj.Mesh {
      *
      * @return a new buffer with a capacity of 2 * vertexCount floats
      */
-    protected FloatBuffer createUvs() {
-        int numBytes = vertexCount * 2 * Float.BYTES;
-        int usage = VK10.VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-        boolean staging = false;
-        this.texCoordsBuffer = new BufferResource(numBytes, usage, staging);
-
-        ByteBuffer byteBuffer = texCoordsBuffer.getData();
-        byteBuffer.rewind();
-        this.texCoordsFloats = byteBuffer.asFloatBuffer();
-
-        return texCoordsFloats;
+    protected VertexBuffer createUvs() {
+        this.texCoordsBuffer = VertexBuffer.newInstance(2, vertexCount);
+        return texCoordsBuffer;
     }
 
     /**
@@ -669,22 +555,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
         int numFloats = normalArray.length;
         Validate.require(numFloats == vertexCount * numAxes, "correct length");
 
-        int numBytes = numFloats * Float.BYTES;
-        int usage = VK10.VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-        boolean staging = false;
-        this.normalBuffer = new BufferResource(numBytes, usage, staging) {
-            @Override
-            protected void fill(ByteBuffer destinationBuffer) {
-                for (int floatI = 0; floatI < numFloats; ++floatI) {
-                    float fValue = normalArray[floatI];
-                    destinationBuffer.putFloat(fValue);
-                }
-            }
-        };
-
-        ByteBuffer byteBuffer = normalBuffer.getData();
-        byteBuffer.flip();
-        this.normalFloats = byteBuffer.asFloatBuffer();
+        this.normalBuffer = VertexBuffer.newInstance(numAxes, normalArray);
     }
 
     /**
@@ -697,22 +568,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
         int numFloats = positionArray.length;
         Validate.require(numFloats == vertexCount * numAxes, "correct length");
 
-        int numBytes = numFloats * Float.BYTES;
-        int usage = VK10.VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-        boolean staging = false;
-        this.positionBuffer = new BufferResource(numBytes, usage, staging) {
-            @Override
-            protected void fill(ByteBuffer destinationBuffer) {
-                for (int floatI = 0; floatI < numFloats; ++floatI) {
-                    float fValue = positionArray[floatI];
-                    destinationBuffer.putFloat(fValue);
-                }
-            }
-        };
-
-        ByteBuffer byteBuffer = positionBuffer.getData();
-        byteBuffer.flip();
-        this.positionFloats = byteBuffer.asFloatBuffer();
+        this.positionBuffer = VertexBuffer.newInstance(numAxes, positionArray);
     }
 
     /**
@@ -725,22 +581,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
         int numFloats = uvArray.length;
         Validate.require(numFloats == 2 * vertexCount, "correct length");
 
-        int numBytes = numFloats * Float.BYTES;
-        int usage = VK10.VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-        boolean staging = false;
-        this.texCoordsBuffer = new BufferResource(numBytes, usage, staging) {
-            @Override
-            protected void fill(ByteBuffer destinationBuffer) {
-                for (int floatI = 0; floatI < numFloats; ++floatI) {
-                    float fValue = uvArray[floatI];
-                    destinationBuffer.putFloat(fValue);
-                }
-            }
-        };
-
-        ByteBuffer byteBuffer = texCoordsBuffer.getData();
-        byteBuffer.flip();
-        this.texCoordsFloats = byteBuffer.asFloatBuffer();
+        this.texCoordsBuffer = VertexBuffer.newInstance(2, uvArray);
     }
     // *************************************************************************
     // jme3utilities.lbj.Mesh methods
@@ -763,7 +604,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
      */
     @Override
     public FloatBuffer getNormalsData() {
-        return normalFloats;
+        return normalBuffer.getData();
     }
 
     /**
@@ -773,7 +614,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
      */
     @Override
     public FloatBuffer getPositionsData() {
-        return positionFloats;
+        return positionBuffer.getData();
     }
 
     /**
