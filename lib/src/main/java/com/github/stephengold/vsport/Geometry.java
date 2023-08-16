@@ -279,6 +279,7 @@ public class Geometry {
      * @return the (modified) current geometry (for chaining)
      */
     public Geometry rotate(Matrix3fc rotation) {
+        Validate.nonNull(rotation, "rotation");
         uniformValues.rotate(rotation);
         return this;
     }
@@ -394,6 +395,7 @@ public class Geometry {
      * @return the (modified) current geometry (for chaining)
      */
     public Geometry setOrientation(Matrix3fc desiredOrientation) {
+        Validate.nonNull(desiredOrientation, "desired orientation");
         uniformValues.setOrientation(desiredOrientation);
         return this;
     }
