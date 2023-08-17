@@ -132,6 +132,17 @@ abstract public class BaseApplication {
     }
 
     /**
+     * Cleanly terminate the application after the window closes for any reason.
+     */
+    void cleanUpBase() {
+        if (inputManager != null) {
+            inputManager = inputManager.destroy();
+        }
+        Internals.cleanUpVulkan();
+        cleanUpGlfw();
+    }
+
+    /**
      * Access the camera for rendering.
      *
      * @return the pre-existing instance (not null)
@@ -428,17 +439,6 @@ abstract public class BaseApplication {
     }
     // *************************************************************************
     // private methods
-
-    /**
-     * Cleanly terminate the application after the window closes for any reason.
-     */
-    void cleanUpBase() {
-        if (inputManager != null) {
-            inputManager = inputManager.destroy();
-        }
-        Internals.cleanUpVulkan();
-        cleanUpGlfw();
-    }
 
     /**
      * Destroy the window and cleanly terminate GLFW.
