@@ -269,7 +269,7 @@ final public class VertexBuffer {
     }
 
     /**
-     * Create a mutable generic vertex buffer from an array of floats.
+     * Create a mutable vertex buffer from an array of floats.
      *
      * @param fpv the number of floats per vertex (&ge;1, &le;4)
      * @param floatArray the initial data (not null, unaffected)
@@ -289,7 +289,7 @@ final public class VertexBuffer {
     }
 
     /**
-     * Create a mutable, uninitialized generic vertex buffer.
+     * Create a mutable, uninitialized vertex buffer.
      *
      * @param fpv the number of floats per vertex (&ge;1, &le;4)
      * @param numVertices the desired capacity (in vertices)
