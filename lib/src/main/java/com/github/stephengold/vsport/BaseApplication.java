@@ -331,6 +331,7 @@ abstract public class BaseApplication {
         }
 
         try {
+            // Initialize this class:
             int appVersion = VK10.VK_MAKE_VERSION(appMajor, appMinor, appPatch);
             initializeBase(title, appName, appVersion);
 

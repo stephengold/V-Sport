@@ -431,7 +431,7 @@ public class Geometry {
     }
 
     /**
-     * Alter the orientation, without shifting the mesh origin.
+     * Alter the orientation without shifting the mesh origin.
      *
      * @param orientation the desired orientation (not null, not zero,
      * unaffected)
