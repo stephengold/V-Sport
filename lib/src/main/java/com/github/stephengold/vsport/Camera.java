@@ -279,6 +279,7 @@ public class Camera {
      * @return the (modified) current instance (for chaining)
      */
     public Camera setLocation(Vector3fc location) {
+        Validate.nonNull(location, "location");
         Validate.require(location.isFinite(), "a finite location");
 
         eyeLocation.set(location);
