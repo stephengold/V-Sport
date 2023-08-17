@@ -331,42 +331,8 @@ abstract public class BaseApplication {
         }
 
         try {
-            initializeGlfw(title);
-
-            // Create and initialize the InputManager.
-            inputManager = new InputManager(windowHandle);
-
             int appVersion = VK10.VK_MAKE_VERSION(appMajor, appMinor, appPatch);
-            Internals.initializeVulkan(appName, appVersion, this);
-
-            cameraInputProcessor = new CameraInputProcessor(windowHandle);
-            inputManager.add(cameraInputProcessor);
-
-            inputManager.add(new InputProcessor() {
-                @Override
-                public void onKeyboard(int keyId, boolean isPress) {
-                    if (keyId == GLFW.GLFW_KEY_ESCAPE) { // stop the application
-                        GLFW.glfwSetWindowShouldClose(windowHandle, true);
-                        return;
-                    }
-                    super.onKeyboard(keyId, isPress);
-                }
-            });
-
-            inputManager.add(new InputProcessor() {
-                @Override
-                public void onKeyboard(int keyId, boolean isPressed) {
-                    if (keyId == GLFW.GLFW_KEY_C) {
-                        if (isPressed) { // print camera state
-                            Camera cam = getCamera();
-                            System.out.println(cam);
-                            System.out.flush();
-                        }
-                        return;
-                    }
-                    super.onKeyboard(keyId, isPressed);
-                }
-            });
+            initializeBase(title, appName, appVersion);
 
             // Initialize the subclass.
             initialize();
@@ -481,6 +447,53 @@ abstract public class BaseApplication {
          * we use this fallback mechanism.
          */
         Internals.setNeedsResize();
+    }
+
+    /**
+     * Initialize this class.
+     *
+     * @param initialTitle the initial text for the window's title bar (not
+     * null)
+     * @param appName the name of the application
+     * @param appVersion the application's version numbers
+     */
+    private void initializeBase(
+            String initialTitle, String appName, int appVersion) {
+        initializeGlfw(initialTitle);
+
+        // Create and initialize the InputManager.
+        inputManager = new InputManager(windowHandle);
+
+        Internals.initializeVulkan(appName, appVersion, this);
+
+        cameraInputProcessor = new CameraInputProcessor(windowHandle);
+        inputManager.add(cameraInputProcessor);
+
+        inputManager.add(new InputProcessor() {
+            @Override
+            public void onKeyboard(int keyId, boolean isPress) {
+                if (keyId == GLFW.GLFW_KEY_ESCAPE) { // stop the application
+                    GLFW.glfwSetWindowShouldClose(windowHandle, true);
+                    return;
+                }
+                super.onKeyboard(keyId, isPress);
+            }
+        });
+
+        inputManager.add(new InputProcessor() {
+            @Override
+            public void onKeyboard(int keyId, boolean isPressed) {
+                if (keyId == GLFW.GLFW_KEY_C) {
+                    if (isPressed) { // print camera state
+                        Camera cam = getCamera();
+                        System.out.println(cam);
+                        System.out.flush();
+                    }
+                    return;
+                }
+                super.onKeyboard(keyId, isPressed);
+            }
+        });
     }
 
     /**
