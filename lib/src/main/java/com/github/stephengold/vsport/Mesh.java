@@ -252,6 +252,22 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
 
     /**
+     * Count how many point primitives the mesh contains.
+     *
+     * @return the count (&ge;0)
+     */
+    public int countPoints() {
+        int result;
+        if (topology == Topology.PointList) {
+            result = countIndexedVertices();
+        } else {
+            result = 0;
+        }
+
+        return result;
+    }
+
+    /**
      * Count how many triangle primitives the mesh contains.
      *
      * @return the count (&ge;0)
