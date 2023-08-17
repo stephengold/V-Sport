@@ -72,7 +72,7 @@ public class ShaderProgram extends DeviceResource {
     ShaderProgram(String programName) {
         Validate.nonEmpty(programName, "program name");
         this.programName = programName;
-        // Defer program-object creation until use().
+        // Defer {@code VkShaderModule} creation until handles are accessed.
     }
     // *************************************************************************
     // new methods exposed
