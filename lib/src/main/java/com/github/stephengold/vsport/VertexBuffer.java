@@ -276,7 +276,7 @@ final public class VertexBuffer {
      * @return a new instance (not null)
      */
     static VertexBuffer newInstance(int fpv, float... floatArray) {
-        int numVertices = floatArray.length;
+        int numVertices = floatArray.length / fpv;
         VertexBuffer result
                 = VertexBuffer.newInstance(Mesh.numAxes, numVertices);
 
