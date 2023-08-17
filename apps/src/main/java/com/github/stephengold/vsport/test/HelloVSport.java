@@ -147,7 +147,7 @@ public class HelloVSport extends BaseApplication {
         photo.setOrientation(new Matrix3f(
                 0f, -1f, 0f,
                 0f, 0f, 1f,
-                -1f, 0f, 0f));
+                -1f, 0f, 0f).transpose());
         photo.setProgram("Unshaded/Texture");
         photo.setTexture(photoKey);
         photo.setLocation(1.4f, -0.2f, 1f);
