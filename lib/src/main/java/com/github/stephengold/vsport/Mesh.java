@@ -451,12 +451,12 @@ public class Mesh implements jme3utilities.lbj.Mesh {
 
         for (Vertex vertex : vertices) {
             Integer index = tempMap.get(vertex);
-            if (index == null) {
+            if (index == null) { // assign a new index to the vertex
                 int nextIndex = tempVertices.size();
                 tempIndices.add(nextIndex);
                 tempVertices.add(vertex);
                 tempMap.put(vertex, nextIndex);
-            } else { // reuse a vertex we've already seen
+            } else { // reuse an index that's already been assigned
                 tempIndices.add(index);
             }
         }

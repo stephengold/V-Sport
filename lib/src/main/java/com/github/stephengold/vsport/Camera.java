@@ -125,18 +125,18 @@ public class Camera {
     }
 
     /**
-     * Return a copy of the "look" direction. This is a convenience method.
+     * Return a copy of the "look" direction.
      *
-     * @return a new unit vector in world coordinates
+     * @return a new unit vector in world coordinates (not null)
      */
     public Vector3f getDirection() {
         return direction(null);
     }
 
     /**
-     * Return a copy of the eye location. This is a convenience method.
+     * Return a copy of the eye location.
      *
-     * @return a new location vector in world coordinates
+     * @return a new location vector in world coordinates (not null)
      */
     public Vector3f getLocation() {
         return location(null);
@@ -266,6 +266,7 @@ public class Camera {
      */
     public Camera setLocation(Vector3fc location) {
         Validate.require(location.isFinite(), "a finite location");
+
         eyeLocation.set(location);
         return this;
     }

@@ -72,6 +72,7 @@ public class ShaderProgram extends DeviceResource {
     public ShaderProgram(String programName) {
         Validate.nonEmpty(programName, "program name");
         this.programName = programName;
+        // Defer program-object creation until use().
     }
     // *************************************************************************
     // new methods exposed

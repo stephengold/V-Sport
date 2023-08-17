@@ -494,7 +494,7 @@ final class Internals {
     /**
      * Initialize the Vulkan API.
      *
-     * @param appName the name of the application
+     * @param appName the name of the application (may be null)
      * @param appVersion the application's version numbers
      * @param app the application instance (not null)
      */
@@ -1011,8 +1011,8 @@ final class Internals {
      * Create a Vulkan instance to provide the application with access to the
      * Vulkan API.
      *
-     * @param appName the name of the application (not null)
-     * @param appVersion the version number of the application
+     * @param appName the name of the application (may be null)
+     * @param appVersion the version numbers of the application
      */
     private static void createVkInstance(String appName, int appVersion) {
         // Verify that all required validation layers are available:
