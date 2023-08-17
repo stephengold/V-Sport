@@ -187,48 +187,15 @@ final public class IndexBuffer extends jme3utilities.lbj.IndexBuffer {
      * @return a new instance (not null)
      */
     static IndexBuffer newInstance(int[] indices) {
-        int numIndices = indices.length;
-        boolean staging = false;
+        int capacity = indices.length;
         int maxIndex = Utils.maxInt(indices);
-        int numVertices = 1 + maxIndex;
+        int maxVertices = 1 + maxIndex;
 
-        BufferResource resource;
-        int elementType;
-        Buffer data;
-        if (numVertices > (1 << 16)) {
-            elementType = VK10.VK_INDEX_TYPE_UINT32;
-            int numBytes = numIndices * Integer.BYTES;
-            resource = new BufferResource(
-                    numBytes, VK10.VK_BUFFER_USAGE_INDEX_BUFFER_BIT, staging) {
-                @Override
-                protected void fill(ByteBuffer destinationBuffer) {
-                    for (int vIndex : indices) {
-                        destinationBuffer.putInt(vIndex);
-                    }
-                }
-            };
-            ByteBuffer bytes = resource.findData();
-            bytes.flip();
-            data = bytes.asIntBuffer();
-
-        } else { // Use 16-bit indices to conserve memory:
-            elementType = VK10.VK_INDEX_TYPE_UINT16;
-            int numBytes = numIndices * Short.BYTES;
-            resource = new BufferResource(
-                    numBytes, VK10.VK_BUFFER_USAGE_INDEX_BUFFER_BIT, staging) {
-                @Override
-                protected void fill(ByteBuffer destinationBuffer) {
-                    for (int vIndex : indices) {
-                        destinationBuffer.putShort((short) vIndex);
-                    }
-                }
-            };
-            ByteBuffer bytes = resource.findData();
-            bytes.flip();
-            data = bytes.asShortBuffer();
+        IndexBuffer result = newInstance(maxVertices, capacity);
+        for (int vIndex : indices) {
+            result.put(vIndex);
         }
 
-        IndexBuffer result = new IndexBuffer(data, elementType, resource);
         return result;
     }
 
@@ -239,48 +206,15 @@ final public class IndexBuffer extends jme3utilities.lbj.IndexBuffer {
      * @return a new instance (not null)
      */
     static IndexBuffer newInstance(List<Integer> indices) {
-        int numIndices = indices.size();
-        boolean staging = false;
+        int capacity = indices.size();
         int maxIndex = Collections.max(indices);
-        int numVertices = 1 + maxIndex;
+        int maxVertices = 1 + maxIndex;
 
-        BufferResource resource;
-        int elementType;
-        Buffer data;
-        if (numVertices > (1 << 16)) {
-            elementType = VK10.VK_INDEX_TYPE_UINT32;
-            int numBytes = numIndices * Integer.BYTES;
-            resource = new BufferResource(
-                    numBytes, VK10.VK_BUFFER_USAGE_INDEX_BUFFER_BIT, staging) {
-                @Override
-                protected void fill(ByteBuffer destinationBuffer) {
-                    for (int vIndex : indices) {
-                        destinationBuffer.putInt(vIndex);
-                    }
-                }
-            };
-            ByteBuffer bytes = resource.findData();
-            bytes.flip();
-            data = bytes.asIntBuffer();
-
-        } else { // Use 16-bit indices to conserve memory:
-            elementType = VK10.VK_INDEX_TYPE_UINT16;
-            int numBytes = numIndices * Short.BYTES;
-            resource = new BufferResource(
-                    numBytes, VK10.VK_BUFFER_USAGE_INDEX_BUFFER_BIT, staging) {
-                @Override
-                protected void fill(ByteBuffer destinationBuffer) {
-                    for (int vIndex : indices) {
-                        destinationBuffer.putShort((short) vIndex);
-                    }
-                }
-            };
-            ByteBuffer bytes = resource.findData();
-            bytes.flip();
-            data = bytes.asShortBuffer();
+        IndexBuffer result = newInstance(maxVertices, capacity);
+        for (int vIndex : indices) {
+            result.put(vIndex);
         }
 
-        IndexBuffer result = new IndexBuffer(data, elementType, resource);
         return result;
     }
     // *************************************************************************
