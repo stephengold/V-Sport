@@ -651,7 +651,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     /**
      * Access the normals data buffer.
      *
-     * @return the pre-existing buffer (not null)
+     * @return the pre-existing direct buffer (not null)
      */
     @Override
     public FloatBuffer getNormalsData() {
@@ -659,9 +659,9 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
 
     /**
-     * Access the positions data buffer for writing.
+     * Access the positions data buffer.
      *
-     * @return the pre-existing buffer (not null)
+     * @return the pre-existing direct buffer (not null)
      */
     @Override
     public FloatBuffer getPositionsData() {
@@ -691,7 +691,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
 
     /**
-     * Indicate that the normals data have changed.
+     * Indicate that the normals data buffer is dirty.
      */
     @Override
     public void setNormalsModified() {
@@ -699,7 +699,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
 
     /**
-     * Indicate that the positions data have changed.
+     * Indicate that the positions data buffer is dirty.
      */
     @Override
     public void setPositionsModified() {
