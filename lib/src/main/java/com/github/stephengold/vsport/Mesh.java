@@ -30,6 +30,7 @@
 package com.github.stephengold.vsport;
 
 import com.jme3.math.Quaternion;
+import com.jme3.math.Transform;
 import java.nio.FloatBuffer;
 import java.nio.LongBuffer;
 import java.util.ArrayList;
@@ -37,6 +38,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import jme3utilities.Validate;
+import jme3utilities.math.MyMath;
 import org.joml.Vector2f;
 import org.joml.Vector2fc;
 import org.joml.Vector3f;
@@ -491,6 +493,22 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
 
     /**
+     * Apply the specified scaling to all vertices.
+     *
+     * @param scaleFactor the scale factor to apply
+     * @return the (modified) current instance (for chaining)
+     */
+    public Mesh scale(float scaleFactor) {
+        if (scaleFactor == 1f) {
+            return this;
+        }
+        verifyMutable();
+
+        positionBuffer.scale(scaleFactor);
+        return this;
+    }
+
+    /**
      * Alter the primitive topology, which determines how vertices/indices are
      * organized into primitives.
      *
@@ -510,6 +528,32 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     public Topology topology() {
         assert topology != null;
         return topology;
+    }
+
+    /**
+     * Apply the specified transform to all vertices.
+     *
+     * @param transform the transform to apply (not null, unaffected)
+     * @return the (modified) current instance (for chaining)
+     */
+    public Mesh transform(Transform transform) {
+        Validate.nonNull(transform, "transform");
+        if (MyMath.isIdentity(transform)) {
+            return this;
+        }
+        verifyMutable();
+
+        positionBuffer.transform(transform);
+
+        if (normalBuffer != null) {
+            Transform normalsTransform = transform.clone();
+            normalsTransform.getTranslation().zero();
+            normalsTransform.setScale(1f);
+
+            normalBuffer.transform(normalsTransform);
+        }
+
+        return this;
     }
 
     /**
@@ -547,6 +591,18 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
     // *************************************************************************
     // new protected methods
+
+    /**
+     * Create a buffer for putting vertex indices.
+     *
+     * @param capacity the desired capacity (in indices, &ge;0)
+     * @return a new IndexBuffer with the specified capacity
+     */
+    protected IndexBuffer createIndices(int capacity) {
+        verifyMutable();
+        this.indexBuffer = IndexBuffer.newInstance(vertexCount, capacity);
+        return indexBuffer;
+    }
 
     /**
      * Replace any existing index buffer with a new one containing the specified
