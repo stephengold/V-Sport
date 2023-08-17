@@ -38,11 +38,11 @@ import com.github.stephengold.vsport.Vertex;
 import com.github.stephengold.vsport.importers.AssimpUtils;
 import com.github.stephengold.vsport.input.CameraInputProcessor;
 import com.github.stephengold.vsport.input.RotateMode;
+import com.jme3.math.Vector3f;
 import java.util.ArrayList;
 import java.util.List;
 import org.joml.Matrix3f;
 import org.joml.Matrix3fc;
-import org.joml.Vector3f;
 import org.lwjgl.assimp.Assimp;
 
 /**

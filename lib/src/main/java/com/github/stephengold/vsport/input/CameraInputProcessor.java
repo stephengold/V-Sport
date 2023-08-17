@@ -251,7 +251,7 @@ public class CameraInputProcessor extends InputProcessor {
         long nanoTime = System.nanoTime();
         if (lastMove != null) {
             Camera camera = BaseApplication.getCamera();
-            Vector3f lookDirection = camera.getDirection(); // TODO garbage
+            Vector3f lookDirection = camera.direction(null); // TODO garbage
             Vector3f rightDirection
                     = camera.rightDirection(null); // TODO garbage
 

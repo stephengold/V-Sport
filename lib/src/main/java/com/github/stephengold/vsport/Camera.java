@@ -129,8 +129,9 @@ public class Camera {
      *
      * @return a new unit vector in world coordinates (not null)
      */
-    public Vector3f getDirection() {
-        return direction(null);
+    public com.jme3.math.Vector3f getDirection() {
+        com.jme3.math.Vector3f result = Utils.toJmeVector(lookDirection);
+        return result;
     }
 
     /**
@@ -138,8 +139,9 @@ public class Camera {
      *
      * @return a new location vector in world coordinates (not null)
      */
-    public Vector3f getLocation() {
-        return location(null);
+    public com.jme3.math.Vector3f getLocation() {
+        com.jme3.math.Vector3f result = Utils.toJmeVector(eyeLocation);
+        return result;
     }
 
     /**
@@ -179,13 +181,15 @@ public class Camera {
      * null, finite, unaffected)
      * @return the (modified) current instance (for chaining)
      */
-    public Camera reposition(Vector3fc eyeLocation, Vector3fc targetLocation) {
-        Validate.require(eyeLocation.isFinite(), "a finite eye location");
-        Validate.require(targetLocation.isFinite(), "a finite target location");
+    public Camera reposition(com.jme3.math.Vector3f eyeLocation,
+            com.jme3.math.Vector3f targetLocation) {
+        Validate.finite(eyeLocation, "eye location");
+        Validate.finite(targetLocation, "target location");
 
-        this.eyeLocation.set(eyeLocation);
+        this.eyeLocation.set(eyeLocation.x, eyeLocation.y, eyeLocation.z);
 
-        Vector3f offset = new Vector3f(targetLocation).sub(eyeLocation);
+        Vector3f offset
+                = Utils.toJomlVector(targetLocation).sub(this.eyeLocation);
         setLookDirection(offset);
 
         return this;
