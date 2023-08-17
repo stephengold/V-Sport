@@ -487,7 +487,6 @@ abstract public class BaseApplication {
             public void onKeyboard(int keyId, boolean isPressed) {
                 if (keyId == GLFW.GLFW_KEY_C) {
                     if (isPressed) { // print camera state
-                        Camera cam = getCamera();
                         System.out.println(cam);
                         System.out.flush();
                     }
