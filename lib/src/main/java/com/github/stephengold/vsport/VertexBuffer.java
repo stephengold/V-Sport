@@ -317,6 +317,23 @@ final public class VertexBuffer {
     }
 
     /**
+     * Create a mutable vertex buffer from an array of vectors.
+     *
+     * @param vectors the initial data (not null, unaffected)
+     * @return a new instance (not null)
+     */
+    static VertexBuffer newInstance(com.jme3.math.Vector3f... vectors) {
+        int numVertices = vectors.length;
+        VertexBuffer result
+                = VertexBuffer.newInstance(Mesh.numAxes, numVertices);
+        for (com.jme3.math.Vector3f vector : vectors) {
+            result.put(vector);
+        }
+
+        return result;
+    }
+
+    /**
      * Create a mutable normal buffer from a list of vertices.
      *
      * @param vertices the vertices to use (not null, unaffected)
