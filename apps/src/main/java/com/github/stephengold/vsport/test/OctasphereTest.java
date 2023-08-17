@@ -31,7 +31,6 @@ package com.github.stephengold.vsport.test;
 
 import com.github.stephengold.vsport.BaseApplication;
 import com.github.stephengold.vsport.Constants;
-import com.github.stephengold.vsport.FlipAxes;
 import com.github.stephengold.vsport.Geometry;
 import com.github.stephengold.vsport.Mesh;
 import com.github.stephengold.vsport.TextureKey;
