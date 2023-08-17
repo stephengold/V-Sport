@@ -143,6 +143,44 @@ final public class IndexBuffer extends jme3utilities.lbj.IndexBuffer {
     }
 
     /**
+     * Create an index buffer without initializing its contents.
+     *
+     * @param maxVertices one more than the highest index value (&ge;0)
+     * @param capacity the desired number of indices (&ge;0)
+     * @return a new instance (not null)
+     */
+    static IndexBuffer newInstance(int maxVertices, int capacity) {
+        boolean staging = false;
+
+        BufferResource resource;
+        int elementType;
+        Buffer data;
+        if (maxVertices > (1 << 16)) {
+            elementType = VK10.VK_INDEX_TYPE_UINT32;
+            int numBytes = capacity * Integer.BYTES;
+            resource = new BufferResource(
+                    numBytes, VK10.VK_BUFFER_USAGE_INDEX_BUFFER_BIT, staging);
+            ByteBuffer bytes = resource.findData();
+            bytes.position(numBytes);
+            bytes.flip();
+            data = bytes.asIntBuffer();
+
+        } else { // Use 16-bit indices to conserve memory:
+            elementType = VK10.VK_INDEX_TYPE_UINT16;
+            int numBytes = capacity * Short.BYTES;
+            resource = new BufferResource(
+                    numBytes, VK10.VK_BUFFER_USAGE_INDEX_BUFFER_BIT, staging);
+            ByteBuffer bytes = resource.findData();
+            bytes.position(numBytes);
+            bytes.flip();
+            data = bytes.asShortBuffer();
+        }
+
+        IndexBuffer result = new IndexBuffer(data, elementType, resource);
+        return result;
+    }
+
+    /**
      * Create an IndexBuffer from an array of vertex indices.
      *
      * @param indices the desired indices (not null, unaffected)
