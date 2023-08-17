@@ -229,7 +229,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
      *
      * @return the count (&ge;0)
      */
-    int countIndexedVertices() {
+    public int countIndexedVertices() {
         int result = (indexBuffer == null) ? vertexCount : indexBuffer.size();
         return result;
     }
