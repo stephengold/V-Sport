@@ -41,6 +41,8 @@ import jme3utilities.MyString;
 import jme3utilities.Validate;
 import jme3utilities.math.MyMath;
 import org.joml.Matrix3f;
+import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.vulkan.KHRSwapchain;
 import org.lwjgl.vulkan.VK10;
@@ -330,5 +332,27 @@ final public class Utils {
         }
 
         return result;
+    }
+
+    /**
+     * Copy the specified JOML vector to a JME vector.
+     *
+     * @param vector3f the JOML vector to copy (not null, unaffected)
+     * @return a new JME vector (not null)
+     */
+    public static com.jme3.math.Vector3f toJmeVector(Vector3fc vector3f) {
+        com.jme3.math.Vector3f result = new com.jme3.math.Vector3f(
+                vector3f.x(), vector3f.y(), vector3f.z());
+        return result;
+    }
+
+    /**
+     * Copy the specified JME vector to a JOML vector.
+     *
+     * @param vector3f the JME vector to copy (not null, unaffected)
+     * @return a new JOML vector (not null)
+     */
+    public static Vector3f toJomlVector(com.jme3.math.Vector3f vector3f) {
+        return new Vector3f(vector3f.x, vector3f.y, vector3f.z);
     }
 }
