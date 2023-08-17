@@ -45,7 +45,7 @@ import org.lwjgl.vulkan.VkImageSubresourceLayers;
 import org.lwjgl.vulkan.VkImageSubresourceRange;
 
 /**
- * A 2-D texture for sampling.
+ * A 2-D texture for sampling, obtained using a TextureKey.
  *
  * @author Stephen Gold sgold@sonic.net
  */

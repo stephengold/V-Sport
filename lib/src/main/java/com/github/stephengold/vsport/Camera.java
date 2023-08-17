@@ -37,8 +37,8 @@ import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
 /**
- * A viewpoint for 3-D rendering, including an eye location, "look" direction,
- * and "up" direction.
+ * A viewpoint for 3-D rendering, including an eye location, a "look" direction,
+ * and an "up" direction.
  * <p>
  * Intended for a Y-up environment. When the camera's azimuth and up angle are
  * both zero, it looks in the +X direction.

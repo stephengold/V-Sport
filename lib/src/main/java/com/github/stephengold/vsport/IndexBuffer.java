@@ -123,7 +123,7 @@ final public class IndexBuffer extends jme3utilities.lbj.IndexBuffer {
     }
 
     /**
-     * Return the type of index.
+     * Return the type of vertex indices (elements) contained in the buffer.
      *
      * @return either {@code VK_INDEX_TYPE_UINT16} or
      * {@code VK_INDEX_TYPE_UINT32}

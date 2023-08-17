@@ -83,7 +83,7 @@ abstract public class BaseApplication {
      */
     private static CameraInputProcessor cameraInputProcessor;
     /**
-     * all visible geometries
+     * all visible geometries, regardless of depth-test status
      */
     private static final Collection<Geometry> visibleGeometries
             = new HashSet<>(256);
@@ -180,7 +180,7 @@ abstract public class BaseApplication {
     }
 
     /**
-     * Access the view-to-clip transform for rendering.
+     * Access the current view-to-clip transform for rendering.
      *
      * @return the pre-existing instance (not null)
      */
@@ -217,7 +217,8 @@ abstract public class BaseApplication {
     }
 
     /**
-     * Hide the specified geometries.
+     * Hide the specified geometries. When a Geometry is hidden, it loses its
+     * place in the deferred queue.
      *
      * @param geometries the geometries to de-visualize (not null, unaffected)
      */
@@ -255,7 +256,9 @@ abstract public class BaseApplication {
     }
 
     /**
-     * Make the specified Geometry visible.
+     * Make the specified Geometry visible. If it omits depth testing and wasn't
+     * previous visible, append it to the deferred queue (causing it to be
+     * rendered last).
      *
      * @param geometry the Geometry to visualize (not null, unaffected)
      */
