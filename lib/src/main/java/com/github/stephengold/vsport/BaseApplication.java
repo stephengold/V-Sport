@@ -466,6 +466,8 @@ abstract public class BaseApplication {
 
         Internals.initializeVulkan(appName, appVersion, this);
 
+        setBackgroundColor(Constants.DARK_GRAY);
+
         cameraInputProcessor = new CameraInputProcessor(windowHandle);
         inputManager.add(cameraInputProcessor);
 
