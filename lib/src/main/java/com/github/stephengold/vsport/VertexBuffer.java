@@ -276,22 +276,14 @@ final public class VertexBuffer {
      * @return a new instance (not null)
      */
     static VertexBuffer newInstance(int fpv, float... floatArray) {
-        int numBytes = floatArray.length * Float.BYTES;
-        int usage = VK10.VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-        boolean staging = false;
-        BufferResource bufferResource = new BufferResource(
-                numBytes, usage, staging) {
-            @Override
-            protected void fill(ByteBuffer destinationBuffer) {
-                for (float fValue : floatArray) {
-                    destinationBuffer.putFloat(fValue);
-                }
-            }
-        };
-        ByteBuffer byteBuffer = bufferResource.findData();
-        byteBuffer.flip();
-        FloatBuffer dataBuffer = byteBuffer.asFloatBuffer();
-        VertexBuffer result = new VertexBuffer(dataBuffer, fpv, bufferResource);
+        int numVertices = floatArray.length;
+        VertexBuffer result
+                = VertexBuffer.newInstance(Mesh.numAxes, numVertices);
+
+        FloatBuffer data = result.getData();
+        for (float fValue : floatArray) {
+            data.put(fValue);
+        }
 
         return result;
     }
@@ -331,24 +323,14 @@ final public class VertexBuffer {
      * @return a new instance (not null)
      */
     static VertexBuffer newNormal(List<Vertex> vertices) {
-        int fpv = Mesh.numAxes;
-        int numFloats = vertices.size() * fpv;
-        int numBytes = numFloats * Float.BYTES;
-        int usage = VK10.VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-        boolean staging = false;
-        BufferResource bufferResource = new BufferResource(
-                numBytes, usage, staging) {
-            @Override
-            protected void fill(ByteBuffer destinationBuffer) {
-                for (Vertex vertex : vertices) {
-                    vertex.writeNormalTo(destinationBuffer);
-                }
-            }
-        };
-        ByteBuffer byteBuffer = bufferResource.findData();
-        byteBuffer.flip();
-        FloatBuffer dataBuffer = byteBuffer.asFloatBuffer();
-        VertexBuffer result = new VertexBuffer(dataBuffer, fpv, bufferResource);
+        int numVertices = vertices.size();
+        VertexBuffer result
+                = VertexBuffer.newInstance(Mesh.numAxes, numVertices);
+
+        ByteBuffer data = result.bufferResource.findData();
+        for (Vertex vertex : vertices) {
+            vertex.writeNormalTo(data);
+        }
 
         return result;
     }
@@ -360,24 +342,14 @@ final public class VertexBuffer {
      * @return a new instance (not null)
      */
     static VertexBuffer newPosition(List<Vertex> vertices) {
-        int fpv = Mesh.numAxes;
-        int numFloats = vertices.size() * fpv;
-        int numBytes = numFloats * Float.BYTES;
-        int usage = VK10.VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-        boolean staging = false;
-        BufferResource bufferResource = new BufferResource(
-                numBytes, usage, staging) {
-            @Override
-            protected void fill(ByteBuffer destinationBuffer) {
-                for (Vertex vertex : vertices) {
-                    vertex.writePositionTo(destinationBuffer);
-                }
-            }
-        };
-        ByteBuffer byteBuffer = bufferResource.findData();
-        byteBuffer.flip();
-        FloatBuffer dataBuffer = byteBuffer.asFloatBuffer();
-        VertexBuffer result = new VertexBuffer(dataBuffer, fpv, bufferResource);
+        int numVertices = vertices.size();
+        VertexBuffer result
+                = VertexBuffer.newInstance(Mesh.numAxes, numVertices);
+
+        ByteBuffer data = result.bufferResource.findData();
+        for (Vertex vertex : vertices) {
+            vertex.writePositionTo(data);
+        }
 
         return result;
     }
@@ -389,24 +361,13 @@ final public class VertexBuffer {
      * @return a new instance (not null)
      */
     static VertexBuffer newTexCoords(List<Vertex> vertices) {
-        int fpv = 2;
-        int numFloats = vertices.size() * fpv;
-        int numBytes = numFloats * Float.BYTES;
-        int usage = VK10.VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-        boolean staging = false;
-        BufferResource bufferResource = new BufferResource(
-                numBytes, usage, staging) {
-            @Override
-            protected void fill(ByteBuffer destinationBuffer) {
-                for (Vertex vertex : vertices) {
-                    vertex.writeTexCoordsTo(destinationBuffer);
-                }
-            }
-        };
-        ByteBuffer byteBuffer = bufferResource.findData();
-        byteBuffer.flip();
-        FloatBuffer dataBuffer = byteBuffer.asFloatBuffer();
-        VertexBuffer result = new VertexBuffer(dataBuffer, fpv, bufferResource);
+        int numVertices = vertices.size();
+        VertexBuffer result = VertexBuffer.newInstance(2, numVertices);
+
+        ByteBuffer data = result.bufferResource.findData();
+        for (Vertex vertex : vertices) {
+            vertex.writeTexCoordsTo(data);
+        }
 
         return result;
     }
