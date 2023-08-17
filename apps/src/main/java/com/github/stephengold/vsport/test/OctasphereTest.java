@@ -86,8 +86,7 @@ public class OctasphereTest extends BaseApplication {
                 .setScale(radius);
 
         String resourceName = "/Textures/TextureTest.png";
-        TextureKey textureKey = new TextureKey(
-                "classpath://" + resourceName, true, FlipAxes.noFlip);
+        TextureKey textureKey = new TextureKey("classpath://" + resourceName);
         sphereGeometry.setTexture(textureKey);
 
         // Add a red wireframe to visualize the underlying mesh.
