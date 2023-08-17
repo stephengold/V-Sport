@@ -145,6 +145,16 @@ public class Camera {
     }
 
     /**
+     * Return a copy of the camera's "right" direction.
+     *
+     * @return a new unit vector in world coordinates (not null)
+     */
+    public com.jme3.math.Vector3f getRight() {
+        com.jme3.math.Vector3f result = Utils.toJmeVector(rightDirection);
+        return result;
+    }
+
+    /**
      * Return a copy of the eye location.
      *
      * @param storeResult storage for the result (modified if not null)
