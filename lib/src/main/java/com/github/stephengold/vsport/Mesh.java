@@ -299,6 +299,14 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
 
     /**
+     * Remove the colors, if any.
+     */
+    public void dropColors() {
+        verifyMutable();
+        this.colorBuffer = null;
+    }
+
+    /**
      * Remove the normals, if any.
      */
     public void dropNormals() {
@@ -397,6 +405,15 @@ public class Mesh implements jme3utilities.lbj.Mesh {
         }
 
         return this;
+    }
+
+    /**
+     * Access the positions VertexBuffer.
+     *
+     * @return the pre-existing buffer (not null)
+     */
+    public VertexBuffer getPositions() {
+        return positionBuffer;
     }
 
     /**
@@ -593,6 +610,17 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     // new protected methods
 
     /**
+     * Create a buffer for putting vertex colors.
+     *
+     * @return a new buffer with a capacity of 3 * vertexCount floats
+     */
+    protected VertexBuffer createColors() {
+        verifyMutable();
+        this.colorBuffer = VertexBuffer.newInstance(3, vertexCount);
+        return colorBuffer;
+    }
+
+    /**
      * Create a buffer for putting vertex indices.
      *
      * @param capacity the desired capacity (in indices, &ge;0)
@@ -663,6 +691,20 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     protected void setIndices(int... indexArray) {
         verifyMutable();
         this.indexBuffer = IndexBuffer.newInstance(indexArray);
+    }
+
+    /**
+     * Assign new colors to the vertices.
+     *
+     * @param colorArray the desired vertex colors (not null,
+     * length=3*vertexCount, unaffected)
+     */
+    protected void setColors(float... colorArray) {
+        int numFloats = colorArray.length;
+        Validate.require(numFloats == vertexCount * 3, "correct length");
+        verifyMutable();
+
+        this.colorBuffer = VertexBuffer.newInstance(3, colorArray);
     }
 
     /**
