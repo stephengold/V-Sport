@@ -12,12 +12,12 @@ layout(binding = 0) uniform Global { // global uniforms:
     mat4 projectionMatrix;
 } global;
 
-layout(binding = 1) uniform NonGlobal {
+layout(binding = 1) uniform PerGeometry {
     vec4 BaseMaterialColor; // for ambient/diffuse lighting
     mat4 modelMatrix;
     mat3 modelRotationMatrix;
     vec4 SpecularMaterialColor;
-} ubo;
+} geometry;
 
 layout(location = 1) in vec3 EyeDirection_cameraspace;
 layout(location = 2) in vec3 LightDirection_cameraspace;
@@ -54,7 +54,7 @@ void main() {
     float cosAlpha4 = cosAlpha2 * cosAlpha2;
     float cosAlpha8 = cosAlpha4 * cosAlpha4;
 
-    vec3 color = (global.ambientStrength + cosTheta) * ubo.BaseMaterialColor.rgb;
-    color = color + cosAlpha8 * ubo.SpecularMaterialColor.rgb;
+    vec3 color = (global.ambientStrength + cosTheta) * geometry.BaseMaterialColor.rgb;
+    color = color + cosAlpha8 * geometry.SpecularMaterialColor.rgb;
     fragColor = color * global.LightColor;
 }

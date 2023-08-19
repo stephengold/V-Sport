@@ -12,12 +12,12 @@ layout(binding = 0) uniform Global { // global uniforms:
     mat4 projectionMatrix;
 } global;
 
-layout(binding = 1) uniform NonGlobal {
+layout(binding = 1) uniform PerGeometry {
     vec4 BaseMaterialColor; // for ambient/diffuse lighting
     mat4 modelMatrix;
     mat3 modelRotationMatrix;
     vec4 SpecularMaterialColor;
-} ubo;
+} geometry;
 
 layout(location = 0) in vec3 vertexPosition_modelspace; // positions from a vertex buffer
 layout(location = 1) in vec3 vertexNormal_modelspace; // normals from a vertex buffer
@@ -30,7 +30,7 @@ layout(location = 4) out vec3 Normal_cameraspace;
 
 void main() {
     // vertex position in camera space
-    vec4 vertexPosition_cameraspace = global.viewMatrix * ubo.modelMatrix * vec4(vertexPosition_modelspace, 1);
+    vec4 vertexPosition_cameraspace = global.viewMatrix * geometry.modelMatrix * vec4(vertexPosition_modelspace, 1);
 
     // vertex position in clip space
     gl_Position = global.projectionMatrix * vertexPosition_cameraspace;
@@ -43,7 +43,7 @@ void main() {
     LightDirection_cameraspace = (global.viewMatrix * vec4(global.LightDirection_worldspace, 0)).xyz;
 
     // vertex normal in camera space
-    Normal_cameraspace = (global.viewMatrix * vec4(ubo.modelRotationMatrix * vertexNormal_modelspace, 0)).xyz;
+    Normal_cameraspace = (global.viewMatrix * vec4(geometry.modelRotationMatrix * vertexNormal_modelspace, 0)).xyz;
 
     // texture coordinates of the vertex
     UV = vertexUV;

@@ -3,15 +3,15 @@
  */
 #version 450
 
-layout(binding = 1) uniform NonGlobal {
+layout(binding = 1) uniform PerGeometry {
     vec4 BaseMaterialColor; // for ambient/diffuse lighting
     mat4 modelMatrix;
     mat3 modelRotationMatrix;
     vec4 SpecularMaterialColor;
-} ubo;
+} geometry;
 
 layout(location = 0) out vec3 fragColor;
 
 void main() {
-    fragColor = ubo.BaseMaterialColor.rgb;
+    fragColor = geometry.BaseMaterialColor.rgb;
 }
