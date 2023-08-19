@@ -29,7 +29,7 @@
  */
 package com.github.stephengold.vsport;
 
-import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import jme3utilities.Validate;
 import org.joml.Matrix3fc;
 import org.joml.Vector2f;
@@ -143,50 +143,50 @@ public class Vertex {
     }
 
     /**
-     * Write the vertex color data to the specified ByteBuffer, starting at the
+     * Write the vertex color data to the specified FloatBuffer, starting at the
      * current buffer position) and advance the buffer position.
      *
      * @param target the buffer to write to (not null, modified)
      */
-    void writeColorTo(ByteBuffer target) {
-        target.putFloat(color.x());
-        target.putFloat(color.y());
-        target.putFloat(color.z());
+    void writeColorTo(FloatBuffer target) {
+        target.put(color.x());
+        target.put(color.y());
+        target.put(color.z());
     }
 
     /**
-     * Write the vertex normal data to the specified ByteBuffer, starting at the
-     * current buffer position) and advance the buffer position.
-     *
-     * @param target the buffer to write to (not null, modified)
-     */
-    void writeNormalTo(ByteBuffer target) {
-        target.putFloat(normal.x());
-        target.putFloat(normal.y());
-        target.putFloat(normal.z());
-    }
-
-    /**
-     * Write the vertex position data to the specified ByteBuffer, starting at
+     * Write the vertex normal data to the specified FloatBuffer, starting at
      * the current buffer position) and advance the buffer position.
      *
      * @param target the buffer to write to (not null, modified)
      */
-    void writePositionTo(ByteBuffer target) {
-        target.putFloat(position.x());
-        target.putFloat(position.y());
-        target.putFloat(position.z());
+    void writeNormalTo(FloatBuffer target) {
+        target.put(normal.x());
+        target.put(normal.y());
+        target.put(normal.z());
     }
 
     /**
-     * Write the texture coordinate data to the specified ByteBuffer, starting
-     * at the current buffer position) and advances the buffer position.
+     * Write the vertex position data to the specified FloatBuffer, starting at
+     * the current buffer position) and advance the buffer position.
      *
      * @param target the buffer to write to (not null, modified)
      */
-    void writeTexCoordsTo(ByteBuffer target) {
-        target.putFloat(texCoords.x());
-        target.putFloat(texCoords.y());
+    void writePositionTo(FloatBuffer target) {
+        target.put(position.x());
+        target.put(position.y());
+        target.put(position.z());
+    }
+
+    /**
+     * Write the texture coordinate data to the specified FloatBuffer, starting
+     * at the current buffer position) and advance the buffer position.
+     *
+     * @param target the buffer to write to (not null, modified)
+     */
+    void writeTexCoordsTo(FloatBuffer target) {
+        target.put(texCoords.x());
+        target.put(texCoords.y());
     }
     // *************************************************************************
     // Object methods

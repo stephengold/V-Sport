@@ -247,29 +247,19 @@ final public class VertexBuffer {
      */
     static VertexBuffer newColor(List<Vertex> vertices) {
         int fpv = 3;
-        int numFloats = vertices.size() * fpv;
-        int numBytes = numFloats * Float.BYTES;
-        int usage = VK10.VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-        boolean staging = false;
-        BufferResource bufferResource = new BufferResource(
-                numBytes, usage, staging) {
-            @Override
-            protected void fill(ByteBuffer destinationBuffer) {
-                for (Vertex vertex : vertices) {
-                    vertex.writeColorTo(destinationBuffer);
-                }
-            }
-        };
-        ByteBuffer byteBuffer = bufferResource.findData();
-        byteBuffer.flip();
-        FloatBuffer dataBuffer = byteBuffer.asFloatBuffer();
-        VertexBuffer result = new VertexBuffer(dataBuffer, fpv, bufferResource);
+        int numVertices = vertices.size();
+        VertexBuffer result = newInstance(fpv, numVertices);
+
+        FloatBuffer data = result.getData();
+        for (Vertex vertex : vertices) {
+            vertex.writeColorTo(data);
+        }
 
         return result;
     }
 
     /**
-     * Create a mutable vertex buffer from an array of floats.
+     * Create a mutable vertex buffer initialized from an array of floats.
      *
      * @param fpv the number of floats per vertex (&ge;1, &le;4)
      * @param floatArray the initial data (not null, unaffected)
@@ -341,10 +331,10 @@ final public class VertexBuffer {
      */
     static VertexBuffer newNormal(List<Vertex> vertices) {
         int numVertices = vertices.size();
-        VertexBuffer result
-                = VertexBuffer.newInstance(Mesh.numAxes, numVertices);
+        int fpv = Mesh.numAxes;
+        VertexBuffer result = newInstance(fpv, numVertices);
 
-        ByteBuffer data = result.bufferResource.findData();
+        FloatBuffer data = result.getData();
         for (Vertex vertex : vertices) {
             vertex.writeNormalTo(data);
         }
@@ -359,11 +349,11 @@ final public class VertexBuffer {
      * @return a new instance (not null)
      */
     static VertexBuffer newPosition(List<Vertex> vertices) {
+        int fpv = Mesh.numAxes;
         int numVertices = vertices.size();
-        VertexBuffer result
-                = VertexBuffer.newInstance(Mesh.numAxes, numVertices);
+        VertexBuffer result = newInstance(fpv, numVertices);
 
-        ByteBuffer data = result.bufferResource.findData();
+        FloatBuffer data = result.getData();
         for (Vertex vertex : vertices) {
             vertex.writePositionTo(data);
         }
@@ -378,10 +368,11 @@ final public class VertexBuffer {
      * @return a new instance (not null)
      */
     static VertexBuffer newTexCoords(List<Vertex> vertices) {
+        int fpv = 2;
         int numVertices = vertices.size();
-        VertexBuffer result = VertexBuffer.newInstance(2, numVertices);
+        VertexBuffer result = newInstance(fpv, numVertices);
 
-        ByteBuffer data = result.bufferResource.findData();
+        FloatBuffer data = result.getData();
         for (Vertex vertex : vertices) {
             vertex.writeTexCoordsTo(data);
         }
