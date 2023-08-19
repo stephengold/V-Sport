@@ -182,7 +182,7 @@ public class Camera {
     }
 
     /**
-     * Teleport the eye to {@code newLocation} and orient it to look at
+     * Translate the eye to {@code eyeLocation} and orient it to look at
      * {@code targetLocation}.
      *
      * @param eyeLocation the desired eye location (in world coordinates, not

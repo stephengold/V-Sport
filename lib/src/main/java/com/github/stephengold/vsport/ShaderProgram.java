@@ -87,7 +87,7 @@ public class ShaderProgram extends DeviceResource {
     // new methods exposed
 
     /**
-     * Count how many attributes the program requires.
+     * Count how many vertex attributes the program requires.
      *
      * @return the count (&gt;0)
      */
@@ -134,7 +134,7 @@ public class ShaderProgram extends DeviceResource {
                         numAttributes, stack);
 
         int slotIndex = 0; // current binding/slot
-        int offset = 0;
+        int offset = 0; // start offset in bytes
 
         // position attribute (3 signed floats in slot 0)
         VkVertexInputAttributeDescription posDescription
@@ -328,7 +328,8 @@ public class ShaderProgram extends DeviceResource {
     }
 
     /**
-     * Load the fragment shader from the classpath.
+     * Load the fragment shader (FRAG file) from the classpath and compile it to
+     * a {@code VkShaderModule}.
      */
     private void reloadFragModule() {
         String resourceName = String.format("/Shaders/%s.frag", programName);

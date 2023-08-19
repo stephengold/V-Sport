@@ -307,7 +307,7 @@ final public class VertexBuffer {
     }
 
     /**
-     * Create a mutable vertex buffer from an array of vectors.
+     * Create a mutable vertex buffer initialized from an array of vectors.
      *
      * @param vectors the initial data (not null, unaffected)
      * @return a new instance (not null)

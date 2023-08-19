@@ -73,7 +73,7 @@ public class Vertex {
      *
      * @param position the desired position (in mesh coordinates, not null,
      * unaffected)
-     * @param color the desired color (may be null, unaffected)
+     * @param color the desired vertex color (may be null, unaffected)
      * @param normal the desired normal direction (unit vector in mesh
      * coordinates, may be null, unaffected)
      * @param texCoords the desired texture coordinates (may be null,
@@ -105,7 +105,7 @@ public class Vertex {
     }
 
     /**
-     * Text whether the normal attribute is present.
+     * Text whether the vertex-normal attribute is present.
      *
      * @return true if present, otherwise false
      */
