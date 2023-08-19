@@ -206,6 +206,28 @@ public class Camera {
     }
 
     /**
+     * Translate the eye to {@code eyeLocation} and orient it to look at
+     * {@code targetLocation}.
+     *
+     * @param eyeLocation the desired eye location (in world coordinates, not
+     * null, finite, unaffected)
+     * @param targetLocation the location to look at (in world coordinates, not
+     * null, finite, unaffected)
+     * @return the (modified) current instance (for chaining)
+     */
+    public Camera reposition(Vector3fc eyeLocation, Vector3fc targetLocation) {
+        Validate.require(eyeLocation.isFinite(), "eye location");
+        Validate.require(targetLocation.isFinite(), "target location");
+
+        this.eyeLocation.set(eyeLocation);
+
+        Vector3f direction = new Vector3f(targetLocation).sub(eyeLocation);
+        setLookDirection(direction);
+
+        return this;
+    }
+
+    /**
      * Return a copy of the camera's "right" direction.
      *
      * @param storeResult storage for the result (modified if not null)
