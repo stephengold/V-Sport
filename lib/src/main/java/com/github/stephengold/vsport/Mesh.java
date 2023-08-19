@@ -335,7 +335,8 @@ public class Mesh implements jme3utilities.lbj.Mesh {
 
         int slotIndex = 0;
         result.put(slotIndex, positionBuffer.handle());
-        if (program.requiresColor()) {
+
+        if (program.requires(ShaderInput.VertexColor)) {
             if (colorBuffer == null) {
                 throw new IllegalStateException(
                         "Geometry cannot be rendered because the " + program
@@ -344,7 +345,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
             ++slotIndex;
             result.put(slotIndex, colorBuffer.handle());
         }
-        if (program.requiresNormal()) {
+        if (program.requires(ShaderInput.VertexNormal)) {
             if (normalBuffer == null) {
                 throw new IllegalStateException(
                         "Geometry cannot be rendered because the " + program
@@ -353,7 +354,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
             ++slotIndex;
             result.put(slotIndex, normalBuffer.handle());
         }
-        if (program.requiresTexCoords()) {
+        if (program.requires(ShaderInput.VertexTexCoords)) {
             if (texCoordsBuffer == null) {
                 throw new IllegalStateException(
                         "Geometry cannot be rendered because the " + program

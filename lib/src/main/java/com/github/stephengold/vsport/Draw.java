@@ -178,7 +178,7 @@ class Draw {
             int numWrites;
             VkDescriptorImageInfo.Buffer pImageInfo;
             ShaderProgram program = geometry.getProgram();
-            if (program.requiresTexCoords()) {
+            if (program.requires(ShaderInput.MaterialTexture)) {
                 numWrites = 2;
                 pImageInfo = VkDescriptorImageInfo.calloc(1, stack);
                 pImageInfo.imageLayout(
@@ -211,7 +211,7 @@ class Draw {
             uboWrite.dstSet(descriptorSetHandle);
             uboWrite.pBufferInfo(pBufferInfo);
 
-            if (program.requiresTexCoords()) {
+            if (program.requires(ShaderInput.MaterialTexture)) {
                 VkWriteDescriptorSet samplerWrite = pWrites.get(1);
                 samplerWrite.sType(VK10.VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET);
 

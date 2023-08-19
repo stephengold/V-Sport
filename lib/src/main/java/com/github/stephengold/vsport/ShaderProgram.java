@@ -29,8 +29,13 @@
  */
 package com.github.stephengold.vsport;
 
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.LongBuffer;
+import java.nio.charset.StandardCharsets;
+import java.util.EnumSet;
+import java.util.Scanner;
+import jme3utilities.MyString;
 import jme3utilities.Validate;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.util.shaderc.Shaderc;
@@ -48,6 +53,10 @@ public class ShaderProgram extends DeviceResource {
     // *************************************************************************
     // fields
 
+    /**
+     * required inputs
+     */
+    private EnumSet<ShaderInput> requiredInputs;
     /**
      * handle of the {@code VkShaderModule} for the fragment shader
      */
@@ -83,15 +92,15 @@ public class ShaderProgram extends DeviceResource {
      * @return the count (&gt;0)
      */
     int countAttributes() {
-        int result = 1; // The position attribute is always required.
-        if (requiresColor()) {
-            ++result;
+        if (requiredInputs == null) {
+            reloadRequiredInputs();
         }
-        if (requiresNormal()) {
-            ++result;
-        }
-        if (requiresTexCoords()) {
-            ++result;
+
+        int result = 0;
+        for (ShaderInput input : requiredInputs) {
+            if (input.isVertexAttribute()) {
+                ++result;
+            }
         }
 
         return result;
@@ -135,7 +144,7 @@ public class ShaderProgram extends DeviceResource {
         posDescription.location(slotIndex); // slot 0 (see the vertex shader)
         posDescription.offset(offset); // start offset in bytes
 
-        if (requiresColor()) {
+        if (requires(ShaderInput.VertexColor)) {
             // color attribute (3 signed floats)
             ++slotIndex;
             VkVertexInputAttributeDescription colorDescription
@@ -146,7 +155,7 @@ public class ShaderProgram extends DeviceResource {
             colorDescription.offset(offset); // start offset in bytes
         }
 
-        if (requiresNormal()) {
+        if (requires(ShaderInput.VertexNormal)) {
             // normal attribute (3 signed floats)
             ++slotIndex;
             VkVertexInputAttributeDescription normalDescription
@@ -157,7 +166,7 @@ public class ShaderProgram extends DeviceResource {
             normalDescription.offset(offset); // start offset in bytes
         }
 
-        if (requiresTexCoords()) {
+        if (requires(ShaderInput.VertexTexCoords)) {
             // texCoords attribute (2 signed floats)
             ++slotIndex;
             VkVertexInputAttributeDescription texCoordsDescription
@@ -191,7 +200,7 @@ public class ShaderProgram extends DeviceResource {
         posDescription.inputRate(VK10.VK_VERTEX_INPUT_RATE_VERTEX);
         posDescription.stride(Mesh.numAxes * Float.BYTES);
 
-        if (requiresColor()) {
+        if (requires(ShaderInput.VertexColor)) {
             // color attribute (3 signed floats)
             ++slotIndex;
             VkVertexInputBindingDescription colorDescription
@@ -201,7 +210,7 @@ public class ShaderProgram extends DeviceResource {
             colorDescription.stride(Mesh.numAxes * Float.BYTES);
         }
 
-        if (requiresNormal()) {
+        if (requires(ShaderInput.VertexNormal)) {
             // normal attribute (3 signed floats)
             ++slotIndex;
             VkVertexInputBindingDescription normalDescription
@@ -211,7 +220,7 @@ public class ShaderProgram extends DeviceResource {
             normalDescription.stride(Mesh.numAxes * Float.BYTES);
         }
 
-        if (requiresTexCoords()) {
+        if (requires(ShaderInput.VertexTexCoords)) {
             // texture-coordinates attribute (2 signed floats)
             ++slotIndex;
             VkVertexInputBindingDescription tcDescription
@@ -225,67 +234,18 @@ public class ShaderProgram extends DeviceResource {
     }
 
     /**
-     * Test whether the vertex shader requires vertex-color input.
+     * Test whether the program requires the specified input.
      *
+     * @param input the enum value of the input to test for (not null)
      * @return true if required, otherwise false
      */
-    boolean requiresColor() {
-        switch (programName) {
-            case "Debug/LocalNormals":
-            case "Debug/WorldNormals":
-            case "Phong/Distant/Monochrome":
-            case "Phong/Distant/Texture":
-            case "Unshaded/Monochrome":
-            case "Unshaded/Texture":
-                return false;
-
-            default:
-                throw new IllegalStateException("programName = " + programName);
+    boolean requires(ShaderInput input) {
+        if (requiredInputs == null) {
+            reloadRequiredInputs();
         }
-    }
+        boolean result = requiredInputs.contains(input);
 
-    /**
-     * Test whether the vertex shader requires vertex-normal input.
-     *
-     * @return true if required, otherwise false
-     */
-    boolean requiresNormal() {
-        switch (programName) {
-            case "Debug/LocalNormals":
-            case "Debug/WorldNormals":
-            case "Phong/Distant/Monochrome":
-            case "Phong/Distant/Texture":
-                return true;
-
-            case "Unshaded/Monochrome":
-            case "Unshaded/Texture":
-                return false;
-
-            default:
-                throw new IllegalStateException("programName = " + programName);
-        }
-    }
-
-    /**
-     * Test whether the vertex shader requires texture-coordinate input.
-     *
-     * @return true if required, otherwise false
-     */
-    boolean requiresTexCoords() {
-        switch (programName) {
-            case "Debug/LocalNormals":
-            case "Debug/WorldNormals":
-            case "Phong/Distant/Monochrome":
-            case "Unshaded/Monochrome":
-                return false;
-
-            case "Phong/Distant/Texture":
-            case "Unshaded/Texture":
-                return true;
-
-            default:
-                throw new IllegalStateException("programName = " + programName);
-        }
+        return result;
     }
 
     /**
@@ -379,7 +339,35 @@ public class ShaderProgram extends DeviceResource {
     }
 
     /**
-     * Load the vertex shader from the classpath.
+     * Load the required inputs (TXT file) from the classpath.
+     */
+    private void reloadRequiredInputs() {
+        String resourceName = String.format("/Shaders/%s.txt", programName);
+        InputStream inputStream = Utils.class.getResourceAsStream(resourceName);
+        if (inputStream == null) {
+            String q = MyString.quote(resourceName);
+            throw new RuntimeException("resource not found:  " + q);
+        }
+        Scanner scanner
+                = new Scanner(inputStream, StandardCharsets.UTF_8.name());
+
+        this.requiredInputs = EnumSet.noneOf(ShaderInput.class);
+        while (scanner.hasNext()) {
+            String variableName = scanner.next();
+            ShaderInput input = ShaderInput.find(variableName);
+            if (input == null) {
+                String qVariable = MyString.quote(variableName);
+                String qResource = MyString.quote(resourceName);
+                throw new RuntimeException("Unknown variable name:  "
+                        + qVariable + " in resource " + qResource);
+            }
+            requiredInputs.add(input);
+        }
+    }
+
+    /**
+     * Load the vertex shader (VERT file) from the classpath and compile it to a
+     * {@code VkShaderModule}.
      */
     private void reloadVertModule() {
         String resourceName = String.format("/Shaders/%s.vert", programName);
