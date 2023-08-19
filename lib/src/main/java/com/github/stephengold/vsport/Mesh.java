@@ -210,13 +210,13 @@ public class Mesh implements jme3utilities.lbj.Mesh {
      */
     int countAttributes() {
         int result = 1; // for the position buffer
+        if (colorBuffer != null) {
+            ++result;
+        }
         if (normalBuffer != null) {
             ++result;
         }
         if (texCoordsBuffer != null) {
-            ++result;
-        }
-        if (colorBuffer != null) {
             ++result;
         }
 
@@ -584,11 +584,11 @@ public class Mesh implements jme3utilities.lbj.Mesh {
      * @return the (modified) current instance (for chaining)
      */
     public Mesh transformUvs(Vector4fc uCoefficients, Vector4fc vCoefficients) {
+        verifyMutable();
         if (texCoordsBuffer == null) {
             throw new IllegalStateException("There are no UVs in the mesh.");
         }
         Vector2f tmpVector = new Vector2f();
-        verifyMutable();
 
         for (int vIndex = 0; vIndex < vertexCount; ++vIndex) {
             texCoordsBuffer.get2f(vIndex, tmpVector);
