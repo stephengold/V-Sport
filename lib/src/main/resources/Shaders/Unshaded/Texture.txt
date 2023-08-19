@@ -1,0 +1,9 @@
+ColorMaterialTexture
+
+geometry.modelMatrix
+
+global.projectionMatrix
+global.viewMatrix
+
+vertexPosition_modelspace
+vertexUV

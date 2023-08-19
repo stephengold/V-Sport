@@ -1,0 +1,7 @@
+geometry.modelMatrix
+
+global.projectionMatrix
+global.viewMatrix
+
+vertexNormal_modelspace
+vertexPosition_modelspace

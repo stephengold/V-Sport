@@ -1,0 +1,16 @@
+ColorMaterialTexture
+
+geometry.BaseMaterialColor
+geometry.modelMatrix
+geometry.modelRotationMatrix
+geometry.SpecularMaterialColor
+
+global.ambientStrength
+global.LightColor
+global.LightDirection_worldspace
+global.projectionMatrix
+global.viewMatrix
+
+vertexNormal_modelspace
+vertexPosition_modelspace
+vertexUV

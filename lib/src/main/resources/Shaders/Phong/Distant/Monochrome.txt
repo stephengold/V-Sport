@@ -1,0 +1,9 @@
+geometry.modelMatrix
+geometry.modelRotationMatrix
+
+global.LightDirection_worldspace
+global.projectionMatrix
+global.viewMatrix
+
+vertexNormal_modelspace
+vertexPosition_modelspace

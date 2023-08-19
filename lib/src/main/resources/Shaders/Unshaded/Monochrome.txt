@@ -1,0 +1,7 @@
+geometry.BaseMaterialColor
+geometry.modelMatrix
+
+global.projectionMatrix
+global.viewMatrix
+
+vertexPosition_modelspace
