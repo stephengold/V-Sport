@@ -530,11 +530,11 @@ public class Mesh implements jme3utilities.lbj.Mesh {
      * Alter the primitive topology, which determines how vertices/indices are
      * organized into primitives.
      *
-     * @param desiredTopology the desired enum value (not null)
+     * @param topology the enum value for the desired topology (not null)
      */
-    public void setTopology(Topology desiredTopology) {
+    public void setTopology(Topology topology) {
         verifyMutable();
-        this.topology = desiredTopology;
+        this.topology = topology;
     }
 
     /**
