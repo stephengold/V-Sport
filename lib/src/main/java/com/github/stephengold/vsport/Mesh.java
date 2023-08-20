@@ -29,6 +29,7 @@
  */
 package com.github.stephengold.vsport;
 
+import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Transform;
 import java.nio.FloatBuffer;
@@ -40,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import jme3utilities.Validate;
 import jme3utilities.math.MyMath;
+import jme3utilities.math.MyVector3f;
 import org.joml.Vector2f;
 import org.joml.Vector2fc;
 import org.joml.Vector3f;
@@ -404,6 +406,80 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
 
     /**
+     * Generate normals on a triangle-by-triangle basis for a non-indexed,
+     * TriangleList mesh. Any pre-existing normals are discarded.
+     *
+     * @return the (modified) current instance (for chaining)
+     */
+    public Mesh generateFacetNormals() {
+        verifyMutable();
+        if (topology != Topology.TriangleList) {
+            throw new IllegalStateException("topology = " + topology);
+        }
+        if (indexBuffer != null) {
+            throw new IllegalStateException("must be non-indexed");
+        }
+        int numTriangles = countTriangles();
+        assert vertexCount == vpt * numTriangles;
+
+        com.jme3.math.Vector3f posA = new com.jme3.math.Vector3f();
+        com.jme3.math.Vector3f posB = new com.jme3.math.Vector3f();
+        com.jme3.math.Vector3f posC = new com.jme3.math.Vector3f();
+        com.jme3.math.Vector3f ac = new com.jme3.math.Vector3f();
+        com.jme3.math.Vector3f normal = new com.jme3.math.Vector3f();
+
+        createNormals();
+        for (int triIndex = 0; triIndex < numTriangles; ++triIndex) {
+            int trianglePosition = triIndex * vpt * numAxes;
+            positionBuffer.get(trianglePosition, posA);
+            positionBuffer.get(trianglePosition + numAxes, posB);
+            positionBuffer.get(trianglePosition + 2 * numAxes, posC);
+
+            posB.subtract(posA, normal);
+            posC.subtract(posA, ac);
+            normal.cross(ac, normal);
+            MyVector3f.normalizeLocal(normal);
+
+            for (int j = 0; j < vpt; ++j) {
+                normalBuffer.put(normal);
+            }
+        }
+        normalBuffer.flip();
+        assert normalBuffer.limit() == normalBuffer.capacity();
+
+        return this;
+    }
+
+    /**
+     * Generate normals using the specified strategy. Any pre-existing normals
+     * are discarded.
+     *
+     * @param option how to generate the normals (not null)
+     * @return the (modified) current instance (for chaining)
+     */
+    public Mesh generateNormals(NormalsOption option) {
+        switch (option) {
+            case Facet:
+                generateFacetNormals();
+                break;
+            case None:
+                this.normalBuffer = null;
+                break;
+            case Smooth:
+                generateFacetNormals();
+                smoothNormals();
+                break;
+            case Sphere:
+                generateSphereNormals();
+                break;
+            default:
+                throw new IllegalArgumentException("option = " + option);
+        }
+
+        return this;
+    }
+
+    /**
      * Generate normals on a vertex-by-vertex basis for an outward-facing
      * sphere. Any pre-existing normals are discarded.
      *
@@ -419,6 +495,54 @@ public class Mesh implements jme3utilities.lbj.Mesh {
             tmpVector.normalize();
             normalBuffer.put3f(vertexIndex, tmpVector);
         }
+
+        return this;
+    }
+
+    /**
+     * Generate texture coordinates using the specified strategy and
+     * coefficients. Any pre-existing texture coordinates are discarded.
+     *
+     * @param option how to generate the texture coordinates (not null)
+     * @param uCoefficients the coefficients for generating the first (U)
+     * texture coordinate (not null)
+     * @param vCoefficients the coefficients for generating the 2nd (V) texture
+     * coordinate (not null)
+     * @return the (modified) current instance (for chaining)
+     */
+    public Mesh generateUvs(UvsOption option, Vector4fc uCoefficients,
+            Vector4fc vCoefficients) {
+        verifyMutable();
+        if (option == UvsOption.None) {
+            texCoordsBuffer = null;
+            return this;
+        }
+        createUvs();
+
+        com.jme3.math.Vector3f tmpVector = new com.jme3.math.Vector3f();
+        for (int vertIndex = 0; vertIndex < vertexCount; ++vertIndex) {
+            int inPosition = vertIndex * numAxes;
+            positionBuffer.get(inPosition, tmpVector);
+            switch (option) {
+                case Linear:
+                    break;
+                case Spherical:
+                    Utils.toSpherical(tmpVector);
+                    tmpVector.y /= FastMath.PI;
+                    tmpVector.z /= FastMath.PI;
+                    break;
+                default:
+                    throw new IllegalArgumentException("option = " + option);
+            }
+
+            float u = uCoefficients.dot(
+                    tmpVector.x, tmpVector.y, tmpVector.z, 1f);
+            float v = vCoefficients.dot(
+                    tmpVector.x, tmpVector.y, tmpVector.z, 1f);
+            texCoordsBuffer.put(u).put(v);
+        }
+        texCoordsBuffer.flip();
+        assert texCoordsBuffer.limit() == texCoordsBuffer.capacity();
 
         return this;
     }
@@ -930,6 +1054,63 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
     // *************************************************************************
     // private methods
+
+    /**
+     * Smooth the pre-existing normals by averaging them across all uses of each
+     * distinct vertex position.
+     */
+    private void smoothNormals() {
+        verifyMutable();
+        assert indexBuffer == null;
+        assert normalBuffer != null;
+
+        Map<com.jme3.math.Vector3f, Integer> mapPosToDpid
+                = new HashMap<>(vertexCount);
+        int numDistinctPositions = 0;
+        for (int vertexIndex = 0; vertexIndex < vertexCount; ++vertexIndex) {
+            int start = vertexIndex * numAxes;
+            com.jme3.math.Vector3f position = new com.jme3.math.Vector3f();
+            positionBuffer.get(start, position);
+            MyVector3f.standardize(position, position);
+            if (!mapPosToDpid.containsKey(position)) {
+                mapPosToDpid.put(position, numDistinctPositions);
+                ++numDistinctPositions;
+            }
+        }
+
+        // Initialize the normal sum for each distinct position.
+        com.jme3.math.Vector3f[] normalSums
+                = new com.jme3.math.Vector3f[numDistinctPositions];
+        for (int dpid = 0; dpid < numDistinctPositions; ++dpid) {
+            normalSums[dpid] = new com.jme3.math.Vector3f();
+        }
+
+        com.jme3.math.Vector3f tmpPosition = new com.jme3.math.Vector3f();
+        com.jme3.math.Vector3f tmpNormal = new com.jme3.math.Vector3f();
+        for (int vertexIndex = 0; vertexIndex < vertexCount; ++vertexIndex) {
+            int start = vertexIndex * numAxes;
+            positionBuffer.get(start, tmpPosition);
+            MyVector3f.standardize(tmpPosition, tmpPosition);
+            int dpid = mapPosToDpid.get(tmpPosition);
+
+            normalBuffer.get(start, tmpNormal);
+            normalSums[dpid].addLocal(tmpNormal);
+        }
+
+        // Re-normalize the normal sum for each distinct position.
+        for (com.jme3.math.Vector3f normal : normalSums) {
+            MyVector3f.normalizeLocal(normal);
+        }
+
+        // Write new normals to the buffer.
+        for (int vertexIndex = 0; vertexIndex < vertexCount; ++vertexIndex) {
+            int start = vertexIndex * numAxes;
+            positionBuffer.get(start, tmpPosition);
+            MyVector3f.standardize(tmpPosition, tmpPosition);
+            int dpid = mapPosToDpid.get(tmpPosition);
+            normalBuffer.put(start, normalSums[dpid]);
+        }
+    }
 
     /**
      * Verify that the mesh is still mutable.
