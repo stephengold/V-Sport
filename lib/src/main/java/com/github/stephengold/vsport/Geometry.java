@@ -38,7 +38,9 @@ import org.joml.Quaternionfc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector4fc;
+import org.lwjgl.system.MemoryStack;
 import org.lwjgl.vulkan.VK10;
+import org.lwjgl.vulkan.VkPipelineRasterizationStateCreateInfo;
 
 /**
  * A 3-D object to be rendered by V-Sport, including a mesh, a texture, a shader
@@ -52,6 +54,14 @@ public class Geometry {
      * true to enable depth test, false to disable it
      */
     private boolean depthTest = true;
+    /**
+     * true to enable back-face culling, false to disable it
+     */
+    private boolean isBackCulling = true;
+    /**
+     * true to enable front-face culling, false to disable it
+     */
+    private boolean isFrontCulling;
     /**
      * true to enable wireframe rendering, false to disable it
      */
@@ -147,6 +157,46 @@ public class Geometry {
     }
 
     /**
+     * Generate a rasterization-state create buffer.
+     *
+     * @param stack for allocating temporary host buffers (not null)
+     * @return a new temporary buffer
+     */
+    VkPipelineRasterizationStateCreateInfo
+            generateRasterizationState(MemoryStack stack) {
+        VkPipelineRasterizationStateCreateInfo result
+                = VkPipelineRasterizationStateCreateInfo.calloc(stack);
+        result.sType(
+                VK10.VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO
+        );
+
+        result.depthBiasEnable(false);
+        result.depthClampEnable(false);
+        result.frontFace(VK10.VK_FRONT_FACE_COUNTER_CLOCKWISE); // TODO use this
+        result.lineWidth(1f); // in fragments
+        result.rasterizerDiscardEnable(false);
+
+        int cullMode = VK10.VK_CULL_MODE_NONE;
+        if (isBackCulling) {
+            cullMode |= VK10.VK_CULL_MODE_BACK_BIT;
+        }
+        if (isFrontCulling) {
+            cullMode |= VK10.VK_CULL_MODE_FRONT_BIT;
+        }
+        result.cullMode(cullMode);
+
+        int polygonMode;
+        if (wireframe) {
+            polygonMode = VK10.VK_POLYGON_MODE_LINE;
+        } else {
+            polygonMode = VK10.VK_POLYGON_MODE_FILL;
+        }
+        result.polygonMode(polygonMode);
+
+        return result;
+    }
+
+    /**
      * Access the Mesh.
      *
      * @return the pre-existing object (not null)
@@ -167,12 +217,30 @@ public class Geometry {
     }
 
     /**
+     * Test whether back-face culling is enabled.
+     *
+     * @return true if enabled, otherwise false
+     */
+    public boolean isBackCulling() {
+        return isBackCulling;
+    }
+
+    /**
      * Test whether depth test is enabled.
      *
      * @return true if enabled, otherwise false
      */
     public boolean isDepthTest() {
         return depthTest;
+    }
+
+    /**
+     * Test whether front-face culling is enabled.
+     *
+     * @return true if enabled, otherwise false
+     */
+    public boolean isFrontCulling() {
+        return isFrontCulling;
     }
 
     /**
@@ -244,19 +312,6 @@ public class Geometry {
     }
 
     /**
-     * Return the polygon mode for rasterization.
-     *
-     * @return the {@code VkPolygonMode} value
-     */
-    int polygonMode() {
-        if (wireframe) {
-            return VK10.VK_POLYGON_MODE_LINE;
-        } else {
-            return VK10.VK_POLYGON_MODE_FILL;
-        }
-    }
-
-    /**
      * Reset the model transform so that mesh coordinates and world coordinates
      * are the same.
      *
@@ -309,6 +364,17 @@ public class Geometry {
     }
 
     /**
+     * Enable or disable back-face culling.
+     *
+     * @param newSetting true to enable, false to disable (default=true)
+     * @return the (modified) current geometry (for chaining)
+     */
+    public Geometry setBackCulling(boolean newSetting) {
+        this.isBackCulling = newSetting;
+        return this;
+    }
+
+    /**
      * Alter the base color.
      *
      * @param color the desired color (in the Linear colorspace, not null,
@@ -333,6 +399,17 @@ public class Geometry {
             BaseApplication.updateDeferredQueue(this);
         }
 
+        return this;
+    }
+
+    /**
+     * Enable or disable front-face culling.
+     *
+     * @param newSetting true to enable, false to disable (default=false)
+     * @return the (modified) current geometry (for chaining)
+     */
+    public Geometry setFrontCulling(boolean newSetting) {
+        this.isFrontCulling = newSetting;
         return this;
     }
 

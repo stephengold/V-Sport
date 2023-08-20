@@ -882,20 +882,7 @@ final class Internals {
             //    3. fills polygons and/or edges (wireframe)
             //    4. determines front/back faces of polygons (winding)
             VkPipelineRasterizationStateCreateInfo rsCreateInfo
-                    = VkPipelineRasterizationStateCreateInfo.calloc(stack);
-            rsCreateInfo.sType(
-                    VK10.VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO
-            );
-
-            rsCreateInfo.cullMode(VK10.VK_CULL_MODE_BACK_BIT);
-            rsCreateInfo.depthBiasEnable(false);
-            rsCreateInfo.depthClampEnable(false);
-            rsCreateInfo.frontFace(VK10.VK_FRONT_FACE_COUNTER_CLOCKWISE);
-            rsCreateInfo.lineWidth(1f); // in fragments
-            rsCreateInfo.rasterizerDiscardEnable(false);
-
-            int polygonMode = geometry.polygonMode();
-            rsCreateInfo.polygonMode(polygonMode);
+                    = geometry.generateRasterizationState(stack);
 
             VkPipelineShaderStageCreateInfo.Buffer stageCreateInfos
                     = VkPipelineShaderStageCreateInfo.calloc(2, stack);

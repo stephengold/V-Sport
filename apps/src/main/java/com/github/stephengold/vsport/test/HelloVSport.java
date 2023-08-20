@@ -152,6 +152,7 @@ public class HelloVSport extends BaseApplication {
         photo.setLocation(1.4f, -0.2f, 1f);
 
         Geometry room = new Geometry(roomMesh);
+        room.setBackCulling(false);
         room.setProgram("Unshaded/Texture");
         room.setTexture(roomKey);
 
