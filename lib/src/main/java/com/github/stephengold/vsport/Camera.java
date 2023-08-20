@@ -325,7 +325,21 @@ public class Camera {
     }
 
     /**
-     * Teleport the eye to the specified location without changing its
+     * Translate the eye to the specified location without changing its
+     * orientation.
+     *
+     * @param location the desired location (in world coordinates, not null,
+     * finite, unaffected)
+     * @return the (modified) current instance (for chaining)
+     */
+    public Camera setLocation(com.jme3.math.Vector3f location) {
+        Validate.finite(location, "location");
+        eyeLocation.set(location.x, location.y, location.z);
+        return this;
+    }
+
+    /**
+     * Translate the eye to the specified location without changing its
      * orientation.
      *
      * @param location the desired location (in world coordinates, not null,
