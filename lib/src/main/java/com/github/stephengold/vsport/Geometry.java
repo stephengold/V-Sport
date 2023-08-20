@@ -416,12 +416,19 @@ public class Geometry {
     /**
      * Alter the location of the mesh origin.
      *
-     * @param x the desired X coordinate (in world coordinates, default=0)
-     * @param y the desired Y coordinate (in world coordinates, default=0)
-     * @param z the desired Z coordinate (in world coordinates, default=0)
+     * @param x the desired X coordinate (in world coordinates, finite,
+     * default=0)
+     * @param y the desired Y coordinate (in world coordinates, finite,
+     * default=0)
+     * @param z the desired Z coordinate (in world coordinates, finite,
+     * default=0)
      * @return the (modified) current geometry (for chaining)
      */
     public Geometry setLocation(float x, float y, float z) {
+        Validate.finite(x, "x");
+        Validate.finite(y, "y");
+        Validate.finite(z, "z");
+
         uniformValues.setLocation(x, y, z);
         return this;
     }
@@ -448,6 +455,8 @@ public class Geometry {
      */
     public Geometry setLocation(Vector3fc location) {
         Validate.nonNull(location, "location");
+        Validate.require(location.isFinite(), "finite location");
+
         uniformValues.setLocation(location.x(), location.y(), location.z());
         return this;
     }
@@ -474,6 +483,10 @@ public class Geometry {
      * @return the (modified) current geometry (for chaining)
      */
     public Geometry setOrientation(float xAngle, float yAngle, float zAngle) {
+        Validate.finite(xAngle, "x angle");
+        Validate.finite(xAngle, "y angle");
+        Validate.finite(xAngle, "z angle");
+
         uniformValues.setOrientation(xAngle, yAngle, zAngle);
         return this;
     }
@@ -490,6 +503,11 @@ public class Geometry {
      * @return the (modified) current geometry (for chaining)
      */
     public Geometry setOrientation(float angle, float x, float y, float z) {
+        Validate.finite(angle, "angle");
+        Validate.inRange(x, "x", -1f, 1f);
+        Validate.inRange(y, "y", -1f, 1f);
+        Validate.inRange(z, "z", -1f, 1f);
+
         uniformValues.setOrientationAngleAxis(angle, x, y, z);
         return this;
     }
@@ -568,11 +586,13 @@ public class Geometry {
      * Alter the mesh-to-world scale factors.
      *
      * @param scaleFactors the desired scale factor for each mesh axis (not
-     * null, unaffected)
+     * null, finite, unaffected)
      * @return the (modified) current geometry (for chaining)
      */
     public Geometry setScale(Vector3fc scaleFactors) {
         Validate.nonNull(scaleFactors, "scale factors");
+        Validate.require(scaleFactors.isFinite(), "finite scale factors");
+
         uniformValues.setScale(
                 scaleFactors.x(), scaleFactors.y(), scaleFactors.z());
         return this;
