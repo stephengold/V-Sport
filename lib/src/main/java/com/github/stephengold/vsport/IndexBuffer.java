@@ -31,8 +31,8 @@ package com.github.stephengold.vsport;
 
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import org.lwjgl.vulkan.VK10;
 
 /**
@@ -205,7 +205,7 @@ final public class IndexBuffer extends jme3utilities.lbj.IndexBuffer {
      * @param indices the desired indices (not null, unaffected)
      * @return a new instance (not null)
      */
-    static IndexBuffer newInstance(List<Integer> indices) {
+    static IndexBuffer newInstance(Collection<Integer> indices) {
         int capacity = indices.size();
         int maxIndex = Collections.max(indices);
         int maxVertices = 1 + maxIndex;
