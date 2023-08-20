@@ -181,7 +181,7 @@ public class OctasphereMesh extends Mesh {
                 countVertices(numRefineSteps, withIndices));
         Validate.inRange(numRefineSteps, "number of refinement steps", 0, 13);
 
-        int numVertices = super.countVertices();
+        int numVertices = countVertices();
         this.uOverrides = new ArrayList<>(numVertices);
         this.locations = new ArrayList<>(numVertices);
         this.midpointCache = new HashMap<>(numVertices);
@@ -257,15 +257,15 @@ public class OctasphereMesh extends Mesh {
         midpointCache.clear();
         assert faces.size() == 3 << (3 + 2 * numRefineSteps);
 
-        this.posBuffer = super.createPositions();
-        this.normBuffer = super.createNormals();
-        this.uvBuffer = super.createUvs();
+        this.posBuffer = createPositions();
+        this.normBuffer = createNormals();
+        this.uvBuffer = createUvs();
 
         if (withIndices) {
             assert locations.size() == numVertices :
                     locations.size() + " != " + numVertices;
 
-            super.createIndices(faces);
+            createIndices(faces);
             for (int vIndex = 0; vIndex < locations.size(); ++vIndex) {
                 putVertex(vIndex);
             }
