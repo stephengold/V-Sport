@@ -152,6 +152,24 @@ final public class VertexBuffer {
     }
 
     /**
+     * Read a Vector3f from the specified buffer position. Does not alter the
+     * buffer's read/write position.
+     *
+     * @param position the position from which to begin reading (&ge;0,
+     * &lt;limit-2)
+     * @param storeResult storage for the result (modified if not null)
+     * @return the value that was read (either {@code storeResult} or a new
+     * vector)
+     */
+    public com.jme3.math.Vector3f get(
+            int position, com.jme3.math.Vector3f storeResult) {
+        com.jme3.math.Vector3f result = (storeResult == null)
+                ? new com.jme3.math.Vector3f() : storeResult;
+        MyBuffer.get(dataBuffer, position, storeResult);
+        return result;
+    }
+
+    /**
      * Read a Vector2f from the specified vertex. Does not alter the buffer's
      * read/write position. Requires fpv=2.
      *
