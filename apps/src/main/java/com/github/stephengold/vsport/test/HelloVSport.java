@@ -97,6 +97,7 @@ public class HelloVSport extends BaseApplication {
      */
     @Override
     public void cleanUp() {
+        // do nothing
     }
 
     /**

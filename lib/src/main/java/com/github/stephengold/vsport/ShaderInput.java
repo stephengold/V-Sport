@@ -30,7 +30,8 @@
 package com.github.stephengold.vsport;
 
 /**
- * Enumerate the inputs to a ShaderProgram.
+ * Enumerate the inputs to a ShaderProgram, including both uniforms and vertex
+ * attributes.
  *
  * @author Stephen Gold sgold@sonic.net
  */
@@ -63,10 +64,15 @@ public enum ShaderInput {
     MaterialTexture(false, "ColorMaterialTexture"),
     /**
      * mesh-to-world transform (mat4 in the per-geometry uniform)
+     * <p>
+     * When using cameraspace shaders, this becomes the mesh-to-camera
+     * transform.
      */
     ModelMatrix(false, "geometry.modelMatrix"),
     /**
      * mesh-to-world rotation (mat3 in the per-geometry uniform)
+     * <p>
+     * When using cameraspace shaders, this becomes the mesh-to-camera rotation.
      */
     ModelRotationMatrix(false, "geometry.modelRotationMatrix"),
     /**
@@ -79,7 +85,7 @@ public enum ShaderInput {
      */
     SpecularColor(false, "geometry.SpecularMaterialColor"),
     /**
-     * color of each vertex (vec3 in vertex buffer)
+     * color of each vertex in linear colorspace (vec3 in vertex buffer)
      */
     VertexColor(true, "vertexColor"),
     /**

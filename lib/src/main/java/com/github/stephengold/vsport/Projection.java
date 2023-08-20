@@ -58,6 +58,9 @@ import org.joml.Vector4f;
  * <li>the far clipping plane is Z=+1</li>
  * </ul>
  *
+ * Note that camera space is a right-handed coordinate system, but clip space is
+ * a left-handed coordinate system.
+ *
  * @author Stephen Gold sgold@sonic.net
  */
 public class Projection {
@@ -70,12 +73,11 @@ public class Projection {
      */
     private float fovyRadians = MyMath.toRadians(45f);
     /**
-     * distance of the far clipping plane from the eye location (in world units)
+     * distance of the far clipping plane from the eye (in world units)
      */
     private float zFar = 1000f;
     /**
-     * distance of the near clipping plane from the eye location (in world
-     * units)
+     * distance of the near clipping plane from the eye (in world units)
      */
     private float zNear = 1f;
     /**
@@ -106,8 +108,8 @@ public class Projection {
      * @param location the camera-space coordinates to convert (not null,
      * unaffected)
      * @param storeResult storage for the result (modified if not null)
-     * @return a location vector in camera space (either {@code storeResult} or
-     * a new vector)
+     * @return a location vector in clip space (either {@code storeResult} or a
+     * new vector)
      */
     public Vector3f cameraToClip(Vector3f location, Vector3f storeResult) {
         updateMatrix(tmpMatrix);
@@ -127,7 +129,7 @@ public class Projection {
      * Convert the specified clip-space coordinates to camera-space coordinates.
      *
      * @param clipXy the clip-space X and Y coordinates (not null, unaffected)
-     * @param clipZ the clip-space Z coordinate (-1 for near plane, +1 for far
+     * @param clipZ the clip-space Z coordinate (0 for near plane, +1 for far
      * plane)
      * @param storeResult storage for the result (modified if not null)
      * @return a location vector in camera space (either {@code storeResult} or
