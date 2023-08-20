@@ -287,8 +287,7 @@ final public class VertexBuffer {
      */
     static VertexBuffer newInstance(int fpv, float... floatArray) {
         int numVertices = floatArray.length / fpv;
-        VertexBuffer result
-                = VertexBuffer.newInstance(Mesh.numAxes, numVertices);
+        VertexBuffer result = newInstance(fpv, numVertices);
 
         FloatBuffer data = result.getData();
         for (float fValue : floatArray) {
