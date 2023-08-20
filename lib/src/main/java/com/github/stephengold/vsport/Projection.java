@@ -85,7 +85,7 @@ public class Projection {
     /**
      * distance of the far clipping plane from the eye (in world units)
      */
-    private float zFar = 1000f;
+    private float zFar = 1_000f;
     /**
      * distance of the near clipping plane from the eye (in world units)
      */
