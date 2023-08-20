@@ -67,6 +67,8 @@ public enum ShaderInput {
      * <p>
      * When using cameraspace shaders, this becomes the mesh-to-camera
      * transform.
+     * <p>
+     * When using clipspace shaders, this becomes the mesh-to-clip transform.
      */
     ModelMatrix(false, "geometry.modelMatrix"),
     /**

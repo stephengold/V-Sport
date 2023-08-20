@@ -1,0 +1,4 @@
+geometry.BaseMaterialColor
+geometry.modelMatrix
+
+vertexPosition_modelspace
