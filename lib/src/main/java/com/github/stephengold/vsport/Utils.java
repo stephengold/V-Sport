@@ -355,4 +355,40 @@ final public class Utils {
     public static Vector3f toJomlVector(com.jme3.math.Vector3f vector3f) {
         return new Vector3f(vector3f.x, vector3f.y, vector3f.z);
     }
+
+    /**
+     * Convert the specified vector from Cartesian coordinates to spherical
+     * coordinates (r, theta, phi) per ISO 80000.
+     * <p>
+     * In particular:
+     * <ul>
+     * <li>{@code r} is a distance measured from the origin. It ranges from 0 to
+     * infinity and is stored in the first (X) vector component.
+     *
+     * <li>{@code theta} is the polar angle, measured (in radians) from the +Z
+     * axis. It ranges from 0 to PI and is stored in the 2nd (Y) vector
+     * component.
+     *
+     * <li>{@code phi} is the azimuthal angle, measured (in radians) from the +X
+     * axis to the projection of the vector onto the X-Y plane. It ranges from
+     * -PI to PI and is stored in the 3rd (Z) vector component.
+     * </ul>
+     *
+     * @param vec the vector to convert (not null, modified)
+     */
+    public static void toSpherical(com.jme3.math.Vector3f vec) {
+        double xx = vec.x;
+        double yy = vec.y;
+        double zz = vec.z;
+        double sumOfSquares = xx * xx + yy * yy;
+        double rxy = Math.sqrt(sumOfSquares);
+        double theta = Math.atan2(yy, xx);
+        sumOfSquares += zz * zz;
+        double phi = Math.atan2(rxy, zz);
+        double rr = Math.sqrt(sumOfSquares);
+
+        vec.x = (float) rr;    // distance from origin
+        vec.y = (float) theta; // polar angle
+        vec.z = (float) phi;   // azimuthal angle
+    }
 }
