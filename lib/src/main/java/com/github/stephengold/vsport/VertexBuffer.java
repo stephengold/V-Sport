@@ -155,19 +155,20 @@ final public class VertexBuffer {
      * Read a Vector2f from the specified vertex. Does not alter the buffer's
      * read/write position. Requires fpv=2.
      *
-     * @param index the index of the vertex to read (&ge;0, &lt;vertexCount)
+     * @param vertexIndex the index of the vertex to read (&ge;0,
+     * &lt;vertexCount)
      * @param storeResult storage for the result (modified if not null)
      * @return the value that was read (either {@code storeResult} or a new
      * vector)
      */
-    public Vector2f get2f(int index, Vector2f storeResult) {
-        Validate.inRange(index, "index", 0, vertexCount - 1);
+    public Vector2f get2f(int vertexIndex, Vector2f storeResult) {
+        Validate.inRange(vertexIndex, "vertex index", 0, vertexCount - 1);
         if (fpv != 2) {
             throw new IllegalStateException("fpv = " + fpv);
         }
         Vector2f result = (storeResult == null) ? new Vector2f() : storeResult;
 
-        int startPosition = index * fpv;
+        int startPosition = vertexIndex * fpv;
         result.x = dataBuffer.get(startPosition);
         result.y = dataBuffer.get(startPosition + 1);
 
@@ -178,19 +179,20 @@ final public class VertexBuffer {
      * Read a Vector3f from the specified vertex. Does not alter the buffer's
      * read/write position. Requires fpv=3.
      *
-     * @param index the index of the vertex to read (&ge;0, &lt;vertexCount)
+     * @param vertexIndex the index of the vertex to read (&ge;0,
+     * &lt;vertexCount)
      * @param storeResult storage for the result (modified if not null)
      * @return the value that was read (either {@code storeResult} or a new
      * vector)
      */
-    public Vector3f get3f(int index, Vector3f storeResult) {
-        Validate.inRange(index, "index", 0, vertexCount - 1);
+    public Vector3f get3f(int vertexIndex, Vector3f storeResult) {
+        Validate.inRange(vertexIndex, "vertex index", 0, vertexCount - 1);
         if (fpv != Mesh.numAxes) {
             throw new IllegalStateException("fpv = " + fpv);
         }
         Vector3f result = (storeResult == null) ? new Vector3f() : storeResult;
 
-        int startPosition = index * fpv;
+        int startPosition = vertexIndex * fpv;
         result.x = dataBuffer.get(startPosition + MyVector3f.xAxis);
         result.y = dataBuffer.get(startPosition + MyVector3f.yAxis);
         result.z = dataBuffer.get(startPosition + MyVector3f.zAxis);
