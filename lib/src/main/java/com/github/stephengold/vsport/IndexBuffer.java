@@ -147,7 +147,7 @@ final public class IndexBuffer extends jme3utilities.lbj.IndexBuffer {
      *
      * @param maxVertices one more than the highest index value (&ge;0)
      * @param capacity the desired number of indices (&ge;0)
-     * @return a new instance (not null)
+     * @return a new flipped instance (not null)
      */
     static IndexBuffer newInstance(int maxVertices, int capacity) {
         boolean staging = false;
@@ -184,7 +184,7 @@ final public class IndexBuffer extends jme3utilities.lbj.IndexBuffer {
      * Create an IndexBuffer from an array of vertex indices.
      *
      * @param indices the desired indices (not null, unaffected)
-     * @return a new instance (not null)
+     * @return a new flipped instance (not null)
      */
     static IndexBuffer newInstance(int[] indices) {
         int capacity = indices.length;
@@ -195,6 +195,7 @@ final public class IndexBuffer extends jme3utilities.lbj.IndexBuffer {
         for (int vIndex : indices) {
             result.put(vIndex);
         }
+        result.flip();
 
         return result;
     }
@@ -203,7 +204,7 @@ final public class IndexBuffer extends jme3utilities.lbj.IndexBuffer {
      * Create an IndexBuffer from a list of indices.
      *
      * @param indices the desired indices (not null, unaffected)
-     * @return a new instance (not null)
+     * @return a new flipped instance (not null)
      */
     static IndexBuffer newInstance(Collection<Integer> indices) {
         int capacity = indices.size();
@@ -214,6 +215,7 @@ final public class IndexBuffer extends jme3utilities.lbj.IndexBuffer {
         for (int vIndex : indices) {
             result.put(vIndex);
         }
+        result.flip();
 
         return result;
     }
