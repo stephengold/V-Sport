@@ -67,11 +67,11 @@ public class Projection {
     // constants
 
     /**
-     * Z coordinate of the far plane in clip space
+     * Z coordinate of the far plane in clipspace
      */
     final public static float farClipZ = 1f;
     /**
-     * Z coordinate of the near plane in clip space
+     * Z coordinate of the near plane in clipspace
      */
     final public static float nearClipZ = 0f;
     // *************************************************************************
@@ -113,9 +113,9 @@ public class Projection {
     // new methods exposed
 
     /**
-     * Convert the specified camera-space coordinates to clip-space coordinates.
+     * Convert the specified cameraspace coordinates to clipspace coordinates.
      *
-     * @param location the camera-space coordinates to convert (not null,
+     * @param location the cameraspace coordinates to convert (not null,
      * unaffected)
      * @param storeResult storage for the result (modified if not null)
      * @return a location vector in clip space (either {@code storeResult} or a
@@ -136,13 +136,13 @@ public class Projection {
     }
 
     /**
-     * Convert the specified clip-space coordinates to camera-space coordinates.
+     * Convert the specified clipspace coordinates to cameraspace coordinates.
      *
-     * @param clipXy the clip-space X and Y coordinates (not null, unaffected)
-     * @param clipZ the clip-space Z coordinate (0 for near plane, +1 for far
+     * @param clipXy the clipspace X and Y coordinates (not null, unaffected)
+     * @param clipZ the clipspace Z coordinate (0 for near plane, +1 for far
      * plane)
      * @param storeResult storage for the result (modified if not null)
-     * @return a location vector in camera space (either {@code storeResult} or
+     * @return a location vector in cameraspace (either {@code storeResult} or
      * a new vector)
      */
     public Vector3f clipToCamera(

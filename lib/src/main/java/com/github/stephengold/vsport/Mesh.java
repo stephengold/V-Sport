@@ -126,6 +126,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
             this.indexBuffer = IndexBuffer.newInstance(indices);
         }
 
+        // position buffer:
         this.positionBuffer = VertexBuffer.newPosition(vertices);
         Vertex representativeVertex = vertices.get(0);
 

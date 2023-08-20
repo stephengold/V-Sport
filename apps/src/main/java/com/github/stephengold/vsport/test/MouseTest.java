@@ -48,7 +48,7 @@ public class MouseTest extends BaseApplication {
     // fields
 
     /**
-     * crosshairs in clip space, controlled by the mouse
+     * crosshairs in clipspace, controlled by the mouse
      */
     private static Geometry crosshairs;
     // *************************************************************************

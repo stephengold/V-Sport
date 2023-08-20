@@ -43,7 +43,7 @@ public enum Topology {
     // values
 
     /**
-     * lines (edges) that don't overlap
+     * lines (edges) that don't overlap (list mode)
      */
     LineList(Mesh.vpe, 0, VK10.VK_PRIMITIVE_TOPOLOGY_LINE_LIST),
     /**
@@ -51,7 +51,7 @@ public enum Topology {
      */
     LineStrip(Mesh.vpe, 1, VK10.VK_PRIMITIVE_TOPOLOGY_LINE_STRIP),
     /**
-     * unconnected points
+     * unconnected points (list mode)
      */
     PointList(1, 0, VK10.VK_PRIMITIVE_TOPOLOGY_POINT_LIST),
     /**
@@ -60,7 +60,7 @@ public enum Topology {
      */
     TriangleFan(Mesh.vpt, 2, VK10.VK_PRIMITIVE_TOPOLOGY_TRIANGLE_FAN),
     /**
-     * triangles that don't overlap
+     * triangles that don't overlap (list mode)
      */
     TriangleList(Mesh.vpt, 0, VK10.VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST),
     /**
@@ -105,7 +105,7 @@ public enum Topology {
     /**
      * Return the encoding used by Vulkan's pipeline input assembly state.
      *
-     * @return the code (&ge;0)
+     * @return the {@code VkPrimitiveTopology} value (&ge;0)
      */
     int code() {
         return code;
