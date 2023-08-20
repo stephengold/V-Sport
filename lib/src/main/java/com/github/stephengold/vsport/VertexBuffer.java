@@ -205,7 +205,7 @@ final public class VertexBuffer {
      *
      * @return the pre-existing buffer
      */
-    FloatBuffer getData() {
+    public FloatBuffer getData() {
         verifyMutable();
         assert dataBuffer != null;
         return dataBuffer;
