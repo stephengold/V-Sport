@@ -63,7 +63,7 @@ abstract class DeviceResource implements Comparable<DeviceResource> {
     // new methods exposed
 
     /**
-     * Update this object after a device change.
+     * Update this object during a device change.
      *
      * @param nextDevice the current device if it's just been created, or null
      * if the current device is about to be destroyed

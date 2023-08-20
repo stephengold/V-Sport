@@ -40,7 +40,7 @@ import org.joml.Vector4f;
 /**
  * The camera-to-clip transform for use in shaders.
  * <p>
- * In camera space:
+ * In cameraspace:
  * <ul>
  * <li>coordinates are measured in world units from the eye location</li>
  * <li>right is +X</li>
@@ -48,7 +48,7 @@ import org.joml.Vector4f;
  * <li>the camera's look direction is -Z</li>
  * </ul>
  * <p>
- * In clip space:
+ * In clipspace:
  * <ul>
  * <li>the top clipping plane is Y=-1</li>
  * <li>the bottom clipping plane is Y=+1</li>
@@ -58,8 +58,7 @@ import org.joml.Vector4f;
  * <li>the far clipping plane is Z=+1</li>
  * </ul>
  *
- * Note that camera space is a right-handed coordinate system, but clip space is
- * a left-handed coordinate system.
+ * Note that both cameraspace and clipspace are right-handed coordinate systems.
  *
  * @author Stephen Gold sgold@sonic.net
  */
