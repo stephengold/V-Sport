@@ -81,7 +81,7 @@ public class Projection {
      * vertical field-of-view angle (between the bottom plane and the top plane,
      * in radians, &gt;0, &lt;PI)
      */
-    private float fovyRadians = MyMath.toRadians(45f);
+    private float fovy = MyMath.toRadians(45f);
     /**
      * distance of the far clipping plane from the eye (in world units)
      */
@@ -169,9 +169,9 @@ public class Projection {
      * @return the angle (in radians, &gt;0, &lt;PI)
      */
     public float fovy() {
-        assert fovyRadians > 0f : fovyRadians;
-        assert fovyRadians < FastMath.PI : fovyRadians;
-        return fovyRadians;
+        assert fovy > 0f : fovy;
+        assert fovy < FastMath.PI : fovy;
+        return fovy;
     }
 
     /**
@@ -183,7 +183,7 @@ public class Projection {
     public Projection setFovy(float fovyRadians) {
         Validate.inRange(
                 fovyRadians, "fovy in radians", Float.MIN_VALUE, FastMath.PI);
-        this.fovyRadians = fovyRadians;
+        this.fovy = fovyRadians;
         return this;
     }
 
@@ -272,7 +272,7 @@ public class Projection {
         float aspectRatio = BaseApplication.aspectRatio();
         boolean zeroToOne = true;
         storeMatrix.setPerspective(
-                fovyRadians, aspectRatio, zNear, zFar, zeroToOne);
+                fovy, aspectRatio, zNear, zFar, zeroToOne);
 
         // In Vulkan's clip space, the Y axis increases downward, not upward:
         float m11 = storeMatrix.m11();
@@ -289,7 +289,7 @@ public class Projection {
     @Override
     public String toString() {
         String result = String.format(
-                "fovy=%.2f near=%.2f far=%g", fovyRadians, zNear, zFar);
+                "fovy=%.2f near=%.2f far=%g", fovy, zNear, zFar);
         return result;
     }
 }
