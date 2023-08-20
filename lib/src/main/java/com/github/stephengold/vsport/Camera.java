@@ -32,7 +32,9 @@ package com.github.stephengold.vsport;
 import com.jme3.math.FastMath;
 import jme3utilities.Validate;
 import jme3utilities.math.MyMath;
+import jme3utilities.math.MyVector3f;
 import org.joml.Matrix4f;
+import org.joml.Vector2fc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
@@ -107,6 +109,36 @@ public class Camera {
      */
     public float azimuthAngle() {
         return azimuthRadians;
+    }
+
+    /**
+     * Convert the specified clip-space coordinates to world coordinates.
+     *
+     * @param clipXy the clip-space X and Y coordinates (not null, unaffected)
+     * @param clipZ the clip-space Z coordinate (0 for near plane, +1 for far
+     * plane)
+     * @param storeResult storage for the result (modified if not null)
+     * @return a location vector in world space (either {@code storeResult} or a
+     * new vector)
+     */
+    public com.jme3.math.Vector3f clipToWorld(
+            Vector2fc clipXy, float clipZ, com.jme3.math.Vector3f storeResult) {
+        Projection projection = BaseApplication.getProjection();
+        com.jme3.math.Vector3f result
+                = projection.clipToCamera(clipXy, clipZ, storeResult);
+
+        float right = result.x;
+        float up = result.y;
+        float forward = -result.z;
+
+        result.set(eyeLocation.x, eyeLocation.y, eyeLocation.z);
+        MyVector3f.accumulateScaled(
+                result, Utils.toJmeVector(rightDirection), right);
+        MyVector3f.accumulateScaled(result, Utils.toJmeVector(upDirection), up);
+        MyVector3f.accumulateScaled(
+                result, Utils.toJmeVector(lookDirection), forward);
+
+        return result;
     }
 
     /**
