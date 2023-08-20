@@ -444,6 +444,23 @@ final public class VertexBuffer {
     }
 
     /**
+     * Write the specified vector at the specified buffer position. Does not
+     * alter the buffer's read/write position.
+     *
+     * @param position the position to write to (&ge;0, &lt;limit)
+     * @param vector the vector to write (not null, unaffected)
+     * @return the (modified) current instance (for chaining)
+     */
+    public VertexBuffer put(int position, com.jme3.math.Vector3f vector) {
+        verifyMutable();
+
+        MyBuffer.put(dataBuffer, position, vector);
+        setModified();
+
+        return this;
+    }
+
+    /**
      * Write the specified vector at the current read/write position, then
      * increment the position by 3.
      *
