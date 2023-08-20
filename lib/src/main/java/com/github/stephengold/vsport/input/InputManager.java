@@ -205,7 +205,11 @@ public class InputManager {
         double xScale = 2.0 / windowWidth[0];
         double yScale = 2.0 / windowHeight[0];
         float xClip = (float) (xScale * x - 1.0);
-        float yClip = (float) (1.0 - yScale * y);
+        /*
+         * In Vulkan's clip space, Y coordinates increase downward,
+         * just as in GLFW's screen space.
+         */
+        float yClip = (float) (yScale * y - 1.0);
         if (cursorLocationClipspace == null) {
             this.cursorLocationClipspace = new Vector2f(xClip, yClip);
         } else {
