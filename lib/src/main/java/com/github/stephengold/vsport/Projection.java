@@ -65,6 +65,17 @@ import org.joml.Vector4f;
  */
 public class Projection {
     // *************************************************************************
+    // constants
+
+    /**
+     * Z coordinate of the far plane in clip space
+     */
+    final public static float farClipZ = 1f;
+    /**
+     * Z coordinate of the near plane in clip space
+     */
+    final public static float nearClipZ = 0f;
+    // *************************************************************************
     // fields
 
     /**
