@@ -450,24 +450,6 @@ final public class VertexBuffer {
      * @param vector the value to be written (not null, unaffected)
      * @return the (modified) current instance (for chaining)
      */
-    public VertexBuffer put(Vector3fc vector) {
-        verifyMutable();
-
-        dataBuffer.put(vector.x());
-        dataBuffer.put(vector.y());
-        dataBuffer.put(vector.z());
-        setModified();
-
-        return this;
-    }
-
-    /**
-     * Write the specified vector at the current read/write position, then
-     * increment the position by 3.
-     *
-     * @param vector the value to be written (not null, unaffected)
-     * @return the (modified) current instance (for chaining)
-     */
     public VertexBuffer put(com.jme3.math.Vector3f vector) {
         verifyMutable();
 
