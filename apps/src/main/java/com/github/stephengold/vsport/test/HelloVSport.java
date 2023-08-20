@@ -137,7 +137,7 @@ public class HelloVSport extends BaseApplication {
 
         // geometries:
         mars = new Geometry(globeMesh);
-        mars.setProgram("Unshaded/Texture");
+        mars.setProgram("Phong/Distant/Texture");
         mars.setTexture(marsKey);
         mars.scale(0.4f);
         mars.setLocation(0f, 0.2f, 1f);
