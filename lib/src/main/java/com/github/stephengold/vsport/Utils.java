@@ -43,6 +43,7 @@ import jme3utilities.math.MyMath;
 import org.joml.Matrix3f;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
+import org.joml.Vector4f;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.vulkan.KHRSwapchain;
 import org.lwjgl.vulkan.VK10;
@@ -354,6 +355,33 @@ final public class Utils {
      */
     public static Vector3f toJomlVector(com.jme3.math.Vector3f vector3f) {
         return new Vector3f(vector3f.x, vector3f.y, vector3f.z);
+    }
+
+    /**
+     * Convert an sRGB color string to a color in the linear colorspace.
+     *
+     * @param hexString the input color (hexadecimal string with red channel in
+     * the most-significant byte, alpha channel in the least significant byte)
+     * @return a new vector (red channel in the X component, alpha channel in
+     * the W component)
+     *
+     * @throws NumberFormatException if {@code hexString} fails to parse
+     */
+    public static Vector4f toLinearColor(String hexString) {
+        int srgbColor = Integer.parseUnsignedInt(hexString, 16);
+
+        double red = ((srgbColor >> 24) & 0xFF) / 255.0;
+        double green = ((srgbColor >> 16) & 0xFF) / 255.0;
+        double blue = ((srgbColor >> 8) & 0xFF) / 255.0;
+
+        // linearize the color channels
+        float r = (float) Math.pow(red, 2.2);
+        float g = (float) Math.pow(green, 2.2);
+        float b = (float) Math.pow(blue, 2.2);
+
+        float a = (srgbColor & 0xFF) / 255f;
+
+        return new Vector4f(r, g, b, a);
     }
 
     /**
