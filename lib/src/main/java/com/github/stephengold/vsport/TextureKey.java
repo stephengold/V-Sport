@@ -111,6 +111,16 @@ public class TextureKey {
     // new methods exposed
 
     /**
+     * Return the option for axis flipping.
+     *
+     * @return an enum value (not null)
+     */
+    FlipAxes flipAxes() {
+        assert flipAxes != null;
+        return flipAxes;
+    }
+
+    /**
      * Load/generate the Texture for this key.
      *
      * @return a new instance
@@ -176,6 +186,16 @@ public class TextureKey {
     public static void setDefaultMipmaps(boolean enable) {
         mipmapsDefault = enable;
     }
+    /**
+     * Return the URI used to load/generate image data.
+     *
+     * @return the pre-existing instance (not null)
+     */
+    URI uri() {
+        assert uri != null;
+        return uri;
+    }
+
     // *************************************************************************
     // Object methods
 
