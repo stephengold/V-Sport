@@ -30,7 +30,6 @@
 package com.github.stephengold.vsport.test;
 
 import com.github.stephengold.vsport.BaseApplication;
-import com.github.stephengold.vsport.FlipAxes;
 import com.github.stephengold.vsport.Geometry;
 import com.github.stephengold.vsport.Mesh;
 import com.github.stephengold.vsport.TextureKey;
@@ -131,8 +130,7 @@ public class HelloVSport extends BaseApplication {
         TextureKey marsKey
                 = new TextureKey("classpath:/Textures/sss/2k_mars.jpg");
         TextureKey roomKey = new TextureKey(
-                "classpath:/Models/viking_room/viking_room.png",
-                true, FlipAxes.noFlip);
+                "classpath:/Models/viking_room/viking_room.png");
         TextureKey photoKey
                 = new TextureKey("classpath:/Textures/texture.jpg");
 
