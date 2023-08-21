@@ -413,12 +413,7 @@ abstract public class BaseApplication {
      */
     private void cleanUpGlfw() {
         if (windowHandle != MemoryUtil.NULL) {
-            GLFWFramebufferSizeCallback resizeCallback
-                    = GLFW.glfwSetFramebufferSizeCallback(windowHandle, null);
-            if (resizeCallback != null) {
-                resizeCallback.free();
-            }
-
+            Callbacks.glfwFreeCallbacks(windowHandle);
             GLFW.glfwDestroyWindow(windowHandle);
             windowHandle = MemoryUtil.NULL;
         }
