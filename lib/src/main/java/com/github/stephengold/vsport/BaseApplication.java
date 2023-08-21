@@ -411,20 +411,19 @@ abstract public class BaseApplication {
     /**
      * Destroy the window and cleanly terminate GLFW.
      */
-    private void cleanUpGlfw() {
+    private static void cleanUpGlfw() {
         if (windowHandle != MemoryUtil.NULL) {
             Callbacks.glfwFreeCallbacks(windowHandle);
             GLFW.glfwDestroyWindow(windowHandle);
             windowHandle = MemoryUtil.NULL;
         }
+        GLFW.glfwTerminate();
 
         // Cancel the error callback:
         GLFWErrorCallback errorCallback = GLFW.glfwSetErrorCallback(null);
         if (errorCallback != null) {
             errorCallback.free();
         }
-
-        GLFW.glfwTerminate();
     }
 
     /**
