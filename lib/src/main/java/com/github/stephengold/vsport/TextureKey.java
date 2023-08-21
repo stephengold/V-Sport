@@ -289,7 +289,7 @@ public class TextureKey {
             ByteBuffer color0 = Utils.hexToBytes(c0Arg, stack);
             ByteBuffer color1 = Utils.hexToBytes(c1Arg, stack);
 
-            Texture result = new Texture(numBytes, size, size, mipmaps) {
+            Texture result = new Texture(numBytes, size, size, this) {
                 @Override
                 protected void fill(ByteBuffer pixels) {
                     for (int y = 0; y < size; ++y) {
