@@ -537,6 +537,14 @@ abstract public class BaseApplication {
             throw new RuntimeException("Failed to create a GLFW window");
         }
 
+        // Center the window.
+        GLFWVidMode videoMode
+                = GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor());
+        GLFW.glfwSetWindowPos(windowHandle,
+                (videoMode.width() - width) / 2,
+                (videoMode.height() - height) / 2
+        );
+
         // Request callback when the frame buffer is resized:
         GLFW.glfwSetFramebufferSizeCallback(
                 windowHandle, BaseApplication::frameBufferResizeCallback);
