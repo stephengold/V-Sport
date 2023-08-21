@@ -285,7 +285,6 @@ public class TextureKey {
 
             return result;
         }
-
     }
 
     /**
@@ -313,14 +312,12 @@ public class TextureKey {
             case "/checkerboard":
                 result = synthesizeCheckerboard(queryMap);
                 break;
-
             default:
                 String qPath = MyString.quote(path);
                 String qQuery = MyString.quote(query);
                 throw new IllegalArgumentException(
                         "path=" + qPath + ", query=" + qQuery);
         }
-
         return result;
     }
 

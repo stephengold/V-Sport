@@ -44,7 +44,7 @@ import org.lwjgl.vulkan.VkPipelineRasterizationStateCreateInfo;
 
 /**
  * A 3-D object to be rendered by V-Sport, including a mesh, a texture, a shader
- * program, and a coordinate transform.
+ * program, a coordinate transform, and 2 colors.
  */
 public class Geometry {
     // *************************************************************************
@@ -256,8 +256,8 @@ public class Geometry {
      * Return a copy of the location of the mesh origin.
      *
      * @param storeResult storage for the result (modified if not null)
-     * @return a location vector in world coordinates (either
-     * {@code storeResult} or a new vector, not null)
+     * @return a location vector in worldspace (either {@code storeResult} or a
+     * new vector, not null)
      */
     public Vector3f location(Vector3f storeResult) {
         Vector3f result = uniformValues.location(storeResult);
@@ -268,8 +268,8 @@ public class Geometry {
      * Return a copy of the location of the mesh origin.
      *
      * @param storeResult storage for the result (modified if not null)
-     * @return a location vector in world coordinates (either
-     * {@code storeResult} or a new vector, not null)
+     * @return a location vector in worldspace (either {@code storeResult} or a
+     * new vector, not null)
      */
     public com.jme3.math.Vector3f locationJme(
             com.jme3.math.Vector3f storeResult) {
@@ -280,8 +280,7 @@ public class Geometry {
     /**
      * Translate by the specified offset without changing the orientation.
      *
-     * @param offset the offset (in world coordinates, not null, finite,
-     * unaffected)
+     * @param offset the offset (in worldspace, not null, finite, unaffected)
      */
     public void move(com.jme3.math.Vector3f offset) {
         Validate.finite(offset, "offset");
@@ -291,8 +290,7 @@ public class Geometry {
     /**
      * Translate by the specified offset without changing the orientation.
      *
-     * @param offset the offset (in world coordinates, not null, finite,
-     * unaffected)
+     * @param offset the offset (in worldspace, not null, finite, unaffected)
      */
     public void move(Vector3fc offset) {
         Validate.require(offset.isFinite(), "a finite offset");
@@ -312,8 +310,7 @@ public class Geometry {
     }
 
     /**
-     * Reset the model transform so that mesh coordinates and world coordinates
-     * are the same.
+     * Reset the model transform so that meshspace and worldspace are the same.
      *
      * @return the (modified) current geometry (for chaining)
      */
@@ -324,7 +321,7 @@ public class Geometry {
 
     /**
      * Rotate the model by the specified angle around the specified axis,
-     * without shifting the mesh origin.
+     * without translating the mesh origin.
      * <p>
      * The rotation axis is assumed to be a unit vector.
      *
@@ -340,7 +337,7 @@ public class Geometry {
     }
 
     /**
-     * Apply the specified rotation, without shifting the mesh origin.
+     * Apply the specified rotation, without translating the mesh origin.
      *
      * @param rotation the rotation to apply (not null, each row is a unit
      * vector, unaffected)
@@ -416,12 +413,9 @@ public class Geometry {
     /**
      * Alter the location of the mesh origin.
      *
-     * @param x the desired X coordinate (in world coordinates, finite,
-     * default=0)
-     * @param y the desired Y coordinate (in world coordinates, finite,
-     * default=0)
-     * @param z the desired Z coordinate (in world coordinates, finite,
-     * default=0)
+     * @param x the desired X coordinate (in worldspace, finite, default=0)
+     * @param y the desired Y coordinate (in worldspace, finite, default=0)
+     * @param z the desired Z coordinate (in worldspace, finite, default=0)
      * @return the (modified) current geometry (for chaining)
      */
     public Geometry setLocation(float x, float y, float z) {
@@ -436,8 +430,8 @@ public class Geometry {
     /**
      * Translate the mesh origin to the specified location.
      *
-     * @param location the desired location (in world coordinates, not null,
-     * finite, unaffected, default=(0,0,0))
+     * @param location the desired location (in worldspace, not null, finite,
+     * unaffected, default=(0,0,0))
      * @return the (modified) current geometry (for chaining)
      */
     public Geometry setLocation(com.jme3.math.Vector3f location) {
@@ -449,8 +443,8 @@ public class Geometry {
     /**
      * Translate the mesh origin to the specified location.
      *
-     * @param location the desired location (in world coordinates, not null,
-     * finite, unaffected, default=(0,0,0))
+     * @param location the desired location (in worldspace, not null, finite,
+     * unaffected, default=(0,0,0))
      * @return the (modified) current geometry (for chaining)
      */
     public Geometry setLocation(Vector3fc location) {
@@ -492,7 +486,7 @@ public class Geometry {
     }
 
     /**
-     * Alter the orientation without shifting the mesh origin.
+     * Alter the orientation without translating the mesh origin.
      * <p>
      * The rotation axis is assumed to be a unit vector.
      *
@@ -513,7 +507,7 @@ public class Geometry {
     }
 
     /**
-     * Alter the orientation without shifting the mesh origin.
+     * Alter the orientation without translating the mesh origin.
      *
      * @param orientation the desired orientation (not null, each row is a unit
      * vector, unaffected)
@@ -526,7 +520,7 @@ public class Geometry {
     }
 
     /**
-     * Alter the orientation without shifting the mesh origin.
+     * Alter the orientation without translating the mesh origin.
      *
      * @param orientation the desired orientation (not null, not zero,
      * unaffected)

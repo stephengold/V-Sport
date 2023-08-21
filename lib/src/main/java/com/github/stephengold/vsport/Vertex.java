@@ -54,7 +54,7 @@ public class Vertex {
      */
     final private Vector2f texCoords;
     /**
-     * vertex colors (3 floats) or null if not present
+     * vertex color (3 floats) or null if not present
      */
     final private Vector3f color;
     /**

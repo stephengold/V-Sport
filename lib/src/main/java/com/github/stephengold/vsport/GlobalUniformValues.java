@@ -58,7 +58,7 @@ public class GlobalUniformValues {
      */
     final private Matrix4f viewMatrix = new Matrix4f();
     /**
-     * direction to the directional light (in world coordinates)
+     * direction to the directional light (in worldspace)
      */
     final private Vector3f lightDirectionWorldspace
             = new Vector3f(1f, 3f, 2f).normalize();
@@ -120,8 +120,8 @@ public class GlobalUniformValues {
     /**
      * Alter the direction to the directional light.
      *
-     * @param newDirection the desired direction (in world coordinates, not
-     * null, not zero)
+     * @param newDirection the desired direction (in worldspace, not null, not
+     * zero)
      */
     public void setLightDirection(Vector3f newDirection) {
         lightDirectionWorldspace.set(newDirection).normalize();
@@ -143,7 +143,7 @@ public class GlobalUniformValues {
         projectionMatrix.setPerspective(
                 (float) fov, aspectRatio, zNear, zFar, zeroToOne);
 
-        // In Vulkan's clip space, the Y axis increases downward, not upward:
+        // In Vulkan's clipspace, the Y axis increases downward, not upward:
         float m11 = projectionMatrix.m11();
         projectionMatrix.m11(-m11);
 

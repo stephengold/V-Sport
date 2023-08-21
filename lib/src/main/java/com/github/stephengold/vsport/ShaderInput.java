@@ -49,8 +49,7 @@ public enum ShaderInput {
      */
     LightColor(false, "global.LightColor"),
     /**
-     * direction to the distant light in world space (vec3 in the global
-     * uniform)
+     * direction to the distant light in worldspace (vec3 in the global uniform)
      */
     LightDirection(false, "global.LightDirection_worldspace"),
     /**

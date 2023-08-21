@@ -24,7 +24,7 @@ layout(location = 1) in vec3 vertexNormal_modelspace; // normals from a vertex b
 layout(location = 1) out vec3 Normal_modelspace; // normals to the frag shader
 
 void main() {
-    // vertex position in clip space
+    // vertex position in clipspace
     gl_Position = global.projectionMatrix * global.viewMatrix * geometry.modelMatrix * vec4(vertexPosition_modelspace, 1.0);
 
     // vertex normal in model space

@@ -405,7 +405,7 @@ public class Texture extends DeviceResource {
                  * order, starting from uv=(0,0).
                  *
                  * In an AWT BufferedImage, xy=(0,0) is in the upper left, hence
-                 * we usually want FlipAxes.flipY.
+                 * we often want FlipAxes.flipY.
                  */
                 for (int uu = 0; uu < h; ++uu) { // row index starting from U=0
                     int y;

@@ -340,7 +340,7 @@ public class ShaderProgram extends DeviceResource {
     }
 
     /**
-     * Load the required inputs (TXT file) from the classpath.
+     * Load the required-input list (TXT file) from the classpath.
      */
     private void reloadRequiredInputs() {
         String resourceName = String.format("/Shaders/%s.txt", programName);

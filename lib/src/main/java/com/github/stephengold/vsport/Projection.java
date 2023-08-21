@@ -118,7 +118,7 @@ public class Projection {
      * @param location the cameraspace coordinates to convert (not null,
      * unaffected)
      * @param storeResult storage for the result (modified if not null)
-     * @return a location vector in clip space (either {@code storeResult} or a
+     * @return a location vector in clipspace (either {@code storeResult} or a
      * new vector)
      */
     public Vector3f cameraToClip(Vector3f location, Vector3f storeResult) {
@@ -142,8 +142,8 @@ public class Projection {
      * @param clipZ the clipspace Z coordinate (0 for near plane, +1 for far
      * plane)
      * @param storeResult storage for the result (modified if not null)
-     * @return a location vector in cameraspace (either {@code storeResult} or
-     * a new vector)
+     * @return a location vector in cameraspace (either {@code storeResult} or a
+     * new vector)
      */
     public Vector3f clipToCamera(
             Vector2fc clipXy, float clipZ, Vector3f storeResult) {
@@ -274,7 +274,7 @@ public class Projection {
         storeMatrix.setPerspective(
                 fovy, aspectRatio, zNear, zFar, zeroToOne);
 
-        // In Vulkan's clip space, the Y axis increases downward, not upward:
+        // In Vulkan's clipspace, the Y axis increases downward, not upward:
         float m11 = storeMatrix.m11();
         storeMatrix.m11(-m11);
     }

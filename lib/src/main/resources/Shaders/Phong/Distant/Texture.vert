@@ -29,20 +29,20 @@ layout(location = 3) out vec3 LightDirection_cameraspace;
 layout(location = 4) out vec3 Normal_cameraspace;
 
 void main() {
-    // vertex position in camera space
+    // vertex position in cameraspace
     vec4 vertexPosition_cameraspace = global.viewMatrix * geometry.modelMatrix * vec4(vertexPosition_modelspace, 1);
 
-    // vertex position in clip space
+    // vertex position in clipspace
     gl_Position = global.projectionMatrix * vertexPosition_cameraspace;
 
-    // direction from the vertex to the camera, in camera space
-    // In camera space, the camera is at (0,0,0).
+    // direction from the vertex to the camera, in cameraspace
+    // In cameraspace, the camera is at (0,0,0).
     EyeDirection_cameraspace = vec3(0,0,0) - vertexPosition_cameraspace.xyz;
 
-    // direction from the vertex to the light, in camera space
+    // direction from the vertex to the light, in cameraspace
     LightDirection_cameraspace = (global.viewMatrix * vec4(global.LightDirection_worldspace, 0)).xyz;
 
-    // vertex normal in camera space
+    // vertex normal in cameraspace
     Normal_cameraspace = (global.viewMatrix * vec4(geometry.modelRotationMatrix * vertexNormal_modelspace, 0)).xyz;
 
     // texture coordinates of the vertex

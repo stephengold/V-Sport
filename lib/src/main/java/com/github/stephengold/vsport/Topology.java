@@ -92,7 +92,7 @@ public enum Topology {
      * &le;4, 3&rarr;triangles)
      * @param numShared the number of indices (or vertices) shared between
      * successive primitives (&ge;0, &le;2)
-     * @param code the Vulkan encoding (&ge;0)
+     * @param code the Vulkan encoding
      */
     Topology(int vpp, int numShared, int code) {
         this.vpp = vpp;
@@ -105,7 +105,7 @@ public enum Topology {
     /**
      * Return the encoding used by Vulkan's pipeline input assembly state.
      *
-     * @return the {@code VkPrimitiveTopology} value (&ge;0)
+     * @return the {@code VkPrimitiveTopology} value
      */
     int code() {
         return code;
@@ -115,7 +115,7 @@ public enum Topology {
      * Return the number of indices (or vertices) shared between successive
      * primitives.
      *
-     * @return the number (&ge;0, &le;3)
+     * @return the number (&ge;0, &le;2)
      */
     public int numShared() {
         return numShared;

@@ -132,8 +132,8 @@ class NonGlobalUniformValues {
      * Return a copy of the location of the mesh origin.
      *
      * @param storeResult storage for the result (modified if not null)
-     * @return a location vector in world coordinates (either
-     * {@code storeResult} or a new vector, not null)
+     * @return a location vector in worldspace (either {@code storeResult} or a
+     * new vector, not null)
      */
     Vector3f location(Vector3f storeResult) {
         if (storeResult == null) {
@@ -147,8 +147,8 @@ class NonGlobalUniformValues {
      * Return a copy of the location of the mesh origin.
      *
      * @param storeResult storage for the result (modified if not null)
-     * @return a location vector in world coordinates (either
-     * {@code storeResult} or a new vector, not null)
+     * @return a location vector in worldspace (either {@code storeResult} or a
+     * new vector, not null)
      */
     com.jme3.math.Vector3f locationJme(
             com.jme3.math.Vector3f storeResult) {
@@ -221,8 +221,7 @@ class NonGlobalUniformValues {
     }
 
     /**
-     * Reset the model transform so that mesh coordinates and world coordinates
-     * are the same.
+     * Reset the model transform so that meshspace and worldspace are the same.
      */
     void resetModelTransform() {
         scale.set(1f);
