@@ -458,30 +458,48 @@ public class LogicalDevice {
      */
     long createSampler(TextureKey key) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
-            VkSamplerCreateInfo samplerInfo = VkSamplerCreateInfo.calloc(stack);
-            samplerInfo.sType(VK10.VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO);
+            VkSamplerCreateInfo createInfo = VkSamplerCreateInfo.calloc(stack);
+            createInfo.sType(VK10.VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO);
 
-            samplerInfo.addressModeU(VK10.VK_SAMPLER_ADDRESS_MODE_REPEAT);
-            samplerInfo.addressModeV(VK10.VK_SAMPLER_ADDRESS_MODE_REPEAT);
-            samplerInfo.addressModeW(VK10.VK_SAMPLER_ADDRESS_MODE_REPEAT);
-            samplerInfo.anisotropyEnable(true);
-            samplerInfo.borderColor(VK10.VK_BORDER_COLOR_INT_OPAQUE_BLACK);
-            samplerInfo.compareEnable(false);
-            samplerInfo.compareOp(VK10.VK_COMPARE_OP_ALWAYS);
-            samplerInfo.magFilter(VK10.VK_FILTER_LINEAR);
-            samplerInfo.maxAnisotropy(16f);
-            samplerInfo.maxLod(31f);
-            samplerInfo.minFilter(VK10.VK_FILTER_LINEAR);
-            samplerInfo.minLod(0f);
-            samplerInfo.mipLodBias(0f);
-            samplerInfo.mipmapMode(VK10.VK_SAMPLER_MIPMAP_MODE_LINEAR);
-            samplerInfo.unnormalizedCoordinates(false);
+            createInfo.addressModeW(VK10.VK_SAMPLER_ADDRESS_MODE_REPEAT);
+            createInfo.borderColor(VK10.VK_BORDER_COLOR_INT_OPAQUE_BLACK);
+            createInfo.compareEnable(false);
+            createInfo.compareOp(VK10.VK_COMPARE_OP_ALWAYS);
+            createInfo.minLod(0f);
+            createInfo.mipLodBias(0f);
+            createInfo.unnormalizedCoordinates(false);
 
-            LongBuffer pTextureSampler = stack.mallocLong(1);
+            int addressModeU = key.wrapU().code();
+            createInfo.addressModeU(addressModeU);
+
+            int addressModeV = key.wrapV().code();
+            createInfo.addressModeV(addressModeV);
+
+            float maxAnisotropy = key.maxAniso();
+            boolean anisotropyEnable = (maxAnisotropy > 1f);
+            createInfo.anisotropyEnable(anisotropyEnable);
+
+            Filter magnifier = key.magFilter();
+            int magFilter = magnifier.filterCode();
+            createInfo.magFilter(magFilter);
+
+            createInfo.maxAnisotropy(maxAnisotropy);
+
+            Filter minifier = key.minFilter();
+            float maxLod = minifier.maxLod();
+            createInfo.maxLod(maxLod);
+
+            int minFilter = minifier.filterCode();
+            createInfo.minFilter(minFilter);
+
+            int mipmapMode = minifier.mipmapMode();
+            createInfo.mipmapMode(mipmapMode);
+
+            LongBuffer pSampler = stack.mallocLong(1);
             int retCode = VK10.vkCreateSampler(
-                    vkDevice, samplerInfo, allocator, pTextureSampler);
+                    vkDevice, createInfo, allocator, pSampler);
             Utils.checkForError(retCode, "create texture sampler");
-            long result = pTextureSampler.get(0);
+            long result = pSampler.get(0);
 
             assert result != VK10.VK_NULL_HANDLE;
             return result;

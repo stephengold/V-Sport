@@ -52,6 +52,30 @@ public class TextureKey {
     // fields
 
     /**
+     * true to generate MIP maps, false to skip generating them
+     */
+    final private boolean mipmaps;
+    /**
+     * default setting for MIP-map generation
+     */
+    private static boolean mipmapsDefault = true;
+    /**
+     * filter to use when magnifying
+     */
+    final private Filter magFilter;
+    /**
+     * default magnifying filter
+     */
+    private static Filter magFilterDefault = Filter.Linear;
+    /**
+     * filter to use when minifying
+     */
+    final private Filter minFilter;
+    /**
+     * default minifying filter
+     */
+    private static Filter minFilterDefault = Filter.NearestMipmapLinear;
+    /**
      * option for flipping axes (not null)
      */
     final private FlipAxes flipAxes;
@@ -60,17 +84,33 @@ public class TextureKey {
      */
     private static FlipAxes flipAxesDefault = FlipAxes.noFlip;
     /**
-     * true to generate MIP maps, false to skip generating them
+     * maximum degree of anisotropic filtering
      */
-    final private boolean mipmaps;
+    final private float maxAniso;
     /**
-     * default setting for mipmaps
+     * default for max aniso
      */
-    private static boolean mipmapsDefault = true;
+    private static float maxAnisoDefault = 1f;
     /**
      * URI to load/generate image data
      */
     final private URI uri;
+    /**
+     * wrap function for the first (U) texture coordinate
+     */
+    final private WrapFunction wrapU;
+    /**
+     * default for the U-axis wrap function
+     */
+    private static WrapFunction wrapUDefault = WrapFunction.Repeat;
+    /**
+     * wrap function for the 2nd (V) texture coordinate
+     */
+    final private WrapFunction wrapV;
+    /**
+     * default for the V-axis wrap function
+     */
+    private static WrapFunction wrapVDefault = WrapFunction.Repeat;
     // *************************************************************************
     // constructors
 
@@ -81,20 +121,67 @@ public class TextureKey {
      * empty)
      */
     public TextureKey(String uriString) {
-        this(uriString, mipmapsDefault, flipAxesDefault);
+        this(uriString, magFilterDefault, minFilterDefault);
     }
 
     /**
-     * Instantiate a custom key.
+     * Instantiate a key with the specified URI and anisotropic filtering.
      *
      * @param uriString unparsed URI to load/generate image data (not null, not
      * empty)
-     * @param mipmaps true to generate MIP maps, false to skip
-     * @param flipAxes option for flipping axes (not null)
+     * @param maxAniso the maximum degree of anisotropic filtering (&ge;1,
+     * default=1)
      */
-    public TextureKey(String uriString, boolean mipmaps, FlipAxes flipAxes) {
-        Validate.nonEmpty(uriString, "path");
+    public TextureKey(String uriString, float maxAniso) {
+        this(uriString, magFilterDefault, minFilterDefault, wrapUDefault,
+                wrapVDefault, mipmapsDefault, flipAxesDefault, maxAniso);
+    }
+
+    /**
+     * Instantiate a key with the specified URI and mag/min filters.
+     *
+     * @param uriString unparsed URI to load/generate image data (not null, not
+     * empty)
+     * @param magFilter the filter to use when magnifying (default=Linear)
+     * @param minFilter the filter to use when minifying
+     * (default=NearestMipmapLinear)
+     */
+    public TextureKey(String uriString, Filter magFilter, Filter minFilter) {
+        this(uriString, magFilter, minFilter, wrapUDefault, wrapVDefault,
+                mipmapsDefault, flipAxesDefault, maxAnisoDefault);
+    }
+
+    /**
+     * Instantiate a fully custom key.
+     *
+     * @param uriString unparsed URI to load/generate image data (not null, not
+     * empty)
+     * @param magFilter the filter to use when magnifying (not null,
+     * default=Linear)
+     * @param minFilter the filter to use when minifying (not null,
+     * default=NearestMipmapLinear)
+     * @param wrapU the wrap function for the first (U) texture coordinate (not
+     * null, default=Repeat)
+     * @param wrapV the wrap function for the 2nd (V) texture coordinate (not
+     * null, default=Repeat)
+     * @param mipmaps true to generate MIP maps, false to skip (default=true)
+     * @param flipAxes option for flipping texture axes (not null)
+     * @param maxAniso the maximum degree of anisotropic filtering (&ge;1,
+     * default=1)
+     */
+    public TextureKey(String uriString, Filter magFilter, Filter minFilter,
+            WrapFunction wrapU, WrapFunction wrapV,
+            boolean mipmaps, FlipAxes flipAxes, float maxAniso) {
+        Validate.nonEmpty(uriString, "URI string");
+        Validate.nonNull(magFilter, "mag filter");
+        Validate.require(
+                magFilter.isValidForMagnification(), "valid mag filter");
+        Validate.nonNull(minFilter, "min filter");
+        Validate.nonNull(wrapU, "wrap u");
+        Validate.nonNull(wrapV, "wrap v");
         Validate.nonNull(flipAxes, "flip axes");
+        Validate.inRange(maxAniso, "max anisotropy", 1f, Float.MAX_VALUE);
+
         // It's better to report URI errors now than during load()!
         validateUriString(uriString);
 
@@ -104,8 +191,13 @@ public class TextureKey {
             throw new RuntimeException(uriString); // shouldn't occur
         }
 
+        this.magFilter = magFilter;
+        this.minFilter = minFilter;
+        this.wrapU = wrapU;
+        this.wrapV = wrapV;
         this.mipmaps = mipmaps;
         this.flipAxes = flipAxes;
+        this.maxAniso = maxAniso;
     }
     // *************************************************************************
     // new methods exposed
@@ -161,6 +253,33 @@ public class TextureKey {
     }
 
     /**
+     * Return the filter to use when magnifying.
+     *
+     * @return an enum value (not null)
+     */
+    public Filter magFilter() {
+        return magFilter;
+    }
+
+    /**
+     * Return the maximum degree of anisotropic filtering.
+     *
+     * @return the maximum degree (&ge;1)
+     */
+    public float maxAniso() {
+        return maxAniso;
+    }
+
+    /**
+     * Return the filter to use when minifying.
+     *
+     * @return an enum value (not null)
+     */
+    public Filter minFilter() {
+        return minFilter;
+    }
+
+    /**
      * Test whether MIP maps should be generated during load().
      *
      * @return true if they should be generated, otherwise false
@@ -179,12 +298,68 @@ public class TextureKey {
     }
 
     /**
+     * Alter the default magnification filter for new texture keys.
+     *
+     * @param filter the enum value of the filter to use (not null,
+     * default=Linear)
+     */
+    public static void setDefaultMagFilter(Filter filter) {
+        Validate.nonNull(filter, "filter");
+        Validate.require(filter.isValidForMagnification(), "valid filter");
+
+        magFilterDefault = filter;
+    }
+
+    /**
+     * Alter the default max aniso for new texture keys.
+     *
+     * @param degree the maximum degree to be assigned (&ge;1, default=1)
+     */
+    public static void setDefaultMaxAniso(float degree) {
+        Validate.inRange(degree, "degree", 1f, Float.MAX_VALUE);
+        maxAnisoDefault = degree;
+    }
+
+    /**
+     * Alter the default minification filter for new texture keys.
+     *
+     * @param filter the enum value of the filter to become the default (not
+     * null, default=GL_NEAREST_MIPMAP_LINEAR)
+     */
+    public static void setDefaultMinFilter(Filter filter) {
+        Validate.nonNull(filter, "filter");
+        minFilterDefault = filter;
+    }
+
+    /**
      * Alter the default MIP-maps setting for new texture keys.
      *
      * @param enable the setting to become the default (default=true)
      */
     public static void setDefaultMipmaps(boolean enable) {
         mipmapsDefault = enable;
+    }
+
+    /**
+     * Alter the default U-axis wrap function for new texture keys.
+     *
+     * @param function the enum value of the function to become the default (not
+     * null, default=Repeat)
+     */
+    public static void setDefaultWrapU(WrapFunction function) {
+        Validate.nonNull(function, "function");
+        wrapUDefault = function;
+    }
+
+    /**
+     * Alter the default V-axis wrap function for new texture keys.
+     *
+     * @param function the enum value of the function to become the default (not
+     * null, default=Repeat)
+     */
+    public static void setDefaultWrapV(WrapFunction function) {
+        Validate.nonNull(function, "function");
+        wrapVDefault = function;
     }
 
     /**
@@ -197,6 +372,25 @@ public class TextureKey {
         return uri;
     }
 
+    /**
+     * Return the wrap function for the first (U) texture coordinate.
+     *
+     * @return the enum value (not null)
+     */
+    public WrapFunction wrapU() {
+        assert wrapU != null;
+        return wrapU;
+    }
+
+    /**
+     * Return the wrap function for the 2nd (V) texture coordinate.
+     *
+     * @return the enum value (not null)
+     */
+    public WrapFunction wrapV() {
+        assert wrapV != null;
+        return wrapV;
+    }
     // *************************************************************************
     // Object methods
 
@@ -217,7 +411,12 @@ public class TextureKey {
             TextureKey otherKey = (TextureKey) otherObject;
             result = uri.equals(otherKey.uri)
                     && mipmaps == otherKey.mipmaps
-                    && flipAxes == otherKey.flipAxes;
+                    && flipAxes == otherKey.flipAxes
+                    && Float.compare(maxAniso, otherKey.maxAniso) == 0
+                    && magFilter == otherKey.magFilter
+                    && minFilter == otherKey.minFilter
+                    && wrapU == otherKey.wrapU
+                    && wrapV == otherKey.wrapV;
 
         } else {
             result = false;
@@ -235,7 +434,12 @@ public class TextureKey {
     public int hashCode() {
         int hash = uri.hashCode();
         hash = 707 * hash + (mipmaps ? 1 : 0);
-        hash = 707 * hash + flipAxes.hashCode();
+        hash = 707 * hash + flipAxes.ordinal();
+        hash = 707 * hash + Float.hashCode(maxAniso);
+        hash = 707 * hash + magFilter.ordinal();
+        hash = 707 * hash + minFilter.ordinal();
+        hash = 707 * hash + wrapU.ordinal();
+        hash = 707 * hash + wrapV.ordinal();
 
         return hash;
     }
@@ -248,8 +452,11 @@ public class TextureKey {
     @Override
     public String toString() {
         String mm = mipmaps ? "+" : "-";
-        String result = String.format(
-                "TextureKey(%s%n %s %smipmaps)", uri, flipAxes, mm);
+        String quri = MyString.quote(uri.toString());
+        String result = String.format("TextureKey(%s%n"
+                + " %s mag=%s min=%s wrap(%s %s) %smipmaps maxAniso=%.1f)",
+                quri,
+                flipAxes, magFilter, minFilter, wrapU, wrapV, mm, maxAniso);
 
         return result;
     }
