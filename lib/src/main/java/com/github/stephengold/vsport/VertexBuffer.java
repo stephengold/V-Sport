@@ -283,7 +283,7 @@ final public class VertexBuffer {
      *
      * @param fpv the number of floats per vertex (&ge;1, &le;4)
      * @param floatArray the initial data (not null, unaffected)
-     * @return a new instance (not null)
+     * @return a new flipped instance (not null)
      */
     static VertexBuffer newInstance(int fpv, float... floatArray) {
         int numVertices = floatArray.length / fpv;
@@ -293,6 +293,7 @@ final public class VertexBuffer {
         for (float fValue : floatArray) {
             data.put(fValue);
         }
+        data.flip();
 
         return result;
     }
@@ -329,7 +330,7 @@ final public class VertexBuffer {
      * Create a mutable vertex buffer initialized from an array of vectors.
      *
      * @param vectors the initial data (not null, unaffected)
-     * @return a new instance (not null)
+     * @return a new flipped instance (not null)
      */
     static VertexBuffer newInstance(com.jme3.math.Vector3f... vectors) {
         int numVertices = vectors.length;
@@ -338,6 +339,7 @@ final public class VertexBuffer {
         for (com.jme3.math.Vector3f vector : vectors) {
             result.put(vector);
         }
+        result.flip();
 
         return result;
     }
