@@ -154,7 +154,7 @@ public class TextureKey {
                 }
             }
 
-            result = Texture.newInstance(stream, uri, mipmaps, flipAxes);
+            result = Texture.newInstance(stream, this);
         }
 
         return result;

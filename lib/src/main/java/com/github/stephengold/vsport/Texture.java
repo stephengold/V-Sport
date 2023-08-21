@@ -81,6 +81,10 @@ public class Texture extends DeviceResource {
      * handle of the image view (native type: VkImageView)
      */
     private long viewHandle = VK10.VK_NULL_HANDLE;
+    /**
+     * key used to create the texture (not null)
+     */
+    final private TextureKey key;
     // *************************************************************************
     // constructors
 
@@ -90,15 +94,15 @@ public class Texture extends DeviceResource {
      * @param numBytes the desired size in bytes (&ge;0)
      * @param width the width (in pixels, &gt;0)
      * @param height the height (in pixels, &gt;0)
-     * @param generateMipMaps true to generate MIP maps, false to skip MIP-map
-     * generation
+     * @param key the key for this texture (not null)
      */
-    Texture(int numBytes, int width, int height, boolean generateMipMaps) {
+    Texture(int numBytes, int width, int height, TextureKey key) {
         this.numBytes = numBytes;
         this.width = width;
         this.height = height;
+        this.key = key;
 
-        if (generateMipMaps) {
+        if (key.mipmaps()) {
             int maxDimension = Math.max(width, width);
             this.numMipLevels = 1 + Utils.log2(maxDimension); // 1 .. 31
         } else {
@@ -113,26 +117,23 @@ public class Texture extends DeviceResource {
      * Create a texture from the specified InputStream.
      *
      * @param stream the stream to read from (not null)
-     * @param uri the URI from which the stream data originated (not null)
-     * @param generateMipMaps true to generate MIP maps, false to skip MIP-map
-     * generation
-     * @param flipAxes option for flipping axes (not null)
+     * @param key the key for this texture (not null)
      * @return a new texture (not null)
      */
-    static Texture newInstance(InputStream stream, URI uri,
-            boolean generateMipMaps, FlipAxes flipAxes) {
+    static Texture newInstance(InputStream stream, TextureKey key) {
         ImageIO.setUseCache(false);
         BufferedImage image;
         try {
             image = ImageIO.read(stream);
 
         } catch (IOException exception) {
+            URI uri = key.uri();
             String q = MyString.quote(uri.toString());
             String message = "URI=" + q + System.lineSeparator() + exception;
             throw new RuntimeException(message, exception);
         }
 
-        Texture result = newInstance(image, generateMipMaps, flipAxes);
+        Texture result = newInstance(image, key);
         return result;
     }
 
@@ -382,13 +383,10 @@ public class Texture extends DeviceResource {
      * Create a texture from the specified BufferedImage.
      *
      * @param image the image to use (not null)
-     * @param generateMipMaps true to generate MIP maps, false to skip MIP-map
-     * generation
-     * @param flipAxes option for flipping axes (not null)
+     * @param key the key for this texture (not null)
      * @return a new instance (not null)
      */
-    private static Texture newInstance(
-            BufferedImage image, boolean generateMipMaps, FlipAxes flipAxes) {
+    private static Texture newInstance(BufferedImage image, TextureKey key) {
         /*
          * Note: loading with AWT instead of STB
          * (which doesn't handle InputStream input).
@@ -397,7 +395,7 @@ public class Texture extends DeviceResource {
         int w = image.getWidth();
         int h = image.getHeight();
         int numBytes = w * h * numChannels;
-        Texture result = new Texture(numBytes, w, h, generateMipMaps) {
+        Texture result = new Texture(numBytes, w, h, key) {
             @Override
             protected void fill(ByteBuffer pixels) {
                 /*
@@ -409,7 +407,7 @@ public class Texture extends DeviceResource {
                  */
                 for (int uu = 0; uu < h; ++uu) { // row index starting from U=0
                     int y;
-                    if (flipAxes == FlipAxes.flipY) {
+                    if (key.flipAxes() == FlipAxes.flipY) {
                         y = h - uu - 1;
                     } else {
                         y = uu;
