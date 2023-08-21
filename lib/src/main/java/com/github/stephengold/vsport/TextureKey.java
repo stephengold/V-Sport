@@ -39,6 +39,7 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 import jme3utilities.MyString;
+import jme3utilities.Validate;
 import org.lwjgl.system.MemoryStack;
 
 /**
@@ -92,6 +93,8 @@ public class TextureKey {
      * @param flipAxes option for flipping axes (not null)
      */
     public TextureKey(String uriString, boolean mipmaps, FlipAxes flipAxes) {
+        Validate.nonEmpty(uriString, "path");
+        Validate.nonNull(flipAxes, "flip axes");
         // It's better to report URI errors now than during load()!
         validateUriString(uriString);
 

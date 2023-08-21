@@ -29,6 +29,7 @@
  */
 package com.github.stephengold.vsport;
 
+import jme3utilities.Validate;
 import org.lwjgl.vulkan.VK10;
 
 /**
@@ -95,6 +96,9 @@ public enum Topology {
      * @param code the Vulkan encoding
      */
     Topology(int vpp, int numShared, int code) {
+        Validate.inRange(vpp, "vpp", 1, 4);
+        Validate.inRange(numShared, "num shared", 0, 2);
+
         this.vpp = vpp;
         this.numShared = numShared;
         this.code = code;
@@ -118,6 +122,8 @@ public enum Topology {
      * @return the number (&ge;0, &le;2)
      */
     public int numShared() {
+        assert numShared >= 0 : numShared;
+        assert numShared <= 2 : numShared;
         return numShared;
     }
 
@@ -127,6 +133,8 @@ public enum Topology {
      * @return the count (&ge;1, &le;4, 3&rarr;triangles)
      */
     public int vpp() {
+        assert vpp >= 1 : vpp;
+        assert vpp <= 4 : vpp;
         return vpp;
     }
 }
