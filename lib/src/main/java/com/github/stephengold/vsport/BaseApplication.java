@@ -45,6 +45,7 @@ import org.joml.Vector4fc;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWFramebufferSizeCallback;
+import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.system.Configuration;
 import org.lwjgl.system.MemoryUtil;
 import org.lwjgl.vulkan.VK10;
