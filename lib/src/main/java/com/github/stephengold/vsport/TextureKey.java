@@ -186,6 +186,7 @@ public class TextureKey {
     public static void setDefaultMipmaps(boolean enable) {
         mipmapsDefault = enable;
     }
+
     /**
      * Return the URI used to load/generate image data.
      *
