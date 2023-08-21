@@ -115,18 +115,15 @@ class ChainResources {
      * @param desiredWidth the desired framebuffer width (in pixels, &gt;0)
      * @param desiredHeight the desired framebuffer height (in pixels, &gt;0)
      * @param depthFormat the desired depth-buffer format
-     * @param samplerHandle the handle of the {@code VkSampler} for textures
-     * (not null)
      * @param pipelineLayoutHandle the handle of the graphics-pipeline layout
      * (not null)
      */
     ChainResources(SurfaceSummary surface, long descriptorSetLayoutHandle,
             int desiredWidth, int desiredHeight,
-            int depthFormat, long samplerHandle, long pipelineLayoutHandle) {
+            int depthFormat, long pipelineLayoutHandle) {
         Validate.nonNull(surface, "surface");
         Validate.nonZero(
                 descriptorSetLayoutHandle, "descriptor-set layout handle");
-        Validate.nonZero(samplerHandle, "sampler handle");
         Validate.nonZero(pipelineLayoutHandle, "pipeline-layout handle");
 
         this.numImages = chooseNumImages(surface);

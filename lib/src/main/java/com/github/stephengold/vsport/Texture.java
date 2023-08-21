@@ -78,6 +78,10 @@ public class Texture extends DeviceResource {
      */
     final private int width;
     /**
+     * handle of the sampler (native type: VkSampler)
+     */
+    private long samplerHandle = VK10.VK_NULL_HANDLE;
+    /**
      * handle of the image view (native type: VkImageView)
      */
     private long viewHandle = VK10.VK_NULL_HANDLE;
@@ -138,6 +142,16 @@ public class Texture extends DeviceResource {
     }
 
     /**
+     * Access the sampler.
+     *
+     * @return the handle of the pre-existing {@code VkImageView} (not null)
+     */
+    final long samplerHandle() {
+        assert samplerHandle != VK10.VK_NULL_HANDLE;
+        return samplerHandle;
+    }
+
+    /**
      * Access the image view.
      *
      * @return the handle of the pre-existing {@code VkImageView} (not null)
@@ -168,6 +182,7 @@ public class Texture extends DeviceResource {
     protected void destroy() {
         LogicalDevice logicalDevice = Internals.getLogicalDevice();
         this.viewHandle = logicalDevice.destroyImageView(viewHandle);
+        this.samplerHandle = logicalDevice.destroySampler(samplerHandle);
 
         if (deviceImage != null) {
             this.deviceImage = deviceImage.destroy();
@@ -186,6 +201,7 @@ public class Texture extends DeviceResource {
     void updateLogicalDevice(LogicalDevice nextDevice) {
         LogicalDevice logicalDevice = Internals.getLogicalDevice();
         this.viewHandle = logicalDevice.destroyImageView(viewHandle);
+        this.samplerHandle = logicalDevice.destroySampler(samplerHandle);
 
         if (deviceImage != null) {
             this.deviceImage = deviceImage.destroy();
@@ -215,7 +231,8 @@ public class Texture extends DeviceResource {
     }
 
     /**
-     * Create the underlying resources: the device image and the image view.
+     * Create the underlying resources: the device image, image view, and
+     * sampler.
      */
     private void create() {
         // Create a temporary buffer object for staging:
@@ -259,6 +276,9 @@ public class Texture extends DeviceResource {
         long imageHandle = deviceImage.imageHandle();
         this.viewHandle = logicalDevice.createImageView(imageHandle,
                 imageFormat, VK10.VK_IMAGE_ASPECT_COLOR_BIT, numMipLevels);
+
+        // Create a sampler:
+        this.samplerHandle = logicalDevice.createSampler(key);
     }
 
     /**

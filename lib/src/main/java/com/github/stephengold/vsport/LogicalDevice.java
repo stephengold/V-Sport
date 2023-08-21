@@ -453,9 +453,10 @@ public class LogicalDevice {
     /**
      * Create a texture sampler for the current logical device.
      *
+     * @param key (not null)
      * @return the handle of the new {@code VkSampler} (not null)
      */
-    long createSampler() {
+    long createSampler(TextureKey key) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             VkSamplerCreateInfo samplerInfo = VkSamplerCreateInfo.calloc(stack);
             samplerInfo.sType(VK10.VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO);

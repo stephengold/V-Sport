@@ -152,11 +152,9 @@ class Draw {
      * Update the descriptor set for rendering.
      *
      * @param geometry the geometry to be rendered (not null)
-     * @param samplerHandle the handle of the VkSampler for textures (not null)
      * @param globalUbo the global UBO (not null)
      */
-    void updateDescriptorSet(
-            Geometry geometry, long samplerHandle, BufferResource globalUbo) {
+    void updateDescriptorSet(Geometry geometry, BufferResource globalUbo) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             VkDescriptorBufferInfo.Buffer pBufferInfo
                     = VkDescriptorBufferInfo.calloc(2, stack);
@@ -189,9 +187,11 @@ class Draw {
                             "Geometry cannot be rendered because the " + program
                             + " program requires a texture.");
                 }
-                long viewHandle = texture.viewHandle();
-                pImageInfo.imageView(viewHandle);
-                pImageInfo.sampler(samplerHandle);
+                long imageView = texture.viewHandle();
+                pImageInfo.imageView(imageView);
+                long sampler = texture.samplerHandle();
+                pImageInfo.sampler(sampler);
+
             } else {
                 numWrites = 1;
                 pImageInfo = null;

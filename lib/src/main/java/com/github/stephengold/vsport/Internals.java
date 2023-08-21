@@ -171,10 +171,6 @@ final class Internals {
      */
     private static long pipelineLayoutHandle = VK10.VK_NULL_HANDLE;
     /**
-     * handle of the {@code VkSampler} for sampling textures
-     */
-    private static long samplerHandle = VK10.VK_NULL_HANDLE;
-    /**
      * handle of the {@code VkSurfaceKHR} for presentation
      */
     private static long surfaceHandle = VK10.VK_NULL_HANDLE;
@@ -358,12 +354,6 @@ final class Internals {
             descriptorSetLayoutHandle = VK10.VK_NULL_HANDLE;
         }
 
-        // Destroy the texture sampler:
-        if (samplerHandle != VK10.VK_NULL_HANDLE) {
-            VK10.vkDestroySampler(vkDevice, samplerHandle, defaultAllocator);
-            samplerHandle = VK10.VK_NULL_HANDLE;
-        }
-
         // Destroy the logical device:
         vkDevice = null;
         if (logicalDevice != null) {
@@ -517,7 +507,6 @@ final class Internals {
         System.out.println("numSamples = " + numMsaaSamples);
 
         createLogicalDevice();
-        samplerHandle = logicalDevice.createSampler();
         descriptorSetLayoutHandle = logicalDevice.createDescriptorSetLayout();
         pipelineLayoutHandle
                 = logicalDevice.createPipelineLayout(descriptorSetLayoutHandle);
@@ -625,7 +614,7 @@ final class Internals {
                 Geometry geometry = geometryList.get(geometryI);
                 geometry.writeUniformValuesTo(nonGlobalUbo);
 
-                draw.updateDescriptorSet(geometry, samplerHandle, globalUbo);
+                draw.updateDescriptorSet(geometry, globalUbo);
 
                 long pipelineHandle = createPipeline(pipelineLayoutHandle,
                         framebufferExtent, passHandle, geometry);
@@ -767,8 +756,7 @@ final class Internals {
                     = physicalDevice.summarizeSurface(surfaceHandle, stack);
             chainResources = new ChainResources(
                     surface, descriptorSetLayoutHandle, framebufferWidth,
-                    framebufferHeight, depthBufferFormat, samplerHandle,
-                    pipelineLayoutHandle);
+                    framebufferHeight, depthBufferFormat, pipelineLayoutHandle);
             framebufferHeight = chainResources.framebufferHeight();
             framebufferWidth = chainResources.framebufferWidth();
 
