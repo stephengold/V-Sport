@@ -49,7 +49,7 @@ import org.lwjgl.vulkan.VkImageSubresourceRange;
  *
  * @author Stephen Gold sgold@sonic.net
  */
-public class Texture extends DeviceResource {
+class Texture extends DeviceResource {
     // *************************************************************************
     // fields
 
