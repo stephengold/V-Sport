@@ -591,6 +591,20 @@ public class LogicalDevice {
     }
 
     /**
+     * Destroy the specified sampler, if any.
+     *
+     * @param handle the handle of the {@code VkSampler} to destroy, or null
+     * @return null
+     */
+    long destroySampler(long handle) {
+        if (handle != VK10.VK_NULL_HANDLE) {
+            VK10.vkDestroySampler(vkDevice, handle, allocator);
+        }
+
+        return VK10.VK_NULL_HANDLE;
+    }
+
+    /**
      * Destroy the specified semaphore, if any.
      *
      * @param handle the handle of the {@code VkSemaphore} to destroy, or null
