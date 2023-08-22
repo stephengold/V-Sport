@@ -645,6 +645,15 @@ final public class VertexBuffer {
     }
 
     /**
+     * Alter the usage hint.
+     *
+     * @return the (modified) current instance (for chaining)
+     */
+    public VertexBuffer setDynamic() {
+        throw new UnsupportedOperationException("Not implemented yet."); // TODO
+    }
+
+    /**
      * Indicate that the buffer data have changed.
      *
      * @return the (modified) current instance (for chaining)
