@@ -392,27 +392,6 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
 
     /**
-     * Generate create info for the input-assembly state of a graphics pipeline.
-     *
-     * @param stack for allocating temporary host buffers (not null)
-     * @return a new, temporary struct (not null)
-     */
-    VkPipelineInputAssemblyStateCreateInfo
-            generateIasCreateInfo(MemoryStack stack) {
-        VkPipelineInputAssemblyStateCreateInfo result
-                = VkPipelineInputAssemblyStateCreateInfo.calloc(stack);
-        result.sType(
-                VK10.VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO
-        );
-
-        result.primitiveRestartEnable(false);
-        int topologyCode = topology.code();
-        result.topology(topologyCode);
-
-        return result;
-    }
-
-    /**
      * Generate normals on a triangle-by-triangle basis for a non-indexed,
      * TriangleList mesh. Any pre-existing normals are discarded.
      *
@@ -455,6 +434,27 @@ public class Mesh implements jme3utilities.lbj.Mesh {
         assert normalBuffer.limit() == normalBuffer.capacity();
 
         return this;
+    }
+
+    /**
+     * Generate create info for the input-assembly state of a graphics pipeline.
+     *
+     * @param stack for allocating temporary host buffers (not null)
+     * @return a new, temporary struct (not null)
+     */
+    VkPipelineInputAssemblyStateCreateInfo
+            generateIasCreateInfo(MemoryStack stack) {
+        VkPipelineInputAssemblyStateCreateInfo result
+                = VkPipelineInputAssemblyStateCreateInfo.calloc(stack);
+        result.sType(
+                VK10.VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO
+        );
+
+        result.primitiveRestartEnable(false);
+        int topologyCode = topology.code();
+        result.topology(topologyCode);
+
+        return result;
     }
 
     /**
