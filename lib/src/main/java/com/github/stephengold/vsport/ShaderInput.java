@@ -35,7 +35,7 @@ package com.github.stephengold.vsport;
  *
  * @author Stephen Gold sgold@sonic.net
  */
-public enum ShaderInput {
+enum ShaderInput {
     // *************************************************************************
     // values
 
