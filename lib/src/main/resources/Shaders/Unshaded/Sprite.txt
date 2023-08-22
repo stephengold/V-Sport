@@ -1,0 +1,11 @@
+ColorMaterialTexture
+
+geometry.alphaDiscardMaterialThreshold
+geometry.BaseMaterialColor
+geometry.modelMatrix
+geometry.pointMaterialSize
+
+global.projectionMatrix
+global.viewMatrix
+
+vertexPosition_modelspace
