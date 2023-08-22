@@ -299,6 +299,28 @@ final public class VertexBuffer {
     }
 
     /**
+     * Create a mutable vertex buffer initialized from a FloatBuffer.
+     *
+     * @param fpv the number of floats per vertex (&ge;1, &le;4)
+     * @param floatBuffer the initial data (not null, unaffected)
+     * @return a new flipped instance (not null)
+     */
+    static VertexBuffer newInstance(int fpv, FloatBuffer floatBuffer) {
+        int numFloats = floatBuffer.capacity();
+        int numVertices = numFloats / fpv;
+        VertexBuffer result = newInstance(fpv, numVertices);
+
+        FloatBuffer data = result.getData();
+        for (int i = 0; i < numFloats; ++i) {
+            float fValue = floatBuffer.get(i);
+            data.put(fValue);
+        }
+        data.flip();
+
+        return result;
+    }
+
+    /**
      * Create a mutable, uninitialized vertex buffer.
      *
      * @param fpv the number of floats per vertex (&ge;1, &le;4)
