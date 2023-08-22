@@ -48,7 +48,7 @@ final public class IndexBuffer extends jme3utilities.lbj.IndexBuffer {
     /**
      * buffer resource
      */
-    private BufferResource bufferResource;
+    final private BufferResource bufferResource;
     /**
      * Vulkan data type of the individual indices (either
      * {@code VK_INDEX_TYPE_UINT16} or {@code VK_INDEX_TYPE_UINT32})
@@ -88,16 +88,6 @@ final public class IndexBuffer extends jme3utilities.lbj.IndexBuffer {
     public int capacity() {
         int result = getBuffer().capacity();
         return result;
-    }
-
-    /**
-     * Destroy the buffer resource.
-     */
-    void destroy() {
-        if (bufferResource != null) {
-            bufferResource.destroy();
-            this.bufferResource = null;
-        }
     }
 
     /**
