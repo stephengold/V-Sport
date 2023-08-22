@@ -671,6 +671,16 @@ public class Geometry {
     }
 
     /**
+     * Update properties before recording a draw command for the geometry.
+     * <p>
+     * Meant to be overridden. Can't be used to enable or disable the depth
+     * test.
+     */
+    public void updateAndRender() {
+        // do nothing
+    }
+
+    /**
      * Write the uniform values to the specified UBO.
      *
      * @param ubo the target resource (not null)

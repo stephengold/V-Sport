@@ -583,6 +583,8 @@ final class Internals {
         Deque<Geometry> deferredQueue = BaseApplication.listDeferred();
         for (Geometry geometry : visibleGeometries) {
             if (geometry.isDepthTest()) {
+                geometry.updateAndRender();
+                assert geometry.isDepthTest();
                 geometryList.add(geometry);
             } else {
                 assert deferredQueue.contains(geometry);
@@ -592,6 +594,8 @@ final class Internals {
         // List the no-depth-test geometries last, from back to front:
         for (Geometry geometry : deferredQueue) {
             assert visibleGeometries.contains(geometry);
+            assert !geometry.isDepthTest();
+            geometry.updateAndRender();
             assert !geometry.isDepthTest();
             geometryList.add(geometry);
         }
