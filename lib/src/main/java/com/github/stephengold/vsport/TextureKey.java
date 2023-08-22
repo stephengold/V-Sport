@@ -90,7 +90,7 @@ public class TextureKey {
     /**
      * default for max aniso
      */
-    private static float maxAnisoDefault = 1f;
+    private static float maxAnisoDefault = 16f;
     /**
      * URI to load/generate image data
      */
@@ -313,7 +313,7 @@ public class TextureKey {
     /**
      * Alter the default max aniso for new texture keys.
      *
-     * @param degree the maximum degree to be assigned (&ge;1, default=1)
+     * @param degree the maximum degree to be assigned (&ge;1, default=16)
      */
     public static void setDefaultMaxAniso(float degree) {
         Validate.inRange(degree, "degree", 1f, Float.MAX_VALUE);
