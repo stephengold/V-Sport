@@ -111,6 +111,15 @@ public class Geometry {
     // new methods exposed
 
     /**
+     * Return the alpha discard threshold.
+     *
+     * @return the threshold value
+     */
+    public float alphaDiscardThreshold() {
+        return uniformValues.alphaDiscardThreshold();
+    }
+
+    /**
      * Return a copy of the mesh-to-world scale factors.
      *
      * @param storeResult storage for the result (modified if not null)
@@ -310,6 +319,16 @@ public class Geometry {
     }
 
     /**
+     * Return the point size for sprites.
+     *
+     * @return the size (in pixels)
+     */
+    public float pointSize() {
+        float result = uniformValues.pointSize();
+        return result;
+    }
+
+    /**
      * Reset the model transform so that meshspace and worldspace are the same.
      *
      * @return the (modified) current geometry (for chaining)
@@ -357,6 +376,17 @@ public class Geometry {
      */
     public Geometry scale(float factor) {
         uniformValues.scale(factor, factor, factor);
+        return this;
+    }
+
+    /**
+     * Alter the alpha discard threshold.
+     *
+     * @param threshold the desired threshold (default=0.5)
+     * @return the (modified) current geometry (for chaining)
+     */
+    public Geometry setAlphaDiscardThreshold(float threshold) {
+        uniformValues.setAlphaDiscardThreshold(threshold);
         return this;
     }
 
@@ -530,6 +560,17 @@ public class Geometry {
         Validate.nonNull(orientation, "orientation");
         uniformValues.setOrientationQuaternion(orientation.x(), orientation.y(),
                 orientation.z(), orientation.w());
+        return this;
+    }
+
+    /**
+     * Alter the point size for sprites.
+     *
+     * @param size the desired size (in pixels, default=32)
+     * @return the (modified) current geometry (for chaining)
+     */
+    public Geometry setPointSize(float size) {
+        uniformValues.setPointSize(size);
         return this;
     }
 
