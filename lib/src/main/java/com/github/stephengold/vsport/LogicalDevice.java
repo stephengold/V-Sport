@@ -31,9 +31,9 @@ package com.github.stephengold.vsport;
 
 import java.nio.ByteBuffer;
 import java.nio.LongBuffer;
-import java.util.Collection;
 import java.util.List;
-import java.util.TreeSet;
+import java.util.Map;
+import java.util.WeakHashMap;
 import jme3utilities.Validate;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.system.MemoryStack;
@@ -76,8 +76,8 @@ public class LogicalDevice {
     /**
      * all device-dependent resources
      */
-    final private static Collection<DeviceResource> resourceSet
-            = new TreeSet<>();
+    final private static Map<DeviceResource, Object> resourceSet
+            = new WeakHashMap<>();
     /**
      * allocator for direct buffers
      */
@@ -108,7 +108,7 @@ public class LogicalDevice {
         this.commandPoolHandle
                 = createCommandPool(physicalDevice, surfaceHandle);
 
-        for (DeviceResource resource : resourceSet) {
+        for (DeviceResource resource : resourceSet.keySet()) {
             resource.updateLogicalDevice(this);
         }
     }
@@ -535,7 +535,7 @@ public class LogicalDevice {
      * @return null
      */
     LogicalDevice destroy() {
-        for (DeviceResource resource : resourceSet) {
+        for (DeviceResource resource : resourceSet.keySet()) {
             resource.updateLogicalDevice(null);
         }
 
@@ -741,7 +741,7 @@ public class LogicalDevice {
      */
     static void stopTrackingResource(DeviceResource resource) {
         Validate.nonNull(resource, "resource");
-        assert resourceSet.contains(resource);
+        assert resourceSet.containsKey(resource);
 
         resourceSet.remove(resource);
     }
@@ -753,9 +753,7 @@ public class LogicalDevice {
      */
     static void trackResource(DeviceResource resource) {
         Validate.nonNull(resource, "resource");
-        assert !resourceSet.contains(resource);
-
-        resourceSet.add(resource);
+        resourceSet.put(resource, null);
     }
 
     /**
