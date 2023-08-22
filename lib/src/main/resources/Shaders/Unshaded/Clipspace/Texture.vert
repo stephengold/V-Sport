@@ -8,6 +8,8 @@ layout(binding = 1) uniform PerGeometry {
     mat4 modelMatrix;
     mat3 modelRotationMatrix;
     vec4 SpecularMaterialColor;
+    float alphaDiscardMaterialThreshold;
+    float pointMaterialSize;
 } geometry;
 
 layout(location = 0) in vec3 vertexPosition_modelspace; // positions from a vertex buffer

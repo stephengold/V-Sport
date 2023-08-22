@@ -18,6 +18,8 @@ layout(binding = 1) uniform PerGeometry {
     mat4 modelMatrix;
     mat3 modelRotationMatrix;
     vec4 SpecularMaterialColor;
+    float alphaDiscardMaterialThreshold;
+    float pointMaterialSize;
 } geometry;
 layout(binding = 2) uniform sampler2D ColorMaterialTexture;
 

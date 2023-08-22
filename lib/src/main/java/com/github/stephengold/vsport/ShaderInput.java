@@ -40,6 +40,10 @@ public enum ShaderInput {
     // values
 
     /**
+     * alpha discard threshold for sprites (float in the per-geometry uniform)
+     */
+    AlphaDiscardThreshold(false, "geometry.alphaDiscardMaterialThreshold"),
+    /**
      * strength of the ambient light (float in the global uniform)
      */
     AmbientStrength(false, "global.ambientStrength"),
@@ -57,6 +61,10 @@ public enum ShaderInput {
      * the per-geometry uniform)
      */
     MaterialColor(false, "geometry.BaseMaterialColor"),
+    /**
+     * point size for sprites (float in the per-geometry uniform)
+     */
+    MaterialPointSize(false, "geometry.pointMaterialSize"),
     /**
      * base material texture for U-V sampling (sampler2D at uniform binding=2)
      */
