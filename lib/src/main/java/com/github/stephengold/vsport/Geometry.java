@@ -29,6 +29,7 @@
  */
 package com.github.stephengold.vsport;
 
+import com.jme3.bullet.CollisionSpace;
 import java.nio.ByteBuffer;
 import jme3utilities.Validate;
 import org.joml.Matrix3fc;
@@ -678,6 +679,17 @@ public class Geometry {
      */
     public void updateAndRender() {
         // do nothing
+    }
+
+    /**
+     * Test whether the physics object (if any) has been removed from the
+     * specified CollisionSpace. Meant to be overridden.
+     *
+     * @param space the CollisionSpace to test (not null)
+     * @return true if removed, otherwise false
+     */
+    public boolean wasRemovedFrom(CollisionSpace space) {
+        return false;
     }
 
     /**
