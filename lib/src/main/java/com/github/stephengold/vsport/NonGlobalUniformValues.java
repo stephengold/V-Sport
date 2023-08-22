@@ -49,6 +49,14 @@ class NonGlobalUniformValues {
     // fields
 
     /**
+     * alpha discard threshold (for transparency)
+     */
+    private float alphaDiscardThreshold = 0.5f;
+    /**
+     * point size for sprites (in pixels)
+     */
+    private float pointSize = 32f;
+    /**
      * temporary storage (TODO not thread-safe)
      */
     final private static Matrix3f tmpMatrix3f = new Matrix3f();
@@ -76,6 +84,15 @@ class NonGlobalUniformValues {
     final private Vector4f specularMaterialColor = new Vector4f(1f);
     // *************************************************************************
     // new methods exposed
+
+    /**
+     * Return the alpha discard threshold.
+     *
+     * @return the threshold value
+     */
+    float alphaDiscardThreshold() {
+        return alphaDiscardThreshold;
+    }
 
     /**
      * Return a copy of the mesh-to-world scale factors.
@@ -202,6 +219,12 @@ class NonGlobalUniformValues {
         result = Utils.align(result, 16);
         result += 4 * Float.BYTES;
 
+        // float alphaDiscardMaterialThreshold
+        result += Float.BYTES;
+
+        // float pointMaterialSize;
+        result += Float.BYTES;
+
         return result;
     }
 
@@ -218,6 +241,15 @@ class NonGlobalUniformValues {
         } else {
             return storeResult.set(orientation);
         }
+    }
+
+    /**
+     * Return the point size for sprites.
+     *
+     * @return the size (in pixels)
+     */
+    float pointSize() {
+        return pointSize;
     }
 
     /**
@@ -284,6 +316,15 @@ class NonGlobalUniformValues {
         Validate.nonNegative(zFactor, "z factor");
 
         scale.mul(xFactor, yFactor, zFactor);
+    }
+
+    /**
+     * Alter the alpha discard threshold.
+     *
+     * @param threshold the desired threshold (default=0.5)
+     */
+    void setAlphaDiscardThreshold(float threshold) {
+        this.alphaDiscardThreshold = threshold;
     }
 
     /**
@@ -394,6 +435,15 @@ class NonGlobalUniformValues {
     }
 
     /**
+     * Alter the point size for sprites.
+     *
+     * @param size the desired size (in pixels, default=32)
+     */
+    void setPointSize(float size) {
+        this.pointSize = size;
+    }
+
+    /**
      * Alter the mesh-to-world scale factors.
      *
      * @param xFactor the desired scale factor for the mesh X axis (finite,
@@ -461,6 +511,14 @@ class NonGlobalUniformValues {
         byteOffset = Utils.align(byteOffset, 16);
         specularMaterialColor.get(byteOffset, target);
         byteOffset += 4 * Float.BYTES;
+
+        // float alphaDiscardMaterialThreshold
+        target.putFloat(byteOffset, alphaDiscardThreshold);
+        byteOffset += Float.BYTES;
+
+        // float pointMaterialSize;
+        target.putFloat(byteOffset, pointSize);
+        byteOffset += Float.BYTES;
 
         assert byteOffset == numBytes() :
                 "byteOffset=" + byteOffset + " numBytes=" + numBytes();
