@@ -191,6 +191,13 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     // new methods exposed
 
     /**
+     * Callback invoked after the main update loop terminates.
+     */
+    public void cleanUp() {
+        // do nothing
+    }
+
+    /**
      * Copy a single vertex from the mesh.
      *
      * @param vertexIndex the vertex index (&ge;0, &lt;vertexCount)
