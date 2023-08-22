@@ -12,7 +12,7 @@ layout(binding = 0) uniform Global { // global uniforms:
 } global;
 
 layout(binding = 1) uniform PerGeometry {
-    vec4 BaseMaterialColor; // for ambient/diffuse lighting
+    vec4 BaseMaterialColor;
     mat4 modelMatrix;
     mat3 modelRotationMatrix;
     vec4 SpecularMaterialColor;

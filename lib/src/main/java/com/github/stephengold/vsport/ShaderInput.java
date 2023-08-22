@@ -48,7 +48,7 @@ public enum ShaderInput {
      */
     AmbientStrength(false, "global.ambientStrength"),
     /**
-     * light color for ambient/diffuse lighting in linear colorspace (vec3 in
+     * light color for ambient/diffuse lighting (in linear colorspace, vec3 in
      * the global uniform)
      */
     LightColor(false, "global.LightColor"),
@@ -57,8 +57,8 @@ public enum ShaderInput {
      */
     LightDirection(false, "global.LightDirection_worldspace"),
     /**
-     * material color for ambient/diffuse lighting in linear colorspace (vec4 in
-     * the per-geometry uniform)
+     * material color for ambient/diffuse lighting or sprites (in linear
+     * colorspace, vec4 in the per-geometry uniform)
      */
     MaterialColor(false, "geometry.BaseMaterialColor"),
     /**
@@ -98,12 +98,11 @@ public enum ShaderInput {
      */
     VertexColor(true, "vertexColor"),
     /**
-     * normal direction of each vertex in model space (vec3 from a vertex
-     * buffer)
+     * normal direction of each vertex in mesh space (vec3 from a vertex buffer)
      */
     VertexNormal(true, "vertexNormal_modelspace"),
     /**
-     * position (location) of each vertex in model space (vec3 from a vertex
+     * position (location) of each vertex in mesh space (vec3 from a vertex
      * buffer)
      */
     VertexPosition(true, "vertexPosition_modelspace"),

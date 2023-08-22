@@ -92,7 +92,7 @@ public class HelloVSport extends BaseApplication {
     // BaseApplication methods
 
     /**
-     * Callback invoked after the main update loop terminates.
+     * Callback invoked by V-Sport after the main update loop terminates.
      */
     @Override
     public void cleanUp() {
@@ -109,7 +109,6 @@ public class HelloVSport extends BaseApplication {
         // meshes:
         int numRefineSteps = 5;
         Mesh globeMesh = new OctasphereMesh(numRefineSteps);
-
         Vector4fc uCoefficients = new Vector4f(0.5f, 0f, 0f, 0.5f);
         Vector4fc vCoefficients = new Vector4f(0f, 1f, 0f, 0f);
         globeMesh.transformUvs(uCoefficients, vCoefficients);
@@ -155,7 +154,7 @@ public class HelloVSport extends BaseApplication {
         room.setProgram("Unshaded/Texture");
         room.setTexture(roomKey);
 
-        // camera:
+        // Configure the camera:
         getProjection().setZClip(0.1f, 10f);
 
         Vector3f eye = new Vector3f(2f, 2f, 2f);
