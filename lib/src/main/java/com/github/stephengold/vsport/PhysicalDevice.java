@@ -68,6 +68,29 @@ class PhysicalDevice {
     // fields
 
     /**
+     * true if the device supports anisotropic texture sampling, or null if not
+     * determined yet
+     */
+    private Boolean supportsAnisotropy;
+    /**
+     * true if the device supports non-solid fill modes, or null if not
+     * determined yet
+     */
+    private Boolean supportsNonSolidFill;
+    /**
+     * maximum number of samples the device supports for for MSAA, or null if
+     * not determined yet
+     */
+    private Integer maxNumSamples;
+    /**
+     * available extensions, or null if not determined yet
+     */
+    private Set<String> availableExtensions;
+    /**
+     * name of device, or null if not determined yet
+     */
+    private String name;
+    /**
      * underlying lwjgl-vulkan resource
      */
     final private VkPhysicalDevice vkPhysicalDevice;
@@ -237,30 +260,31 @@ class PhysicalDevice {
      * @return the number of samples per pixel (a power of 2, &ge;1, &le;64)
      */
     int maxNumSamples() {
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            VkPhysicalDeviceProperties properties
-                    = VkPhysicalDeviceProperties.calloc(stack);
-            VK10.vkGetPhysicalDeviceProperties(vkPhysicalDevice, properties);
-            VkPhysicalDeviceLimits limits = properties.limits();
-
-            int bitmask = limits.framebufferColorSampleCounts()
-                    & limits.framebufferDepthSampleCounts();
-            if ((bitmask & VK10.VK_SAMPLE_COUNT_64_BIT) != 0x0) {
-                return 64;
-            } else if ((bitmask & VK10.VK_SAMPLE_COUNT_32_BIT) != 0x0) {
-                return 32;
-            } else if ((bitmask & VK10.VK_SAMPLE_COUNT_16_BIT) != 0x0) {
-                return 16;
-            } else if ((bitmask & VK10.VK_SAMPLE_COUNT_8_BIT) != 0x0) {
-                return 8;
-            } else if ((bitmask & VK10.VK_SAMPLE_COUNT_4_BIT) != 0x0) {
-                return 4;
-            } else if ((bitmask & VK10.VK_SAMPLE_COUNT_2_BIT) != 0x0) {
-                return 2;
-            } else {
-                return 1;
+        if (maxNumSamples == null) {
+            try (MemoryStack stack = MemoryStack.stackPush()) {
+                queryProperties(stack);
             }
         }
+
+        assert maxNumSamples >= 1 : maxNumSamples;
+        assert maxNumSamples <= 64 : maxNumSamples;
+        return maxNumSamples;
+    }
+
+    /**
+     * Return the name of the device.
+     *
+     * @return the name (not null)
+     */
+    String name() {
+        if (name == null) {
+            try (MemoryStack stack = MemoryStack.stackPush()) {
+                queryProperties(stack);
+            }
+        }
+
+        assert name != null;
+        return name;
     }
 
     /**
@@ -279,10 +303,14 @@ class PhysicalDevice {
         }
 
         // Does the device support all required extensions?
-        Set<String> extensions = listAvailableExtensions();
+        if (availableExtensions == null) {
+            try (MemoryStack stack = MemoryStack.stackPush()) {
+                queryExtensionProperties(stack);
+            }
+        }
         String[] requiredExtensions = Internals.listRequiredDeviceExtensions();
         for (String name : requiredExtensions) {
-            if (!extensions.contains(name)) {
+            if (!availableExtensions.contains(name)) {
                 if (diagnose) {
                     System.out.println("  doesn't support extension " + name);
                 }
@@ -420,15 +448,8 @@ class PhysicalDevice {
      */
     @Override
     public String toString() {
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            VkPhysicalDeviceProperties properties
-                    = VkPhysicalDeviceProperties.calloc(stack);
-            VK10.vkGetPhysicalDeviceProperties(vkPhysicalDevice, properties);
-            String name = properties.deviceNameString();
-            String result = MyString.quote(name);
-
-            return result;
-        }
+        String result = MyString.quote(name);
+        return result;
     }
     // *************************************************************************
     // private methods
@@ -462,39 +483,6 @@ class PhysicalDevice {
     }
 
     /**
-     * Enumerate all available extensions for the device.
-     *
-     * @return a new set of extension names (not null)
-     */
-    private Set<String> listAvailableExtensions() {
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            // Count the available extensions:
-            String layerName = null; // Vk implementation and implicitly enabled
-            IntBuffer pCount = stack.mallocInt(1);
-            int retCode = VK10.vkEnumerateDeviceExtensionProperties(
-                    vkPhysicalDevice, layerName, pCount, null);
-            Utils.checkForError(retCode, "count extensions");
-            int numExtensions = pCount.get(0);
-
-            VkExtensionProperties.Buffer buffer
-                    = VkExtensionProperties.malloc(numExtensions, stack);
-            retCode = VK10.vkEnumerateDeviceExtensionProperties(
-                    vkPhysicalDevice, layerName, pCount, buffer);
-            Utils.checkForError(retCode, "enumerate extensions");
-
-            Set<String> result = new TreeSet<>();
-            for (int extIndex = 0; extIndex < numExtensions; ++extIndex) {
-                VkExtensionProperties properties = buffer.get(extIndex);
-                String extensionName = properties.extensionNameString();
-                //System.out.println("extension name = " + extensionName);
-                result.add(extensionName);
-            }
-
-            return result;
-        }
-    }
-
-    /**
      * Enumerate all required device extensions.
      *
      * @param stack for allocating temporary host buffers (not null)
@@ -516,21 +504,93 @@ class PhysicalDevice {
     }
 
     /**
+     * Enumerate all available extensions for the device.
+     *
+     * @param stack for allocating temporary host buffers (not null)
+     */
+    private void queryExtensionProperties(MemoryStack stack) {
+        // Count the available extensions:
+        String layerName = null; // Vk implementation and implicitly enabled
+        IntBuffer pCount = stack.mallocInt(1);
+        int retCode = VK10.vkEnumerateDeviceExtensionProperties(
+                vkPhysicalDevice, layerName, pCount, null);
+        Utils.checkForError(retCode, "count extensions");
+        int numExtensions = pCount.get(0);
+
+        VkExtensionProperties.Buffer pProperties
+                = VkExtensionProperties.malloc(numExtensions, stack);
+        retCode = VK10.vkEnumerateDeviceExtensionProperties(
+                vkPhysicalDevice, layerName, pCount, pProperties);
+        Utils.checkForError(retCode, "enumerate extensions");
+
+        this.availableExtensions = new TreeSet<>();
+        for (int extIndex = 0; extIndex < numExtensions; ++extIndex) {
+            VkExtensionProperties properties = pProperties.get(extIndex);
+            String extensionName = properties.extensionNameString();
+            availableExtensions.add(extensionName);
+        }
+    }
+
+    /**
+     * Query the basic features of the device, including support for anisotropic
+     * sampling of textures and non-solid fill modes for polygons.
+     *
+     * @param stack for allocating temporary host buffers (not null)
+     */
+    private void queryFeatures(MemoryStack stack) {
+        VkPhysicalDeviceFeatures supportedFeatures
+                = VkPhysicalDeviceFeatures.malloc(stack);
+        VK10.vkGetPhysicalDeviceFeatures(vkPhysicalDevice, supportedFeatures);
+        this.supportsAnisotropy = supportedFeatures.samplerAnisotropy();
+        this.supportsNonSolidFill = supportedFeatures.fillModeNonSolid();
+    }
+
+    /**
+     * Query the basic properties of the device, including its limits and name.
+     *
+     * @param stack for allocating temporary host buffers (not null)
+     */
+    private void queryProperties(MemoryStack stack) {
+        VkPhysicalDeviceProperties properties
+                = VkPhysicalDeviceProperties.calloc(stack);
+        VK10.vkGetPhysicalDeviceProperties(vkPhysicalDevice, properties);
+
+        this.name = properties.deviceNameString();
+
+        VkPhysicalDeviceLimits limits = properties.limits();
+        int bitmask = limits.framebufferColorSampleCounts()
+                & limits.framebufferDepthSampleCounts();
+        if ((bitmask & VK10.VK_SAMPLE_COUNT_64_BIT) != 0x0) {
+            this.maxNumSamples = 64;
+        } else if ((bitmask & VK10.VK_SAMPLE_COUNT_32_BIT) != 0x0) {
+            this.maxNumSamples = 32;
+        } else if ((bitmask & VK10.VK_SAMPLE_COUNT_16_BIT) != 0x0) {
+            this.maxNumSamples = 16;
+        } else if ((bitmask & VK10.VK_SAMPLE_COUNT_8_BIT) != 0x0) {
+            this.maxNumSamples = 8;
+        } else if ((bitmask & VK10.VK_SAMPLE_COUNT_4_BIT) != 0x0) {
+            this.maxNumSamples = 4;
+        } else if ((bitmask & VK10.VK_SAMPLE_COUNT_2_BIT) != 0x0) {
+            this.maxNumSamples = 2;
+        } else {
+            this.maxNumSamples = 1;
+        }
+    }
+
+    /**
      * Test whether the device supports anisotropic filtering in texture
      * samplers.
      *
      * @return true if supported, otherwise false
      */
     private boolean supportsAnisotropy() {
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            VkPhysicalDeviceFeatures supportedFeatures
-                    = VkPhysicalDeviceFeatures.malloc(stack);
-            VK10.vkGetPhysicalDeviceFeatures(
-                    vkPhysicalDevice, supportedFeatures);
-            boolean result = supportedFeatures.samplerAnisotropy();
-
-            return result;
+        if (supportsAnisotropy == null) {
+            try (MemoryStack stack = MemoryStack.stackPush()) {
+                queryFeatures(stack);
+            }
         }
+
+        return supportsAnisotropy;
     }
 
     /**
@@ -540,14 +600,12 @@ class PhysicalDevice {
      * @return true if supported, otherwise false
      */
     private boolean supportsNonSolidFill() {
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            VkPhysicalDeviceFeatures supportedFeatures
-                    = VkPhysicalDeviceFeatures.malloc(stack);
-            VK10.vkGetPhysicalDeviceFeatures(
-                    vkPhysicalDevice, supportedFeatures);
-            boolean result = supportedFeatures.fillModeNonSolid();
-
-            return result;
+        if (supportsNonSolidFill == null) {
+            try (MemoryStack stack = MemoryStack.stackPush()) {
+                queryFeatures(stack);
+            }
         }
+
+        return supportsNonSolidFill;
     }
 }
