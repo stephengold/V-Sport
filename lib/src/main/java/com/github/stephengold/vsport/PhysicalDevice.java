@@ -305,7 +305,7 @@ class PhysicalDevice {
         }
 
         // Does the device support anisotropic sampling of textures?
-        if (!supportsAnisotropicSampling()) {
+        if (!supportsAnisotropy()) {
             if (diagnose) {
                 System.out.println(
                         "  doesn't support anisotropic sampling of textures");
@@ -521,7 +521,7 @@ class PhysicalDevice {
      *
      * @return true if supported, otherwise false
      */
-    private boolean supportsAnisotropicSampling() {
+    private boolean supportsAnisotropy() {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             VkPhysicalDeviceFeatures supportedFeatures
                     = VkPhysicalDeviceFeatures.malloc(stack);
