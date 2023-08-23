@@ -178,7 +178,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
      * texture coordinates.
      *
      * @param topology the desired primitive topology (not null)
-     * @param vertexCount number of vertices (&ge;0)
+     * @param vertexCount the expected number of vertices (&ge;0)
      */
     protected Mesh(Topology topology, int vertexCount) {
         Validate.nonNull(topology, "topology");
@@ -291,7 +291,8 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
 
     /**
-     * Count how many point primitives the mesh contains.
+     * Count how many point primitives the mesh contains, taking indexing and
+     * topology into account.
      *
      * @return the count (&ge;0)
      */

@@ -87,7 +87,7 @@ class PhysicalDevice {
     // new methods exposed
 
     /**
-     * Create a logical device based on this physical device.
+     * Create a logical device based on the physical device.
      *
      * @param surfaceHandle the handle of the {@code VkSurfaceKHR} for
      * presentation (not null)
@@ -381,8 +381,8 @@ class PhysicalDevice {
     SurfaceSummary summarizeSurface(long surfaceHandle, MemoryStack stack) {
         Validate.nonZero(surfaceHandle, "surface handle");
 
-        SurfaceSummary result = new SurfaceSummary(
-                vkPhysicalDevice, surfaceHandle, stack);
+        SurfaceSummary result
+                = new SurfaceSummary(vkPhysicalDevice, surfaceHandle, stack);
         return result;
     }
 
@@ -449,15 +449,13 @@ class PhysicalDevice {
             SurfaceSummary surface = new SurfaceSummary(
                     vkPhysicalDevice, surfaceHandle, stack);
             if (diagnose && !surface.hasFormat()) {
-                System.out.println(
-                        "  doesn't have any formats available");
+                System.out.println("  doesn't have any formats available");
             }
             if (diagnose && !surface.hasPresentationMode()) {
-                System.out.println(
-                        "  doesn't have any present modes avilable");
+                System.out.println("  doesn't have any present modes avilable");
             }
-            boolean result = surface.hasFormat()
-                    && surface.hasPresentationMode();
+            boolean result
+                    = surface.hasFormat() && surface.hasPresentationMode();
 
             return result;
         }
@@ -518,7 +516,8 @@ class PhysicalDevice {
     }
 
     /**
-     * Test whether the device supports anisotropic sampling of textures.
+     * Test whether the device supports anisotropic filtering in texture
+     * samplers.
      *
      * @return true if supported, otherwise false
      */
@@ -535,7 +534,8 @@ class PhysicalDevice {
     }
 
     /**
-     * Test whether the device supports polygon fill modes other than solid.
+     * Test whether the device supports polygon fill modes other than solid,
+     * such as wireframe.
      *
      * @return true if supported, otherwise false
      */

@@ -58,6 +58,8 @@ public enum Topology {
     /**
      * triangles, all triangles in the mesh share the first vertex and
      * consecutive triangles share an additional vertex
+     * <p>
+     * MoltenVK doesn't support this topology!
      */
     TriangleFan(Mesh.vpt, 2, VK10.VK_PRIMITIVE_TOPOLOGY_TRIANGLE_FAN),
     /**

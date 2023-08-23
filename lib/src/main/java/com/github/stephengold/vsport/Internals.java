@@ -578,7 +578,7 @@ final class Internals {
         List<Geometry> geometryList = pass.getGeometryList();
         geometryList.clear();
 
-        // List the depth-test geometries first:
+        // List the depth-test geometries first and defer the rest:
         Collection<Geometry> visibleGeometries = BaseApplication.listVisible();
         Deque<Geometry> deferredQueue = BaseApplication.listDeferred();
         for (Geometry geometry : visibleGeometries) {
