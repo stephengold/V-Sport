@@ -38,6 +38,7 @@ import jme3utilities.MyString;
 import jme3utilities.Validate;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.system.MemoryStack;
+import org.lwjgl.vulkan.KHRGetPhysicalDeviceProperties2;
 import org.lwjgl.vulkan.KHRSurface;
 import org.lwjgl.vulkan.VK10;
 import org.lwjgl.vulkan.VkAllocationCallbacks;
@@ -50,8 +51,10 @@ import org.lwjgl.vulkan.VkInstance;
 import org.lwjgl.vulkan.VkMemoryType;
 import org.lwjgl.vulkan.VkPhysicalDevice;
 import org.lwjgl.vulkan.VkPhysicalDeviceFeatures;
+import org.lwjgl.vulkan.VkPhysicalDeviceFeatures2;
 import org.lwjgl.vulkan.VkPhysicalDeviceLimits;
 import org.lwjgl.vulkan.VkPhysicalDeviceMemoryProperties;
+import org.lwjgl.vulkan.VkPhysicalDevicePortabilitySubsetFeaturesKHR;
 import org.lwjgl.vulkan.VkPhysicalDeviceProperties;
 import org.lwjgl.vulkan.VkQueueFamilyProperties;
 
@@ -77,6 +80,10 @@ class PhysicalDevice {
      * determined yet
      */
     private Boolean supportsNonSolidFill;
+    /**
+     * true if the device supports TriangleFan, or null if not determined yet
+     */
+    private Boolean supportsTriangleFan;
     /**
      * maximum number of samples the device supports for for MSAA, or null if
      * not determined yet
@@ -349,6 +356,13 @@ class PhysicalDevice {
             return 0f;
         }
 
+        if (!supportsTriangleFan()) {
+            if (diagnose) {
+                System.out.println("  doesn't support triangle-fan topology");
+            }
+            return 0.5f;
+        }
+
         return 1f;
     }
 
@@ -437,6 +451,28 @@ class PhysicalDevice {
                 return false;
             }
         }
+    }
+
+    /**
+     * Test whether the device supports the TriangleFan primitive topology.
+     *
+     * @return true if supported, otherwise false
+     */
+    boolean supportsTriangleFan() {
+        if (supportsTriangleFan == null) {
+            try (MemoryStack stack = MemoryStack.stackPush()) {
+                if (availableExtensions == null) {
+                    queryExtensionProperties(stack);
+                }
+                if (availableExtensions.contains("VK_KHR_portability_subset")) {
+                    querySubsetFeatures(stack);
+                } else {
+                    this.supportsTriangleFan = true;
+                }
+            }
+        }
+
+        return supportsTriangleFan;
     }
     // *************************************************************************
     // Object methods
@@ -575,6 +611,23 @@ class PhysicalDevice {
         } else {
             this.maxNumSamples = 1;
         }
+    }
+
+    /**
+     * Query the portability-subset features of the device, including
+     * triangle-fan support.
+     *
+     * @param stack for allocating temporary host buffers (not null)
+     */
+    private void querySubsetFeatures(MemoryStack stack) {
+        VkPhysicalDeviceFeatures2 features2
+                = VkPhysicalDeviceFeatures2.calloc(stack);
+        VkPhysicalDevicePortabilitySubsetFeaturesKHR psFeatures
+                = VkPhysicalDevicePortabilitySubsetFeaturesKHR.calloc(stack);
+        features2.pNext(psFeatures);
+        KHRGetPhysicalDeviceProperties2.vkGetPhysicalDeviceFeatures2KHR(
+                vkPhysicalDevice, features2);
+        this.supportsTriangleFan = psFeatures.triangleFans();
     }
 
     /**
