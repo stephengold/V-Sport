@@ -596,6 +596,17 @@ public class Mesh implements jme3utilities.lbj.Mesh {
      * @return the (modified) current instance (for chaining)
      */
     public Mesh makeImmutable() {
+        switch (topology) {
+            case TriangleFan:
+                PhysicalDevice pd = Internals.getPhysicalDevice();
+                if (!pd.supportsTriangleFan()) {
+                    convertToList();
+                }
+                break;
+
+            default:
+        }
+
         this.mutable = false;
         positionBuffer.makeImmutable();
         if (indexBuffer != null) {
@@ -1075,6 +1086,36 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
     // *************************************************************************
     // private methods
+
+    /**
+     * Convert the mesh to an equivalent TriangleList mesh. The initial topology
+     * must be TriangleFan.
+     */
+    private void convertToList() {
+        assert topology == Topology.TriangleFan : topology;
+
+        int numTriangles = countTriangles();
+        int numListIndices = vpt * numTriangles;
+        List<Integer> list = new ArrayList<>(numListIndices);
+        list.add(0);
+        list.add(1);
+        list.add(2);
+        for (int i = 1; i < numTriangles; ++i) {
+            list.add(0);
+            list.add(i + 1);
+            list.add(i + 2);
+        }
+
+        if (indexBuffer != null) {
+            for (int i = 0; i < numListIndices; ++i) {
+                int j = list.get(i);
+                int newIndex = indexBuffer.get(j);
+                list.set(i, newIndex);
+            }
+        }
+        this.indexBuffer = IndexBuffer.newInstance(list);
+        this.topology = Topology.TriangleList;
+    }
 
     /**
      * Smooth the pre-existing normals by averaging them across all uses of each
