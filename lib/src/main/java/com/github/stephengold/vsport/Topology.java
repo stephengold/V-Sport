@@ -48,6 +48,13 @@ public enum Topology {
      */
     LineList(Mesh.vpe, 0, VK10.VK_PRIMITIVE_TOPOLOGY_LINE_LIST),
     /**
+     * lines (edges), consecutive lines share a vertex, plus an implied line
+     * connecting the last vertex to the first vertex
+     * <p>
+     * Vulkan doesn't support this topology!
+     */
+    LineLoop(Mesh.vpe, 1, Integer.MIN_VALUE),
+    /**
      * lines (edges), consecutive lines share a vertex
      */
     LineStrip(Mesh.vpe, 1, VK10.VK_PRIMITIVE_TOPOLOGY_LINE_STRIP),
@@ -95,7 +102,7 @@ public enum Topology {
      * &le;4, 3&rarr;triangles)
      * @param numShared the number of indices (or vertices) shared between
      * successive primitives (&ge;0, &le;2)
-     * @param code the Vulkan encoding
+     * @param code the Vulkan encoding, or MIN_VALUE if none
      */
     Topology(int vpp, int numShared, int code) {
         Validate.inRange(vpp, "vpp", 1, 4);

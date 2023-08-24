@@ -284,6 +284,9 @@ public class Mesh implements jme3utilities.lbj.Mesh {
             int numIndices = countIndexedVertices();
             int numShared = topology.numShared();
             result = (numIndices - numShared) / (vpp - numShared);
+            if (topology == Topology.LineLoop) {
+                ++result; // complete the loop
+            }
         } else {
             result = 0;
         }
@@ -599,6 +602,10 @@ public class Mesh implements jme3utilities.lbj.Mesh {
      */
     public Mesh makeImmutable() {
         switch (topology) {
+            case LineLoop:
+                convertToStrip();
+                break;
+
             case TriangleFan:
                 PhysicalDevice pd = Internals.getPhysicalDevice();
                 if (!pd.supportsTriangleFan()) {
@@ -1117,6 +1124,26 @@ public class Mesh implements jme3utilities.lbj.Mesh {
         }
         this.indexBuffer = IndexBuffer.newInstance(list);
         this.topology = Topology.TriangleList;
+    }
+
+    /**
+     * Convert the mesh to an equivalent LineStrip mesh. The initial topology
+     * must be LineLoop.
+     */
+    private void convertToStrip() {
+        assert topology == Topology.LineLoop : topology;
+
+        int numLoopIndices = countIndexedVertices();
+        List<Integer> list = new ArrayList<>(numLoopIndices + 1);
+        for (int i = 0; i < numLoopIndices; ++i) {
+            int newIndex = (indexBuffer == null) ? i : indexBuffer.get(i);
+            list.add(newIndex);
+        }
+        int firstIndex = list.get(0);
+        list.add(firstIndex);
+
+        this.indexBuffer = IndexBuffer.newInstance(list);
+        this.topology = Topology.LineStrip;
     }
 
     /**
