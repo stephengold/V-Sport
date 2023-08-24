@@ -40,6 +40,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
+import jme3utilities.Validate;
 import org.joml.Vector3f;
 import org.joml.Vector4fc;
 import org.lwjgl.glfw.Callbacks;
@@ -293,6 +294,31 @@ abstract public class BaseApplication {
      */
     public static void setBackgroundColor(Vector4fc desiredColor) {
         Internals.setBackgroundColor(desiredColor);
+    }
+
+    /**
+     * Alter the color of lights.
+     *
+     * @param color the desired color (not null, unaffected, default=(1,1,1,1))
+     */
+    public static void setLightColor(Vector4fc color) {
+        Vector3f newColor = new Vector3f(color.x(), color.y(), color.z());
+        GlobalUniformValues guv = Internals.getGlobalUniformValues();
+        guv.setLightColor(newColor);
+    }
+
+    /**
+     * Alter the direction to the directional light.
+     *
+     * @param direction the desired direction (in worldspace, not null, not
+     * zero)
+     */
+    public static void setLightDirection(com.jme3.math.Vector3f direction) {
+        Validate.nonZero(direction, "direction");
+
+        Vector3f dir = Utils.toJomlVector(direction);
+        GlobalUniformValues guv = Internals.getGlobalUniformValues();
+        guv.setLightDirection(dir);
     }
 
     /**
