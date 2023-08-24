@@ -119,7 +119,7 @@ class NonGlobalUniformValues {
     com.jme3.math.Vector3f copyScaleJme(
             com.jme3.math.Vector3f storeResult) {
         if (storeResult == null) {
-            return new com.jme3.math.Vector3f(scale.x(), scale.y(), scale.z());
+            return Utils.toJmeVector(scale);
         } else {
             return storeResult.set(scale.x(), scale.y(), scale.z());
         }
@@ -170,8 +170,7 @@ class NonGlobalUniformValues {
     com.jme3.math.Vector3f locationJme(
             com.jme3.math.Vector3f storeResult) {
         if (storeResult == null) {
-            return new com.jme3.math.Vector3f(
-                    location.x(), location.y(), location.z());
+            return Utils.toJmeVector(location);
         } else {
             return storeResult.set(location.x(), location.y(), location.z());
         }
