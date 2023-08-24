@@ -519,7 +519,28 @@ class PhysicalDevice {
     }
 
     /**
-     * Enumerate all required device extensions.
+     * Test whether the named device extension is available.
+     *
+     * @param extensionName the name of the extension to test for (not null, not
+     * empty)
+     * @return true if available, otherwise false
+     */
+    private boolean hasExtension(String extensionName) {
+        if (availableExtensions == null) {
+            try (MemoryStack stack = MemoryStack.stackPush()) {
+                queryExtensionProperties(stack);
+            }
+        }
+
+        if (availableExtensions.contains(extensionName)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Enumerate all device extensions required by V-Sport.
      *
      * @param stack for allocating temporary host buffers (not null)
      * @return a temporary buffer containing the names of all device extensions
