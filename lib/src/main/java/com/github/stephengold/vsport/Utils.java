@@ -411,6 +411,43 @@ final public class Utils {
     }
 
     /**
+     * Convert a BufferedImage to an array of heights.
+     *
+     * @param image the image to use (not null, unaffected)
+     * @param maxHeight the vertical scaling factor
+     * @return a new array of values in the range [0, maxHeight], one element
+     * for each pixel in the image
+     */
+    public static float[] toHeightArray(BufferedImage image, float maxHeight) {
+        int imageWidth = image.getWidth();
+        int imageHeight = image.getHeight();
+        int numSamples = imageWidth * imageHeight;
+        float[] result = new float[numSamples];
+
+        int index = 0;
+        for (int y = 0; y < imageHeight; ++y) {
+            for (int x = 0; x < imageWidth; ++x) {
+                int srgb = image.getRGB(x, y);
+                double red = ((srgb >> 16) & 0xFF) / 255.0;
+                double green = ((srgb >> 8) & 0xFF) / 255.0;
+                double blue = (srgb & 0xFF) / 255.0;
+
+                // linearize the pixel's color
+                red = Math.pow(red, 2.2);
+                green = Math.pow(green, 2.2);
+                blue = Math.pow(blue, 2.2);
+
+                double height = 0.299 * red + 0.587 * green + 0.114 * blue;
+                result[index] = maxHeight * (float) height;
+
+                ++index;
+            }
+        }
+
+        return result;
+    }
+
+    /**
      * Convert the specified vector from Cartesian coordinates to spherical
      * coordinates (r, theta, phi) per ISO 80000.
      * <p>
