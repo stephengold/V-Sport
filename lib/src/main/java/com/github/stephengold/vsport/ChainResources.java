@@ -121,7 +121,7 @@ class ChainResources {
      */
     ChainResources(SurfaceSummary surface, long descriptorSetLayoutHandle,
             int desiredWidth, int desiredHeight,
-            int depthFormat, boolean vSyncEnabled) {
+            int depthFormat, boolean enableVsync) {
         Validate.nonNull(surface, "surface");
         Validate.nonZero(
                 descriptorSetLayoutHandle, "descriptor-set layout handle");
@@ -155,7 +155,7 @@ class ChainResources {
                 VK10.VK_IMAGE_ASPECT_DEPTH_BIT, numSamples);
 
         this.chainHandle = createChain(framebufferExtent, imageFormat,
-                numImages, surface, surfaceFormat, queueFamilies, vSyncEnabled);
+                numImages, surface, surfaceFormat, queueFamilies, enableVsync);
         this.passHandle
                 = createPass(imageFormat, colorAttachment, depthAttachment);
 
@@ -335,8 +335,9 @@ class ChainResources {
      * @param surface the features of a active VkSurfaceKHR (not null)
      * @param surfaceFormat the desired surface format (not null)
      * @param queueFamilies a summary of the available queue families (not null)
-     * @param enableVsync true &rarr; accept one presentation request per vertical
-     * blanking period, false &rarr; accept unlimited presentation requests
+     * @param enableVsync true &rarr; accept one presentation request per
+     * vertical blanking period, false &rarr; accept unlimited presentation
+     * requests
      * @return the handle of the new {@code VkSwapchainKHR}
      */
     private static long createChain(
