@@ -44,6 +44,7 @@ import org.joml.Matrix3f;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector4f;
+import org.lwjgl.PointerBuffer;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.vulkan.KHRSwapchain;
 import org.lwjgl.vulkan.VK10;
@@ -89,6 +90,31 @@ final public class Utils {
 
         assert result - offset < alignment;
         assert result % alignment == 0;
+        return result;
+    }
+
+    /**
+     * Append a UTF-8 string pointer to the specified PointerBuffer.
+     *
+     * @param bufferIn (not null, unaffected)
+     * @param string the text string to append (not null)
+     * @param stack for allocating temporary host buffers (not null)
+     * @return a new, flipped, temporary buffer (not null)
+     */
+    static PointerBuffer appendStringPointer(
+            PointerBuffer bufferIn, String string, MemoryStack stack) {
+        int oldCapacity = bufferIn.capacity();
+        int newCapacity = oldCapacity + 1;
+        PointerBuffer result = stack.mallocPointer(newCapacity);
+        for (int i = 0; i < oldCapacity; ++i) {
+            long pointer = bufferIn.get(i);
+            result.put(pointer);
+        }
+
+        ByteBuffer utf8Name = stack.UTF8(string);
+        result.put(utf8Name);
+        result.flip();
+
         return result;
     }
 
