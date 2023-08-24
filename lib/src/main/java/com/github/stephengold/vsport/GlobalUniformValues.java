@@ -58,14 +58,14 @@ public class GlobalUniformValues {
      */
     final private Matrix4f viewMatrix = new Matrix4f();
     /**
+     * color of the lights
+     */
+    final private Vector3f lightColor = new Vector3f(1f, 1f, 1f);
+    /**
      * direction to the directional light (in worldspace)
      */
     final private Vector3f lightDirectionWorldspace
             = new Vector3f(1f, 3f, 2f).normalize();
-    /**
-     * color of the lights
-     */
-    final private Vector3f lightColor = new Vector3f(1f, 1f, 1f);
     // *************************************************************************
     // new methods exposed
 
