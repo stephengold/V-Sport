@@ -29,6 +29,7 @@
  */
 package com.github.stephengold.vsport;
 
+import com.jme3.math.Quaternion;
 import java.nio.ByteBuffer;
 import jme3utilities.Validate;
 import org.joml.Matrix3f;
@@ -239,6 +240,25 @@ class NonGlobalUniformValues {
             return new Quaternionf(orientation);
         } else {
             return storeResult.set(orientation);
+        }
+    }
+
+    /**
+     * Return a copy of the mesh-to-world coordinate rotation.
+     *
+     * @param storeResult storage for the result (modified if not null)
+     * @return a unit quaternion (either {@code storeResult} or a new
+     * quaternion)
+     */
+    Quaternion orientationJme(Quaternion storeResult) {
+        float x = orientation.x();
+        float y = orientation.y();
+        float z = orientation.z();
+        float w = orientation.w();
+        if (storeResult == null) {
+            return new Quaternion(x, y, z, w);
+        } else {
+            return storeResult.set(x, y, z, w);
         }
     }
 
