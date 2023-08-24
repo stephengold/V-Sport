@@ -322,6 +322,17 @@ abstract public class BaseApplication {
     }
 
     /**
+     * Alter the "Vsync" setting and apply it to the presentation surface.
+     *
+     * @param newSetting true &rarr; accept one presentation request per
+     * vertical blanking period, false &rarr; accept unlimited presentation
+     * requests (default=true)
+     */
+    public static void setVsync(boolean newSetting) {
+        Internals.setVsyncEnabled(newSetting);
+    }
+
+    /**
      * Alter the title of the window.
      *
      * @param text the desired text (in UTF-8 encoding)

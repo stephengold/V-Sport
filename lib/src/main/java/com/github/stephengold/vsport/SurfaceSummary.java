@@ -159,20 +159,31 @@ class SurfaceSummary {
     /**
      * Choose a presentation mode for the swap chain.
      *
+     * @param enableVsync true &rarr; accept one presentation request per
+     * vertical blanking period, false &rarr; accept unlimited presentation
+     * requests
      * @return the selected mode
      */
-    int choosePresentationMode() {
-        int numModes = presentationModes.capacity();
+    int choosePresentationMode(boolean enableVsync) {
+        int preferredMode;
+        if (enableVsync) {
+            preferredMode = KHRSurface.VK_PRESENT_MODE_FIFO_KHR;
+        } else {
+            preferredMode = KHRSurface.VK_PRESENT_MODE_MAILBOX_KHR;
+        }
 
-        // Choose mailbox mode, if available:
+        int numModes = presentationModes.capacity();
         for (int i = 0; i < numModes; ++i) {
             int mode = presentationModes.get(i);
-            if (mode == KHRSurface.VK_PRESENT_MODE_MAILBOX_KHR) {
+            if (mode == preferredMode) {
                 return mode;
             }
         }
 
-        // Otherwise settle for FIFO mode.
+        System.err.println("The preferred presentation mode is unavailable.");
+        System.err.flush();
+
+        // All Vulkan implementations support FIFO mode:
         return KHRSurface.VK_PRESENT_MODE_FIFO_KHR;
     }
 

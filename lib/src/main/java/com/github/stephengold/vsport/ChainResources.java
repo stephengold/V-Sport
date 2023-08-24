@@ -115,16 +115,16 @@ class ChainResources {
      * @param desiredWidth the desired framebuffer width (in pixels, &gt;0)
      * @param desiredHeight the desired framebuffer height (in pixels, &gt;0)
      * @param depthFormat the desired depth-buffer format
-     * @param pipelineLayoutHandle the handle of the graphics-pipeline layout
-     * (not null)
+     * @param enableVsync true &rarr; accept one presentation request per
+     * vertical blanking period, false &rarr; accept unlimited presentation
+     * requests
      */
     ChainResources(SurfaceSummary surface, long descriptorSetLayoutHandle,
             int desiredWidth, int desiredHeight,
-            int depthFormat, long pipelineLayoutHandle) {
+            int depthFormat, boolean vSyncEnabled) {
         Validate.nonNull(surface, "surface");
         Validate.nonZero(
                 descriptorSetLayoutHandle, "descriptor-set layout handle");
-        Validate.nonZero(pipelineLayoutHandle, "pipeline-layout handle");
 
         this.numImages = chooseNumImages(surface);
         System.out.println("numImages = " + numImages);
@@ -155,7 +155,7 @@ class ChainResources {
                 VK10.VK_IMAGE_ASPECT_DEPTH_BIT, numSamples);
 
         this.chainHandle = createChain(framebufferExtent, imageFormat,
-                numImages, surface, surfaceFormat, queueFamilies);
+                numImages, surface, surfaceFormat, queueFamilies, vSyncEnabled);
         this.passHandle
                 = createPass(imageFormat, colorAttachment, depthAttachment);
 
@@ -335,12 +335,14 @@ class ChainResources {
      * @param surface the features of a active VkSurfaceKHR (not null)
      * @param surfaceFormat the desired surface format (not null)
      * @param queueFamilies a summary of the available queue families (not null)
+     * @param enableVsync true &rarr; accept one presentation request per vertical
+     * blanking period, false &rarr; accept unlimited presentation requests
      * @return the handle of the new {@code VkSwapchainKHR}
      */
-    private static long createChain(VkExtent2D framebufferExtent,
-            int imageFormat, int numImages, SurfaceSummary surface,
-            VkSurfaceFormatKHR surfaceFormat,
-            QueueFamilySummary queueFamilies) {
+    private static long createChain(
+            VkExtent2D framebufferExtent, int imageFormat, int numImages,
+            SurfaceSummary surface, VkSurfaceFormatKHR surfaceFormat,
+            QueueFamilySummary queueFamilies, boolean enableVsync) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             VkSwapchainCreateInfoKHR createInfo
                     = VkSwapchainCreateInfoKHR.calloc(stack);
@@ -380,7 +382,7 @@ class ChainResources {
                 createInfo.imageSharingMode(VK10.VK_SHARING_MODE_EXCLUSIVE);
             }
 
-            int presentMode = surface.choosePresentationMode();
+            int presentMode = surface.choosePresentationMode(enableVsync);
             createInfo.presentMode(presentMode);
 
             VkDevice vkDevice = Internals.getVkDevice();

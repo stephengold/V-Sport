@@ -118,6 +118,11 @@ final class Internals {
     // fields
 
     /**
+     * true &rarr; accept one presentation request per vertical blanking period,
+     * false &rarr; accept unlimited presentation requests
+     */
+    private static boolean enableVsync = true;
+    /**
      * true if the framebuffers need to be resized
      */
     private static boolean needsResize = false;
@@ -664,6 +669,18 @@ final class Internals {
     static void setNeedsResize() {
         needsResize = true;
     }
+
+    /**
+     * Alter the "Vsync" setting and apply it to the presentation surface.
+     *
+     * @param newSetting true &rarr; accept one presentation request per
+     * vertical blanking period, false &rarr; accept unlimited presentation
+     * requests (default=true)
+     */
+    static void setVsyncEnabled(boolean newSetting) {
+        enableVsync = newSetting;
+        recreateChainResources();
+    }
     // *************************************************************************
     // private methods
 
@@ -761,7 +778,7 @@ final class Internals {
                     = physicalDevice.summarizeSurface(surfaceHandle, stack);
             chainResources = new ChainResources(
                     surface, descriptorSetLayoutHandle, framebufferWidth,
-                    framebufferHeight, depthBufferFormat, pipelineLayoutHandle);
+                    framebufferHeight, depthBufferFormat, enableVsync);
             framebufferHeight = chainResources.framebufferHeight();
             framebufferWidth = chainResources.framebufferWidth();
 
