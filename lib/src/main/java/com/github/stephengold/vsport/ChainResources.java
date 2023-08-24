@@ -129,7 +129,7 @@ class ChainResources {
         this.numImages = chooseNumImages(surface);
         System.out.println("numImages = " + numImages);
 
-        this.poolHandle = createPool(numImages * 64); // TODO plenty for now
+        this.poolHandle = createPool(numImages * 1600); // TODO plenty for now
 
         VkSurfaceFormatKHR surfaceFormat = surface.chooseSurfaceFormat();
         this.imageFormat = surfaceFormat.format();
