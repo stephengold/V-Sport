@@ -52,6 +52,7 @@ import org.lwjgl.glfw.GLFWVulkan;
 import org.lwjgl.system.Callback;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.vulkan.EXTDebugUtils;
+import org.lwjgl.vulkan.KHRGetPhysicalDeviceProperties2;
 import org.lwjgl.vulkan.KHRSurface;
 import org.lwjgl.vulkan.KHRSwapchain;
 import org.lwjgl.vulkan.VK10;
@@ -1149,6 +1150,11 @@ final class Internals {
             result = Utils.appendStringPointer(result,
                     EXTDebugUtils.VK_EXT_DEBUG_UTILS_EXTENSION_NAME, stack);
         }
+
+        // Add an extension used to deal with portability subsets:
+        result = Utils.appendStringPointer(result,
+                KHRGetPhysicalDeviceProperties2.VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME,
+                stack);
 
         return result;
     }
