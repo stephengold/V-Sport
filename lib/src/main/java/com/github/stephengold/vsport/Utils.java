@@ -120,7 +120,7 @@ final public class Utils {
 
     /**
      * Throw a runtime exception if an operation returned a code other than
-     * {@code VK_SUCCESS} or {S@code VK_SUBOPTIMAL}.
+     * {@code VK_SUCCESS} or {@code VK_SUBOPTIMAL}.
      *
      * @param description a textual description of the operation
      * @param returnCode a code returned by the GLFW API or the Vulkan API
