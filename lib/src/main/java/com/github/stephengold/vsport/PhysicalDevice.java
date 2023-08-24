@@ -170,6 +170,10 @@ class PhysicalDevice {
             createInfo.pEnabledFeatures(deviceFeatures);
 
             PointerBuffer extensionNames = listRequiredDeviceExtensions(stack);
+            if (hasExtension(portabilitySubset)) {
+                extensionNames = Utils.appendStringPointer(
+                        extensionNames, portabilitySubset, stack);
+            }
             createInfo.ppEnabledExtensionNames(extensionNames);
 
             if (enableDebugging) {
