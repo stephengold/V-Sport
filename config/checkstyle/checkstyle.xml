@@ -190,7 +190,7 @@
         <!-- Checks for naming conventions            -->
         <!-- See https://checkstyle.org/checks/naming -->
         <module name="PackageName">
-            <property name="format" value="^[a-z][a-z.]*[a-z]$"/>
+            <property name="format" value="^[a-z][a-z3.]*[a-z]$"/>
             <message key="name.invalidPattern"
                      value="Package name ''{0}'' must match pattern ''{1}''."/>
         </module>
