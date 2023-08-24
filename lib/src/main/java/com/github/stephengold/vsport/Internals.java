@@ -491,8 +491,6 @@ final class Internals {
      */
     static void initializeVulkan(
             String appName, int appVersion, BaseApplication app) {
-        requiredDeviceExtensions
-                .add(KHRSwapchain.VK_KHR_SWAPCHAIN_EXTENSION_NAME);
         if (enableDebugging) {
             requiredLayers.add("VK_LAYER_KHRONOS_validation");
         }
@@ -500,6 +498,8 @@ final class Internals {
         createVkInstance(appName, appVersion);
         surfaceHandle = createSurface();
 
+        requiredDeviceExtensions
+                .add(KHRSwapchain.VK_KHR_SWAPCHAIN_EXTENSION_NAME);
         selectPhysicalDevice(app);
 
         depthBufferFormat = chooseDepthBufferFormat();
