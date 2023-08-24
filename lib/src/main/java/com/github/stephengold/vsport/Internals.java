@@ -1141,22 +1141,13 @@ final class Internals {
      */
     private static PointerBuffer
             listRequiredInstanceExtensions(MemoryStack stack) {
-        PointerBuffer glfwRequirements
+        PointerBuffer result
                 = GLFWVulkan.glfwGetRequiredInstanceExtensions();
 
-        PointerBuffer result;
         if (enableDebugging) {
             // Vulkan debug utils require one additional instance extension:
-            int numExtensions = glfwRequirements.capacity() + 1;
-            result = stack.mallocPointer(numExtensions);
-            result.put(glfwRequirements);
-            ByteBuffer utf8Name = stack.UTF8(
-                    EXTDebugUtils.VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-            result.put(utf8Name);
-            result.rewind();
-
-        } else {
-            result = glfwRequirements;
+            result = Utils.appendStringPointer(result,
+                    EXTDebugUtils.VK_EXT_DEBUG_UTILS_EXTENSION_NAME, stack);
         }
 
         return result;
