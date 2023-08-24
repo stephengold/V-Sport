@@ -1021,15 +1021,16 @@ final class Internals {
             VkInstanceCreateInfo createInfo
                     = VkInstanceCreateInfo.calloc(stack);
             createInfo.sType(VK10.VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO);
+
             createInfo.pApplicationInfo(appInfo);
 
-            // Specify the required extensions:
+            // Specify which instance extensions to enable:
             PointerBuffer extensionNames
                     = listRequiredInstanceExtensions(stack);
             createInfo.ppEnabledExtensionNames(extensionNames);
 
             if (enableDebugging) {
-                // Specify the required validation layers:
+                // Specify which validation layers to enable:
                 PointerBuffer layerNames = listRequiredLayers(stack);
                 createInfo.ppEnabledLayerNames(layerNames);
 
@@ -1037,9 +1038,7 @@ final class Internals {
                 addDebugMessengerCreateInfo(createInfo, stack);
             }
 
-            // Allocate a buffer to receive the pointer to the new instance:
             PointerBuffer pPointer = stack.mallocPointer(1);
-
             int retCode = VK10.vkCreateInstance(
                     createInfo, defaultAllocator, pPointer);
             Utils.checkForError(retCode, "create Vulkan instance");

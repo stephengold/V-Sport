@@ -168,8 +168,7 @@ class NonGlobalUniformValues {
      * @return a location vector in worldspace (either {@code storeResult} or a
      * new vector, not null)
      */
-    com.jme3.math.Vector3f locationJme(
-            com.jme3.math.Vector3f storeResult) {
+    com.jme3.math.Vector3f locationJme(com.jme3.math.Vector3f storeResult) {
         if (storeResult == null) {
             return Utils.toJmeVector(location);
         } else {

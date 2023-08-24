@@ -272,7 +272,8 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
 
     /**
-     * Count how many line primitives the mesh contains.
+     * Count how many line primitives the mesh contains, taking indexing and
+     * topology into account.
      *
      * @return the count (&ge;0)
      */
@@ -308,7 +309,8 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
 
     /**
-     * Count how many triangle primitives the mesh contains.
+     * Count how many triangle primitives the mesh contains, taking indexing and
+     * topology into account.
      *
      * @return the count (&ge;0)
      */
