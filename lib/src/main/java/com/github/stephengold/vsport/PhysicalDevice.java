@@ -39,6 +39,7 @@ import jme3utilities.Validate;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.vulkan.KHRGetPhysicalDeviceProperties2;
+import org.lwjgl.vulkan.KHRPortabilitySubset;
 import org.lwjgl.vulkan.KHRSurface;
 import org.lwjgl.vulkan.VK10;
 import org.lwjgl.vulkan.VkAllocationCallbacks;
@@ -67,6 +68,14 @@ import org.lwjgl.vulkan.VkQueueFamilyProperties;
  * Derived from Cristian Herrera's Vulkan-Tutorial-Java project.
  */
 class PhysicalDevice {
+    // *************************************************************************
+    // constants
+
+    /**
+     * name of the "portability subset" device extension
+     */
+    final public static String portabilitySubset
+            = KHRPortabilitySubset.VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME;
     // *************************************************************************
     // fields
 
