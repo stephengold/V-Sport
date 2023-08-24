@@ -30,6 +30,7 @@
 package com.github.stephengold.vsport;
 
 import com.jme3.bullet.CollisionSpace;
+import com.jme3.math.Quaternion;
 import java.nio.ByteBuffer;
 import jme3utilities.Validate;
 import org.joml.Matrix3fc;
@@ -320,6 +321,18 @@ public class Geometry {
     }
 
     /**
+     * Return a copy of the mesh-to-world coordinate rotation.
+     *
+     * @param storeResult storage for the result (modified if not null)
+     * @return a unit quaternion (either {@code storeResult} or a new
+     * quaternion)
+     */
+    public Quaternion orientationJme(Quaternion storeResult) {
+        Quaternion result = uniformValues.orientationJme(storeResult);
+        return result;
+    }
+
+    /**
      * Return the point size for sprites.
      *
      * @return the size (in pixels)
@@ -557,10 +570,51 @@ public class Geometry {
      * unaffected)
      * @return the (modified) current geometry (for chaining)
      */
+    public Geometry setOrientation(Quaternion orientation) {
+        Validate.nonZero(orientation, "orientation");
+        uniformValues.setOrientationQuaternion(orientation.getX(),
+                orientation.getY(), orientation.getZ(), orientation.getW());
+        return this;
+    }
+
+    /**
+     * Alter the orientation without translating the mesh origin.
+     *
+     * @param orientation the desired orientation (not null, not zero,
+     * unaffected)
+     * @return the (modified) current geometry (for chaining)
+     */
     public Geometry setOrientation(Quaternionfc orientation) {
         Validate.nonNull(orientation, "orientation");
         uniformValues.setOrientationQuaternion(orientation.x(), orientation.y(),
                 orientation.z(), orientation.w());
+        return this;
+    }
+
+    /**
+     * Alter the orientation without translating the mesh origin.
+     * <p>
+     * The arguments are assumed to form an orthonormal basis.
+     *
+     * @param xDir the desired direction of the mesh X axis (unit vector in
+     * world coordinates, not null, unaffected)
+     * @param yDir the desired direction of the mesh Y axis (unit vector in
+     * world coordinates, not null, unaffected)
+     * @param zDir the desired direction of the mesh Z axis (unit vector in
+     * world coordinates, not null, unaffected)
+     * @return the (modified) current geometry (for chaining)
+     */
+    public Geometry setOrientation(com.jme3.math.Vector3f xDir,
+            com.jme3.math.Vector3f yDir, com.jme3.math.Vector3f zDir) {
+        Validate.nonZero(xDir, "x direction");
+        Validate.nonZero(yDir, "y direction");
+        Validate.nonZero(zDir, "z direction");
+
+        com.jme3.math.Quaternion q = new Quaternion();
+        q.fromAxes(xDir, yDir, zDir);
+        uniformValues.setOrientationQuaternion(
+                q.getX(), q.getY(), q.getZ(), q.getW());
+
         return this;
     }
 
