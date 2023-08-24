@@ -4,6 +4,19 @@ plugins {
     id 'application' // to support building a Java application
 }
 
+ext {
+    // which BTF (buildType + flavor) of the native physics library to use:
+    //btf = 'DebugSp'
+    btf = 'ReleaseSp'
+
+    fs = System.getProperty('file.separator')
+    downloadsDir = System.getProperty('user.home') + fs + 'Downloads' + fs
+
+    // URL from which native physics libraries should be copied:
+    libbulletjmeUrl = "https://github.com/stephengold/Libbulletjme/releases/download/$lbjVersion/"
+    //libbulletjmeUrl = "file:///home/sgold/NetBeansProjects/Libbulletjme/dist/"
+}
+
 // tasks to run specific apps:
 
 tasks.register('AssimpTest', JavaExec) {
@@ -28,6 +41,20 @@ tasks.withType(JavaExec) { // Java runtime options:
     }
     classpath sourceSets.main.runtimeClasspath
     enableAssertions true
+
+    if (includeLinux) {
+        dependsOn 'downloadLinux64'
+        dependsOn 'downloadLinux_ARM32'
+        dependsOn 'downloadLinux_ARM64'
+    }
+    if (includeMacOsX) {
+        dependsOn 'downloadMacOSX64'
+        dependsOn 'downloadMacOSX_ARM64'
+    }
+    if (includeWindows) {
+        dependsOn 'downloadWindows32'
+        dependsOn 'downloadWindows64'
+    }
 }
 
 dependencies {
@@ -76,4 +103,49 @@ dependencies {
     }
 
     implementation project(':lib')
+}
+
+// tasks to download/clean the native physics library for each platform:
+
+registerPlatformTasks('Linux64',     '_libbulletjme.so')
+registerPlatformTasks('Linux_ARM32', '_libbulletjme.so')
+registerPlatformTasks('Linux_ARM64', '_libbulletjme.so')
+
+registerPlatformTasks('MacOSX64',     '_libbulletjme.dylib')
+registerPlatformTasks('MacOSX_ARM64', '_libbulletjme.dylib')
+
+registerPlatformTasks('Windows32', '_bulletjme.dll')
+registerPlatformTasks('Windows64', '_bulletjme.dll')
+
+// helper method to register 'download' and 'clean' tasks:
+
+void registerPlatformTasks(String platform, String suffix) {
+    String filename = platform + btf + suffix
+
+    String cleanTaskName = 'clean' + platform
+    clean.dependsOn(cleanTaskName)
+    tasks.register(cleanTaskName, Delete) {
+        delete downloadsDir + filename
+    }
+
+    tasks.register('download' + platform, MyDownload) {
+        sourceUrl = libbulletjmeUrl + filename
+        target = file(downloadsDir + filename)
+    }
+}
+
+// helper class to wrap Ant download task:
+
+class MyDownload extends DefaultTask {
+    @Input
+    String sourceUrl
+
+    @OutputFile
+    File target
+
+    @TaskAction
+    void download() {
+        ant.get(src: sourceUrl, dest: target)
+        println sourceUrl
+    }
 }
