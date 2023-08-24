@@ -323,14 +323,9 @@ class PhysicalDevice {
         }
 
         // Does the device support all required extensions?
-        if (availableExtensions == null) {
-            try (MemoryStack stack = MemoryStack.stackPush()) {
-                queryExtensionProperties(stack);
-            }
-        }
         String[] requiredExtensions = Internals.listRequiredDeviceExtensions();
         for (String name : requiredExtensions) {
-            if (!availableExtensions.contains(name)) {
+            if (!hasExtension(name)) {
                 if (diagnose) {
                     System.out.println("  doesn't support extension " + name);
                 }
@@ -474,10 +469,7 @@ class PhysicalDevice {
     boolean supportsTriangleFan() {
         if (supportsTriangleFan == null) {
             try (MemoryStack stack = MemoryStack.stackPush()) {
-                if (availableExtensions == null) {
-                    queryExtensionProperties(stack);
-                }
-                if (availableExtensions.contains("VK_KHR_portability_subset")) {
+                if (hasExtension(portabilitySubset)) {
                     querySubsetFeatures(stack);
                 } else {
                     this.supportsTriangleFan = true;
