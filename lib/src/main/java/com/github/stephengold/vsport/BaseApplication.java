@@ -346,7 +346,7 @@ abstract public class BaseApplication {
     }
 
     /**
-     * Alter the title of the window.
+     * Alter the text in the window's title bar.
      *
      * @param text the desired text (in UTF-8 encoding)
      */
