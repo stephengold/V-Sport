@@ -49,8 +49,6 @@ import com.jme3.math.Vector3f;
  */
 public class HelloSport extends BasePhysicsApp<PhysicsSpace> {
 
-    private static PhysicsRigidBody ball;
-
     /**
      * Main entry point for the HelloSport application.
      *
@@ -95,7 +93,7 @@ public class HelloSport extends BasePhysicsApp<PhysicsSpace> {
         float radius = 0.3f;
         CollisionShape ballShape = new SphereCollisionShape(radius);
         mass = 1f;
-        ball = new PhysicsRigidBody(ballShape, mass);
+        PhysicsRigidBody ball = new PhysicsRigidBody(ballShape, mass);
         physicsSpace.addCollisionObject(ball);
 
         // Visualize the collision objects.

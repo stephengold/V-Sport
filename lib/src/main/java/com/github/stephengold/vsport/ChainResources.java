@@ -72,10 +72,6 @@ class ChainResources {
      */
     private Attachment depthAttachment;
     /**
-     * image format (shared by all images in the swapchain)
-     */
-    final private int imageFormat;
-    /**
      * number of presentation images in the swapchain (&gt;0)
      */
     final private int numImages;
@@ -132,7 +128,7 @@ class ChainResources {
         this.poolHandle = createPool(numImages * 1600); // TODO plenty for now
 
         VkSurfaceFormatKHR surfaceFormat = surface.chooseSurfaceFormat();
-        this.imageFormat = surfaceFormat.format();
+        int imageFormat = surfaceFormat.format();
 
         PhysicalDevice physicalDevice = Internals.getPhysicalDevice();
         long surfaceHandle = surface.handle();
