@@ -49,7 +49,7 @@ import org.lwjgl.vulkan.VkVertexInputBindingDescription;
 /**
  * Encapsulate a vertex shader and a fragment shader that are used together.
  */
-public class ShaderProgram extends DeviceResource {
+class ShaderProgram extends DeviceResource {
     // *************************************************************************
     // fields
 
