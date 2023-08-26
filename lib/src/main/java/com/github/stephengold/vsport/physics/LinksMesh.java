@@ -109,7 +109,7 @@ class LinksMesh extends Mesh {
 
         // Update the index buffer from links. TODO avoid copying indices
         softBody.copyLinks(copyIndices);
-        IndexBuffer indices = super.getIndexBuffer();
+        IndexBuffer indices = getIndexBuffer();
         for (int i = 0; i < vpe * numLinks; ++i) {
             int index = copyIndices.get(i);
             indices.put(i, index);

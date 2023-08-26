@@ -105,7 +105,7 @@ public class LinksGeometry extends Geometry {
         boolean success = mesh.update();
         if (!success) {
             mesh = new LinksMesh(softBody);
-            super.setMesh(mesh);
+            setMesh(mesh);
         }
     }
 }

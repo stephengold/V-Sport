@@ -356,8 +356,7 @@ final public class VertexBuffer {
      */
     static VertexBuffer newInstance(com.jme3.math.Vector3f... vectors) {
         int numVertices = vectors.length;
-        VertexBuffer result
-                = VertexBuffer.newInstance(Mesh.numAxes, numVertices);
+        VertexBuffer result = newInstance(Mesh.numAxes, numVertices);
         for (com.jme3.math.Vector3f vector : vectors) {
             result.put(vector);
         }

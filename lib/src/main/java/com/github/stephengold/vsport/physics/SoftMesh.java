@@ -117,7 +117,7 @@ class SoftMesh extends Mesh {
             }
             softBody.copyLinks(links);
 
-            IndexBuffer indices = super.getIndexBuffer();
+            IndexBuffer indices = getIndexBuffer();
             for (int i = 0; i < 2 * numLinks; ++i) {
                 int index = links.get(i);
                 indices.put(i, index);

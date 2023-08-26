@@ -164,7 +164,7 @@ final public class Utils {
      */
     static int getToBuffer(
             Matrix3f matrix, int startOffset, ByteBuffer target) {
-        int offset = Utils.align(startOffset, 16);
+        int offset = align(startOffset, 16);
         target.putFloat(offset, matrix.m00());
         target.putFloat(offset + 4, matrix.m01());
         target.putFloat(offset + 8, matrix.m02());
