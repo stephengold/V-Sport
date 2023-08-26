@@ -400,9 +400,13 @@ final class Internals {
         selectPhysicalDevice(app);
 
         depthBufferFormat = chooseDepthBufferFormat();
-        System.out.println("depthBufferFormat = " + depthBufferFormat);
+        if (BaseApplication.isDebuggingEnabled()) {
+            System.out.println("depthBufferFormat = " + depthBufferFormat);
+        }
         numMsaaSamples = physicalDevice.maxNumSamples();
-        System.out.println("numSamples = " + numMsaaSamples);
+        if (BaseApplication.isDebuggingEnabled()) {
+            System.out.println("numMsaaSamples = " + numMsaaSamples);
+        }
 
         createLogicalDevice();
         descriptorSetLayoutHandle = logicalDevice.createDescriptorSetLayout();
@@ -1259,7 +1263,9 @@ final class Internals {
                 throw new RuntimeException(
                         "Didn't find a physical device with Vulkan support");
             }
-            System.out.println("numDevices = " + numDevices);
+            if (BaseApplication.isDebuggingEnabled()) {
+                System.out.println("numDevices = " + numDevices);
+            }
 
             PointerBuffer pPointers = stack.mallocPointer(numDevices);
             retCode = VK10.vkEnumeratePhysicalDevices(

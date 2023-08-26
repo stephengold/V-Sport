@@ -123,7 +123,9 @@ class ChainResources {
                 descriptorSetLayoutHandle, "descriptor-set layout handle");
 
         this.numImages = chooseNumImages(surface);
-        System.out.println("numImages = " + numImages);
+        if (BaseApplication.isDebuggingEnabled()) {
+            System.out.println("numImages = " + numImages);
+        }
 
         this.poolHandle = createPool(numImages * 1600); // TODO plenty for now
 
