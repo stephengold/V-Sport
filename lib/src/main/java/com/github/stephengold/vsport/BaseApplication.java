@@ -66,7 +66,7 @@ abstract public class BaseApplication {
     /**
      * version of the V-Sport graphics engine
      */
-    final static int engineVersion = VK10.VK_MAKE_VERSION(0, 1, 0);
+    final static int engineVersion = VK10.VK_MAKE_VERSION(0, 9, 0);
     /**
      * name of the graphics engine
      */
