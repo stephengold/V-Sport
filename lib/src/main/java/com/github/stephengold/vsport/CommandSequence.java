@@ -124,7 +124,7 @@ class CommandSequence {
 
             VkClearValue.Buffer pClearValues = VkClearValue.calloc(2, stack);
             VkClearColorValue colorClearValue = pClearValues.get(0).color();
-            FloatBuffer float32 = Internals.copyBackgroudColor(stack);
+            FloatBuffer float32 = Internals.copyBackgroundColor(stack);
             colorClearValue.float32(float32);
             VkClearDepthStencilValue dsClearValue
                     = pClearValues.get(1).depthStencil();

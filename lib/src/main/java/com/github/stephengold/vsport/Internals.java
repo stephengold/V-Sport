@@ -283,7 +283,7 @@ final class Internals {
      * @param stack for allocating temporary host buffers (not null)
      * @return a new temporary buffer (not null)
      */
-    static FloatBuffer copyBackgroudColor(MemoryStack stack) {
+    static FloatBuffer copyBackgroundColor(MemoryStack stack) {
         FloatBuffer result = stack.mallocFloat(4);
         backgroundColor.get(result);
 
