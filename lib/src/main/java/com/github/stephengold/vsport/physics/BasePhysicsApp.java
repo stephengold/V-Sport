@@ -87,7 +87,6 @@ public abstract class BasePhysicsApp<T extends PhysicsSpace>
      */
     final private static Map<ShapeSummary, Mesh> meshCache
             = new WeakHashMap<>(200);
-    //private PhysicsThread physicsThread;
     /**
      * space for physics simulation
      */
@@ -149,8 +148,8 @@ public abstract class BasePhysicsApp<T extends PhysicsSpace>
      * &ge;0)
      * @return an array of new, visible geometries
      */
-    public static Geometry[] visualizeAxes(PhysicsCollisionObject pco,
-            float axisLength) {
+    public static Geometry[] visualizeAxes(
+            PhysicsCollisionObject pco, float axisLength) {
         Validate.nonNegative(axisLength, "axis length");
 
         Geometry[] result = new Geometry[MyVector3f.numAxes];
@@ -192,8 +191,7 @@ public abstract class BasePhysicsApp<T extends PhysicsSpace>
         if (shape instanceof PlaneCollisionShape) {
             meshingStrategy = new MeshingStrategy(
                     DebugShapeFactory.lowResolution, NormalsOption.Facet,
-                    UvsOption.Linear,
-                    new Vector4f(uvScale, 0f, 0f, 0f),
+                    UvsOption.Linear, new Vector4f(uvScale, 0f, 0f, 0f),
                     new Vector4f(0f, 0f, uvScale, 0f)
             );
             programName = "Phong/Distant/Texture";

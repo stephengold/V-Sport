@@ -160,10 +160,9 @@ class ChainResources {
             CommandSequence sequence = new CommandSequence();
             sequenceList.add(sequence);
 
-            Pass pass = new Pass(
-                    imageHandle, poolHandle, descriptorSetLayoutHandle,
-                    imageFormat, colorAttachment, depthAttachment, passHandle,
-                    framebufferExtent);
+            Pass pass = new Pass(imageHandle, poolHandle,
+                    descriptorSetLayoutHandle, imageFormat, colorAttachment,
+                    depthAttachment, passHandle, framebufferExtent);
             passList.add(pass);
         }
     }
