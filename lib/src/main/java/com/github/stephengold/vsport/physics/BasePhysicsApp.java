@@ -302,9 +302,6 @@ public abstract class BasePhysicsApp<T extends PhysicsSpace>
 
         this.physicsSpace = createSpace();
         populateSpace();
-
-        //physicsThread = new PhysicsThread(space);
-        //physicsThread.start();
     }
 
     /**

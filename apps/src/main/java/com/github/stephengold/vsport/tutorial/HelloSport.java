@@ -41,7 +41,7 @@ import com.jme3.math.Vector3f;
 
 /**
  * Drop a dynamic sphere onto a horizontal surface and visualize them both using
- * SPORT graphics.
+ * V-Sport graphics.
  * <p>
  * Builds upon HelloLibbulletjme.
  *

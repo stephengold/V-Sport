@@ -87,7 +87,8 @@ public class Camera {
     /**
      * Instantiate a camera in the specified position.
      *
-     * @param location the desired eye location (in worldspace, not null)
+     * @param location the desired eye location (in worldspace, not null,
+     * unaffected)
      * @param azimuthRadians the desired azimuth angle (in radians)
      * @param upAngleRadians the desired altitude angle (in radians)
      */
