@@ -143,6 +143,7 @@ tasks.register('HelloWalk', JavaExec) {
 // graphics-only tests (no physics)
 tasks.register('AssimpTest', JavaExec) {
     description 'Runs the Assimp test app.'
+    enableAssertions true
     mainClass = 'com.github.stephengold.vsport.test.AssimpTest'
 }
 tasks.register('CheckerboardTest', JavaExec) {
@@ -152,6 +153,7 @@ tasks.register('CheckerboardTest', JavaExec) {
 }
 tasks.register('HelloVSport', JavaExec) {
     description 'Runs the HelloVSport test app.'
+    enableAssertions true
     mainClass = 'com.github.stephengold.vsport.test.HelloVSport'
 }
 tasks.register('MouseTest2', JavaExec) {
@@ -161,6 +163,7 @@ tasks.register('MouseTest2', JavaExec) {
 }
 tasks.register('OctasphereTest', JavaExec) {
     description 'Runs the octasphere test app.'
+    enableAssertions true
     mainClass = 'com.github.stephengold.vsport.test.OctasphereTest'
 }
 tasks.register('SpriteTest', JavaExec) {
