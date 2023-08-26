@@ -120,7 +120,7 @@ Future enhancements might include:
 [Jump to table of contents](#toc)
 
 
-<a name="ack"></a>
+<a name="acks"></a>
 
 ## Acknowledgments
 
