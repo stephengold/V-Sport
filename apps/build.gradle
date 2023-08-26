@@ -21,7 +21,7 @@ ext {
 
 tasks.register('AppChooser', JavaExec) {
     description 'Runs the AppChooser app.'
-    mainClass = 'com.github.stephengold.vsport.test.AppChooser'
+    mainClass = 'com.github.stephengold.vsport.demo.AppChooser'
 }
 tasks.register('ConveyorDemo', JavaExec) {
     description 'Runs the ConveyorDemo app.'
