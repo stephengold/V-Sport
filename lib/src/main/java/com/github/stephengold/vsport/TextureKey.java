@@ -452,10 +452,10 @@ public class TextureKey {
     @Override
     public String toString() {
         String mm = mipmaps ? "+" : "-";
-        String quri = MyString.quote(uri.toString());
+        String quotedUri = MyString.quote(uri.toString());
         String result = String.format("TextureKey(%s%n"
                 + " %s mag=%s min=%s wrap(%s %s) %smipmaps maxAniso=%.1f)",
-                quri,
+                quotedUri,
                 flipAxes, magFilter, minFilter, wrapU, wrapV, mm, maxAniso);
 
         return result;

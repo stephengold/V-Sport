@@ -308,10 +308,11 @@ class PhysicalDevice {
 
         // Does the device support all required extensions?
         String[] requiredExtensions = Internals.listRequiredDeviceExtensions();
-        for (String name : requiredExtensions) {
-            if (!hasExtension(name)) {
+        for (String extensionName : requiredExtensions) {
+            if (!hasExtension(extensionName)) {
                 if (diagnose) {
-                    System.out.println("  doesn't support extension " + name);
+                    System.out.println(
+                            "  doesn't support extension " + extensionName);
                 }
                 return 0f;
             }
