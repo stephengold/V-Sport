@@ -12,7 +12,18 @@ Complete source code (in [Java]) is provided under
 [a BSD 3-Clause license][license].
 
 
-## How to build and run V-Sport
+<a name="toc"></a>
+
+## Contents of this document
+
++ [How to build and run V-Sport from source](#build)
++ [What's missing](#todo)
++ [Acknowledgments](#acks)
+
+
+<a name="build"></a>
+
+## How to build and run V-Sport from source
 
 ### Initial build
 
@@ -48,6 +59,10 @@ You can restore the project to a pristine state:
 + using Bash or PowerShell or Zsh: `./gradlew clean`
 + using Windows Command Prompt: `.\gradlew clean`
 
+[Jump to table of contents](#toc)
+
+
+<a name="todo"></a>
 
 ## What's missing
 
@@ -65,6 +80,10 @@ Future enhancements might include:
 + skeletal animation
 + run on mobile platforms (Android and/or iOS)
 
+[Jump to table of contents](#toc)
+
+
+<a name="ack"></a>
 
 ## Acknowledgments
 
@@ -100,6 +119,8 @@ I'm also grateful to my dear Holly, for keeping me sane.
 
 If I've misattributed anything or left anyone out, please let me know, so I can
 correct the situation: sgold@sonic.net
+
+[Jump to table of contents](#toc)
 
 
 [adoptium]: https://adoptium.net/releases.html "Adoptium Project"
