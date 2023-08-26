@@ -23,6 +23,8 @@ tasks.register('AppChooser', JavaExec) {
     description 'Runs the AppChooser app.'
     mainClass = 'com.github.stephengold.vsport.demo.AppChooser'
 }
+
+// physics demos
 tasks.register('ConveyorDemo', JavaExec) {
     description 'Runs the ConveyorDemo app.'
     mainClass = 'com.github.stephengold.vsport.demo.ConveyorDemo'
@@ -47,6 +49,8 @@ tasks.register('Windlass', JavaExec) {
     description 'Runs the Windlass demo app.'
     mainClass = 'com.github.stephengold.vsport.demo.Windlass'
 }
+
+// physics tutorial apps (very simple)
 tasks.register('HelloCcd', JavaExec) {
     description 'Runs the HelloCcd tutorial app.'
     mainClass = 'com.github.stephengold.vsport.tutorial.HelloCcd'
@@ -135,6 +139,8 @@ tasks.register('HelloWalk', JavaExec) {
     description 'Runs the HelloWalk tutorial app.'
     mainClass = 'com.github.stephengold.vsport.tutorial.HelloWalk'
 }
+
+// graphics-only tests (no physics)
 tasks.register('AssimpTest', JavaExec) {
     description 'Runs the Assimp test app.'
     mainClass = 'com.github.stephengold.vsport.test.AssimpTest'
