@@ -68,7 +68,7 @@ import org.lwjgl.glfw.GLFW;
  */
 public class SplitDemo extends BasePhysicsApp<PhysicsSpace> {
     // *************************************************************************
-    // constants
+    // constants and loggers
 
     /**
      * simulation speed when "paused"
