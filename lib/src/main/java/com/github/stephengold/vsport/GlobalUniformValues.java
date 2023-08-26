@@ -135,15 +135,6 @@ class GlobalUniformValues {
      * @param target the buffer to write to (not null, modified)
      */
     void writeTo(ByteBuffer target) {
-        // Update the projection matrix:
-        double fov = Math.toRadians(45.); // in radians
-        float aspectRatio = BaseApplication.aspectRatio();
-        float zNear = 0.1f;
-        float zFar = 10f;
-        boolean zeroToOne = true;
-        projectionMatrix.setPerspective(
-                (float) fov, aspectRatio, zNear, zFar, zeroToOne);
-
         // In Vulkan's clipspace, the Y axis increases downward, not upward:
         float m11 = projectionMatrix.m11();
         projectionMatrix.m11(-m11);
