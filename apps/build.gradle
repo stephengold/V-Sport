@@ -25,9 +25,11 @@ tasks.register('AppChooser', JavaExec) {
 }
 tasks.register('AssimpTest', JavaExec) {
     mainClass = 'com.github.stephengold.vsport.test.AssimpTest'
+    description 'Runs the Assimp test app.'
 }
 tasks.register('HelloVSport', JavaExec) {
     mainClass = 'com.github.stephengold.vsport.test.HelloVSport'
+    description 'Runs the HelloVSport test app.'
 }
 tasks.register('NewtonsCradle', JavaExec) {
     mainClass = 'com.github.stephengold.vsport.demo.NewtonsCradle'
@@ -35,6 +37,7 @@ tasks.register('NewtonsCradle', JavaExec) {
 }
 tasks.register('OctasphereTest', JavaExec) {
     mainClass = 'com.github.stephengold.vsport.test.OctasphereTest'
+    description 'Runs the octasphere test app.'
 }
 
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
