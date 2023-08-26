@@ -35,7 +35,6 @@ import com.github.stephengold.vsport.Vertex;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.Collection;
-import java.util.List;
 import org.joml.Vector2f;
 import org.joml.Vector2fc;
 import org.joml.Vector3f;
@@ -81,7 +80,8 @@ final public class AssimpUtils {
      * @param addVertices storage for vertex attributes (not null, added to)
      */
     public static void extractTriangles(String resourceName, int flags,
-            List<Integer> addVertexIndices, List<Vertex> addVertices) {
+            Collection<Integer> addVertexIndices,
+            Collection<Vertex> addVertices) {
         ByteBuffer pLoadedBytes = Utils.loadResourceAsBytes(resourceName);
 
         CharSequence hints = null;
@@ -109,7 +109,8 @@ final public class AssimpUtils {
      * @param addVertices storage for vertex attributes (not null, added to)
      */
     private static void processNode(AINode aiNode, PointerBuffer pMeshes,
-            List<Integer> addVertexIndices, List<Vertex> addVertices) {
+            Collection<Integer> addVertexIndices,
+            Collection<Vertex> addVertices) {
         if (aiNode.mMeshes() != null) {
             processNodeMeshes(aiNode, pMeshes, addVertexIndices, addVertices);
         }
@@ -134,7 +135,8 @@ final public class AssimpUtils {
      * @param addVertices storage for vertex attributes (not null, added to)
      */
     private static void processNodeMeshes(AINode aiNode, PointerBuffer pMeshes,
-            List<Integer> addVertexIndices, List<Vertex> addVertices) {
+            Collection<Integer> addVertexIndices,
+            Collection<Vertex> addVertices) {
         IntBuffer pMeshIndices = aiNode.mMeshes();
         if (pMeshIndices == null) {
             return;
