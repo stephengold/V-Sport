@@ -196,6 +196,14 @@ tasks.withType(JavaExec) { // Java runtime options:
     }
 }
 
+application {
+    mainClass = 'com.github.stephengold.vsport.demo.AppChooser'
+}
+if (!hasProperty('mainClass')) {
+    ext.mainClass = application.mainClass
+}
+jar.manifest.attributes('Main-Class': application.mainClass)
+
 dependencies {
     // LWJGL's Vulkan bindings do not require natives, except on macOS.
     if (includeLinux) {
