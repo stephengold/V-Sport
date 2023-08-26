@@ -1,6 +1,6 @@
 <img height="150" src="https://i.imgur.com/YEPFEcx.png" alt="Libbulletjme Project logo">
 
-[The V-Sport Project][project] will implement
+[The V-Sport Project][project] implements
 a simple [Vulkan]-based graphics engine for physics demos.
 
 It contains 2 sub-projects:
