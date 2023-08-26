@@ -56,6 +56,8 @@ by Cristian Herrera, which was in turn ported from
 [Alexander Overvoorde's Vulkan tutorial][vt].
 I am deeply grateful for all the work that went into these invaluable tutorials.
 
+The ConveyorDemo app derives from sourcecode contributed by "qwq".
+
 This project has made use of the following libraries and software tools:
 
   + the [Firefox] web browser
