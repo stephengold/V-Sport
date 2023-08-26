@@ -241,26 +241,6 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
 
     /**
-     * Count how many attributes the mesh contains.
-     *
-     * @return the count (&gt;0)
-     */
-    int countAttributes() {
-        int result = 1; // for the position buffer
-        if (colorBuffer != null) {
-            ++result;
-        }
-        if (normalBuffer != null) {
-            ++result;
-        }
-        if (texCoordsBuffer != null) {
-            ++result;
-        }
-
-        return result;
-    }
-
-    /**
      * Count how many vertices the mesh renders, taking indexing into account,
      * but not the topology.
      *
@@ -571,15 +551,6 @@ public class Mesh implements jme3utilities.lbj.Mesh {
         assert texCoordsBuffer.limit() == texCoordsBuffer.capacity();
 
         return this;
-    }
-
-    /**
-     * Access the positions VertexBuffer.
-     *
-     * @return the pre-existing buffer (not null)
-     */
-    public VertexBuffer getPositions() {
-        return positionBuffer;
     }
 
     /**

@@ -148,25 +148,6 @@ class MeshingStrategy {
 
         return result;
     }
-
-    /**
-     * Return the strategy for generating vertex normals.
-     *
-     * @return the enum value (not null)
-     */
-    NormalsOption normals() {
-        return normals;
-    }
-
-    /**
-     * Return the strategy for generating vertex positions.
-     *
-     * @return option code (&ge;-6, &le;1)
-     */
-    int positions() {
-        assert positions >= -6 && positions <= 1 : positions;
-        return positions;
-    }
     // *************************************************************************
     // Object methods
 

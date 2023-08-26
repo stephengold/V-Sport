@@ -153,15 +153,6 @@ class Attachment {
     }
 
     /**
-     * Return the image format.
-     *
-     * @return the format code
-     */
-    int imageFormat() {
-        return format;
-    }
-
-    /**
      * Access the image view.
      *
      * @return the handle of the pre-existing {@code VkImageView} (not null)

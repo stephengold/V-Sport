@@ -236,16 +236,6 @@ class DeviceImage {
     }
 
     /**
-     * Return the handle of the associated memory, if any.
-     *
-     * @return the handle of the pre-existing {@code VkDeviceMemory}, or null if
-     * none associated with the image
-     */
-    long memoryHandle() {
-        return memoryHandle;
-    }
-
-    /**
      * Return the width of the image.
      *
      * @return the width (in pixels, &gt;0)
