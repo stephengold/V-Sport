@@ -1,7 +1,7 @@
 <img height="150" src="https://i.imgur.com/YEPFEcx.png" alt="Libbulletjme Project logo">
 
 [The V-Sport Project][project] implements
-a simple [Vulkan]-based graphics engine for physics demos.
+a simple [Vulkan]-based graphics engine for physics applications.
 
 It contains 2 sub-projects:
 
@@ -60,17 +60,41 @@ It has been tested on Windows, Linux, and macOS.
 ### Tutorials
 
 The tutorial apps all have names starting with "Hello".
-For instance, the first tutorial app is named "HelloVSport".
+For instance, the first tutorial app is named "HelloSport".
 
-To execute "HelloVSport":
-+ using Bash or PowerShell or Zsh: `./gradlew HelloVSport`
-+ using Windows Command Prompt: `.\gradlew HelloVSport`
+To execute "HelloSport":
++ using Bash or PowerShell or Zsh: `./gradlew HelloSport`
++ using Windows Command Prompt: `.\gradlew HelloSport`
+
+### Demos
+
+Six demo applications are included:
++ ConveyorDemo
++ NewtonsCradle
++ Pachinko
++ SplitDemo
++ TestGearJoint
++ Windlass
+
+Documentation for the demo apps is at
+https://stephengold.github.io/Libbulletjme/lbj-en/English/demos.html
+
+### Chooser
+
+A Swing-based chooser application is included.
+However, it includes only the graphical apps and doesn't work yet on macOS.
+
+To run the chooser:
++ using Bash or PowerShell or Zsh: `./gradlew AppChooser`
++ using Windows Command Prompt: `.\gradlew AppChooser`
 
 ### Cleanup
 
 You can restore the project to a pristine state:
 + using Bash or PowerShell or Zsh: `./gradlew clean`
 + using Windows Command Prompt: `.\gradlew clean`
+
+Note:  these commands won't affect any downloaded native libraries.
 
 [Jump to table of contents](#toc)
 
