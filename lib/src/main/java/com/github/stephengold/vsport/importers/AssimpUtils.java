@@ -34,6 +34,7 @@ import com.github.stephengold.vsport.Utils;
 import com.github.stephengold.vsport.Vertex;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.util.Collection;
 import java.util.List;
 import org.joml.Vector2f;
 import org.joml.Vector2fc;
@@ -155,8 +156,9 @@ final public class AssimpUtils {
      * @param addVertexIndices storage for vertex indices (added to if not null)
      * @param addVertices storage for vertex attributes (not null, added to)
      */
-    private static void processOneMesh(AIMesh aiMesh,
-            List<Integer> addVertexIndices, List<Vertex> addVertices) {
+    private static void processOneMesh(
+            AIMesh aiMesh, Collection<Integer> addVertexIndices,
+            Collection<Vertex> addVertices) {
         AIVector3D.Buffer pAiPositions = aiMesh.mVertices();
         int numVertices = pAiPositions.capacity();
 

@@ -102,7 +102,7 @@ final public class Utils {
      * @return a new, flipped, temporary buffer (not null)
      */
     static PointerBuffer appendStringPointer(
-            PointerBuffer bufferIn, String string, MemoryStack stack) {
+            PointerBuffer bufferIn, CharSequence string, MemoryStack stack) {
         int oldCapacity = bufferIn.capacity();
         int newCapacity = oldCapacity + 1;
         PointerBuffer result = stack.mallocPointer(newCapacity);

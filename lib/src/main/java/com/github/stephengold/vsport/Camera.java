@@ -92,7 +92,7 @@ public class Camera {
      * @param upAngleRadians the desired altitude angle (in radians)
      */
     public Camera(
-            Vector3f location, float azimuthRadians, float upAngleRadians) {
+            Vector3fc location, float azimuthRadians, float upAngleRadians) {
         eyeLocation.set(location);
 
         this.azimuthRadians = azimuthRadians;

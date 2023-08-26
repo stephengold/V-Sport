@@ -31,7 +31,7 @@ package com.github.stephengold.vsport;
 
 import java.nio.ByteBuffer;
 import java.nio.LongBuffer;
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 import java.util.WeakHashMap;
 import jme3utilities.Validate;
@@ -123,7 +123,7 @@ public class LogicalDevice {
      * to)
      */
     void addCommandBuffers(
-            int numBuffersNeeded, List<VkCommandBuffer> addBuffers) {
+            int numBuffersNeeded, Collection<VkCommandBuffer> addBuffers) {
         numBuffersNeeded -= addBuffers.size();
         if (numBuffersNeeded <= 0) {
             return;

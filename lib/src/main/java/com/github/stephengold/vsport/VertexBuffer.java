@@ -33,7 +33,7 @@ import com.jme3.math.Quaternion;
 import com.jme3.math.Transform;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
-import java.util.List;
+import java.util.Collection;
 import jme3utilities.Validate;
 import jme3utilities.math.MyBuffer;
 import jme3utilities.math.MyMath;
@@ -260,12 +260,12 @@ final public class VertexBuffer {
     }
 
     /**
-     * Create a mutable color buffer from a list of vertices.
+     * Create a mutable color buffer from a collection of vertices.
      *
      * @param vertices the vertices to use (not null, unaffected)
      * @return a new instance (not null)
      */
-    static VertexBuffer newColor(List<Vertex> vertices) {
+    static VertexBuffer newColor(Collection<Vertex> vertices) {
         int fpv = 3;
         int numVertices = vertices.size();
         VertexBuffer result = newInstance(fpv, numVertices);
@@ -367,12 +367,12 @@ final public class VertexBuffer {
     }
 
     /**
-     * Create a mutable normal buffer from a list of vertices.
+     * Create a mutable normal buffer from a collection of vertices.
      *
      * @param vertices the vertices to use (not null, unaffected)
      * @return a new instance (not null)
      */
-    static VertexBuffer newNormal(List<Vertex> vertices) {
+    static VertexBuffer newNormal(Collection<Vertex> vertices) {
         int numVertices = vertices.size();
         int fpv = Mesh.numAxes;
         VertexBuffer result = newInstance(fpv, numVertices);
@@ -386,12 +386,12 @@ final public class VertexBuffer {
     }
 
     /**
-     * Create a mutable position buffer from a list of vertices.
+     * Create a mutable position buffer from a collection of vertices.
      *
      * @param vertices the vertices to use (not null, unaffected)
      * @return a new instance (not null)
      */
-    static VertexBuffer newPosition(List<Vertex> vertices) {
+    static VertexBuffer newPosition(Collection<Vertex> vertices) {
         int fpv = Mesh.numAxes;
         int numVertices = vertices.size();
         VertexBuffer result = newInstance(fpv, numVertices);
@@ -405,12 +405,12 @@ final public class VertexBuffer {
     }
 
     /**
-     * Create a texture-coordinates buffer from a list of vertices.
+     * Create a texture-coordinates buffer from a collection of vertices.
      *
      * @param vertices the vertices to use (not null, unaffected)
      * @return a new instance (not null)
      */
-    static VertexBuffer newTexCoords(List<Vertex> vertices) {
+    static VertexBuffer newTexCoords(Collection<Vertex> vertices) {
         int fpv = 2;
         int numVertices = vertices.size();
         VertexBuffer result = newInstance(fpv, numVertices);

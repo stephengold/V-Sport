@@ -635,13 +635,14 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
 
     /**
-     * Create a mutable mesh by de-duplicating a list of vertices.
+     * Create a mutable mesh by de-duplicating a collection of vertices.
      *
      * @param topology the desired primitive topology (not null)
      * @param vertices the vertex data to use (not null, unaffected)
      * @return a new instance
      */
-    public static Mesh newInstance(Topology topology, List<Vertex> vertices) {
+    public static Mesh newInstance(
+            Topology topology, Collection<Vertex> vertices) {
         Validate.nonNull(topology, "topology");
 
         int count = vertices.size();
@@ -820,7 +821,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
      * @param indices the desired vertex indices (not null, unaffected)
      * @return a new IndexBuffer with the specified capacity
      */
-    protected IndexBuffer createIndices(List<Integer> indices) {
+    protected IndexBuffer createIndices(Collection<Integer> indices) {
         verifyMutable();
         this.indexBuffer = IndexBuffer.newInstance(indices);
         return indexBuffer;

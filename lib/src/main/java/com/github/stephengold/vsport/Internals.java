@@ -191,11 +191,12 @@ final class Internals {
     /**
      * names of all device extensions that the application requires
      */
-    final private static Set<String> requiredDeviceExtensions = new HashSet<>();
+    final private static Collection<String> requiredDeviceExtensions
+            = new HashSet<>();
     /**
      * names of validation layers to enable during initialization
      */
-    final private static Set<String> requiredLayers = new HashSet<>();
+    final private static Collection<String> requiredLayers = new HashSet<>();
     /**
      * current background color
      */
@@ -1011,7 +1012,7 @@ final class Internals {
      * @param appName the name of the application (may be null)
      * @param appVersion the version numbers of the application
      */
-    private static void createVkInstance(String appName, int appVersion) {
+    private static void createVkInstance(CharSequence appName, int appVersion) {
         // Verify that all required validation layers are available:
         Set<String> availableSet = listAvailableLayers();
         for (String layerName : requiredLayers) {

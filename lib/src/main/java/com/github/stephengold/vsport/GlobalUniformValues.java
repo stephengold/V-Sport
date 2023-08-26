@@ -32,6 +32,7 @@ package com.github.stephengold.vsport;
 import java.nio.ByteBuffer;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 /**
  * Shader parameters to be written to a global Uniform Buffer Objects (UBOs).
@@ -113,7 +114,7 @@ class GlobalUniformValues {
      *
      * @param newColor the desired color (not null, unaffected, default=(1,1,1))
      */
-    void setLightColor(Vector3f newColor) {
+    void setLightColor(Vector3fc newColor) {
         lightColor.set(newColor);
     }
 
@@ -123,7 +124,7 @@ class GlobalUniformValues {
      * @param newDirection the desired direction (in worldspace, not null, not
      * zero)
      */
-    void setLightDirection(Vector3f newDirection) {
+    void setLightDirection(Vector3fc newDirection) {
         lightDirectionWorldspace.set(newDirection).normalize();
     }
 
