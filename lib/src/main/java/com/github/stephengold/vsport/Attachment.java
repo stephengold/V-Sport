@@ -111,8 +111,8 @@ class Attachment {
                 imageHandle, format, aspectMask, numMipLevels);
 
         // Immediately transition the image to an optimal layout:
-        Internals.alterImageLayout(deviceImage, format,
-                VK10.VK_IMAGE_LAYOUT_UNDEFINED, finalLayout, numMipLevels);
+        deviceImage.alterImageLayout(format, VK10.VK_IMAGE_LAYOUT_UNDEFINED,
+                finalLayout, numMipLevels);
     }
     // *************************************************************************
     // new methods exposed
