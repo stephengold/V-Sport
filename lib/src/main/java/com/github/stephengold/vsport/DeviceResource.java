@@ -95,6 +95,42 @@ abstract class DeviceResource implements Comparable<DeviceResource> {
         return result;
     }
     // *************************************************************************
+    // Object methods
+
+    /**
+     * Test for equivalence with another Object.
+     *
+     * @param otherObject the object to compare to (may be null, unaffected)
+     * @return true if the objects are equivalent, otherwise false
+     */
+    @Override
+    public boolean equals(Object otherObject) {
+        boolean result;
+        if (otherObject == this) {
+            result = true;
+
+        } else if (otherObject != null
+                && otherObject.getClass() == getClass()) {
+            DeviceResource otherResource = (DeviceResource) otherObject;
+            result = (lookupId == otherResource.lookupId());
+
+        } else {
+            result = false;
+        }
+
+        return result;
+    }
+
+    /**
+     * Generate the hash code for this resource.
+     *
+     * @return a 32-bit value for use in hashing
+     */
+    @Override
+    public int hashCode() {
+        return lookupId;
+    }
+    // *************************************************************************
     // private methods
 
     /**
