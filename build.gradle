@@ -23,6 +23,10 @@ configurations.all {
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds' // to disable caching of SNAPSHOTs
 }
 
+tasks.register('AppChooser') {
+    dependsOn ':apps:AppChooser'
+    description 'Runs the AppChooser app.'
+}
 tasks.register('AssimpTest') {
     dependsOn ':apps:AssimpTest'
     description 'Runs the Assimp test app.'
@@ -34,6 +38,10 @@ tasks.register('checkstyle') {
 tasks.register('HelloVSport') {
     dependsOn ':apps:HelloVSport'
     description 'Runs the HelloVSport tutorial app.'
+}
+tasks.register('NewtonsCradle') {
+    dependsOn ':apps:NewtonsCradle'
+    description 'Runs the NewtonsCradle demo app.'
 }
 tasks.register('OctasphereTest') {
     dependsOn ':apps:OctasphereTest'
