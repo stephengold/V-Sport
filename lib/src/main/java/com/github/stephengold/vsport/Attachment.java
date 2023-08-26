@@ -51,15 +51,15 @@ class Attachment {
     /**
      * final image layout
      */
-    final int finalLayout;
+    private final int finalLayout;
     /**
      * image format code
      */
-    final int format;
+    private final int format;
     /**
      * number of samples per pixel (&gt;0)
      */
-    final int numSamples;
+    private final int numSamples;
     /**
      * handle of the VkImageView
      */

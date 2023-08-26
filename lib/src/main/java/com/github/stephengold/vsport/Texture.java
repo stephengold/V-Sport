@@ -68,7 +68,7 @@ class Texture extends DeviceResource {
     /**
      * size of the original image (in bytes, &gt;0)
      */
-    final int numBytes;
+    final private int numBytes;
     /**
      * number of MIP levels in the image (including the original image)
      */
