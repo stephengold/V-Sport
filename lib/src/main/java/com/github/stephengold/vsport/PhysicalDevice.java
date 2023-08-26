@@ -505,7 +505,8 @@ class PhysicalDevice {
                 System.out.println("  doesn't have any formats available");
             }
             if (diagnose && !surface.hasPresentationMode()) {
-                System.out.println("  doesn't have any present modes avilable");
+                System.out.println(
+                        "  doesn't have any presentation modes available");
             }
             boolean result
                     = surface.hasFormat() && surface.hasPresentationMode();
