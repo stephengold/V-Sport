@@ -16,9 +16,22 @@ Complete source code (in [Java]) is provided under
 
 ## Contents of this document
 
++ [About V-Sport](#about)
 + [How to build and run V-Sport from source](#build)
 + [What's missing](#todo)
 + [Acknowledgments](#acks)
+
+
+<a name="about"></a>
+
+## About V-Sport
+
+V-Sport is a Simple Phyisics-ORienTed graphics engine written in Java 1.8.
+In addition to Libbulletjme,
+it uses [LWJGL], [Assimp], [GLFW], [JOML], and [Vulkan].
+It has been tested on Windows, Linux, and macOS.
+
+[Jump to table of contents](#toc)
 
 
 <a name="build"></a>
