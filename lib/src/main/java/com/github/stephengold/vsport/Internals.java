@@ -43,6 +43,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import jme3utilities.MyString;
 import org.joml.Vector4f;
 import org.joml.Vector4fc;
 import org.lwjgl.PointerBuffer;
@@ -450,20 +451,23 @@ final class Internals {
     /**
      * Enumerate the validation layers to enable.
      *
+     * @param printStream the stream for diagnostic output, or null for none
      * @param stack for allocating temporary host buffers (not null)
      * @return a temporary buffer containing the names of validation layers
      */
-    static PointerBuffer listValidationLayers(MemoryStack stack) {
+    static PointerBuffer listValidationLayers(
+            PrintStream printStream, MemoryStack stack) {
         Collection<String> availableLayers = listAvailableLayers();
 
         PointerBuffer result = stack.mallocPointer(0);
         for (String layerName : desiredLayers) {
             if (availableLayers.contains(layerName)) {
                 result = Utils.appendStringPointer(result, layerName, stack);
-            } else {
-                System.err.println(
-                        "Skipping unavailable validation layer: " + layerName);
-                System.err.flush();
+            } else if (printStream != null) {
+                printStream.printf(
+                        "[%s] Skipping unavailable validation layer %s%n",
+                        BaseApplication.engineName, MyString.quote(layerName));
+                printStream.flush();
             }
         }
 
@@ -967,7 +971,8 @@ final class Internals {
 
             if (enableDebugging) {
                 // Specify which validation layers to enable:
-                PointerBuffer ppLayersToEnable = listValidationLayers(stack);
+                PointerBuffer ppLayersToEnable
+                        = listValidationLayers(System.err, stack);
                 createInfo.ppEnabledLayerNames(ppLayersToEnable);
 
                 // Configure a debug messenger:

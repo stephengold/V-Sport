@@ -29,6 +29,7 @@
  */
 package com.github.stephengold.vsport;
 
+import java.io.PrintStream;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -181,8 +182,9 @@ class PhysicalDevice {
                  * Ensure compatibility with older implementations that
                  * distinguish device-specific layers from instance layers.
                  */
+                PrintStream printStream = null; // no diagnostic output
                 PointerBuffer layerNames
-                        = Internals.listValidationLayers(stack);
+                        = Internals.listValidationLayers(printStream, stack);
                 createInfo.ppEnabledLayerNames(layerNames);
             }
 
