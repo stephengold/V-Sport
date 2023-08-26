@@ -20,12 +20,16 @@ ext {
 // tasks to run specific apps:
 
 tasks.register('AppChooser', JavaExec) {
-    mainClass = 'com.github.stephengold.vsport.test.AppChooser'
     description 'Runs the AppChooser app.'
+    mainClass = 'com.github.stephengold.vsport.test.AppChooser'
 }
 tasks.register('ConveyorDemo', JavaExec) {
     description 'Runs the ConveyorDemo app.'
     mainClass = 'com.github.stephengold.vsport.demo.ConveyorDemo'
+}
+tasks.register('NewtonsCradle', JavaExec) {
+    description 'Runs the NewtonsCradle demo app.'
+    mainClass = 'com.github.stephengold.vsport.demo.NewtonsCradle'
 }
 tasks.register('Pachinko', JavaExec) {
     description 'Runs the Pachinko demo app.'
@@ -141,12 +145,8 @@ tasks.register('CheckerboardTest', JavaExec) {
     mainClass = 'com.github.stephengold.vsport.test.CheckerboardTest'
 }
 tasks.register('HelloVSport', JavaExec) {
-    mainClass = 'com.github.stephengold.vsport.test.HelloVSport'
     description 'Runs the HelloVSport test app.'
-}
-tasks.register('NewtonsCradle', JavaExec) {
-    mainClass = 'com.github.stephengold.vsport.demo.NewtonsCradle'
-    description 'Runs the NewtonsCradle demo app.'
+    mainClass = 'com.github.stephengold.vsport.test.HelloVSport'
 }
 tasks.register('MouseTest2', JavaExec) {
     description 'Runs the 2nd mouse test app.'
