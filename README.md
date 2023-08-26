@@ -49,6 +49,23 @@ You can restore the project to a pristine state:
 + using Windows Command Prompt: `.\gradlew clean`
 
 
+## What's missing
+
+This project is incomplete.
+Future enhancements might include:
+
++ handle more than 1600 geometries
++ dynamic meshes (for visualizing soft bodies)
++ graphics and physics on separate threads
++ graphical user interface
++ shadow rendering
++ physically-based rendering
++ more performance statistics
++ sound effects
++ skeletal animation
++ run on mobile platforms (Android and/or iOS)
+
+
 ## Acknowledgments
 
 Portions of the V-Sport Project are derived from [Vulkan-Tutorial-Java][vtj]
