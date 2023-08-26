@@ -181,7 +181,7 @@ class PhysicalDevice {
                  * Ensure compatibility with older implementations that
                  * distinguish device-specific layers from instance layers.
                  */
-                PointerBuffer layerNames = Internals.listRequiredLayers(stack);
+                PointerBuffer layerNames = Internals.listValidationLayers(stack);
                 createInfo.ppEnabledLayerNames(layerNames);
             }
 

@@ -197,7 +197,7 @@ final class Internals {
     /**
      * names of validation layers to enable during initialization
      */
-    final private static Collection<String> requiredLayers = new HashSet<>();
+    final private static Collection<String> desiredLayers = new HashSet<>();
     /**
      * current background color
      */
@@ -393,7 +393,7 @@ final class Internals {
     static void initializeVulkan(
             String appName, int appVersion, BaseApplication app) {
         if (enableDebugging) {
-            requiredLayers.add("VK_LAYER_KHRONOS_validation");
+            desiredLayers.add("VK_LAYER_KHRONOS_validation");
         }
 
         createVkInstance(appName, appVersion);
@@ -448,19 +448,24 @@ final class Internals {
     }
 
     /**
-     * Enumerate all required validation layers.
+     * Enumerate the validation layers to enable.
      *
      * @param stack for allocating temporary host buffers (not null)
-     * @return a temporary buffer containing the names of the validation layers
+     * @return a temporary buffer containing the names of validation layers
      */
-    static PointerBuffer listRequiredLayers(MemoryStack stack) {
-        int numLayers = requiredLayers.size();
-        PointerBuffer result = stack.mallocPointer(numLayers);
-        for (String layerName : requiredLayers) {
-            ByteBuffer utf8Name = stack.UTF8(layerName);
-            result.put(utf8Name);
+    static PointerBuffer listValidationLayers(MemoryStack stack) {
+        Collection<String> availableLayers = listAvailableLayers();
+
+        PointerBuffer result = stack.mallocPointer(0);
+        for (String layerName : desiredLayers) {
+            if (availableLayers.contains(layerName)) {
+                result = Utils.appendStringPointer(result, layerName, stack);
+            } else {
+                System.err.println(
+                        "Skipping unavailable validation layer: " + layerName);
+                System.err.flush();
+            }
         }
-        result.rewind();
 
         return result;
     }
@@ -935,15 +940,6 @@ final class Internals {
      * @param appVersion the version numbers of the application
      */
     private static void createVkInstance(CharSequence appName, int appVersion) {
-        // Verify that all required validation layers are available:
-        Set<String> availableSet = listAvailableLayers();
-        for (String layerName : requiredLayers) {
-            if (!availableSet.contains(layerName)) {
-                throw new RuntimeException(
-                        "Unavailable validation layer: " + layerName);
-            }
-        }
-
         try (MemoryStack stack = MemoryStack.stackPush()) {
             // Create the application info struct:
             VkApplicationInfo appInfo = VkApplicationInfo.calloc(stack);
@@ -971,8 +967,8 @@ final class Internals {
 
             if (enableDebugging) {
                 // Specify which validation layers to enable:
-                PointerBuffer layerNames = listRequiredLayers(stack);
-                createInfo.ppEnabledLayerNames(layerNames);
+                PointerBuffer ppLayersToEnable = listValidationLayers(stack);
+                createInfo.ppEnabledLayerNames(ppLayersToEnable);
 
                 // Configure a debug messenger:
                 addDebugMessengerCreateInfo(createInfo, stack);
