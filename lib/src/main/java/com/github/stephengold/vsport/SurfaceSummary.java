@@ -205,7 +205,7 @@ class SurfaceSummary {
             }
         }
 
-        // Otherwise settle for the first available surface format.
+        // Otherwise, settle for the first available surface format:
         VkSurfaceFormatKHR result = formats.get(0);
         return result;
     }

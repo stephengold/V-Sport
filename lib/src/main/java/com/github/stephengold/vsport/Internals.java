@@ -851,7 +851,7 @@ final class Internals {
             pCreateInfo.renderPass(passHandle);
             pCreateInfo.subpass(0);
 
-            long pipelineCache = VK10.VK_NULL_HANDLE; // disable cacheing
+            long pipelineCache = VK10.VK_NULL_HANDLE; // disable caching
             LongBuffer pHandle = stack.mallocLong(1);
             int retCode = VK10.vkCreateGraphicsPipelines(vkDevice,
                     pipelineCache, pCreateInfo, defaultAllocator, pHandle);

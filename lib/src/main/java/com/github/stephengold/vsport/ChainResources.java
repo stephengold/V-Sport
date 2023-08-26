@@ -296,10 +296,10 @@ class ChainResources {
     // private methods
 
     /**
-     * Choose the number of images in the chain.
+     * Choose the number of images in the swapchain.
      *
-     * @param surface the features of a active surface (not null)
-     * @return the count (&gt;0)
+     * @param surface the features of the active surface (not null)
+     * @return the image count (&gt;0)
      */
     private static int chooseNumImages(SurfaceSummary surface) {
         /*

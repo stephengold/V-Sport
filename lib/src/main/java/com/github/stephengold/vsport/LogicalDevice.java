@@ -271,7 +271,7 @@ class LogicalDevice {
             long imageHandle = pImage.get(0);
             DeviceImage result = new DeviceImage(width, height, imageHandle);
 
-            // Query the images's memory requirements:
+            // Query the memory requirements of the image:
             VkMemoryRequirements memRequirements
                     = VkMemoryRequirements.malloc(stack);
             VK10.vkGetImageMemoryRequirements(
@@ -361,7 +361,7 @@ class LogicalDevice {
      *
      * @param numBytes the desired buffer capacity (in bytes)
      * @param usage a bitmask
-     * @param requiredProperties a bitmask modified)
+     * @param requiredProperties a bitmask
      * @return the new mappable buffer (not null)
      */
     MappableBuffer createMappable(

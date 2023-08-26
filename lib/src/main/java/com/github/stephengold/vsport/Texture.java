@@ -328,7 +328,7 @@ class Texture extends DeviceResource {
                 int dstHeight = (srcHeight > 1) ? srcHeight / 2 : 1;
                 /*
                  * Command to wait until the source level is filled with data
-                 * and then opimize its layout for being a blit source.
+                 * and then optimize its layout for being a blit source.
                  */
                 pBarrier.dstAccessMask(VK10.VK_ACCESS_TRANSFER_READ_BIT);
                 pBarrier.newLayout(VK10.VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);

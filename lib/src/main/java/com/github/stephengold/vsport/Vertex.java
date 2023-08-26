@@ -144,7 +144,7 @@ public class Vertex {
     }
 
     /**
-     * Write the vertex color data to the specified FloatBuffer, starting at the
+     * Write the vertex color data to the specified FloatBuffer (starting at the
      * current buffer position) and advance the buffer position.
      *
      * @param target the buffer to write to (not null, modified)
@@ -156,7 +156,7 @@ public class Vertex {
     }
 
     /**
-     * Write the vertex normal data to the specified FloatBuffer, starting at
+     * Write the vertex normal data to the specified FloatBuffer (starting at
      * the current buffer position) and advance the buffer position.
      *
      * @param target the buffer to write to (not null, modified)
@@ -168,7 +168,7 @@ public class Vertex {
     }
 
     /**
-     * Write the vertex position data to the specified FloatBuffer, starting at
+     * Write the vertex position data to the specified FloatBuffer (starting at
      * the current buffer position) and advance the buffer position.
      *
      * @param target the buffer to write to (not null, modified)
@@ -180,7 +180,7 @@ public class Vertex {
     }
 
     /**
-     * Write the texture coordinate data to the specified FloatBuffer, starting
+     * Write the texture coordinate data to the specified FloatBuffer (starting
      * at the current buffer position) and advance the buffer position.
      *
      * @param target the buffer to write to (not null, modified)

@@ -94,8 +94,8 @@ class PhysicalDevice {
      */
     private Boolean supportsTriangleFan;
     /**
-     * maximum number of samples the device supports for for MSAA, or null if
-     * not determined yet
+     * maximum number of samples the device supports for MSAA, or null if not
+     * determined yet
      */
     private Integer maxNumSamples;
     /**

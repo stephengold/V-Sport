@@ -71,7 +71,7 @@ class Draw {
      *
      * @param dsPoolHandle the handle of the {@code VkDescriptorPool} (not null)
      * @param dsLayoutHandle the handle of the {@code VkDescriptorSetLayout}
-     * null)
+     * (not null)
      */
     Draw(long dsPoolHandle, long dsLayoutHandle) {
         Validate.nonNull(dsPoolHandle, "pool handle");
