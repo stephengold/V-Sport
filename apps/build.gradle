@@ -156,6 +156,11 @@ tasks.register('HelloVSport', JavaExec) {
     enableAssertions true
     mainClass = 'com.github.stephengold.vsport.test.HelloVSport'
 }
+tasks.register('MouseTest', JavaExec) {
+    description 'Runs the first mouse test app.'
+    enableAssertions true
+    mainClass = 'com.github.stephengold.vsport.test.MouseTest'
+}
 tasks.register('MouseTest2', JavaExec) {
     description 'Runs the 2nd mouse test app.'
     enableAssertions true
