@@ -132,6 +132,7 @@ tasks.register('HelloWalk', JavaExec) {
     mainClass = 'com.github.stephengold.vsport.tutorial.HelloWalk'
 }
 tasks.register('AssimpTest', JavaExec) {
+    description 'Runs the Assimp test app.'
     mainClass = 'com.github.stephengold.vsport.test.AssimpTest'
 }
 tasks.register('CheckerboardTest', JavaExec) {
@@ -153,6 +154,7 @@ tasks.register('MouseTest2', JavaExec) {
     mainClass = 'com.github.stephengold.vsport.test.MouseTest2'
 }
 tasks.register('OctasphereTest', JavaExec) {
+    description 'Runs the octasphere test app.'
     mainClass = 'com.github.stephengold.vsport.test.OctasphereTest'
 }
 tasks.register('SpriteTest', JavaExec) {
