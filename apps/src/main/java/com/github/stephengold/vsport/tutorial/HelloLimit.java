@@ -124,6 +124,9 @@ public class HelloLimit
 
         configureCamera();
         configureLighting();
+
+        // Disable VSync for more frequent mouse-position updates.
+        setVsync(false);
     }
 
     /**

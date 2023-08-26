@@ -125,6 +125,9 @@ public class HelloJoint
 
         configureCamera();
         setLightDirection(new Vector3f(7f, 3f, 5f));
+
+        // Disable VSync for more frequent mouse-position updates.
+        setVsync(false);
     }
 
     /**
