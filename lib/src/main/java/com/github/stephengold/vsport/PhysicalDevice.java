@@ -292,22 +292,6 @@ class PhysicalDevice {
     }
 
     /**
-     * Return the name of the device.
-     *
-     * @return the name (not null)
-     */
-    String name() {
-        if (name == null) {
-            try (MemoryStack stack = MemoryStack.stackPush()) {
-                queryProperties(stack);
-            }
-        }
-
-        assert name != null;
-        return name;
-    }
-
-    /**
      * Rate the suitability of the device for graphics applications.
      *
      * @param surfaceHandle the handle of the {@code VkSurfaceKHR} for
@@ -489,7 +473,13 @@ class PhysicalDevice {
      */
     @Override
     public String toString() {
+        if (name == null) {
+            try (MemoryStack stack = MemoryStack.stackPush()) {
+                queryProperties(stack);
+            }
+        }
         String result = MyString.quote(name);
+
         return result;
     }
     // *************************************************************************
