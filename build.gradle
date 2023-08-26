@@ -1,18 +1,13 @@
 // Gradle build script for the V-Sport project
 
 plugins {
-    id 'java'
+    id 'base' // to add a "clean" task to the root project
 }
 
 ext {
     // current versions of libraries:
     lbjVersion = '18.5.2'
     lwjglVersion = '3.3.2'
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
 }
 
 subprojects {
