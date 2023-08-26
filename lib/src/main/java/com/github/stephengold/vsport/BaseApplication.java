@@ -372,6 +372,8 @@ abstract public class BaseApplication {
      */
     public void start(
             String appName, int appMajor, int appMinor, int appPatch) {
+        Internals.start();
+
         // Generate the initial text for the window's title bar:
         initialWindowTitle = String.format("%s   %s", engineName, appName);
         if (appMajor > 0 && appMinor > 0 && appPatch > 0) {
@@ -452,6 +454,16 @@ abstract public class BaseApplication {
      */
     protected void render() {
         // do nothing
+    }
+
+    /**
+     * Alter whether the debugging aids are enabled. Not allowed after
+     * {@code start()} is invoked.
+     *
+     * @param newSetting true to enable, false to disable
+     */
+    protected static void setDebuggingEnabled(boolean newSetting) {
+        Internals.setDebuggingEnabled(newSetting);
     }
 
     /**

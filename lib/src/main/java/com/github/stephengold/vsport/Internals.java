@@ -95,11 +95,6 @@ final class Internals {
     // constants
 
     /**
-     * true to enable debugging output and optional runtime checks, or false to
-     * disable them
-     */
-    final private static boolean enableDebugging = false;
-    /**
      * maximum number of frames in flight
      */
     final private static int maxFramesInFlight = 2;
@@ -115,10 +110,19 @@ final class Internals {
     // fields
 
     /**
+     * true to enable debugging output and optional runtime checks, or false to
+     * disable them
+     */
+    private static boolean enableDebugging = false;
+    /**
      * true &rarr; accept one presentation request per vertical blanking period,
      * false &rarr; accept unlimited presentation requests
      */
     private static boolean enableVsync = true;
+    /**
+     * true after {@code start()} has been invoked
+     */
+    private static boolean hasStarted = false;
     /**
      * true if the framebuffers need to be resized
      */
@@ -559,6 +563,21 @@ final class Internals {
     }
 
     /**
+     * Alter whether the debugging aids are enabled. Not allowed after
+     * {@code start()} is invoked.
+     *
+     * @param newSetting true to enable, false to disable
+     */
+    static void setDebuggingEnabled(boolean newSetting) {
+        if (hasStarted) {
+            throw new IllegalStateException(
+                    "Can't alter debug settings after start().");
+        } else {
+            enableDebugging = newSetting;
+        }
+    }
+
+    /**
      * Indicate that the framebuffers need to be resized, along with all the
      * other swap-chain resources.
      */
@@ -576,6 +595,14 @@ final class Internals {
     static void setVsyncEnabled(boolean newSetting) {
         enableVsync = newSetting;
         recreateChainResources();
+    }
+
+    /**
+     * Finalize whether debugging is enabled.
+     */
+    static void start() {
+        assert !hasStarted;
+        hasStarted = true;
     }
     // *************************************************************************
     // private methods
