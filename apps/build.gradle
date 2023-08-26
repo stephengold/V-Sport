@@ -23,9 +23,121 @@ tasks.register('AppChooser', JavaExec) {
     mainClass = 'com.github.stephengold.vsport.test.AppChooser'
     description 'Runs the AppChooser app.'
 }
+tasks.register('ConveyorDemo', JavaExec) {
+    description 'Runs the ConveyorDemo app.'
+    mainClass = 'com.github.stephengold.vsport.demo.ConveyorDemo'
+}
+tasks.register('Pachinko', JavaExec) {
+    description 'Runs the Pachinko demo app.'
+    mainClass = 'com.github.stephengold.vsport.demo.Pachinko'
+}
+tasks.register('SplitDemo', JavaExec) {
+    description 'Runs the SplitDemo app.'
+    mainClass = 'com.github.stephengold.vsport.demo.SplitDemo'
+}
+tasks.register('TestGearJoint', JavaExec) {
+    description 'Runs the TestGearJoint app.'
+    mainClass = 'com.github.stephengold.vsport.demo.TestGearJoint'
+}
+tasks.register('Windlass', JavaExec) {
+    description 'Runs the Windlass demo app.'
+    mainClass = 'com.github.stephengold.vsport.demo.Windlass'
+}
+tasks.register('HelloCcd', JavaExec) {
+    description 'Runs the HelloCcd tutorial app.'
+    mainClass = 'com.github.stephengold.vsport.tutorial.HelloCcd'
+}
+tasks.register('HelloCharacter', JavaExec) {
+    description 'Runs the HelloCharacter tutorial app.'
+    mainClass = 'com.github.stephengold.vsport.tutorial.HelloCharacter'
+}
+tasks.register('HelloContactResponse', JavaExec) {
+    description 'Runs the HelloContactResponse tutorial app.'
+    mainClass = 'com.github.stephengold.vsport.tutorial.HelloContactResponse'
+}
+tasks.register('HelloDamping', JavaExec) {
+    description 'Runs the HelloDamping tutorial app.'
+    mainClass = 'com.github.stephengold.vsport.tutorial.HelloDamping'
+}
+tasks.register('HelloDeactivation', JavaExec) {
+    description 'Runs the HelloDeactivation tutorial app.'
+    mainClass = 'com.github.stephengold.vsport.tutorial.HelloDeactivation'
+}
+tasks.register('HelloDoubleEnded', JavaExec) {
+    description 'Runs the HelloDoubleEnded tutorial app.'
+    mainClass = 'com.github.stephengold.vsport.tutorial.HelloDoubleEnded'
+}
+tasks.register('HelloGhost', JavaExec) {
+    description 'Runs the HelloGhost tutorial app.'
+    mainClass = 'com.github.stephengold.vsport.tutorial.HelloGhost'
+}
+tasks.register('HelloJoint', JavaExec) {
+    description 'Runs the HelloJoint tutorial app.'
+    mainClass = 'com.github.stephengold.vsport.tutorial.HelloJoint'
+}
+tasks.register('HelloKinematics', JavaExec) {
+    description 'Runs the HelloKinematics tutorial app.'
+    mainClass = 'com.github.stephengold.vsport.tutorial.HelloKinematics'
+}
+tasks.register('HelloLimit', JavaExec) {
+    description 'Runs the HelloLimit tutorial app.'
+    mainClass = 'com.github.stephengold.vsport.tutorial.HelloLimit'
+}
+tasks.register('HelloMadMallet', JavaExec) {
+    description 'Runs the HelloMadMallet tutorial app.'
+    mainClass = 'com.github.stephengold.vsport.tutorial.HelloMadMallet'
+}
+tasks.register('HelloMassDistribution', JavaExec) {
+    description 'Runs the HelloMassDistribution tutorial app.'
+    mainClass = 'com.github.stephengold.vsport.tutorial.HelloMassDistribution'
+}
+tasks.register('HelloMinkowski', JavaExec) {
+    description 'Runs the HelloMinkowski tutorial app.'
+    mainClass = 'com.github.stephengold.vsport.tutorial.HelloMinkowski'
+}
+tasks.register('HelloMotor', JavaExec) {
+    description 'Runs the HelloMotor tutorial app.'
+    mainClass = 'com.github.stephengold.vsport.tutorial.HelloMotor'
+}
+tasks.register('HelloNonUniformGravity', JavaExec) {
+    description 'Runs the HelloNonUniformGravity tutorial app.'
+    mainClass = 'com.github.stephengold.vsport.tutorial.HelloNonUniformGravity'
+}
+tasks.register('HelloRigidBody', JavaExec) {
+    description 'Runs the HelloRigidBody tutorial app.'
+    mainClass = 'com.github.stephengold.vsport.tutorial.HelloRigidBody'
+}
+tasks.register('HelloServo', JavaExec) {
+    description 'Runs the HelloServo tutorial app.'
+    mainClass = 'com.github.stephengold.vsport.tutorial.HelloServo'
+}
+tasks.register('HelloSport', JavaExec) {
+    description 'Runs the HelloSport tutorial app.'
+    mainClass = 'com.github.stephengold.vsport.tutorial.HelloSport'
+}
+tasks.register('HelloSpring', JavaExec) {
+    description 'Runs the HelloSpring tutorial app.'
+    mainClass = 'com.github.stephengold.vsport.tutorial.HelloSpring'
+}
+tasks.register('HelloStaticBody', JavaExec) {
+    description 'Runs the HelloStaticBody tutorial app.'
+    mainClass = 'com.github.stephengold.vsport.tutorial.HelloStaticBody'
+}
+tasks.register('HelloVehicle', JavaExec) {
+    description 'Runs the HelloVehicle tutorial app.'
+    mainClass = 'com.github.stephengold.vsport.tutorial.HelloVehicle'
+}
+tasks.register('HelloWalk', JavaExec) {
+    description 'Runs the HelloWalk tutorial app.'
+    mainClass = 'com.github.stephengold.vsport.tutorial.HelloWalk'
+}
 tasks.register('AssimpTest', JavaExec) {
     mainClass = 'com.github.stephengold.vsport.test.AssimpTest'
-    description 'Runs the Assimp test app.'
+}
+tasks.register('CheckerboardTest', JavaExec) {
+    description 'Runs the checkerboard test app.'
+    enableAssertions true
+    mainClass = 'com.github.stephengold.vsport.test.CheckerboardTest'
 }
 tasks.register('HelloVSport', JavaExec) {
     mainClass = 'com.github.stephengold.vsport.test.HelloVSport'
@@ -35,9 +147,23 @@ tasks.register('NewtonsCradle', JavaExec) {
     mainClass = 'com.github.stephengold.vsport.demo.NewtonsCradle'
     description 'Runs the NewtonsCradle demo app.'
 }
+tasks.register('MouseTest2', JavaExec) {
+    description 'Runs the 2nd mouse test app.'
+    enableAssertions true
+    mainClass = 'com.github.stephengold.vsport.test.MouseTest2'
+}
 tasks.register('OctasphereTest', JavaExec) {
     mainClass = 'com.github.stephengold.vsport.test.OctasphereTest'
-    description 'Runs the octasphere test app.'
+}
+tasks.register('SpriteTest', JavaExec) {
+    description 'Runs the sprite test app.'
+    enableAssertions true
+    mainClass = 'com.github.stephengold.vsport.test.SpriteTest'
+}
+tasks.register('TextureTest', JavaExec) {
+    description 'Runs the texture test app.'
+    enableAssertions true
+    mainClass = 'com.github.stephengold.vsport.test.TextureTest'
 }
 
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
