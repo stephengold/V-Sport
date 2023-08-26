@@ -65,7 +65,7 @@ import org.lwjgl.vulkan.VkSemaphoreCreateInfo;
  *
  * Derived from Cristian Herrera's Vulkan-Tutorial-Java project.
  */
-public class LogicalDevice {
+class LogicalDevice {
     // *************************************************************************
     // fields
 
