@@ -137,6 +137,15 @@ final class Internals {
      */
     private static ChainResources chainResources;
     /**
+     * names of validation layers to enable during initialization
+     */
+    final private static Collection<String> desiredLayers = new HashSet<>();
+    /**
+     * names of all device extensions that the application requires
+     */
+    final private static Collection<String> requiredDeviceExtensions
+            = new HashSet<>();
+    /**
      * synchronization for frames in flight
      */
     private static Frame[] inFlightFrames;
@@ -189,15 +198,6 @@ final class Internals {
      * physical device to display the window
      */
     private static PhysicalDevice physicalDevice;
-    /**
-     * names of all device extensions that the application requires
-     */
-    final private static Collection<String> requiredDeviceExtensions
-            = new HashSet<>();
-    /**
-     * names of validation layers to enable during initialization
-     */
-    final private static Collection<String> desiredLayers = new HashSet<>();
     /**
      * current background color
      */
