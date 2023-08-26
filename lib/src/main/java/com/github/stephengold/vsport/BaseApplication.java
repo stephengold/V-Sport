@@ -468,7 +468,7 @@ abstract public class BaseApplication {
         } else {
             ++frameCount;
             long nanoseconds = currentNanoTime - previousFpsUpdateNanoTime;
-            double milliseconds = 1e-6 * (double) nanoseconds;
+            double milliseconds = 1e-6 * nanoseconds;
             if (milliseconds > 200.) {
                 // Every 200 ms, update the FPS (frames per second) statistics:
                 int fps = (int) Math.round(1000. * frameCount / milliseconds);
