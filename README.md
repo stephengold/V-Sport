@@ -110,6 +110,7 @@ Future enhancements might include:
 
 + handle more than 1600 geometries
 + dynamic meshes (for visualizing soft bodies)
++ pre-compiled shaders
 + graphics and physics on separate threads
 + graphical user interface
 + automated tests
