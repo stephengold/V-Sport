@@ -271,8 +271,6 @@ dependencies {
         runtimeOnly "org.lwjgl:lwjgl-glfw:${lwjglVersion}:natives-windows-x86"
         runtimeOnly "org.lwjgl:lwjgl-shaderc:${lwjglVersion}:natives-windows-x86"
     }
-
-    implementation project(':lib')
 }
 
 // tasks to download/clean the native physics library for each platform:
