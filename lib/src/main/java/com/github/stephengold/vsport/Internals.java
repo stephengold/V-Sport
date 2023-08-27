@@ -575,7 +575,7 @@ final class Internals {
      * Alter whether the debugging aids are enabled. Not allowed after
      * {@code start()} is invoked.
      *
-     * @param newSetting true to enable, false to disable
+     * @param newSetting true to enable, false to disable (default=false)
      */
     static void setDebuggingEnabled(boolean newSetting) {
         if (hasStarted) {

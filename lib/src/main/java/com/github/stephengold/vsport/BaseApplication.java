@@ -469,7 +469,7 @@ abstract public class BaseApplication {
      * Alter whether the debugging aids are enabled. Not allowed after
      * {@code start()} is invoked.
      *
-     * @param newSetting true to enable, false to disable
+     * @param newSetting true to enable, false to disable (default=false)
      */
     protected static void setDebuggingEnabled(boolean newSetting) {
         Internals.setDebuggingEnabled(newSetting);
