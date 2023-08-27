@@ -84,7 +84,7 @@ final class AppChooser extends JFrame {
      */
     public static void main(String[] arguments) {
         Logger.getLogger("").setLevel(Level.WARNING);
-        List<BaseApplication> apps = new ArrayList<>(36);
+        List<BaseApplication> apps = new ArrayList<>(37);
 
         apps.add(new AssimpTest());
         apps.add(new CheckerboardTest());
@@ -128,6 +128,7 @@ final class AppChooser extends JFrame {
         apps.add(new TestGearJoint());
         apps.add(new TextureTest());
 
+        apps.add(new ThousandCubes());
         apps.add(new Windlass());
 
         new AppChooser(apps);

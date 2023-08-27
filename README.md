@@ -68,12 +68,13 @@ To execute "HelloSport":
 
 ### Demos
 
-Six demo applications are included:
+Seven demo applications are included:
 + ConveyorDemo
 + NewtonsCradle
 + Pachinko
 + SplitDemo
 + TestGearJoint
++ ThousandCubes
 + Windlass
 
 Documentation for the demo apps is at
@@ -130,6 +131,7 @@ by Cristian Herrera, which was in turn ported from
 I am deeply grateful for all the work that went into these invaluable tutorials.
 
 The ConveyorDemo app derives from sourcecode contributed by "qwq".
+The ThousandCubes app derives from sourcecode contributed by Yanis Boudiaf.
 
 This project has made use of the following libraries and software tools:
 
