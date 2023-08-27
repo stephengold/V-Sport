@@ -130,6 +130,15 @@ abstract public class BaseApplication {
      */
     private static String initialWindowTitle;
     // *************************************************************************
+    // constructors
+
+    /**
+     * A no-arg constructor to avoid javadoc warnings from JDK 18.
+     */
+    protected BaseApplication() {
+        // do nothing
+    }
+    // *************************************************************************
     // new methods exposed
 
     /**

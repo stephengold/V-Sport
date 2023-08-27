@@ -43,6 +43,15 @@ abstract public class InputProcessor {
      */
     private InputProcessor nextProcessor;
     // *************************************************************************
+    // constructors
+
+    /**
+     * A no-arg constructor to avoid javadoc warnings from JDK 18.
+     */
+    protected InputProcessor() {
+        // do nothing
+    }
+    // *************************************************************************
     // new methods exposed
 
     /**
