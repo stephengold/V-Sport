@@ -25,15 +25,3 @@ tasks.withType(JavaCompile) { // Java compile-time options:
         options.release = 8
     }
 }
-
-dependencies {
-    implementation 'com.github.stephengold:Libbulletjme:' + lbjVersion
-    implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
-
-    implementation 'org.joml:joml:1.10.5'
-    implementation 'org.lwjgl:lwjgl'
-    implementation 'org.lwjgl:lwjgl-assimp'
-    implementation 'org.lwjgl:lwjgl-glfw'
-    implementation 'org.lwjgl:lwjgl-shaderc' // to compile GLSL into SPIR-V 
-    implementation 'org.lwjgl:lwjgl-vulkan'
-}
