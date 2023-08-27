@@ -112,6 +112,7 @@ Future enhancements might include:
 + dynamic meshes (for visualizing soft bodies)
 + graphics and physics on separate threads
 + graphical user interface
++ automated tests
 + shadow rendering
 + physically-based rendering
 + more performance statistics
