@@ -1,7 +1,8 @@
 <img height="150" src="https://i.imgur.com/YEPFEcx.png" alt="Libbulletjme Project logo">
 
 [The V-Sport Project][project] implements
-a simple [Vulkan]-based graphics engine for physics applications.
+a [Vulkan]-based graphics engine
+for the [Libbulletjme 3-D physics library][libbulletjme].
 
 It contains 2 sub-projects:
 
@@ -173,6 +174,7 @@ correct the situation: sgold@sonic.net
 [imgur]: https://imgur.com/ "Imgur"
 [java]: https://en.wikipedia.org/wiki/Java_(programming_language) "Java programming language"
 [joml]: https://joml-ci.github.io/JOML "Java OpenGL Math Library"
+[libbulletjme]: https://stephengold.github.io/Libbulletjme/lbj-en/English/overview.html "Libbulletjme Project"
 [license]: https://github.com/stephengold/V-Sport/blob/master/LICENSE "V-Sport license"
 [lwjgl]: https://www.lwjgl.org "Lightweight Java Game Library"
 [markdown]: https://daringfireball.net/projects/markdown "Markdown Project"
