@@ -84,7 +84,7 @@ https://stephengold.github.io/Libbulletjme/lbj-en/English/demos.html
 ### Chooser
 
 A Swing-based chooser application is included.
-However, it includes only the graphical apps and doesn't work yet on macOS.
+However, it doesn't work yet on macOS.
 
 To run the chooser:
 + using Bash or PowerShell or Zsh: `./gradlew AppChooser`
