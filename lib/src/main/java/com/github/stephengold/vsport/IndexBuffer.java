@@ -228,6 +228,15 @@ final public class IndexBuffer extends jme3utilities.lbj.IndexBuffer {
     public IndexBuffer setDynamic() {
         throw new UnsupportedOperationException("Not implemented yet."); // TODO
     }
+
+    /**
+     * Indicate that the buffer data has changed.
+     *
+     * @return the (modified) current instance (for chaining)
+     */
+    public IndexBuffer setModified() {
+        throw new UnsupportedOperationException("Not implemented yet."); // TODO
+    }
     // *************************************************************************
     // jme3utilities.lbj.IndexBuffer methods
 
