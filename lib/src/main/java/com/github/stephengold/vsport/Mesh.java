@@ -163,6 +163,22 @@ public class Mesh implements jme3utilities.lbj.Mesh {
      * Instantiate a mutable mesh with the specified topology and vertex
      * positions, but no indices, colors, normals, or texture coordinates.
      *
+     * @param topology the desired topology (not null)
+     * @param positionsArray vertex positions (not null, not empty, length a
+     * multiple of 3, unaffected)
+     */
+    public Mesh(Topology topology, float... positionsArray) {
+        this(topology, positionsArray.length / numAxes);
+        Validate.require(
+                positionsArray.length % numAxes == 0, "length a multiple of 3");
+
+        this.positionBuffer = VertexBuffer.newInstance(numAxes, positionsArray);
+    }
+
+    /**
+     * Instantiate a mutable mesh with the specified topology and vertex
+     * positions, but no indices, colors, normals, or texture coordinates.
+     *
      * @param topology the desired primitive topology (not null)
      * @param positionsBuffer the desired vertex positions (not null)
      */
