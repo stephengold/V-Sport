@@ -221,29 +221,6 @@ final public class IndexBuffer extends jme3utilities.lbj.IndexBuffer {
     }
 
     /**
-     * Alter the buffer's read/write position. The data in the buffer is
-     * unaffected.
-     *
-     * @param newPosition the desired position (&ge;0, &le;limit)
-     * @return the (modified) current instance (for chaining)
-     */
-    public IndexBuffer position(int newPosition) {
-        getBuffer().position(newPosition);
-        return this;
-    }
-
-    /**
-     * Rewind the buffer. The read/write position is zeroed. The data in the
-     * buffer is unaffected.
-     *
-     * @return the (modified) current instance (for chaining)
-     */
-    public IndexBuffer rewind() {
-        getBuffer().rewind();
-        return this;
-    }
-
-    /**
      * Alter the usage hint.
      *
      * @return the (modified) current instance (for chaining)
