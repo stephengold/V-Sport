@@ -135,7 +135,7 @@ final class AppChooser extends JFrame {
     }
 
     private AppChooser(List<? extends BaseApplication> apps) {
-        setTitle("LbjExamples AppChooser");
+        setTitle("V-Sport AppChooser");
         setSize(500, 100);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
