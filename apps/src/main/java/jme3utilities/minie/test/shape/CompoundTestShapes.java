@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2019-2022, Stephen Gold
+ Copyright (c) 2019-2023, Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -46,7 +46,7 @@ import jme3utilities.Validate;
 import jme3utilities.math.MyMath;
 
 /**
- * Utility class to generate compound collision shapes for use in LbjExamples.
+ * Utility class to generate compound collision shapes for use in V-Sport.
  *
  * @author Stephen Gold sgold@sonic.net
  */
