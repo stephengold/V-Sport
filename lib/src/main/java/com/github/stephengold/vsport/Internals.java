@@ -677,7 +677,7 @@ final class Internals {
     private static void configureShaderStages(
             VkPipelineShaderStageCreateInfo.Buffer createInfo,
             Geometry geometry, MemoryStack stack) {
-        ByteBuffer entryPoint = stack.UTF8("main");
+        ByteBuffer entryPoint = stack.UTF8Safe("main");
 
         // [0] vertex shader:
         VkPipelineShaderStageCreateInfo vertCreateInfo = createInfo.get(0);

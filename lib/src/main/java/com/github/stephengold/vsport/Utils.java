@@ -111,7 +111,7 @@ final public class Utils {
             result.put(pointer);
         }
 
-        ByteBuffer utf8Name = stack.UTF8(string);
+        ByteBuffer utf8Name = stack.UTF8Safe(string);
         result.put(utf8Name);
         result.flip();
 
