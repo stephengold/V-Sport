@@ -29,6 +29,7 @@
  */
 package com.github.stephengold.vsport.importers;
 
+import com.github.stephengold.vsport.BaseApplication;
 import com.github.stephengold.vsport.Mesh;
 import com.github.stephengold.vsport.Utils;
 import com.github.stephengold.vsport.Vertex;
@@ -42,6 +43,7 @@ import org.joml.Vector3fc;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.AIColor4D;
 import org.lwjgl.assimp.AIFace;
+import org.lwjgl.assimp.AILogStream;
 import org.lwjgl.assimp.AIMesh;
 import org.lwjgl.assimp.AINode;
 import org.lwjgl.assimp.AIScene;
@@ -84,9 +86,19 @@ final public class AssimpUtils {
             Collection<Vertex> addVertices) {
         ByteBuffer pLoadedBytes = Utils.loadResourceAsBytes(resourceName);
 
+        if (BaseApplication.isDebuggingEnabled()) {
+            AILogStream logStream = AILogStream.create();
+            String filename = null;
+            logStream = Assimp.aiGetPredefinedLogStream(
+                    Assimp.aiDefaultLogStream_STDOUT, filename, logStream);
+            Assimp.aiAttachLogStream(logStream);
+            Assimp.aiEnableVerboseLogging(true);
+        }
+
         CharSequence hints = null;
         AIScene aiScene
                 = Assimp.aiImportFileFromMemory(pLoadedBytes, flags, hints);
+        Assimp.aiDetachAllLogStreams();
         if (aiScene == null || aiScene.mRootNode() == null) {
             String errorString = Assimp.aiGetErrorString();
             throw new RuntimeException(
