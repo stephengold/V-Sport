@@ -95,7 +95,7 @@ final public class AssimpUtils {
             Assimp.aiEnableVerboseLogging(true);
         }
 
-        CharSequence hints = null;
+        CharSequence hints;
         int dotIndex = resourceName.lastIndexOf(".");
         if (dotIndex == -1) {
             hints = null;
