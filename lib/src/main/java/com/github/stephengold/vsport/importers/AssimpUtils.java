@@ -96,6 +96,12 @@ final public class AssimpUtils {
         }
 
         CharSequence hints = null;
+        int dotIndex = resourceName.lastIndexOf(".");
+        if (dotIndex == -1) {
+            hints = null;
+        } else {
+            hints = resourceName.substring(dotIndex + 1);
+        }
         AIScene aiScene
                 = Assimp.aiImportFileFromMemory(pLoadedBytes, flags, hints);
         Assimp.aiDetachAllLogStreams();
