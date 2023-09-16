@@ -319,28 +319,27 @@ abstract public class BaseApplication {
     }
 
     /**
-     * Alter the color of lights.
+     * Alter the color and intensity of lights.
      *
-     * @param color the desired color (not null, unaffected, default=(1,1,1,1))
+     * @param red the red component of the desired color (default=1)
+     * @param green the green component of the desired color (default=1)
+     * @param blue the blue component of the desired color (default=1)
      */
-    public static void setLightColor(Vector4fc color) {
-        Vector3f newColor = new Vector3f(color.x(), color.y(), color.z());
+    public static void setLightColor(float red, float green, float blue) {
         GlobalUniformValues guv = Internals.getGlobalUniformValues();
-        guv.setLightColor(newColor);
+        guv.setLightColor(red, green, blue);
     }
 
     /**
-     * Alter the direction to the directional light.
+     * Alter the direction to the distant light.
      *
-     * @param direction the desired direction (in worldspace, not null, not
-     * zero)
+     * @param x the X component of the desired direction (in world coordinates)
+     * @param y the Y component of the desired direction (in world coordinates)
+     * @param z the Z component of the desired direction (in world coordinates)
      */
-    public static void setLightDirection(com.jme3.math.Vector3f direction) {
-        Validate.nonZero(direction, "direction");
-
-        Vector3f dir = Utils.toJomlVector(direction);
+    public static void setLightDirection(float x, float y, float z) {
         GlobalUniformValues guv = Internals.getGlobalUniformValues();
-        guv.setLightDirection(dir);
+        guv.setLightDirection(x, y, z);
     }
 
     /**

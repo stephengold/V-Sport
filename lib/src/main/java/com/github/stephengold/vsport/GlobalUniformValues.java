@@ -32,7 +32,6 @@ package com.github.stephengold.vsport;
 import java.nio.ByteBuffer;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-import org.joml.Vector3fc;
 
 /**
  * Shader parameters to be written to a global Uniform Buffer Objects (UBOs).
@@ -112,20 +111,23 @@ class GlobalUniformValues {
     /**
      * Alter the color of lights.
      *
-     * @param newColor the desired color (not null, unaffected, default=(1,1,1))
+     * @param red the red component of the desired color (default=1)
+     * @param green the green component of the desired color (default=1)
+     * @param blue the blue component of the desired color (default=1)
      */
-    void setLightColor(Vector3fc newColor) {
-        lightColor.set(newColor);
+    void setLightColor(float red, float green, float blue) {
+        lightColor.set(red, green, blue);
     }
 
     /**
      * Alter the direction to the directional light.
      *
-     * @param newDirection the desired direction (in worldspace, not null, not
-     * zero)
+     * @param x the X component of the desired direction (in worldspace)
+     * @param y the Y component of the desired direction (in worldspace)
+     * @param z the Z component of the desired direction (in worldspace)
      */
-    void setLightDirection(Vector3fc newDirection) {
-        lightDirectionWorldspace.set(newDirection).normalize();
+    void setLightDirection(float x, float y, float z) {
+        lightDirectionWorldspace.set(x, y, z).normalize();
     }
 
     /**

@@ -256,11 +256,8 @@ public class HelloWalk
      * Configure lighting and the background color.
      */
     private void configureLighting() {
-        Vector4fc directColor = new Vector4f(0.3f, 0.3f, 0.3f, 1f);
-        setLightColor(directColor);
-
-        Vector3f direction = new Vector3f(7f, 3f, 5f);
-        setLightDirection(direction);
+        setLightColor(0.3f, 0.3f, 0.3f);
+        setLightDirection(7f, 3f, 5f);
 
         // Set the background color to light blue.
         setBackgroundColor(Constants.SKY_BLUE);
