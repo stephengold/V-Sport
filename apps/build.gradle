@@ -64,7 +64,7 @@ tasks.register('TestGearJoint', JavaExec) {
 }
 tasks.register('ThousandCubes', JavaExec) {
     description 'Runs the ThousandCubes demo app.'
-    mainClass = 'com.github.stephengold.lbjexamples.ThousandCubes'
+    mainClass = 'com.github.stephengold.vsport.demo.ThousandCubes'
 }
 tasks.register('Windlass', JavaExec) {
     description 'Runs the Windlass demo app.'
