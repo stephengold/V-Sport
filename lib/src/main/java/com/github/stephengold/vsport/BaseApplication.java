@@ -40,7 +40,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
-import jme3utilities.Validate;
 import org.joml.Vector3f;
 import org.joml.Vector4fc;
 import org.lwjgl.glfw.Callbacks;
