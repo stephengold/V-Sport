@@ -295,8 +295,7 @@ public class HelloGhost
      * Configure lighting and the background color.
      */
     private void configureLighting() {
-        Vector3f direction = new Vector3f(7f, 3f, 5f);
-        setLightDirection(direction);
+        setLightDirection(7f, 3f, 5f);
 
         // Set the background color to light blue.
         setBackgroundColor(Constants.SKY_BLUE);
