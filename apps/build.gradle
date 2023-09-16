@@ -29,11 +29,6 @@ ext {
     //libbulletjmeUrl = "file:///home/sgold/NetBeansProjects/Libbulletjme/dist/"
 }
 
-dependencies {
-    //implementation 'com.github.stephengold:V-Sport:' + vsportVersion // for published library
-    implementation project(':lib') // for latest sourcecode
-}
-
 // tasks to run specific apps:
 
 tasks.register('AppChooser', JavaExec) {
@@ -275,6 +270,9 @@ dependencies {
         runtimeOnly "org.lwjgl:lwjgl-glfw:${lwjglVersion}:natives-windows-x86"
         runtimeOnly "org.lwjgl:lwjgl-shaderc:${lwjglVersion}:natives-windows-x86"
     }
+
+    //implementation 'com.github.stephengold:V-Sport:' + vsportVersion // for published library
+    implementation project(':lib') // for latest sourcecode
 }
 
 // tasks to download/clean the native physics library for each platform:

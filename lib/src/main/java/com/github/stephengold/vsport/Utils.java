@@ -111,7 +111,7 @@ final public class Utils {
             result.put(pointer);
         }
 
-        ByteBuffer utf8Name = stack.UTF8(string);
+        ByteBuffer utf8Name = stack.UTF8Safe(string);
         result.put(utf8Name);
         result.flip();
 
@@ -262,15 +262,17 @@ final public class Utils {
         try {
             while (true) {
                 int numBytesRead = inputStream.read(tmpArray);
-                if (numBytesRead == tmpArray.length) {
+                if (numBytesRead < 0) {
+                    break;
+
+                } else if (numBytesRead == tmpArray.length) {
                     result.put(tmpArray);
+
                 } else {
-                    assert numBytesRead >= 0 : numBytesRead;
                     for (int i = 0; i < numBytesRead; ++i) {
                         byte b = tmpArray[i];
                         result.put(b);
                     }
-                    break;
                 }
             }
             inputStream.close();

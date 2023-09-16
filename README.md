@@ -166,7 +166,7 @@ correct the situation: sgold@sonic.net
 
 
 [adoptium]: https://adoptium.net/releases.html "Adoptium Project"
-[assimp]: https://www.assimp.org/ "The Asset Importer Library"
+[assimp]: https://www.assimp.org/ "The Open Asset Importer Library"
 [firefox]: https://www.mozilla.org/en-US/firefox "Firefox"
 [git]: https://git-scm.com "Git"
 [github]: https://github.com "GitHub"

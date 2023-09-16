@@ -552,7 +552,7 @@ class PhysicalDevice {
         int numLayers = requiredExtensions.length;
         PointerBuffer result = stack.mallocPointer(numLayers);
         for (String extensionName : requiredExtensions) {
-            ByteBuffer utf8Name = stack.UTF8(extensionName);
+            ByteBuffer utf8Name = stack.UTF8Safe(extensionName);
             result.put(utf8Name);
         }
         result.rewind();
