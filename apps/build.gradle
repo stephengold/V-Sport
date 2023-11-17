@@ -5,7 +5,7 @@
 //   of the root project.
 
 plugins {
-    id 'application' // to build a Java application
+    id 'application' // to build Java applications
 }
 
 application {
@@ -29,7 +29,7 @@ ext {
     //libbulletjmeUrl = "file:///home/sgold/NetBeansProjects/Libbulletjme/dist/"
 }
 
-// tasks to run specific apps:
+// Register tasks to run specific applications:
 
 tasks.register('AppChooser', JavaExec) {
     description 'Runs the AppChooser app.'
