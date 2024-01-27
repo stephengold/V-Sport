@@ -79,6 +79,10 @@ tasks.register('HelloContactResponse', JavaExec) {
     description 'Runs the HelloContactResponse tutorial app.'
     mainClass = 'com.github.stephengold.vsport.tutorial.HelloContactResponse'
 }
+tasks.register('HelloCustomShape', JavaExec) {
+    description 'Runs the HelloCustomShape tutorial app.'
+    mainClass = 'com.github.stephengold.vsport.tutorial.HelloCustomShape'
+}
 tasks.register('HelloDamping', JavaExec) {
     description 'Runs the HelloDamping tutorial app.'
     mainClass = 'com.github.stephengold.vsport.tutorial.HelloDamping'
@@ -86,6 +90,10 @@ tasks.register('HelloDamping', JavaExec) {
 tasks.register('HelloDeactivation', JavaExec) {
     description 'Runs the HelloDeactivation tutorial app.'
     mainClass = 'com.github.stephengold.vsport.tutorial.HelloDeactivation'
+}
+tasks.register('HelloDoor', JavaExec) {
+    description 'Runs the HelloDoor tutorial app.'
+    mainClass = 'com.github.stephengold.vsport.tutorial.HelloDoor'
 }
 tasks.register('HelloDoubleEnded', JavaExec) {
     description 'Runs the HelloDoubleEnded tutorial app.'
@@ -122,6 +130,10 @@ tasks.register('HelloMinkowski', JavaExec) {
 tasks.register('HelloMotor', JavaExec) {
     description 'Runs the HelloMotor tutorial app.'
     mainClass = 'com.github.stephengold.vsport.tutorial.HelloMotor'
+}
+tasks.register('HelloNewHinge', JavaExec) {
+    description 'Runs the HelloNewHinge tutorial app.'
+    mainClass = 'com.github.stephengold.vsport.tutorial.HelloNewHinge'
 }
 tasks.register('HelloNonUniformGravity', JavaExec) {
     description 'Runs the HelloNonUniformGravity tutorial app.'
