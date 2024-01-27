@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2022-2023, Stephen Gold
+ Copyright (c) 2022-2024 Stephen Gold
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -41,6 +41,7 @@ import com.github.stephengold.vsport.test.TextureTest;
 import com.github.stephengold.vsport.tutorial.HelloCcd;
 import com.github.stephengold.vsport.tutorial.HelloCharacter;
 import com.github.stephengold.vsport.tutorial.HelloContactResponse;
+import com.github.stephengold.vsport.tutorial.HelloCustomShape;
 import com.github.stephengold.vsport.tutorial.HelloDamping;
 import com.github.stephengold.vsport.tutorial.HelloDeactivation;
 import com.github.stephengold.vsport.tutorial.HelloDoubleEnded;
@@ -83,7 +84,7 @@ final class AppChooser extends JFrame {
      */
     public static void main(String[] arguments) {
         Logger.getLogger("").setLevel(Level.WARNING);
-        List<BaseApplication> apps = new ArrayList<>(37);
+        List<BaseApplication> apps = new ArrayList<>(38);
 
         apps.add(new AssimpTest());
         apps.add(new CheckerboardTest());
@@ -92,41 +93,42 @@ final class AppChooser extends JFrame {
         apps.add(new HelloCharacter());
 
         apps.add(new HelloContactResponse());
+        apps.add(new HelloCustomShape());
         apps.add(new HelloDamping());
         apps.add(new HelloDeactivation());
         apps.add(new HelloDoubleEnded());
-        apps.add(new HelloGhost());
 
+        apps.add(new HelloGhost());
         apps.add(new HelloJoint());
         apps.add(new HelloKinematics());
         apps.add(new HelloLimit());
         apps.add(new HelloMadMallet());
-        apps.add(new HelloMassDistribution());
 
+        apps.add(new HelloMassDistribution());
         apps.add(new HelloMinkowski());
         apps.add(new HelloMotor());
         apps.add(new HelloNonUniformGravity());
         apps.add(new HelloRigidBody());
-        apps.add(new HelloServo());
 
+        apps.add(new HelloServo());
         apps.add(new HelloSport());
         apps.add(new HelloSpring());
         apps.add(new HelloStaticBody());
         apps.add(new HelloVehicle());
-        apps.add(new HelloVSport());
 
+        apps.add(new HelloVSport());
         apps.add(new HelloWalk());
         apps.add(new MouseTest());
         apps.add(new MouseTest2());
         apps.add(new NewtonsCradle());
-        apps.add(new OctasphereTest());
 
+        apps.add(new OctasphereTest());
         apps.add(new Pachinko());
         apps.add(new SplitDemo());
         apps.add(new SpriteTest());
         apps.add(new TestGearJoint());
-        apps.add(new TextureTest());
 
+        apps.add(new TextureTest());
         apps.add(new ThousandCubes());
         apps.add(new Windlass());
 
