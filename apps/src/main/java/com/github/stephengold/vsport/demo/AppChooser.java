@@ -76,7 +76,6 @@ import javax.swing.WindowConstants;
  * Choose a V-Sport application to run.
  */
 final class AppChooser extends JFrame {
-
     /**
      * Main entry point for the AppChooser application.
      *
