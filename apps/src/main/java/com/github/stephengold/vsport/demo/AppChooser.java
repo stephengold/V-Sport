@@ -44,6 +44,7 @@ import com.github.stephengold.vsport.tutorial.HelloContactResponse;
 import com.github.stephengold.vsport.tutorial.HelloCustomShape;
 import com.github.stephengold.vsport.tutorial.HelloDamping;
 import com.github.stephengold.vsport.tutorial.HelloDeactivation;
+import com.github.stephengold.vsport.tutorial.HelloDoor;
 import com.github.stephengold.vsport.tutorial.HelloDoubleEnded;
 import com.github.stephengold.vsport.tutorial.HelloGhost;
 import com.github.stephengold.vsport.tutorial.HelloJoint;
@@ -53,6 +54,7 @@ import com.github.stephengold.vsport.tutorial.HelloMadMallet;
 import com.github.stephengold.vsport.tutorial.HelloMassDistribution;
 import com.github.stephengold.vsport.tutorial.HelloMinkowski;
 import com.github.stephengold.vsport.tutorial.HelloMotor;
+import com.github.stephengold.vsport.tutorial.HelloNewHinge;
 import com.github.stephengold.vsport.tutorial.HelloNonUniformGravity;
 import com.github.stephengold.vsport.tutorial.HelloRigidBody;
 import com.github.stephengold.vsport.tutorial.HelloServo;
@@ -84,7 +86,7 @@ final class AppChooser extends JFrame {
      */
     public static void main(String[] arguments) {
         Logger.getLogger("").setLevel(Level.WARNING);
-        List<BaseApplication> apps = new ArrayList<>(38);
+        List<BaseApplication> apps = new ArrayList<>(40);
 
         apps.add(new AssimpTest());
         apps.add(new CheckerboardTest());
@@ -96,38 +98,40 @@ final class AppChooser extends JFrame {
         apps.add(new HelloCustomShape());
         apps.add(new HelloDamping());
         apps.add(new HelloDeactivation());
-        apps.add(new HelloDoubleEnded());
+        apps.add(new HelloDoor());
 
+        apps.add(new HelloDoubleEnded());
         apps.add(new HelloGhost());
         apps.add(new HelloJoint());
         apps.add(new HelloKinematics());
         apps.add(new HelloLimit());
-        apps.add(new HelloMadMallet());
 
+        apps.add(new HelloMadMallet());
         apps.add(new HelloMassDistribution());
         apps.add(new HelloMinkowski());
         apps.add(new HelloMotor());
+        apps.add(new HelloNewHinge());
+
         apps.add(new HelloNonUniformGravity());
         apps.add(new HelloRigidBody());
-
         apps.add(new HelloServo());
         apps.add(new HelloSport());
         apps.add(new HelloSpring());
+
         apps.add(new HelloStaticBody());
         apps.add(new HelloVehicle());
-
         apps.add(new HelloVSport());
         apps.add(new HelloWalk());
         apps.add(new MouseTest());
+
         apps.add(new MouseTest2());
         apps.add(new NewtonsCradle());
-
         apps.add(new OctasphereTest());
         apps.add(new Pachinko());
         apps.add(new SplitDemo());
+
         apps.add(new SpriteTest());
         apps.add(new TestGearJoint());
-
         apps.add(new TextureTest());
         apps.add(new ThousandCubes());
         apps.add(new Windlass());
