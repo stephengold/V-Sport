@@ -88,13 +88,13 @@ A Swing-based chooser application is included.
 However, it doesn't work yet on macOS.
 
 To run the chooser:
-+ using Bash or PowerShell or Zsh: `./gradlew AppChooser`
++ using Bash or Fish or PowerShell or Zsh: `./gradlew AppChooser`
 + using Windows Command Prompt: `.\gradlew AppChooser`
 
 ### Cleanup
 
 You can restore the project to a pristine state:
-+ using Bash or PowerShell or Zsh: `./gradlew clean`
++ using Bash or Fish or PowerShell or Zsh: `./gradlew clean`
 + using Windows Command Prompt: `.\gradlew clean`
 
 Note:  these commands will delete any downloaded native libraries.
