@@ -32,7 +32,7 @@ In addition to Libbulletjme,
 it uses [LWJGL], [Assimp], [GLFW], [JOML], and [Vulkan].
 It has been tested on Windows, Linux, and macOS.
 
-[Jump to table of contents](#toc)
+[Jump to the table of contents](#toc)
 
 
 <a name="build"></a>
@@ -99,7 +99,7 @@ You can restore the project to a pristine state:
 
 Note:  these commands will delete any downloaded native libraries.
 
-[Jump to table of contents](#toc)
+[Jump to the table of contents](#toc)
 
 
 <a name="todo"></a>
@@ -122,7 +122,7 @@ Future enhancements might include:
 + skeletal animation
 + run on mobile platforms (Android and/or iOS)
 
-[Jump to table of contents](#toc)
+[Jump to the table of contents](#toc)
 
 
 <a name="acks"></a>
@@ -163,7 +163,7 @@ I'm also grateful to my dear Holly, for keeping me sane.
 If I've misattributed anything or left anyone out, please let me know, so I can
 correct the situation: sgold@sonic.net
 
-[Jump to table of contents](#toc)
+[Jump to the table of contents](#toc)
 
 
 [adoptium]: https://adoptium.net/releases.html "Adoptium Project"
