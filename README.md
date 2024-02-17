@@ -48,11 +48,11 @@ It has been tested on Windows, Linux, and macOS.
    or "/usr/lib/jvm/java-8-openjdk-amd64/" or
    "/Library/Java/JavaVirtualMachines/liberica-jdk-17-full.jdk/Contents/Home" .)
   + using Bash or Zsh: `export JAVA_HOME="` *path to installation* `"`
-  + using Fish: `set -g JAVA_HOME "` *path to installation* `"`
+  + using [Fish]: `set -g JAVA_HOME "` *path to installation* `"`
   + using Windows Command Prompt: `set JAVA_HOME="` *path to installation* `"`
   + using PowerShell: `$env:JAVA_HOME = '` *path to installation* `'`
 3. Download and extract the V-Sport source code from GitHub:
-  + using Git:
+  + using [Git]:
     + `git clone https://github.com/stephengold/V-Sport.git`
     + `cd V-Sport`
 4. Run the [Gradle] wrapper:
@@ -169,6 +169,7 @@ correct the situation: sgold@sonic.net
 [adoptium]: https://adoptium.net/releases.html "Adoptium Project"
 [assimp]: https://www.assimp.org/ "The Open Asset Importer Library"
 [firefox]: https://www.mozilla.org/en-US/firefox "Firefox"
+[fish]: https://fishshell.com/ "Fish command-line shell"
 [git]: https://git-scm.com "Git"
 [github]: https://github.com "GitHub"
 [gitkraken]: https://www.gitkraken.com "GitKraken client"
