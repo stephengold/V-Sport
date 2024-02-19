@@ -10,7 +10,7 @@ It contains 2 sub-projects:
 2. apps: demos, tutorial examples, and non-automated test software
 
 Complete source code (in [Java]) is provided under
-[a BSD 3-Clause license][license].
+[a 3-clause BSD license][license].
 
 
 <a name="toc"></a>
