@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2019-2023, Stephen Gold
+ Copyright (c) 2019-2024 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -155,6 +155,11 @@ final public class CompoundTestShapes {
      */
     public static CompoundCollisionShape makeLidlessBox(
             float iHeight, float iWidth, float iDepth, float wallThickness) {
+        Validate.positive(iHeight, "internal height");
+        Validate.positive(iWidth, "internal width");
+        Validate.positive(iDepth, "internal depth");
+        Validate.positive(wallThickness, "wall thickness");
+
         float ihHeight = iHeight / 2f;
         float ihWidth = iWidth / 2f;
         float ihDepth = iDepth / 2f;
