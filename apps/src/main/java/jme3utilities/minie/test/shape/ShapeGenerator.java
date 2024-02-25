@@ -79,6 +79,15 @@ public class ShapeGenerator extends Generator {
     final public static Logger logger
             = Logger.getLogger(ShapeGenerator.class.getName());
     // *************************************************************************
+    // constructors
+
+    /**
+     * Explicit no-arg constructor to avoid javadoc warnings from JDK 18.
+     */
+    public ShapeGenerator() {
+        // do nothing
+    }
+    // *************************************************************************
     // new methods exposed
 
     /**
