@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2022-2023, Stephen Gold
+ Copyright (c) 2022-2024 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -53,6 +53,15 @@ public class CheckerboardTest extends BaseApplication {
      * multi-colored square in clipspace
      */
     private static Geometry squareGeometry;
+    // *************************************************************************
+    // constructors
+
+    /**
+     * A no-arg constructor to avoid javadoc warnings from JDK 18.
+     */
+    public CheckerboardTest() {
+        // do nothing
+    }
     // *************************************************************************
     // new methods exposed
 

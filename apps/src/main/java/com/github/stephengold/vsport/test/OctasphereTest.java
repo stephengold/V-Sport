@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2022-2023, Stephen Gold
+ Copyright (c) 2022-2024 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -43,6 +43,15 @@ import com.jme3.math.FastMath;
  * @author Stephen Gold sgold@sonic.net
  */
 public class OctasphereTest extends BaseApplication {
+    // *************************************************************************
+    // constructors
+
+    /**
+     * A no-arg constructor to avoid javadoc warnings from JDK 18.
+     */
+    public OctasphereTest() {
+        // do nothing
+    }
     // *************************************************************************
     // new methods exposed
 

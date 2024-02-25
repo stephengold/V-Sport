@@ -77,6 +77,15 @@ public class TestGearJoint
      */
     private static PhysicsRigidBody driveshaft;
     // *************************************************************************
+    // constructors
+
+    /**
+     * A no-arg constructor to avoid javadoc warnings from JDK 18.
+     */
+    public TestGearJoint() {
+        // do nothing
+    }
+    // *************************************************************************
     // new methods exposed
 
     /**

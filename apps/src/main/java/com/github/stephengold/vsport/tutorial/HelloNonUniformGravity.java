@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2020-2023, Stephen Gold
+ Copyright (c) 2020-2024 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -59,6 +59,15 @@ public class HelloNonUniformGravity
      * temporary storage for vectors
      */
     final private static Vector3f tmpVector = new Vector3f();
+    // *************************************************************************
+    // constructors
+
+    /**
+     * A no-arg constructor to avoid javadoc warnings from JDK 18.
+     */
+    public HelloNonUniformGravity() {
+        // do nothing
+    }
     // *************************************************************************
     // new methods exposed
 

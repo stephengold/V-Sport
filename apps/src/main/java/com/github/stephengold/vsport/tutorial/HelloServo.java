@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2021-2023, Stephen Gold
+ Copyright (c) 2021-2024 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -63,6 +63,15 @@ public class HelloServo extends BasePhysicsApp<PhysicsSpace> {
      * motor being tested
      */
     private static RotationMotor motor;
+    // *************************************************************************
+    // constructors
+
+    /**
+     * A no-arg constructor to avoid javadoc warnings from JDK 18.
+     */
+    public HelloServo() {
+        // do nothing
+    }
     // *************************************************************************
     // new methods exposed
 
