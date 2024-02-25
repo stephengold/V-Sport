@@ -63,7 +63,7 @@ import jme3utilities.math.RectangularSolid;
 import jme3utilities.math.noise.Generator;
 
 /**
- * Generate pseudo-random collision shapes for use in MinieExamples.
+ * Generate pseudo-random collision shapes for use in V-Sport.
  *
  * @author Stephen Gold sgold@sonic.net
  */
