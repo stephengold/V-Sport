@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2020-2023, Stephen Gold
+ Copyright (c) 2020-2024 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -47,6 +47,8 @@ import com.jme3.math.Vector3f;
  * @author Stephen Gold sgold@sonic.net
  */
 public class HelloSport extends BasePhysicsApp<PhysicsSpace> {
+    // *************************************************************************
+    // new methods exposed
 
     /**
      * Main entry point for the HelloSport application.

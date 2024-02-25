@@ -59,8 +59,7 @@ public class CustomEllipsoid extends CustomConvexShape {
     // fields
 
     /**
-     * 0.2 for a uniform-density solid, 1/3 for a hollow shell, 0 for a point
-     * mass centered in a force field (&ge;0, &le;1)
+     * 0.2 for a uniform-density solid, 1/3 for a hollow shell (&gt;0, &lt;1)
      */
     final private float inertiaFactor;
     /**
@@ -102,7 +101,7 @@ public class CustomEllipsoid extends CustomConvexShape {
      * @param zHalfExtent the desired half extent on the local Z axis, before
      * scaling and excluding margin (&gt;0)
      * @param inertiaFactor 0.2 for a uniform-density solid, 1/3 for a hollow
-     * shell, 0 for a point mass centered in a force field (&ge;0, &le;1)
+     * shell (&gt;0, &lt;1)
      */
     public CustomEllipsoid(float xHalfExtent, float yHalfExtent,
             float zHalfExtent, float inertiaFactor) {
@@ -119,7 +118,7 @@ public class CustomEllipsoid extends CustomConvexShape {
      * @param halfExtents the desired half extents on each local axis, before
      * scaling and excluding margin (not null, all components &gt;0, unaffected)
      * @param inertiaFactor 0.2 for a uniform-density solid, 1/3 for a hollow
-     * shell, 0 for a point mass centered in a force field (&ge;0, &le;1)
+     * shell (&gt;0, &lt;1)
      */
     public CustomEllipsoid(Vector3f halfExtents, float inertiaFactor) {
         super(halfExtents);
@@ -167,8 +166,8 @@ public class CustomEllipsoid extends CustomConvexShape {
     }
 
     /**
-     * Calculate how far the scaled shape extends from its center, excluding
-     * margin.
+     * Calculate how far the scaled shape extends from its center of mass,
+     * excluding collision margin.
      *
      * @return the distance (in physics-space units, &ge;0)
      */
