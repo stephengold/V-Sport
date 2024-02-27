@@ -86,7 +86,7 @@ public class HelloGhost
     /**
      * collision object to trigger the ghost
      */
-    private PhysicsCharacter character;
+    private static PhysicsCharacter character;
     // *************************************************************************
     // constructors
 
