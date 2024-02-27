@@ -49,7 +49,7 @@ public class SpriteTest extends BaseApplication {
     // constructors
 
     /**
-     * A no-arg constructor to avoid javadoc warnings from JDK 18.
+     * Explicit no-arg constructor to avoid javadoc warnings from JDK 18+.
      */
     public SpriteTest() {
         // do nothing

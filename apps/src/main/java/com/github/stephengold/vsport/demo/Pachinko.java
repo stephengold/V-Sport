@@ -97,7 +97,7 @@ public class Pachinko
     // constructors
 
     /**
-     * A no-arg constructor to avoid javadoc warnings from JDK 18.
+     * Explicit no-arg constructor to avoid javadoc warnings from JDK 18+.
      */
     public Pachinko() {
         // do nothing
