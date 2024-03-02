@@ -87,6 +87,18 @@ public class CustomHemisphere extends CustomConvexShape {
         setScale(scale);
     }
     // *************************************************************************
+    // new methods exposed
+
+    /**
+     * Return the radius of the hemisphere.
+     *
+     * @return the unscaled radius (&gt;0)
+     */
+    public float getRadius() {
+        assert unscaledRadius > 0f : unscaledRadius;
+        return unscaledRadius;
+    }
+    // *************************************************************************
     // CustomConvexShape methods
 
     /**
