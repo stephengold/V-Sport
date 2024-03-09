@@ -27,7 +27,7 @@ Complete source code (in [Java]) is provided under
 
 ## About V-Sport
 
-V-Sport is a Simple Phyisics-ORienTed graphics engine written in Java 1.8.
+V-Sport is a Simple Physics-ORienTed graphics engine written in Java 1.8.
 In addition to Libbulletjme,
 it uses [LWJGL], [Assimp], [GLFW], [JOML], and [Vulkan].
 It has been tested on Windows, Linux, and macOS.
