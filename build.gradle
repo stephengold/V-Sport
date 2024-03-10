@@ -44,5 +44,5 @@ tasks.register('NewtonsCradle') {
 }
 tasks.register('OctasphereTest') {
     dependsOn ':apps:OctasphereTest'
-    description 'Runs the octasphere test app.'
+    description 'Runs the Octasphere test app.'
 }
