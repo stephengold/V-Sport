@@ -287,7 +287,7 @@ dependencies {
     implementation project(':lib') // for latest sourcecode
 }
 
-// tasks to download/clean the native physics library for each platform:
+// Register tasks to download/clean the native physics library for each platform:
 
 registerPlatformTasks('Linux64',     '_libbulletjme.so')
 registerPlatformTasks('Linux_ARM32', '_libbulletjme.so')
