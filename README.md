@@ -142,6 +142,7 @@ The ThousandCubes app derives from sourcecode contributed by Yanis Boudiaf.
 
 This project has made use of the following libraries and software tools:
 
+  + the [Checkstyle] tool
   + the [Firefox] web browser
   + the [Git] revision-control system and GitK commit viewer
   + the [GitKraken] client
@@ -150,7 +151,9 @@ This project has made use of the following libraries and software tools:
   + the [Java] compiler, standard doclet, and runtime environment
   + [the Java OpenGL Math Library][joml]
   + [the Lightweight Java Gaming Library][lwjgl]
+  + the [Linux Mint][mint] operating system
   + the [Markdown] document-conversion tool
+  + the [Meld] visual merge tool
   + the [NetBeans] integrated development environment
   + [the Open Asset Import (Assimp) Library][assimp]
   + [the shaderc project][shaderc]
@@ -171,6 +174,7 @@ correct the situation: sgold@sonic.net
 
 [adoptium]: https://adoptium.net/releases.html "Adoptium Project"
 [assimp]: https://www.assimp.org/ "The Open Asset Importer Library"
+[checkstyle]: https://checkstyle.org "Checkstyle"
 [firefox]: https://www.mozilla.org/en-US/firefox "Firefox"
 [fish]: https://fishshell.com/ "Fish command-line shell"
 [git]: https://git-scm.com "Git"
@@ -185,6 +189,8 @@ correct the situation: sgold@sonic.net
 [license]: https://github.com/stephengold/V-Sport/blob/master/LICENSE "V-Sport license"
 [lwjgl]: https://www.lwjgl.org "Lightweight Java Game Library"
 [markdown]: https://daringfireball.net/projects/markdown "Markdown Project"
+[meld]: https://meldmerge.org "Meld merge tool"
+[mint]: https://linuxmint.com "Linux Mint Project"
 [netbeans]: https://netbeans.org "NetBeans Project"
 [project]: https://github.com/stephengold/V-Sport "V-Sport Project"
 [shaderc]: https://github.com/google/shaderc "shaderc project"
