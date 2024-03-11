@@ -6,7 +6,7 @@ for the [Libbulletjme 3-D physics library][libbulletjme].
 
 It contains 2 sub-projects:
 
-1. lib: the V-Sport graphics engine
+1. lib: the V-Sport graphics engine (a single JVM runtime library)
 2. apps: demos, tutorial examples, and non-automated test software
 
 Complete source code (in [Java]) is provided under
@@ -229,8 +229,10 @@ by Cristian Herrera, which was in turn ported from
 [Alexander Overvoorde's Vulkan tutorial][vt].
 I am deeply grateful for all the work that went into these invaluable tutorials.
 
-The ConveyorDemo app derives from sourcecode contributed by "qwq".
-The ThousandCubes app derives from sourcecode contributed by Yanis Boudiaf.
+The ConveyorDemo app derives from source code
+contributed by "qwq" in March 2022.
+
+The ThousandCubes app derives from source code contributed by Yanis Boudiaf.
 
 This project has made use of the following libraries and software tools:
 
