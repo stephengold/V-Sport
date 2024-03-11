@@ -18,6 +18,7 @@ Complete source code (in [Java]) is provided under
 ## Contents of this document
 
 + [About V-Sport](#about)
++ [How to add V-Sport to an existing project](#add)
 + [How to build and run V-Sport from source](#build)
 + [What's missing](#todo)
 + [Acknowledgments](#acks)
@@ -31,6 +32,97 @@ V-Sport is a Simple Physics-ORienTed graphics engine written in Java 1.8.
 In addition to Libbulletjme,
 it uses [LWJGL], [Assimp], [GLFW], [JOML], and [Vulkan].
 It has been tested on Windows, Linux, and macOS.
+
+[Jump to the table of contents](#toc)
+
+
+<a name="add"></a>
+
+## How to add V-Sport to an existing project
+
+V-Sport comes pre-built as a single library that depends on [Libbulletjme].
+However, the Libbulletjme dependency is intentionally omitted from V-Sport's POM
+so developers can specify *which* Libbulletjme library should be used.
+
+For projects built using [Maven] or [Gradle], it is
+*not* sufficient to specify the
+dependency on the V-Sport Library.
+You must also explicitly specify the Libbulletjme dependency.
+
+### Gradle-built projects
+
+Add to the project’s "build.gradle" file:
+
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        implementation 'com.github.stephengold:Libbulletjme:20.1.0'
+        implementation 'com.github.stephengold:V-Sport:0.9.0'
+    }
+
+For some older versions of Gradle,
+it's necessary to replace `implementation` with `compile`.
+
+### Maven-built projects
+
+Add to the project’s "pom.xml" file:
+
+    <repositories>
+      <repository>
+        <id>mvnrepository</id>
+        <url>https://repo1.maven.org/maven2/</url>
+      </repository>
+    </repositories>
+
+    <dependency>
+      <groupId>com.github.stephengold</groupId>
+      <artifactId>Libbulletjme</artifactId>
+      <version>20.1.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.github.stephengold</groupId>
+      <artifactId>V-Sport</artifactId>
+      <version>0.9.0</version>
+    </dependency>
+
+### Coding a V-Sport application
+
+Every V-Sport application should extend the `BasePhysicsApp` class,
+which provides hooks for:
+
++ initializing the application,
++ creating and configuring the application's physics space,
++ populating the space with physics objects, and
++ updating the space before each frame is rendered.
+
+The graphics engine doesn't have a scene graph.
+Instead, it maintains an internal list of renderable objects,
+called *geometries*.
+Instantiating a geometry automatically adds it to the list
+and causes it to be visualized.
+
++ To visualize the world (physics-space) coordinate axes,
+  instantiate one or more `LocalAxisGeometry` objects.
+
+By default, physics objects are not visualized.
+
++ To visualize the shape
+  of a `PhysicsCollisionObject` other than a `PhysicsSoftBody`,
+  invoke the `visualizeShape()` method on the object.
++ To visualize the local coordinate axes of a `PhysicsCollisionObject`,
+  invoke the `visualizeAxes()` method on the object.
++ To visualize the wheels of a `PhysicsVehicle`,
+  invoke the `visualizeWheels()` method on the vehicle.
++ To visualize the bounding box of a `PhysicsCollisionObject`,
+  instantiate an `AabbGeometry` for the object.
++ To visualize a `Constraint`,
+  instantiate a `ConstraintGeometry` for each end.
++ To visualize the pins of a `PhysicsSoftBody`,
+  instantiate a `PinsGeometry` for the body.
++ To visualize the wind acting on a `PhysicsSoftBody`,
+  instantiate a `WindVelocityGeometry` for the body.
 
 [Jump to the table of contents](#toc)
 
@@ -189,6 +281,7 @@ correct the situation: sgold@sonic.net
 [license]: https://github.com/stephengold/V-Sport/blob/master/LICENSE "V-Sport license"
 [lwjgl]: https://www.lwjgl.org "Lightweight Java Game Library"
 [markdown]: https://daringfireball.net/projects/markdown "Markdown Project"
+[maven]: https://maven.apache.org "Maven Project"
 [meld]: https://meldmerge.org "Meld merge tool"
 [mint]: https://linuxmint.com "Linux Mint Project"
 [netbeans]: https://netbeans.org "NetBeans Project"
