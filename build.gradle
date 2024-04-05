@@ -1,4 +1,4 @@
-// Gradle build script for the V-Sport project
+// Gradle script to build the V-Sport project
 
 plugins {
     id 'base' // to add a "clean" task to the root project
