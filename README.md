@@ -57,7 +57,7 @@ Add to the project’s "build.gradle" file:
         mavenCentral()
     }
     dependencies {
-        implementation 'com.github.stephengold:Libbulletjme:21.0.0'
+        implementation 'com.github.stephengold:Libbulletjme:21.1.0'
         implementation 'com.github.stephengold:V-Sport:0.9.0'
     }
 
@@ -78,7 +78,7 @@ Add to the project’s "pom.xml" file:
     <dependency>
       <groupId>com.github.stephengold</groupId>
       <artifactId>Libbulletjme</artifactId>
-      <version>21.0.0</version>
+      <version>21.1.0</version>
     </dependency>
 
     <dependency>
