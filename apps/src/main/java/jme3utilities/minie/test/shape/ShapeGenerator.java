@@ -629,6 +629,10 @@ public class ShapeGenerator extends Generator {
                 result = nextCustomDome();
                 break;
 
+            case "customFrustum":
+                result = nextCustomFrustum();
+                break;
+
             case "customHemisphere":
                 result = nextCustomHemisphere();
                 break;
@@ -667,10 +671,6 @@ public class ShapeGenerator extends Generator {
 
             case "frame":
                 result = nextFrame();
-                break;
-
-            case "frustum":
-                result = nextCustomFrustum();
                 break;
 
             case "halfCylinder":
