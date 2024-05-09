@@ -49,6 +49,7 @@ import com.jme3.bullet.collision.shapes.MinkowskiSum;
 import com.jme3.bullet.collision.shapes.MultiSphere;
 import com.jme3.bullet.collision.shapes.SimplexCollisionShape;
 import com.jme3.bullet.collision.shapes.SphereCollisionShape;
+import com.jme3.bullet.collision.shapes.SphericalSegment;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 import com.jme3.util.BufferUtils;
@@ -271,6 +272,17 @@ public class ShapeGenerator extends Generator {
     }
 
     /**
+     * Generate a hemisphere shape using {@code CustomHemisphere}.
+     *
+     * @return a new shape
+     */
+    public CustomHemisphere nextCustomHemisphere() {
+        float r = nextFloat(0.6f, 1.6f);
+        CustomHemisphere result = new CustomHemisphere(r);
+        return result;
+    }
+
+    /**
      * Generate a parabolic lemon shape using {@code CustomLemon}.
      *
      * @return a new shape
@@ -312,6 +324,21 @@ public class ShapeGenerator extends Generator {
         } else {
             result = new CustomSegment(sphereRadius, y2, y1);
         }
+
+        return result;
+    }
+
+    /**
+     * Generate a spherical dome or plano-convex lens.
+     *
+     * @return a new shape
+     */
+    public SphericalSegment nextDome() {
+        float radius = nextFloat(0.7f, 1.7f);
+        float verticalAngle = nextFloat(0.7f, 2f);
+        float yMax = radius;
+        float yMin = radius * FastMath.cos(verticalAngle);
+        SphericalSegment result = new SphericalSegment(radius, yMax, yMin);
 
         return result;
     }
@@ -540,6 +567,26 @@ public class ShapeGenerator extends Generator {
     }
 
     /**
+     * Generate a spherical segment using {@code SphericalSegment}.
+     *
+     * @return a new shape
+     */
+    public SphericalSegment nextSegment() {
+        float sphereRadius = nextFloat(0.5f, 1.5f);
+        float y1 = sphereRadius * nextFloat(-1f, 1f);
+        float y2 = sphereRadius * nextFloat(-1f, 1f);
+
+        SphericalSegment result;
+        if (y1 > y2) {
+            result = new SphericalSegment(sphereRadius, y1, y2);
+        } else {
+            result = new SphericalSegment(sphereRadius, y2, y1);
+        }
+
+        return result;
+    }
+
+    /**
      * Generate an instance of the named shape.
      *
      * @param shapeName the type of shape to generate (not null, not empty)
@@ -582,6 +629,10 @@ public class ShapeGenerator extends Generator {
                 result = nextCustomDome();
                 break;
 
+            case "customHemisphere":
+                result = nextCustomHemisphere();
+                break;
+
             case "customLemon":
                 result = nextCustomLemon();
                 break;
@@ -600,6 +651,10 @@ public class ShapeGenerator extends Generator {
 
             case "cylinderBox":
                 result = nextCylinderBox();
+                break;
+
+            case "dome":
+                result = nextDome();
                 break;
 
             case "ellipsoid":
@@ -652,6 +707,10 @@ public class ShapeGenerator extends Generator {
 
             case "saucer":
                 result = nextSaucer();
+                break;
+
+            case "segment":
+                result = nextSegment();
                 break;
 
             case "sphere":
