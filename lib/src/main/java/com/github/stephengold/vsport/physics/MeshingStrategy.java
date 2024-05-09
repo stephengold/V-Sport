@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2022-2023, Stephen Gold
+ Copyright (c) 2022-2024 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -94,7 +94,7 @@ class MeshingStrategy {
     /**
      * Instantiate a strategy from components.
      *
-     * @param positions strategy for generating vertex positions (&ge;-6, &le;1)
+     * @param positions strategy for generating vertex positions (&ge;-6, &le;2)
      * @param normals strategy for generating normals, if any (not null)
      * @param uvs strategy for generating texture coordinates, if any (not null)
      * @param uCoefficients coefficients for generating the first (U) texture
@@ -104,7 +104,7 @@ class MeshingStrategy {
      */
     MeshingStrategy(int positions, NormalsOption normals, UvsOption uvs,
             Vector4fc uCoefficients, Vector4fc vCoefficients) {
-        assert positions >= -6 && positions <= 1 : positions;
+        assert positions >= -6 && positions <= 2 : positions;
         assert normals != null;
         assert uvs != null;
 
@@ -268,6 +268,9 @@ class MeshingStrategy {
             case 1:
                 pString = "high";
                 break;
+            case 2:
+                pString = "high2";
+                break;
             default:
                 throw new IllegalStateException("positions = " + positions);
         }
@@ -302,7 +305,7 @@ class MeshingStrategy {
      * description.
      *
      * @param description list of items separated by slashes (not null)
-     * @return option code (&ge;-6, &le;1)
+     * @return option code (&ge;-6, &le;2)
      */
     private static int parsePositions(String description) {
         String[] items = description.split(delimiter);
@@ -370,12 +373,14 @@ class MeshingStrategy {
      * positions.
      *
      * @param pString the name to translate
-     * @return option code (&ge;-6, &le;1)
+     * @return option code (&ge;-6, &le;2)
      */
     private static int toPositions(String pString) {
         switch (pString) {
             case "high":
                 return DebugShapeFactory.highResolution;
+            case "high2":
+                return DebugShapeFactory.highResolution2;
             case "low":
                 return DebugShapeFactory.lowResolution;
             case "octasphere1":

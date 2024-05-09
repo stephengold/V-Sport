@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2022-2023, Stephen Gold
+ Copyright (c) 2022-2024 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -46,12 +46,11 @@ class ShapeMesh extends Mesh {
      *
      * @param shape the shape from which to generate the mesh (not null,
      * unaffected)
-     * @param positionsOption either
-     * {@link com.jme3.bullet.util.DebugShapeFactory#lowResolution} (0) or
-     * {@link com.jme3.bullet.util.DebugShapeFactory#highResolution} (1)
+     * @param meshResolution 0&rarr;low, 1&rarr;high for convex shapes,
+     * 2&rarr;high for all shapes
      */
-    ShapeMesh(CollisionShape shape, int positionsOption) {
+    ShapeMesh(CollisionShape shape, int meshResolution) {
         super(Topology.TriangleList,
-                DebugShapeFactory.getDebugTriangles(shape, positionsOption));
+                DebugShapeFactory.getDebugTriangles(shape, meshResolution));
     }
 }
