@@ -43,6 +43,7 @@ import com.jme3.bullet.collision.shapes.CapsuleCollisionShape;
 import com.jme3.bullet.collision.shapes.CollisionShape;
 import com.jme3.bullet.collision.shapes.CompoundCollisionShape;
 import com.jme3.bullet.collision.shapes.ConeCollisionShape;
+import com.jme3.bullet.collision.shapes.ConicalFrustum;
 import com.jme3.bullet.collision.shapes.CylinderCollisionShape;
 import com.jme3.bullet.collision.shapes.HullCollisionShape;
 import com.jme3.bullet.collision.shapes.MinkowskiSum;
@@ -389,6 +390,20 @@ public class ShapeGenerator extends Generator {
     }
 
     /**
+     * Generate a conical frustum shape using {@code ConicalFrustum}.
+     *
+     * @return a new shape
+     */
+    public ConicalFrustum nextFrustum() {
+        float a = nextFloat(1f, 2f);
+        float b = nextFloat(0.01f, 1.6f);
+        float height = nextFloat(0.6f, 4f);
+        ConicalFrustum result = new ConicalFrustum(a, b, height);
+
+        return result;
+    }
+
+    /**
      * Generate a half-cylinder shape.
      *
      * @return a new shape
@@ -671,6 +686,10 @@ public class ShapeGenerator extends Generator {
 
             case "frame":
                 result = nextFrame();
+                break;
+
+            case "frustum":
+                result = nextFrustum();
                 break;
 
             case "halfCylinder":
