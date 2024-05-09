@@ -424,9 +424,9 @@ public class ShapeGenerator extends Generator {
      *
      * @return a new shape
      */
-    public CustomHemisphere nextHemisphere() {
+    public SphericalSegment nextHemisphere() {
         float r = nextFloat(0.6f, 1.6f);
-        CustomHemisphere result = new CustomHemisphere(r);
+        SphericalSegment result = new SphericalSegment(r);
         return result;
     }
 
