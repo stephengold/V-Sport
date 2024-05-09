@@ -17,9 +17,9 @@ if (!hasProperty('mainClass')) {
 jar.manifest.attributes('Main-Class': application.mainClass)
 
 ext {
-    // which BTF (buildType + flavor) of the native physics library to use:
-    //btf = 'DebugSp'
+    // which BTF (buildType + flavor) of the native physics library to download:
     btf = 'ReleaseSp'
+    //btf = 'DebugSp'
 
     fs = System.getProperty('file.separator')
     downloadsDir = System.getProperty('user.home') + fs + 'Downloads' + fs
