@@ -1,6 +1,4 @@
-/*
- * settings.gradle: global settings shared by all V-Sport subprojects
- */
+// global settings shared by all V-Sport subprojects
 
 dependencyResolutionManagement {
     repositories {
