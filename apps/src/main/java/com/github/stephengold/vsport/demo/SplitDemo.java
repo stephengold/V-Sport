@@ -345,7 +345,7 @@ public class SplitDemo extends BasePhysicsApp<PhysicsSpace> {
      *
      * @param body (not null)
      */
-    private void makeSplittable(PhysicsRigidBody body) {
+    private static void makeSplittable(PhysicsRigidBody body) {
         CollisionShape oldShape = body.getCollisionShape();
         CollisionShape splittableShape = oldShape.toSplittableShape();
         assert splittableShape.canSplit();
