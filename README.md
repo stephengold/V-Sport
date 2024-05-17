@@ -4,7 +4,7 @@
 a [Vulkan]-based graphics engine
 for the [Libbulletjme 3-D physics library][libbulletjme].
 
-It contains 2 sub-projects:
+It contains 2 subprojects:
 
 1. lib: the V-Sport graphics engine (a single JVM runtime library)
 2. apps: demos, tutorial examples, and non-automated test software
