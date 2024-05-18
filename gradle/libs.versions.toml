@@ -1,0 +1,24 @@
+## TOML version catalog for the MonkeyWrench project
+
+[versions]
+
+checkstyle = "9.3"
+libbulletjme = "21.2.1"
+
+lwjgl = '3.3.3'
+#lwjgl = '3.3.4-SNAPSHOT'
+
+[libraries]
+
+joml = { module = "org.joml:joml", version = "1.10.5" }
+libbulletjme = { module = "com.github.stephengold:Libbulletjme", version.ref = "libbulletjme" }
+lwjgl = { module = "org.lwjgl:lwjgl", version.ref = "lwjgl" }
+lwjgl-assimp = { module = "org.lwjgl:lwjgl-assimp", version.ref = "lwjgl" }
+lwjgl-bom = { module = "org.lwjgl:lwjgl-bom", version.ref = "lwjgl" }
+lwjgl-glfw = { module = "org.lwjgl:lwjgl-glfw", version.ref = "lwjgl" }
+lwjgl-shaderc = { module = "org.lwjgl:lwjgl-shaderc", version.ref = "lwjgl" }
+lwjgl-vulkan = { module = "org.lwjgl:lwjgl-vulkan", version.ref = "lwjgl" }
+
+[bundles]
+
+[plugins]

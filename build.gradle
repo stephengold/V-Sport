@@ -1,10 +1,6 @@
 // Gradle script to build the V-Sport project
 
 ext {
-    // current versions of libraries:
-    lbjVersion = '21.2.1'
-    lwjglVersion = '3.3.3'
-    //lwjglVersion = '3.3.4-SNAPSHOT'
     vsportVersion = '0.9.1-SNAPSHOT'
 }
 
