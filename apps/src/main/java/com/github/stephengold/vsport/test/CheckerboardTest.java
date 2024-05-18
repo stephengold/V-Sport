@@ -57,7 +57,10 @@ public class CheckerboardTest extends BaseApplication {
     // constructors
 
     /**
-     * Explicit no-arg constructor to avoid javadoc warnings from JDK 18+.
+     * Instantiate the CheckerboardTest application.
+     * <p>
+     * This no-arg constructor was made explicit to avoid javadoc warnings from
+     * JDK 18+.
      */
     public CheckerboardTest() {
         // do nothing

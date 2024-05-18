@@ -79,7 +79,10 @@ public class HelloVSport extends BaseApplication {
     // constructors
 
     /**
-     * Explicit no-arg constructor to avoid javadoc warnings from JDK 18+.
+     * Instantiate the HelloVSport application.
+     * <p>
+     * This no-arg constructor was made explicit to avoid javadoc warnings from
+     * JDK 18+.
      */
     public HelloVSport() {
         // do nothing

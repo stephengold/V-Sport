@@ -65,7 +65,10 @@ public class AssimpTest extends BaseApplication {
     // constructors
 
     /**
-     * Explicit no-arg constructor to avoid javadoc warnings from JDK 18+.
+     * Instantiate the AssimpTest application.
+     * <p>
+     * This no-arg constructor was made explicit to avoid javadoc warnings from
+     * JDK 18+.
      */
     public AssimpTest() {
         // do nothing

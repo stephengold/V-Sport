@@ -59,7 +59,10 @@ public class MouseTest2 extends BaseApplication {
     // constructors
 
     /**
-     * Explicit no-arg constructor to avoid javadoc warnings from JDK 18+.
+     * Instantiate the MouseTest2 application.
+     * <p>
+     * This no-arg constructor was made explicit to avoid javadoc warnings from
+     * JDK 18+.
      */
     public MouseTest2() {
         // do nothing

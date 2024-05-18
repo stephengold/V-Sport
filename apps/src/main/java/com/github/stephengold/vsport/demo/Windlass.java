@@ -118,7 +118,10 @@ public class Windlass
     // constructors
 
     /**
-     * Explicit no-arg constructor to avoid javadoc warnings from JDK 18+.
+     * Instantiate the Windlass application.
+     * <p>
+     * This no-arg constructor was made explicit to avoid javadoc warnings from
+     * JDK 18+.
      */
     public Windlass() {
         // do nothing
