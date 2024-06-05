@@ -22,3 +22,5 @@ lwjgl-vulkan = { module = "org.lwjgl:lwjgl-vulkan", version.ref = "lwjgl" }
 [bundles]
 
 [plugins]
+
+download = { id = "de.undercouch.download", version = "5.6.0" }
