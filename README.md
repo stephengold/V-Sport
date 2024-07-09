@@ -51,14 +51,14 @@ You must also explicitly specify the Libbulletjme dependency.
 
 ### Gradle-built projects
 
-Add to the project’s "build.gradle" file:
+Add to the project’s "build.gradle" or "build.gradle.kts" file:
 
     repositories {
         mavenCentral()
     }
     dependencies {
-        implementation 'com.github.stephengold:Libbulletjme:21.2.1'
-        implementation 'com.github.stephengold:V-Sport:0.9.0'
+        implementation("com.github.stephengold:Libbulletjme:21.2.1")
+        implementation("com.github.stephengold:V-Sport:0.9.0")
     }
 
 For some older versions of Gradle,
