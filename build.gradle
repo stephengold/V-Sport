@@ -14,27 +14,27 @@ configurations.configureEach {
 
 tasks.register('checkstyle') {
     dependsOn ':apps:checkstyleMain', ':lib:checkstyleMain'
-    description 'Checks the style of all Java sourcecode.'
+    description = 'Checks the style of all Java sourcecode.'
 }
 
 // tasks for the convenience of NetBeans users:
 tasks.register('AppChooser') {
     dependsOn ':apps:AppChooser'
-    description 'Runs the AppChooser app.'
+    description = 'Runs the AppChooser app.'
 }
 tasks.register('AssimpTest') {
     dependsOn ':apps:AssimpTest'
-    description 'Runs the Assimp test app.'
+    description = 'Runs the Assimp test app.'
 }
 tasks.register('HelloVSport') {
     dependsOn ':apps:HelloVSport'
-    description 'Runs the HelloVSport test app.'
+    description = 'Runs the HelloVSport test app.'
 }
 tasks.register('NewtonsCradle') {
     dependsOn ':apps:NewtonsCradle'
-    description 'Runs the NewtonsCradle demo app.'
+    description = 'Runs the NewtonsCradle demo app.'
 }
 tasks.register('OctasphereTest') {
     dependsOn ':apps:OctasphereTest'
-    description 'Runs the Octasphere test app.'
+    description = 'Runs the Octasphere test app.'
 }
