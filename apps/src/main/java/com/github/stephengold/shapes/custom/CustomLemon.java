@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2024 Stephen Gold
+ Copyright (c) 2024-2025 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -158,7 +158,7 @@ public class CustomLemon extends CustomConvexShape {
 
         } else {
             float ny = dirY / dxyz; // the Y component of the normalized vector
-            float radical = FastMath.sqrt(1f - ny * ny); // TODO use MyMath
+            float radical = MyMath.circle(ny);
             float denom = 4f * scaledRadius * radical;
             if (denom == 0f) {
                 if (ny > 0f) {
