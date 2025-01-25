@@ -19,8 +19,9 @@ ext {
 }
 
 dependencies {
-    api(libs.libbulletjme)
+    implementation(libs.jsnaploader)
     api(libs.joml)
+    api(libs.libbulletjme.windows64)
 
     api platform(libs.lwjgl.bom)
     api(libs.lwjgl.assimp) // to import 3-D assets

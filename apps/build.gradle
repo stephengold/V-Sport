@@ -6,7 +6,6 @@
 
 plugins {
     id 'application' // to build JVM applications
-    alias(libs.plugins.download) // to retrieve files from URLs
 }
 
 application {
@@ -16,20 +15,6 @@ if (!hasProperty('mainClass')) {
     ext.mainClass = application.mainClass
 }
 jar.manifest.attributes('Main-Class': application.mainClass)
-
-ext {
-    // which BTF (buildType + flavor) of the native physics library to download:
-    btf = 'ReleaseSp'
-    //btf = 'DebugSp'
-
-    fs = System.getProperty('file.separator')
-    downloadsDir = System.getProperty('user.home') + fs + 'Downloads' + fs
-    lbjVersion = libs.versions.libbulletjme.get()
-
-    // URL from which native physics libraries should be copied:
-    libbulletjmeUrl = "https://github.com/stephengold/Libbulletjme/releases/download/$lbjVersion/"
-    //libbulletjmeUrl = "file:///home/sgold/NetBeansProjects/Libbulletjme/dist/"
-}
 
 // Register tasks to run specific applications:
 
@@ -224,35 +209,18 @@ tasks.withType(JavaExec).configureEach { // Java runtime options:
     }
     classpath sourceSets.main.runtimeClasspath
     enableAssertions = true
-
-    if (includeLinux) {
-        dependsOn 'downloadLinux64'
-        dependsOn 'downloadLinux_ARM32'
-        dependsOn 'downloadLinux_ARM64'
-    }
-    if (includeMacOsX) {
-        dependsOn 'downloadMacOSX64'
-        dependsOn 'downloadMacOSX_ARM64'
-    }
-    if (includeWindows) {
-        dependsOn 'downloadWindows32'
-        dependsOn 'downloadWindows64'
-    }
 }
 
 dependencies {
     // LWJGL's Vulkan bindings do not require natives, except on macOS.
     if (includeLinux) {
+        runtimeOnly(variantOf(libs.libbulletjme.linux64){ classifier(bft) })
         runtimeOnly(variantOf(libs.lwjgl){classifier("natives-linux")})
         runtimeOnly(variantOf(libs.lwjgl.assimp){classifier("natives-linux")})
         runtimeOnly(variantOf(libs.lwjgl.glfw){classifier("natives-linux")})
         runtimeOnly(variantOf(libs.lwjgl.shaderc){classifier("natives-linux")})
 
-        runtimeOnly(variantOf(libs.lwjgl){classifier("natives-linux-arm32")})
-        runtimeOnly(variantOf(libs.lwjgl.assimp){classifier("natives-linux-arm32")})
-        runtimeOnly(variantOf(libs.lwjgl.glfw){classifier("natives-linux-arm32")})
-        runtimeOnly(variantOf(libs.lwjgl.shaderc){classifier("natives-linux-arm32")})
-
+        runtimeOnly(variantOf(libs.libbulletjme.linuxarm64){ classifier(bft) })
         runtimeOnly(variantOf(libs.lwjgl){classifier("natives-linux-arm64")})
         runtimeOnly(variantOf(libs.lwjgl.assimp){classifier("natives-linux-arm64")})
         runtimeOnly(variantOf(libs.lwjgl.glfw){classifier("natives-linux-arm64")})
@@ -260,12 +228,14 @@ dependencies {
     }
 
     if (includeMacOsX) {
+        runtimeOnly(variantOf(libs.libbulletjme.macosx64){ classifier(bft) })
         runtimeOnly(variantOf(libs.lwjgl){classifier("natives-macos")})
         runtimeOnly(variantOf(libs.lwjgl.assimp){classifier("natives-macos")})
         runtimeOnly(variantOf(libs.lwjgl.glfw){classifier("natives-macos")})
         runtimeOnly(variantOf(libs.lwjgl.shaderc){classifier("natives-macos")})
         runtimeOnly(variantOf(libs.lwjgl.vulkan){classifier("natives-macos")})
 
+        runtimeOnly(variantOf(libs.libbulletjme.macosxarm64){ classifier(bft) })
         runtimeOnly(variantOf(libs.lwjgl){classifier("natives-macos-arm64")})
         runtimeOnly(variantOf(libs.lwjgl.assimp){classifier("natives-macos-arm64")})
         runtimeOnly(variantOf(libs.lwjgl.glfw){classifier("natives-macos-arm64")})
@@ -274,46 +244,30 @@ dependencies {
     }
 
     if (includeWindows) {
+        runtimeOnly(variantOf(libs.libbulletjme.windows64){ classifier(bft) })
         runtimeOnly(variantOf(libs.lwjgl){classifier("natives-windows")})
         runtimeOnly(variantOf(libs.lwjgl.assimp){classifier("natives-windows")})
         runtimeOnly(variantOf(libs.lwjgl.glfw){classifier("natives-windows")})
         runtimeOnly(variantOf(libs.lwjgl.shaderc){classifier("natives-windows")})
-
-        runtimeOnly(variantOf(libs.lwjgl){classifier("natives-windows-x86")})
-        runtimeOnly(variantOf(libs.lwjgl.assimp){classifier("natives-windows-x86")})
-        runtimeOnly(variantOf(libs.lwjgl.glfw){classifier("natives-windows-x86")})
-        runtimeOnly(variantOf(libs.lwjgl.shaderc){classifier("natives-windows-x86")})
     }
 
     //implementation 'com.github.stephengold:V-Sport:' + vsportVersion // for published library
     implementation project(':lib') // for latest sourcecode
 }
 
-// Register tasks to download/clean the native physics library for each platform:
+// Register cleanup tasks:
 
-registerPlatformTasks('Linux64',     '_libbulletjme.so')
-registerPlatformTasks('Linux_ARM32', '_libbulletjme.so')
-registerPlatformTasks('Linux_ARM64', '_libbulletjme.so')
+clean.dependsOn('cleanDLLs', 'cleanDyLibs', 'cleanLogs', 'cleanSOs')
 
-registerPlatformTasks('MacOSX64',     '_libbulletjme.dylib')
-registerPlatformTasks('MacOSX_ARM64', '_libbulletjme.dylib')
-
-registerPlatformTasks('Windows32', '_bulletjme.dll')
-registerPlatformTasks('Windows64', '_bulletjme.dll')
-
-// helper method to register 'download' and 'clean' tasks:
-
-void registerPlatformTasks(String platform, String suffix) {
-    String filename = platform + btf + suffix
-
-    String cleanTaskName = 'clean' + platform
-    clean.dependsOn(cleanTaskName)
-    tasks.register(cleanTaskName, Delete) {
-        delete downloadsDir + filename
-    }
-
-    tasks.register('download' + platform, Download) {
-        src libbulletjmeUrl + filename
-        dest file(downloadsDir + filename)
-    }
+tasks.register('cleanDLLs', Delete) { // extracted Windows native libraries
+    delete fileTree(dir: '.', include: '*.dll')
+}
+tasks.register('cleanDyLibs', Delete) { // extracted macOS native libraries
+    delete fileTree(dir: '.', include: '*.dylib')
+}
+tasks.register('cleanLogs', Delete) { // JVM crash logs
+    delete fileTree(dir: '.', include: 'hs_err_pid*.log')
+}
+tasks.register('cleanSOs', Delete) { // extracted Linux and Android native libraries
+    delete fileTree(dir: '.', include: '*.so')
 }
