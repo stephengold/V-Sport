@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2024 Stephen Gold
+ Copyright (c) 2024-2025 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -39,6 +39,8 @@ import jme3utilities.math.MyMath;
  * A collision shape for a conical frustum with uniform density. By convention,
  * the local Y axis is the height axis, with the "A" base having y&lt;0 and the
  * "B" base having y&gt;0.
+ * <p>
+ * {@code ConicalFrustum} is probably more efficient.
  * <p>
  * This is an imprecise shape; margin always expands the shape.
  *
@@ -143,8 +145,8 @@ public class CustomFrustum extends CustomConvexShape {
     // CustomConvexShape methods
 
     /**
-     * Test whether the specified scale factors can be applied to this shape.
-     * For a conical frustum, scaling must preserve the circular cross section.
+     * Test whether the specified scale factors can be applied to the shape. For
+     * a conical frustum, scaling must preserve the circular cross section.
      *
      * @param scale the desired scale factor for each local axis (may be null,
      * unaffected)

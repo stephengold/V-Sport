@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2024 Stephen Gold
+ Copyright (c) 2024-2025 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -102,8 +102,8 @@ public class CustomHemisphere extends CustomConvexShape {
     // CustomConvexShape methods
 
     /**
-     * Test whether the specified scale factors can be applied to this shape.
-     * For a hemisphere, scaling must be uniform.
+     * Test whether the specified scale factors can be applied to the shape. For
+     * a hemisphere, scaling must be uniform.
      *
      * @param scale the desired scale factor for each local axis (may be null,
      * unaffected)

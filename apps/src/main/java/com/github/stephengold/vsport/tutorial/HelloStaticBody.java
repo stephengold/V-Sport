@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2020-2024 Stephen Gold
+ Copyright (c) 2020-2025 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -106,7 +106,7 @@ public class HelloStaticBody extends BasePhysicsApp<PhysicsSpace> {
         dynaBall.setPhysicsLocation(new Vector3f(0f, 4f, 0f));
         statBall.setPhysicsLocation(new Vector3f(0.1f, 0f, 0f));
 
-        // Visualize the physics objects.
+        // Visualize both rigid bodies.
         visualizeShape(dynaBall);
         visualizeShape(statBall);
     }

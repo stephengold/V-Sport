@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2024 Stephen Gold
+ Copyright (c) 2024-2025 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -39,6 +39,8 @@ import jme3utilities.math.MyVector3f;
 /**
  * A collision shape for a spherical segment with uniform density. By
  * convention, both bases are orthogonal to the local Y axis.
+ * <p>
+ * {@code SphericalSegment} is probably more efficient.
  * <p>
  * This is an imprecise shape; margin always expands the shape.
  *
@@ -183,8 +185,8 @@ public class CustomSegment extends CustomConvexShape {
     // CustomConvexShape methods
 
     /**
-     * Test whether the specified scale factors can be applied to this shape.
-     * For a spherical segment, scaling must be uniform.
+     * Test whether the specified scale factors can be applied to the shape. For
+     * a spherical segment, scaling must be uniform.
      *
      * @param scale the desired scale factor for each local axis (may be null,
      * unaffected)

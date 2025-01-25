@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2020-2024 Stephen Gold
+ Copyright (c) 2020-2025 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -111,7 +111,7 @@ public class HelloRigidBody extends BasePhysicsApp<PhysicsSpace> {
         // Set ball #2 on a collision course with ball #1.
         ball2.applyCentralImpulse(new Vector3f(-25f, 0f, 0f));
 
-        // Visualize the rigid bodies.
+        // Visualize both rigid bodies.
         visualizeShape(ball1);
         visualizeShape(ball2);
     }

@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2020-2024 Stephen Gold
+ Copyright (c) 2020-2025 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -98,7 +98,7 @@ public class HelloCharacter
     }
 
     /**
-     * Initialize the application.
+     * Initialize the application. Invoked once.
      */
     @Override
     public void initialize() {
@@ -127,7 +127,7 @@ public class HelloCharacter
         float y = -2f;
         PhysicsRigidBody ground = addSquare(halfExtent, y);
 
-        // Visualize the physics objects.
+        // Visualize both physics objects.
         visualizeShape(character);
         visualizeShape(ground);
     }
@@ -138,7 +138,7 @@ public class HelloCharacter
      * Callback from Bullet, invoked just before each simulation step.
      *
      * @param space the space that's about to be stepped (not null)
-     * @param timeStep the time per simulation step (in seconds, &ge;0)
+     * @param timeStep the duration of the simulation step (in seconds, &ge;0)
      */
     @Override
     public void prePhysicsTick(PhysicsSpace space, float timeStep) {
@@ -152,7 +152,7 @@ public class HelloCharacter
      * Callback from Bullet, invoked just after each simulation step.
      *
      * @param space the space that was just stepped (not null)
-     * @param timeStep the time per simulation step (in seconds, &ge;0)
+     * @param timeStep the duration of the simulation step (in seconds, &ge;0)
      */
     @Override
     public void physicsTick(PhysicsSpace space, float timeStep) {
@@ -164,7 +164,7 @@ public class HelloCharacter
     /**
      * Add a horizontal square body to the space.
      *
-     * @param halfExtent (half of the desired side length)
+     * @param halfExtent half of the desired side length
      * @param y (the desired elevation, in physics-space coordinates)
      * @return the new body (not null)
      */

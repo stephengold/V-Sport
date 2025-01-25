@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2020-2024 Stephen Gold
+ Copyright (c) 2020-2025 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -119,7 +119,7 @@ public class HelloCcd extends BasePhysicsApp<PhysicsSpace> {
                 = new PhysicsRigidBody(discShape, PhysicsBody.massForStatic);
         physicsSpace.addCollisionObject(disc);
 
-        // Visualize the physics objects.
+        // Visualize all 3 physics objects.
         visualizeShape(ccdBall);
         visualizeShape(controlBall);
         visualizeShape(disc).setProgram("Unshaded/Monochrome");

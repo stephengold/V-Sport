@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2020-2024 Stephen Gold
+ Copyright (c) 2020-2025 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -98,7 +98,7 @@ public class HelloContactResponse extends BasePhysicsApp<PhysicsSpace> {
     }
 
     /**
-     * Initialize the application.
+     * Initialize the application. Invoked once.
      */
     @Override
     public void initialize() {
@@ -130,7 +130,7 @@ public class HelloContactResponse extends BasePhysicsApp<PhysicsSpace> {
         // Position the ball directly above the box.
         ball.setPhysicsLocation(new Vector3f(0f, 4f, 0f));
 
-        // Visualize the physics objects.
+        // Visualize both rigid bodies.
         visualizeShape(ball);
         visualizeShape(box);
     }

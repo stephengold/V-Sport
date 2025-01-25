@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2020-2024 Stephen Gold
+ Copyright (c) 2020-2025 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -116,7 +116,7 @@ public class HelloNewHinge
     }
 
     /**
-     * Initialize the application.
+     * Initialize the application. Invoked once.
      */
     @Override
     public void initialize() {
@@ -190,7 +190,7 @@ public class HelloNewHinge
      * Callback from Bullet, invoked just before each simulation step.
      *
      * @param space the space that's about to be stepped (not null)
-     * @param timeStep the time per simulation step (in seconds, &ge;0)
+     * @param timeStep the duration of the simulation step (in seconds, &ge;0)
      */
     @Override
     public void prePhysicsTick(PhysicsSpace space, float timeStep) {
@@ -206,7 +206,7 @@ public class HelloNewHinge
      * Callback from Bullet, invoked just after each simulation step.
      *
      * @param space the space that was just stepped (not null)
-     * @param timeStep the time per simulation step (in seconds, &ge;0)
+     * @param timeStep the duration of the simulation step (in seconds, &ge;0)
      */
     @Override
     public void physicsTick(PhysicsSpace space, float timeStep) {
@@ -226,7 +226,7 @@ public class HelloNewHinge
     /**
      * Add a horizontal plane body to the space.
      *
-     * @param y (the desired elevation, in physics-space coordinates)
+     * @param y the desired elevation (in physics-space coordinates)
      */
     private void addPlane(float y) {
         Plane plane = new Plane(Vector3f.UNIT_Y, y);
