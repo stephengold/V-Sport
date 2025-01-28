@@ -64,29 +64,6 @@ Add to the project’s "build.gradle" or "build.gradle.kts" file:
 For some older versions of Gradle,
 it's necessary to replace `implementation` with `compile`.
 
-### Maven-built projects
-
-Add to the project’s "pom.xml" file:
-
-    <repositories>
-      <repository>
-        <id>mvnrepository</id>
-        <url>https://repo1.maven.org/maven2/</url>
-      </repository>
-    </repositories>
-
-    <dependency>
-      <groupId>com.github.stephengold</groupId>
-      <artifactId>Libbulletjme</artifactId>
-      <version>21.2.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.github.stephengold</groupId>
-      <artifactId>V-Sport</artifactId>
-      <version>0.9.0</version>
-    </dependency>
-
 ### Coding a V-Sport application
 
 Every V-Sport application should extend the `BasePhysicsApp` class,
