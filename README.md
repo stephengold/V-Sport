@@ -20,6 +20,7 @@ Complete source code (in [Java]) is provided under
 + [About V-Sport](#about)
 + [How to add V-Sport to an existing project](#add)
 + [How to build and run V-Sport from source](#build)
++ [Conventions](#conventions)
 + [What's missing](#todo)
 + [Acknowledgments](#acks)
 
@@ -182,6 +183,24 @@ You can restore the project to a pristine state:
 + using Windows Command Prompt: `.\gradlew clean`
 
 Note:  these commands will delete any downloaded native libraries.
+
+[Jump to the table of contents](#toc)
+
+
+<a name="conventions"></a>
+
+## Conventions
+
+Package names begin with `com.github.stephengold` or `jme3utilities.minie`.
+
+The source code and pre-built libraries are compatible with JDK 8.
+
+Rotation signs, polygon windings, and 3-D coordinate axes
+are right-handed/counter-clockwise unless otherwise noted.
+
+Angles are quantified in *radians* unless otherwise noted.
+
+The world coordinate system is assumed to be Z-forward, Y-up.
 
 [Jump to the table of contents](#toc)
 
