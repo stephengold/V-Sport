@@ -230,8 +230,8 @@ public class HelloMotor extends BasePhysicsApp<PhysicsSpace> {
     private void configureInput() {
         getInputManager().add(new InputProcessor() {
             @Override
-            public void onKeyboard(int keyId, boolean isPressed) {
-                if (keyId == GLFW.GLFW_KEY_SPACE) {
+            public void onKeyboard(int glfwKeyId, boolean isPressed) {
+                if (glfwKeyId == GLFW.GLFW_KEY_SPACE) {
                     if (isPressed) {
                         // Reverse the motor's direction.
                         float rate = motor.get(MotorParam.TargetVelocity);
@@ -239,7 +239,7 @@ public class HelloMotor extends BasePhysicsApp<PhysicsSpace> {
                     }
                     return;
                 }
-                super.onKeyboard(keyId, isPressed);
+                super.onKeyboard(glfwKeyId, isPressed);
             }
         });
     }
