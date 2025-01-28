@@ -87,7 +87,7 @@ public abstract class BasePhysicsApp<T extends PhysicsSpace>
      */
     private long lastPhysicsUpdate;
     /**
-     * map summaries to auto-generated meshes, for reuse
+     * map shape summaries to auto-generated meshes, for reuse
      */
     final private static Map<ShapeSummary, Mesh> meshCache
             = new WeakHashMap<>(200);
@@ -346,7 +346,7 @@ public abstract class BasePhysicsApp<T extends PhysicsSpace>
     protected void render() {
         ++renderCount;
 
-        //Advance the physics, but not during the first render().
+        // Advance the physics, but not during the first render().
         long nanoTime = System.nanoTime();
         if (renderCount > 1) {
             long nanoseconds = nanoTime - lastPhysicsUpdate;
