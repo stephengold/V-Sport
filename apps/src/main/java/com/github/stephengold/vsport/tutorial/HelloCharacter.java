@@ -165,7 +165,7 @@ public class HelloCharacter
      * Add a horizontal square body to the space.
      *
      * @param halfExtent half of the desired side length
-     * @param y (the desired elevation, in physics-space coordinates)
+     * @param y the desired elevation (in physics-space coordinates)
      * @return the new body (not null)
      */
     private PhysicsRigidBody addSquare(float halfExtent, float y) {
