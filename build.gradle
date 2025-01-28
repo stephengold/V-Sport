@@ -1,7 +1,7 @@
 // Gradle script to build the V-Sport project
 
 ext {
-    vsportVersion = '0.9.1-SNAPSHOT'
+    vsportVersion = '0.9.1'
 }
 
 subprojects {
