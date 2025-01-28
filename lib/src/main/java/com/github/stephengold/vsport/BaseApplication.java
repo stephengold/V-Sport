@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2023, Stephen Gold
+ Copyright (c) 2023-2025 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -64,7 +64,7 @@ abstract public class BaseApplication {
     /**
      * version of the V-Sport graphics engine
      */
-    final static int engineVersion = VK10.VK_MAKE_VERSION(0, 9, 1);
+    final static int engineVersion = VK10.VK_MAKE_VERSION(0, 9, 2);
     /**
      * name of the graphics engine
      */
