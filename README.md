@@ -62,7 +62,7 @@ Add to the project’s "build.gradle" or "build.gradle.kts" file:
         // JVM library:
         implementation("com.github.stephengold:V-Sport:0.9.1")
 
-        // Libbuletjme native libraries:
+        // Libbulletjme native libraries:
         runtimeOnly("com.github.stephengold:Libbulletjme-Linux64:22.0.1:SpDebug")
           // Libbulletjme native libraries for other platforms could be added.
 
