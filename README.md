@@ -30,8 +30,8 @@ Complete source code (in [Java]) is provided under
 ## About V-Sport
 
 V-Sport is a Simple Physics-ORienTed graphics engine written in Java 1.8.
-In addition to Libbulletjme,
-it uses [LWJGL], [Assimp], [GLFW], [JOML], and [Vulkan].
+In addition to [Libbulletjme],
+it uses [LWJGL], [Assimp], [GLFW], [JOML], [jSnapLoader], and [Vulkan].
 It has been tested on Windows, Linux, and macOS.
 
 [Jump to the table of contents](#toc)
@@ -252,6 +252,7 @@ This project has made use of the following libraries and software tools:
   + the [Gradle] build tool
   + the [Java] compiler, standard doclet, and runtime environment
   + [the Java OpenGL Math Library][joml]
+  + the [jSnapLoader] dynamic-library loader
   + [the Lightweight Java Gaming Library][lwjgl]
   + the [Linux Mint][mint] operating system
   + the [Markdown] document-conversion tool
@@ -287,6 +288,7 @@ correct the situation: sgold@sonic.net
 [imgur]: https://imgur.com/ "Imgur"
 [java]: https://en.wikipedia.org/wiki/Java_(programming_language) "Java programming language"
 [joml]: https://joml-ci.github.io/JOML "Java OpenGL Math Library"
+[jsnaploader]: https://github.com/Electrostat-Lab/jSnapLoader "the jSnapLoader Project"
 [libbulletjme]: https://stephengold.github.io/Libbulletjme/lbj-en/English/overview.html "Libbulletjme Project"
 [license]: https://github.com/stephengold/V-Sport/blob/master/LICENSE "V-Sport license"
 [lwjgl]: https://www.lwjgl.org "Lightweight Java Game Library"
