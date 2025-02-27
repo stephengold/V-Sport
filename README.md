@@ -109,8 +109,6 @@ By default, physics objects are not visualized.
   instantiate an `AabbGeometry` for the object.
 + To visualize a `Constraint`,
   instantiate a `ConstraintGeometry` for each end.
-+ To visualize the pins of a `PhysicsSoftBody`,
-  instantiate a `PinsGeometry` for the body.
 + To visualize the wind acting on a `PhysicsSoftBody`,
   instantiate a `WindVelocityGeometry` for the body.
 
