@@ -142,6 +142,13 @@ By default, physics objects are not visualized.
   + using Bash or Fish or PowerShell or Zsh: `./gradlew build`
   + using Windows Command Prompt: `.\gradlew build`
 
+After a successful build,
+Maven artifacts will be found in "lib/build/libs".
+
+You can install the artifacts to your local Maven repository:
++ using Bash or Fish or PowerShell or Zsh: `./gradlew install`
++ using Windows Command Prompt: `.\gradlew install`
+
 ### Tutorials
 
 The tutorial apps all have names starting with "Hello".
