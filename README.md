@@ -100,9 +100,9 @@ By default, physics objects are not visualized.
 
 + To visualize the shape
   of a `PhysicsCollisionObject` other than a `PhysicsSoftBody`,
-  invoke the `visualizeShape()` method on the object.
+  invoke the `visualizeShape()` method on it.
 + To visualize the local coordinate axes of a `PhysicsCollisionObject`,
-  invoke the `visualizeAxes()` method on the object.
+  invoke the `visualizeAxes()` method on it.
 + To visualize the wheels of a `PhysicsVehicle`,
   invoke the `visualizeWheels()` method on the vehicle.
 + To visualize the bounding box of a `PhysicsCollisionObject`,
