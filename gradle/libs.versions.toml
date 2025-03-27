@@ -27,4 +27,4 @@ lwjgl-vulkan = { module = "org.lwjgl:lwjgl-vulkan", version.ref = "lwjgl" }
 
 [plugins]
 
-validate-poms = { id = "io.freefair.maven-central.validate-poms", version = "8.13" }
+validate-poms = { id = "io.freefair.maven-central.validate-poms", version = "8.13.1" }
