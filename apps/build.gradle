@@ -218,13 +218,13 @@ tasks.withType(JavaExec).configureEach { // Java runtime options:
 dependencies {
     // LWJGL's Vulkan bindings do not require natives, except on macOS.
     if (includeLinux) {
-        runtimeOnly(variantOf(libs.libbulletjme.linux64){ classifier(bft) })
+        runtimeOnly(variantOf(libs.libbulletjme.linux64){classifier(bft)})
         runtimeOnly(variantOf(libs.lwjgl){classifier("natives-linux")})
         runtimeOnly(variantOf(libs.lwjgl.assimp){classifier("natives-linux")})
         runtimeOnly(variantOf(libs.lwjgl.glfw){classifier("natives-linux")})
         runtimeOnly(variantOf(libs.lwjgl.shaderc){classifier("natives-linux")})
 
-        runtimeOnly(variantOf(libs.libbulletjme.linuxarm64){ classifier(bft) })
+        runtimeOnly(variantOf(libs.libbulletjme.linuxarm64){classifier(bft)})
         runtimeOnly(variantOf(libs.lwjgl){classifier("natives-linux-arm64")})
         runtimeOnly(variantOf(libs.lwjgl.assimp){classifier("natives-linux-arm64")})
         runtimeOnly(variantOf(libs.lwjgl.glfw){classifier("natives-linux-arm64")})
@@ -232,27 +232,27 @@ dependencies {
     }
 
     if (includeMacOsX) {
-        runtimeOnly(variantOf(libs.libbulletjme.macosx64){ classifier(bft) })
+        runtimeOnly(variantOf(libs.libbulletjme.macosx64){classifier(bft)})
         runtimeOnly(variantOf(libs.lwjgl){classifier("natives-macos")})
         runtimeOnly(variantOf(libs.lwjgl.assimp){classifier("natives-macos")})
         runtimeOnly(variantOf(libs.lwjgl.glfw){classifier("natives-macos")})
         runtimeOnly(variantOf(libs.lwjgl.shaderc){classifier("natives-macos")})
         runtimeOnly(variantOf(libs.lwjgl.vulkan){classifier("natives-macos")})
 
-        runtimeOnly(variantOf(libs.libbulletjme.macosxarm64){ classifier(bft) })
-        runtimeOnly(variantOf(libs.lwjgl){ classifier("natives-macos-arm64") })
-        runtimeOnly(variantOf(libs.lwjgl.assimp){ classifier("natives-macos-arm64") })
-        runtimeOnly(variantOf(libs.lwjgl.glfw){ classifier("natives-macos-arm64")})
-        runtimeOnly(variantOf(libs.lwjgl.shaderc){ classifier("natives-macos-arm64") })
-        runtimeOnly(variantOf(libs.lwjgl.vulkan){ classifier("natives-macos-arm64") })
+        runtimeOnly(variantOf(libs.libbulletjme.macosxarm64){classifier(bft)})
+        runtimeOnly(variantOf(libs.lwjgl){classifier("natives-macos-arm64")})
+        runtimeOnly(variantOf(libs.lwjgl.assimp){classifier("natives-macos-arm64")})
+        runtimeOnly(variantOf(libs.lwjgl.glfw){classifier("natives-macos-arm64")})
+        runtimeOnly(variantOf(libs.lwjgl.shaderc){classifier("natives-macos-arm64")})
+        runtimeOnly(variantOf(libs.lwjgl.vulkan){classifier("natives-macos-arm64")})
     }
 
     if (includeWindows) {
-        runtimeOnly(variantOf(libs.libbulletjme.windows64){ classifier(bft) })
-        runtimeOnly(variantOf(libs.lwjgl){ classifier("natives-windows") })
-        runtimeOnly(variantOf(libs.lwjgl.assimp){ classifier("natives-windows") })
-        runtimeOnly(variantOf(libs.lwjgl.glfw){ classifier("natives-windows") })
-        runtimeOnly(variantOf(libs.lwjgl.shaderc){ classifier("natives-windows") })
+        runtimeOnly(variantOf(libs.libbulletjme.windows64){classifier(bft)})
+        runtimeOnly(variantOf(libs.lwjgl){classifier("natives-windows")})
+        runtimeOnly(variantOf(libs.lwjgl.assimp){classifier("natives-windows")})
+        runtimeOnly(variantOf(libs.lwjgl.glfw){classifier("natives-windows")})
+        runtimeOnly(variantOf(libs.lwjgl.shaderc){classifier("natives-windows")})
     }
 
     //implementation 'com.github.stephengold:V-Sport:' + vsportVersion // for published library
