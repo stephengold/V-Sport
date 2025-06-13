@@ -114,6 +114,7 @@ publishing {
                         name = 'Stephen Gold'
                     }
                 }
+                inceptionYear = '2023'
                 licenses {
                     license {
                         distribution = 'repo'
