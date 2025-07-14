@@ -157,6 +157,18 @@ public class HelloWalk
     // PhysicsTickListener methods
 
     /**
+     * Callback from Bullet, invoked just after each simulation step.
+     *
+     * @param space the space that was just stepped (not null)
+     * @param timeStep the duration of the simulation step (in seconds, &ge;0)
+     */
+    @Override
+    public void physicsTick(PhysicsSpace space, float timeStep) {
+        Vector3f location = character.getPhysicsLocation(null);
+        cam.setLocation(location);
+    }
+
+    /**
      * Callback from Bullet, invoked just before each simulation step.
      *
      * @param space the space that's about to be stepped (not null)
@@ -182,18 +194,6 @@ public class HelloWalk
                 character.setWalkDirection(offset);
             }
         }
-    }
-
-    /**
-     * Callback from Bullet, invoked just after each simulation step.
-     *
-     * @param space the space that was just stepped (not null)
-     * @param timeStep the duration of the simulation step (in seconds, &ge;0)
-     */
-    @Override
-    public void physicsTick(PhysicsSpace space, float timeStep) {
-        Vector3f location = character.getPhysicsLocation(null);
-        cam.setLocation(location);
     }
     // *************************************************************************
     // private methods
