@@ -91,7 +91,7 @@ public class HelloCustomShape extends BasePhysicsApp<PhysicsSpace> {
     /**
      * Create the PhysicsSpace. Invoked once during initialization.
      *
-     * @return a new instance
+     * @return a new object
      */
     @Override
     public PhysicsSpace createSpace() {
@@ -147,7 +147,7 @@ public class HelloCustomShape extends BasePhysicsApp<PhysicsSpace> {
         addHalfCylinder(3f, 3f);
         addHemisphere(0f, 0f);
 
-        // Visualize the disc.
+        // Visualize the shape of the disc:
         visualizeShape(disc);
     }
     // *************************************************************************

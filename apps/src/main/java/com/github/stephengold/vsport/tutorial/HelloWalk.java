@@ -104,7 +104,7 @@ public class HelloWalk
     /**
      * Create the PhysicsSpace. Invoked once during initialization.
      *
-     * @return a new instance
+     * @return a new object
      */
     @Override
     public PhysicsSpace createSpace() {
@@ -142,7 +142,7 @@ public class HelloWalk
         // Teleport the character to its initial location.
         character.setPhysicsLocation(new Vector3f(-73.6f, 19.09f, -45.58f));
 
-        // Add a static heightmap to represent the ground.
+        // Add a static heightmap to represent the ground:
         addTerrain();
     }
 
@@ -164,7 +164,7 @@ public class HelloWalk
      */
     @Override
     public void prePhysicsTick(PhysicsSpace space, float timeStep) {
-        // Clear any motion from the previous simulation step.
+        // Clear any motion from the previous simulation step:
         character.setWalkDirection(Vector3f.ZERO);
         /*
          * If the character is touching the ground,
@@ -175,7 +175,7 @@ public class HelloWalk
                 character.jump();
 
             } else if (walkRequested) {
-                // Walk in the camera's forward direction.
+                // Walk in the camera's forward direction:
                 Vector3f offset = cam.getDirection();
                 float walkSpeed = 7f;
                 offset.multLocal(walkSpeed * timeStep);
@@ -202,7 +202,7 @@ public class HelloWalk
      * Add a heightfield body to the space.
      */
     private void addTerrain() {
-        // Generate an array of heights from a PNG image on the classpath.
+        // Generate an array of heights from a PNG image on the classpath:
         String resourceName = "/Textures/Terrain/splat/mountains512.png";
         BufferedImage image = Utils.loadResourceAsImage(resourceName);
 
@@ -216,7 +216,7 @@ public class HelloWalk
 
         physicsSpace.addCollisionObject(body);
 
-        // Visualize the terrain.
+        // Visualize the terrain:
         Vector4fc darkGreen = new Vector4f(0f, 0.3f, 0f, 1f);
         visualizeShape(body)
                 .setColor(darkGreen)
@@ -272,7 +272,7 @@ public class HelloWalk
     /**
      * Configure physics during startup.
      *
-     * @return a new instance (not null)
+     * @return a new object
      */
     private PhysicsSpace configurePhysics() {
         PhysicsSpace result

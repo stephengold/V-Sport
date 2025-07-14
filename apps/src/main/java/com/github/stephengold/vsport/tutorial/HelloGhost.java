@@ -117,7 +117,7 @@ public class HelloGhost
     /**
      * Create the PhysicsSpace. Invoked once during initialization.
      *
-     * @return a new instance
+     * @return a new object
      */
     @Override
     public PhysicsSpace createSpace() {
@@ -164,7 +164,7 @@ public class HelloGhost
         float groundY = -2f;
         addPlane(groundY);
 
-        // Visualize both collision objects.
+        // Visualize both collision objects:
         new AabbGeometry(ghost);
         visualizeShape(character);
         new AabbGeometry(character); // outline the character's AABB in white
@@ -310,7 +310,7 @@ public class HelloGhost
     /**
      * Configure physics during startup.
      *
-     * @return a new instance (not null)
+     * @return a new object
      */
     private PhysicsSpace configurePhysics() {
         PhysicsSpace result

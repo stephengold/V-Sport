@@ -83,7 +83,7 @@ public class HelloDeactivation
     /**
      * Create the PhysicsSpace. Invoked once during initialization.
      *
-     * @return a new instance
+     * @return a new object
      */
     @Override
     public PhysicsSpace createSpace() {
@@ -125,7 +125,7 @@ public class HelloDeactivation
         bottomBody.setPhysicsLocation(new Vector3f(0f, -2f, 0f));
         physicsSpace.addCollisionObject(bottomBody);
 
-        // Visualize all 3 physics objects.
+        // Visualize the shapes of all 3 rigid bodies:
         visualizeShape(dynamicCube);
         visualizeShape(supportCube);
         visualizeShape(bottomBody);

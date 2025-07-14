@@ -89,7 +89,7 @@ public class HelloCharacter
     /**
      * Create the PhysicsSpace. Invoked once during initialization.
      *
-     * @return a new instance
+     * @return a new object
      */
     @Override
     public PhysicsSpace createSpace() {
@@ -127,7 +127,7 @@ public class HelloCharacter
         float y = -2f;
         PhysicsRigidBody ground = addSquare(halfExtent, y);
 
-        // Visualize both physics objects.
+        // Visualize the shapes of both collision objects:
         visualizeShape(character);
         visualizeShape(ground);
     }
@@ -190,7 +190,7 @@ public class HelloCharacter
     /**
      * Configure physics during startup.
      *
-     * @return a new instance (not null)
+     * @return a new object
      */
     private PhysicsSpace configurePhysics() {
         PhysicsSpace result

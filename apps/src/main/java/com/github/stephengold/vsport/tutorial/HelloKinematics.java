@@ -88,7 +88,7 @@ public class HelloKinematics
     /**
      * Create the PhysicsSpace. Invoked once during initialization.
      *
-     * @return a new instance
+     * @return a new object
      */
     @Override
     public PhysicsSpace createSpace() {
@@ -121,7 +121,7 @@ public class HelloKinematics
         physicsSpace.addCollisionObject(kineBall);
         kineBall.setKinematic(true);
 
-        // Visualize both rigid bodies.
+        // Visualize the shapes of both rigid bodies:
         visualizeShape(dynaBall);
         visualizeShape(kineBall);
     }

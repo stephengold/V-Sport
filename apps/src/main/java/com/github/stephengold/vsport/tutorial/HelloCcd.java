@@ -75,7 +75,7 @@ public class HelloCcd extends BasePhysicsApp<PhysicsSpace> {
     /**
      * Create the PhysicsSpace. Invoked once during initialization.
      *
-     * @return a new instance
+     * @return a new object
      */
     @Override
     public PhysicsSpace createSpace() {
@@ -119,7 +119,7 @@ public class HelloCcd extends BasePhysicsApp<PhysicsSpace> {
                 = new PhysicsRigidBody(discShape, PhysicsBody.massForStatic);
         physicsSpace.addCollisionObject(disc);
 
-        // Visualize all 3 physics objects.
+        // Visualize the shapes of all 3 rigid bodies:
         visualizeShape(ccdBall);
         visualizeShape(controlBall);
         visualizeShape(disc).setProgram("Unshaded/Monochrome");

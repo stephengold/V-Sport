@@ -88,7 +88,7 @@ public class HelloContactResponse extends BasePhysicsApp<PhysicsSpace> {
     /**
      * Create the PhysicsSpace. Invoked once during initialization.
      *
-     * @return a new instance
+     * @return a new object
      */
     @Override
     public PhysicsSpace createSpace() {
@@ -130,7 +130,7 @@ public class HelloContactResponse extends BasePhysicsApp<PhysicsSpace> {
         // Position the ball directly above the box.
         ball.setPhysicsLocation(new Vector3f(0f, 4f, 0f));
 
-        // Visualize both rigid bodies.
+        // Visualize the shapes of both rigid bodies:
         visualizeShape(ball);
         visualizeShape(box);
     }

@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2022-2024 Stephen Gold
+ Copyright (c) 2022-2025 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -137,7 +137,14 @@ final class AppChooser extends JFrame {
 
         new AppChooser(apps);
     }
+    // *************************************************************************
+    // private methods
 
+    /**
+     * Select and run one V-Sport app from the specified list.
+     *
+     * @param apps the list of apps to choose from (not null, unaffected)
+     */
     private AppChooser(List<? extends BaseApplication> apps) {
         setTitle("V-Sport AppChooser");
         setSize(500, 100);

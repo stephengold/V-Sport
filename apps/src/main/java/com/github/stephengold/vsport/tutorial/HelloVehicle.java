@@ -82,7 +82,7 @@ public class HelloVehicle extends BasePhysicsApp<PhysicsSpace> {
     /**
      * Create the PhysicsSpace. Invoked once during initialization.
      *
-     * @return a new instance
+     * @return a new object
      */
     @Override
     public PhysicsSpace createSpace() {
@@ -107,7 +107,7 @@ public class HelloVehicle extends BasePhysicsApp<PhysicsSpace> {
      */
     @Override
     public void populateSpace() {
-        // Add a static horizontal plane at y=-0.65 to represent the ground.
+        // Add a static horizontal plane at y=-0.65 to represent the ground:
         float groundY = -0.65f;
         addPlane(groundY);
 
@@ -154,7 +154,7 @@ public class HelloVehicle extends BasePhysicsApp<PhysicsSpace> {
 
         physicsSpace.addCollisionObject(vehicle);
 
-        // Visualize the vehicle.
+        // Visualize the vehicle:
         visualizeShape(vehicle);
         visualizeWheels(vehicle);
 
@@ -188,6 +188,7 @@ public class HelloVehicle extends BasePhysicsApp<PhysicsSpace> {
 
         physicsSpace.addCollisionObject(body);
 
+        // visualization
         String resourceName = "/Textures/greenTile.png";
         float maxAniso = 16f;
         TextureKey textureKey

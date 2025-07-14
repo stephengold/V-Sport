@@ -112,7 +112,7 @@ public class HelloDoubleEnded
     /**
      * Create the PhysicsSpace. Invoked once during initialization.
      *
-     * @return a new instance
+     * @return a new object
      */
     @Override
     public PhysicsSpace createSpace() {
@@ -166,7 +166,7 @@ public class HelloDoubleEnded
                 rotInBall, rotInPaddle, RotationOrder.XYZ);
         physicsSpace.addJoint(joint);
 
-        // Visualize the physics joint.
+        // Visualize the physics joint:
         new ConstraintGeometry(joint, JointEnd.A);
         new ConstraintGeometry(joint, JointEnd.B);
     }

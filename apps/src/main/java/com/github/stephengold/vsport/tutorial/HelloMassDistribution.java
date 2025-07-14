@@ -80,7 +80,7 @@ public class HelloMassDistribution extends BasePhysicsApp<PhysicsSpace> {
     /**
      * Create the PhysicsSpace. Invoked once during initialization.
      *
-     * @return a new instance
+     * @return a new object
      */
     @Override
     public PhysicsSpace createSpace() {
@@ -168,7 +168,7 @@ public class HelloMassDistribution extends BasePhysicsApp<PhysicsSpace> {
         float debugAxisLength = 1f;
         visualizeAxes(mallet, debugAxisLength);
 
-        // Visualize the disc.
+        // Visualize the shape of the disc:
         visualizeShape(disc);
     }
 }

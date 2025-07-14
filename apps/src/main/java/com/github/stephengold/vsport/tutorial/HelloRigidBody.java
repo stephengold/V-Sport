@@ -78,7 +78,7 @@ public class HelloRigidBody extends BasePhysicsApp<PhysicsSpace> {
     /**
      * Create the PhysicsSpace. Invoked once during initialization.
      *
-     * @return a new instance
+     * @return a new object
      */
     @Override
     public PhysicsSpace createSpace() {
@@ -92,7 +92,7 @@ public class HelloRigidBody extends BasePhysicsApp<PhysicsSpace> {
      */
     @Override
     public void populateSpace() {
-        // Create a CollisionShape for balls.
+        // Create a collision shape for balls:
         float ballRadius = 1f;
         CollisionShape ballShape = new SphereCollisionShape(ballRadius);
 
@@ -111,7 +111,7 @@ public class HelloRigidBody extends BasePhysicsApp<PhysicsSpace> {
         // Set ball #2 on a collision course with ball #1.
         ball2.applyCentralImpulse(new Vector3f(-25f, 0f, 0f));
 
-        // Visualize both rigid bodies.
+        // Visualize the shapes of both rigid bodies:
         visualizeShape(ball1);
         visualizeShape(ball2);
     }
