@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2023, Stephen Gold
+ Copyright (c) 2023-2025 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -312,6 +312,24 @@ public class Camera {
      */
     public Camera setAzimuthDegrees(float azimuthDegrees) {
         setAzimuth(MyMath.toRadians(azimuthDegrees));
+        return this;
+    }
+
+    /**
+     * Translate the eye to the specified location without changing its
+     * orientation.
+     *
+     * @param x the X component of the desired location (in worldspace, finite)
+     * @param y the Y component of the desired location (in worldspace, finite)
+     * @param z the Z component of the desired location (in worldspace, finite)
+     * @return the (modified) current instance (for chaining)
+     */
+    public Camera setLocation(float x, float y, float z) {
+        Validate.finite(x, "x");
+        Validate.finite(y, "y");
+        Validate.finite(z, "z");
+
+        eyeLocation.set(x, y, z);
         return this;
     }
 
