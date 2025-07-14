@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2023, Stephen Gold
+ Copyright (c) 2023-2025 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -231,6 +231,9 @@ final class Internals {
     // *************************************************************************
     // new methods exposed
 
+    /**
+     * Cleanly terminate the Vulkan instance.
+     */
     static void cleanUpVulkan() {
         if (logicalDevice != null) {
             // Await completion of all GPU operations:
