@@ -278,7 +278,7 @@ public class SplitDemo extends BasePhysicsApp<PhysicsSpace> {
         cip.setMoveSpeed(2f);
         cip.setRotationMode(RotateMode.DragLMB);
 
-        cam.setLocation(new Vector3f(0f, 0f, 6.8f));
+        cam.setLocation(0f, 0f, 6.8f);
     }
 
     /**

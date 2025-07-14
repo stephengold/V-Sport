@@ -217,11 +217,11 @@ public class TestGearJoint
      */
     private void configureCamera() {
         CameraInputProcessor cip = getCameraInputProcessor();
-        cip.setRotationMode(RotateMode.DragLMB);
         cip.setMoveSpeed(4f);
+        cip.setRotationMode(RotateMode.DragLMB);
 
-        cam.setLocation(new Vector3f(2.2f, 2f, 7.7f))
-                .setAzimuth(-1.82f)
+        cam.setAzimuth(-1.82f)
+                .setLocation(2.2f, 2f, 7.7f)
                 .setUpAngle(-0.23f);
     }
 

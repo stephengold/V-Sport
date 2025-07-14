@@ -234,10 +234,10 @@ public class Pachinko
      */
     private static void configureCamera() {
         CameraInputProcessor cip = getCameraInputProcessor();
-        cip.setRotationMode(RotateMode.DragLMB);
         cip.setMoveSpeed(30f);
+        cip.setRotationMode(RotateMode.DragLMB);
 
-        cam.setLocation(new Vector3f(0f, -23f, 83f));
+        cam.setLocation(0f, -23f, 83f);
     }
 
     /**

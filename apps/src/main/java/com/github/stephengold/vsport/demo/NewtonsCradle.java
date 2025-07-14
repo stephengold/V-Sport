@@ -191,11 +191,11 @@ public class NewtonsCradle extends BasePhysicsApp<PhysicsSpace> {
      */
     private static void configureCamera() {
         CameraInputProcessor cip = getCameraInputProcessor();
-        cip.setRotationMode(RotateMode.DragLMB);
         cip.setMoveSpeed(30f);
+        cip.setRotationMode(RotateMode.DragLMB);
 
-        cam.setLocation(new Vector3f(72f, 35f, 140f))
-                .setAzimuth(-2f)
+        cam.setAzimuth(-2f)
+                .setLocation(72f, 35f, 140f)
                 .setUpAngle(-0.2f);
     }
 
