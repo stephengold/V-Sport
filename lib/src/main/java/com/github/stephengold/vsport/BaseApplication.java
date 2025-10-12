@@ -85,13 +85,13 @@ abstract public class BaseApplication {
     /**
      * all visible geometries, regardless of depth-test status
      */
-    private static final Collection<Geometry> visibleGeometries
+    final private static Collection<Geometry> visibleGeometries
             = new HashSet<>(256);
     /**
      * all visible geometries that omit depth testing, in the order they will be
      * rendered (in other words, from back to front)
      */
-    private static final Deque<Geometry> deferredQueue = new LinkedList<>();
+    final private static Deque<Geometry> deferredQueue = new LinkedList<>();
     /**
      * convenient access to user input
      */
@@ -447,7 +447,7 @@ abstract public class BaseApplication {
     /**
      * Callback invoked after the main update loop terminates.
      */
-    protected abstract void cleanUp();
+    abstract protected void cleanUp();
 
     /**
      * Callback invoked before the main update loop begins.

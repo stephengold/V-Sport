@@ -109,11 +109,11 @@ public class Windlass
     /**
      * orientation of the barrel
      */
-    final static private Quaternion barrelOrientation = new Quaternion();
+    final private static Quaternion barrelOrientation = new Quaternion();
     /**
      * location of the forward pivot in a segment's local coordinates
      */
-    final static private Vector3f localPivot = new Vector3f();
+    final private static Vector3f localPivot = new Vector3f();
     // *************************************************************************
     // constructors
 

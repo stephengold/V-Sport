@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2023, Stephen Gold
+ Copyright (c) 2023-2025 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -50,15 +50,15 @@ class Attachment {
     /**
      * final image layout
      */
-    private final int finalLayout;
+    final private int finalLayout;
     /**
      * image format code
      */
-    private final int format;
+    final private int format;
     /**
      * number of samples per pixel (&gt;0)
      */
-    private final int numSamples;
+    final private int numSamples;
     /**
      * handle of the VkImageView
      */

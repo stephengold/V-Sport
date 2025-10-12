@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2023, Stephen Gold
+ Copyright (c) 2023-2025 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -80,7 +80,7 @@ class LogicalDevice {
     /**
      * allocator for direct buffers
      */
-    private final VkAllocationCallbacks allocator;
+    final private VkAllocationCallbacks allocator;
     /**
      * underlying lwjgl-vulkan device
      */
