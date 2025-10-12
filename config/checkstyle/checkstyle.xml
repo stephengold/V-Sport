@@ -229,7 +229,7 @@
             <message key="name.invalidPattern" value="Catch parameter name ''{0}'' must match pattern ''{1}''."/>
         </module>
         <module name="ClassTypeParameterName">
-            <property name="format" value="^[A-Z]$"/>
+            <property name="format" value="^T$"/>
             <message key="name.invalidPattern" value="Class type name ''{0}'' must match pattern ''{1}''."/>
         </module>
         <module name="InterfaceTypeParameterName">
@@ -297,7 +297,7 @@
         <!-- Checks for size violations:             -->
         <!-- See https://checkstyle.org/checks/sizes -->
         <module name="MethodLength">
-            <property name="max" value="170"/>
+            <property name="max" value="160"/>
         </module>
         <module name="ParameterNumber">
             <property name="max" value="8"/>
