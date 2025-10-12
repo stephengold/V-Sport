@@ -44,6 +44,8 @@ import com.jme3.math.Vector3f;
  * <li>gravity (continual downward force), and </li>
  * <li>contact response (avoid intersecting with other bodies).</li>
  * </ul>
+ * <p>
+ * Builds upon HelloSport.
  *
  * @author Stephen Gold sgold@sonic.net
  */
