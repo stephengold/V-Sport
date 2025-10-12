@@ -464,7 +464,7 @@ public class ShapeGenerator extends Generator {
             buffer.put(tmpLocation.x).put(tmpLocation.y).put(tmpLocation.z);
         }
 
-        // Use arithmetic mean to center the vertices.
+        // Use arithmetic mean to center the vertices:
         int start = 0;
         int end = buffer.limit();
         Vector3f offset = MyBuffer.mean(buffer, start, end, null);
@@ -529,7 +529,7 @@ public class ShapeGenerator extends Generator {
         radii.add(mainRadius);
 
         for (int sphereIndex = 1; sphereIndex < numSpheres; ++sphereIndex) {
-            // Add a smaller sphere, offset from the main one.
+            // Add a smaller sphere, offset from the main one:
             Vector3f offset = nextUnitVector3f(null);
             offset.multLocal(mainRadius);
             centers.add(offset);
@@ -541,7 +541,7 @@ public class ShapeGenerator extends Generator {
         MultiSphere result = new MultiSphere(centers, radii);
 
         if (numSpheres == 1) {
-            // Scale the sphere to make an ellipsoid.
+            // Scale the sphere to make an ellipsoid:
             float xScale = nextFloat(1f, 2f);
             float yScale = nextFloat(0.6f, 1.6f);
             float zScale = nextFloat(0.4f, 1.4f);

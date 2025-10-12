@@ -132,10 +132,10 @@ public class HelloDoor
         PhysicsSpace result
                 = new PhysicsSpace(PhysicsSpace.BroadphaseType.DBVT);
 
-        // To enable the callbacks, register the application as a tick listener.
+        // To enable the callbacks, register the application as a tick listener:
         result.addTickListener(this);
 
-        // Reduce the time step for better accuracy.
+        // Reduce the time step for better accuracy:
         result.setAccuracy(0.005f);
 
         return result;
@@ -151,7 +151,7 @@ public class HelloDoor
         configureCamera();
         setLightDirection(7f, 3f, 5f);
 
-        // Disable VSync for more frequent mouse-position updates.
+        // Disable VSync for more frequent mouse-position updates:
         setVsync(false);
     }
 
@@ -179,7 +179,7 @@ public class HelloDoor
         joint.setLimit(lowLimitAngle, highLimitAngle);
         physicsSpace.addJoint(joint);
 
-        // Disable collisions between the door and the door frame.
+        // Disable collisions between the door and the door frame:
         doorBody.addToIgnoreList(doorFrameBody);
 
         // Add a kinematic, yellow ball:
@@ -191,7 +191,7 @@ public class HelloDoor
      */
     @Override
     public void render() {
-        // Calculate the ground location (if any) indicated by the mouse cursor.
+        // Calculate the ground location (if any) indicated by the mouse cursor:
         Vector2fc screenXy = getInputManager().locateCursor();
         if (screenXy != null) {
             Vector3f nearLocation
@@ -225,7 +225,7 @@ public class HelloDoor
      */
     @Override
     public void prePhysicsTick(PhysicsSpace space, float timeStep) {
-        // Reposition the ball based on the mouse location.
+        // Reposition the ball based on the mouse location:
         Vector3f bodyLocation = mouseLocation.add(0f, doorHalfHeight, 0f);
         ballBody.setPhysicsLocation(bodyLocation);
     }
@@ -273,7 +273,7 @@ public class HelloDoor
         doorBody = new PhysicsRigidBody(shape, mass);
         physicsSpace.addCollisionObject(doorBody);
 
-        // Disable sleep (deactivation).
+        // Disable sleep (deactivation):
         doorBody.setEnableSleep(false);
 
         visualizeShape(doorBody);

@@ -224,7 +224,7 @@ public class SplitDemo extends BasePhysicsApp<PhysicsSpace> {
     protected void render() {
         ++renderCount;
 
-        // Advance the physics, but not during the first render().
+        // Advance the physics, but not during the first render():
         long nanoTime = System.nanoTime();
         if (renderCount > 1) {
             long nanoseconds = nanoTime - lastSplitterUpdate;
@@ -398,7 +398,7 @@ public class SplitDemo extends BasePhysicsApp<PhysicsSpace> {
             return; // Splitting an empty shape has no effect.
         }
 
-        // Transform the triangle to the shape coordinate system.
+        // Transform the triangle to the shape coordinate system:
         Transform shapeToWorld = oldBody.getTransform(null);
         if (splittableShape instanceof CompoundCollisionShape) {
             shapeToWorld.setScale(1f);
@@ -509,7 +509,7 @@ public class SplitDemo extends BasePhysicsApp<PhysicsSpace> {
         assert volumes.length == 2 : volumes.length;
         assert locations.length == 2 : locations.length;
 
-        // Tweak the locations to create some separation.
+        // Tweak the locations to create some separation:
         boolean isDynamic = oldBody.isDynamic();
         float deltaX = isDynamic ? 0.04f : 0.1f;
         MyVector3f.accumulateScaled(locations[0], worldNormal, -deltaX);
@@ -522,7 +522,7 @@ public class SplitDemo extends BasePhysicsApp<PhysicsSpace> {
             velocities[0] = oldBody.getLinearVelocity(null);
             velocities[1] = velocities[0].clone();
 
-            // Tweak the linear velocities to enhance the separation.
+            // Tweak the linear velocities to enhance the separation:
             float deltaV = 0.04f;
             MyVector3f.accumulateScaled(velocities[0], worldNormal, -deltaV);
             MyVector3f.accumulateScaled(velocities[1], worldNormal, +deltaV);

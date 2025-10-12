@@ -113,7 +113,7 @@ public class TestGearJoint
         PhysicsSpace result
                 = new PhysicsSpace(PhysicsSpace.BroadphaseType.DBVT);
 
-        // To enable the callbacks, register the application as a tick listener.
+        // To enable the callbacks, register the application as a tick listener:
         result.addTickListener(this);
         result.setGravity(Vector3f.ZERO);
 
@@ -137,7 +137,7 @@ public class TestGearJoint
      */
     @Override
     public void populateSpace() {
-        // Add an elongated dynamic body for the driveshaft.
+        // Add an elongated dynamic body for the driveshaft:
         float radius = 0.5f;
         float height = 3f;
         CollisionShape driveshaftShape = new CylinderCollisionShape(
@@ -150,7 +150,7 @@ public class TestGearJoint
         visualizeAxes(driveshaft, 1f);
         visualizeShape(driveshaft);
 
-        // Add a flattened dynamic body for the wheel.
+        // Add a flattened dynamic body for the wheel:
         radius = 2f;
         height = 0.5f;
         CollisionShape wheelShape = new CylinderCollisionShape(
@@ -205,7 +205,7 @@ public class TestGearJoint
      */
     @Override
     public void prePhysicsTick(PhysicsSpace space, float timeStep) {
-        // Apply torque to the driveshaft based on user-input signals.
+        // Apply torque to the driveshaft based on user-input signals:
         float yTorque = signalCcw - signalCw;
         driveshaft.applyTorque(new Vector3f(0f, yTorque, 0f));
     }

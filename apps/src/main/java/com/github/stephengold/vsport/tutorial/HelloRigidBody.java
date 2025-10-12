@@ -96,19 +96,20 @@ public class HelloRigidBody extends BasePhysicsApp<PhysicsSpace> {
         float ballRadius = 1f;
         CollisionShape ballShape = new SphereCollisionShape(ballRadius);
 
-        // Create 2 balls (dynamic rigid bodies) and add them to the space.
+        // Create 2 balls (dynamic rigid bodies) and add them to the space:
         float ballMass = 2f;
         PhysicsRigidBody ball1 = new PhysicsRigidBody(ballShape, ballMass);
         physicsSpace.addCollisionObject(ball1);
         PhysicsRigidBody ball2 = new PhysicsRigidBody(ballShape, ballMass);
         physicsSpace.addCollisionObject(ball2);
-
-        // Locate the balls initially 2 PSU (physics-space units) apart.
-        // In other words, 4 PSU from center to center.
+        /*
+         * Locate the balls initially 2 PSU (physics-space units) apart.
+         * In other words, 4 PSU from center to center.
+         */
         ball1.setPhysicsLocation(new Vector3f(1f, 1f, 0f));
         ball2.setPhysicsLocation(new Vector3f(5f, 1f, 0f));
 
-        // Set ball #2 on a collision course with ball #1.
+        // Set ball #2 on a collision course with ball #1:
         ball2.applyCentralImpulse(new Vector3f(-25f, 0f, 0f));
 
         // Visualize the shapes of both rigid bodies:
@@ -125,7 +126,7 @@ public class HelloRigidBody extends BasePhysicsApp<PhysicsSpace> {
      */
     @Override
     public void updatePhysics(float wallClockSeconds) {
-        // For clarity, simulate at 1/10th normal speed.
+        // For clarity, simulate at 1/10th normal speed:
         float simulateSeconds = 0.1f * wallClockSeconds;
         physicsSpace.update(simulateSeconds);
     }

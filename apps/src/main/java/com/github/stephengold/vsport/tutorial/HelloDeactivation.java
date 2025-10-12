@@ -90,7 +90,7 @@ public class HelloDeactivation
         PhysicsSpace result
                 = new PhysicsSpace(PhysicsSpace.BroadphaseType.DBVT);
 
-        // To enable the callbacks, register the application as a tick listener.
+        // To enable the callbacks, register the application as a tick listener:
         result.addTickListener(this);
 
         return result;
@@ -101,16 +101,17 @@ public class HelloDeactivation
      */
     @Override
     public void populateSpace() {
-        // Create a dynamic cube and add it to the space.
+        // Create a dynamic cube and add it to the space:
         float boxHalfExtent = 0.5f;
         CollisionShape smallCubeShape = new BoxCollisionShape(boxHalfExtent);
         float boxMass = 1f;
         dynamicCube = new PhysicsRigidBody(smallCubeShape, boxMass);
         physicsSpace.addCollisionObject(dynamicCube);
         dynamicCube.setPhysicsLocation(new Vector3f(0f, 4f, 0f));
-
-        // Create 2 static bodies and add them to the space...
-        // The top body serves as a temporary support.
+        /*
+         * Create 2 static bodies and add them to the space...
+         * The top body serves as a temporary support.
+         */
         float cubeHalfExtent = 1f;
         CollisionShape largeCubeShape = new BoxCollisionShape(cubeHalfExtent);
         supportCube = new PhysicsRigidBody(

@@ -129,7 +129,7 @@ public class HelloWalk
      */
     @Override
     public void populateSpace() {
-        // Create a character with a capsule shape and add it to the space.
+        // Create a character with a capsule shape and add it to the space:
         float capsuleRadius = 3f;
         float capsuleHeight = 4f;
         CapsuleCollisionShape shape
@@ -139,7 +139,7 @@ public class HelloWalk
         character.setGravity(60f);
         physicsSpace.addCollisionObject(character);
 
-        // Teleport the character to its initial location.
+        // Teleport the character to its initial location:
         character.setPhysicsLocation(new Vector3f(-73.6f, 19.09f, -45.58f));
 
         // Add a static heightmap to represent the ground:
@@ -209,7 +209,7 @@ public class HelloWalk
         float maxHeight = 51f;
         float[] heightArray = Utils.toHeightArray(image, maxHeight);
 
-        // Construct a static rigid body based on the array of heights.
+        // Construct a static rigid body based on the array of heights:
         CollisionShape shape = new HeightfieldCollisionShape(heightArray);
         PhysicsRigidBody body
                 = new PhysicsRigidBody(shape, PhysicsBody.massForStatic);
@@ -230,7 +230,7 @@ public class HelloWalk
         getCameraInputProcessor().setRotationMode(RotateMode.DragLMB);
         getProjection().setFovyDegrees(30f);
 
-        // Bring the near plane closer to reduce clipping.
+        // Bring the near plane closer to reduce clipping:
         getProjection().setZClip(0.1f, 1_000f);
     }
 
@@ -265,7 +265,7 @@ public class HelloWalk
         setLightColor(0.3f, 0.3f, 0.3f);
         setLightDirection(7f, 3f, 5f);
 
-        // Set the background color to light blue.
+        // Set the background color to light blue:
         setBackgroundColor(Constants.SKY_BLUE);
     }
 
@@ -278,7 +278,7 @@ public class HelloWalk
         PhysicsSpace result
                 = new PhysicsSpace(PhysicsSpace.BroadphaseType.DBVT);
 
-        // To enable the callbacks, register the application as a tick listener.
+        // To enable the callbacks, register the application as a tick listener:
         result.addTickListener(this);
 
         return result;

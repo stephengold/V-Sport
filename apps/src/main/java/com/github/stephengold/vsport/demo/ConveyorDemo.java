@@ -189,7 +189,7 @@ public class ConveyorDemo extends BasePhysicsApp<PhysicsSpace> {
             }
         };
 
-        // Enable relevant solver options.
+        // Enable relevant solver options:
         int defaultSolverMode = result.getSolverInfo().mode();
         int solverMode = defaultSolverMode
                 | SolverMode.Use2Directions

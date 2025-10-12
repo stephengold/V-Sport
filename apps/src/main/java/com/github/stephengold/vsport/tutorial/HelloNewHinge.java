@@ -109,7 +109,7 @@ public class HelloNewHinge
         PhysicsSpace result
                 = new PhysicsSpace(PhysicsSpace.BroadphaseType.DBVT);
 
-        // To enable the callbacks, register the application as a tick listener.
+        // To enable the callbacks, register the application as a tick listener:
         result.addTickListener(this);
 
         return result;
@@ -131,8 +131,10 @@ public class HelloNewHinge
      */
     @Override
     public void populateSpace() {
-        // Create a wedge-shaped vehicle with a low center of gravity.
-        // The local forward direction is +Z.
+        /*
+         * Create a wedge-shaped vehicle with a low center of gravity.
+         * The local forward direction is +Z.
+         */
         float noseZ = 1.4f;           // offset from chassis center
         float spoilerY = 0.5f;        // offset from chassis center
         float tailZ = -0.7f;          // offset from chassis center
@@ -152,7 +154,7 @@ public class HelloNewHinge
         chassis.setEnableSleep(false);
         physicsSpace.addCollisionObject(chassis);
 
-        // Add 4 wheels, 2 in the front (for steering) and 2 in the rear.
+        // Add 4 wheels, 2 in the front (for steering) and 2 in the rear:
         boolean front = true;
         boolean rear = false;
         float frontAxisZ = 0.7f * noseZ; // offset from chassis center
@@ -174,12 +176,12 @@ public class HelloNewHinge
         // Visualize the shape of the chassis:
         visualizeShape(chassis);
 
-        // Apply a steering angle of 6 degrees left (to the front wheels).
+        // Apply a steering angle of 6 degrees left (to the front wheels):
         for (RotationMotor motor : steer) {
             motor.set(MotorParam.ServoTarget, FastMath.PI / 30f);
         }
 
-        // Add a static plane to represent the ground.
+        // Add a static plane to represent the ground:
         float groundY = -radius - 0.35f;
         addPlane(groundY);
     }
@@ -194,7 +196,7 @@ public class HelloNewHinge
      */
     @Override
     public void prePhysicsTick(PhysicsSpace space, float timeStep) {
-        // Apply a constant torque (to the rear wheels).
+        // Apply a constant torque (to the rear wheels):
         for (PhysicsRigidBody wheel : drive) {
             Vector3f torque = new Vector3f(1f, 0f, 0f);
             MyQuaternion.rotate(wheel.getPhysicsRotation(null), torque, torque);

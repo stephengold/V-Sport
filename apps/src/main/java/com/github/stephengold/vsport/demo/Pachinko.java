@@ -130,7 +130,7 @@ public class Pachinko
         PhysicsSpace result
                 = new PhysicsSpace(PhysicsSpace.BroadphaseType.DBVT);
 
-        // To enable the callbacks, register the application as a tick listener.
+        // To enable the callbacks, register the application as a tick listener:
         result.addTickListener(this);
 
         return result;
@@ -218,11 +218,11 @@ public class Pachinko
         result.setPhysicsLocation(new Vector3f(0f, 4f, 0f));
         result.setRestitution(0.4f);
 
-        // Restrict the ball's motion to the X-Y plane.
+        // Restrict the ball's motion to the X-Y plane:
         result.setAngularFactor(new Vector3f(0f, 0f, 1f));
         result.setLinearFactor(new Vector3f(1f, 1f, 0f));
 
-        // Apply a random horizontal impulse.
+        // Apply a random horizontal impulse:
         float xImpulse = (1f - 2f * generator.nextFloat());
         result.applyCentralImpulse(new Vector3f(xImpulse, 0f, 0f));
 
@@ -320,7 +320,7 @@ public class Pachinko
 
         physicsSpace.destroy();
 
-        // Estimate the number of child shapes in the playing field.
+        // Estimate the number of child shapes in the playing field:
         int estNumChildren = numRows * (numRows + 1) + 3;
         CompoundCollisionShape fieldShape
                 = new CompoundCollisionShape(estNumChildren);
@@ -329,7 +329,7 @@ public class Pachinko
         int lastRow = numRows - 1;
         Vector3f tmpOffset = new Vector3f();
 
-        // Add child shapes for the pins.
+        // Add child shapes for the pins:
         float pinHalfHeight = 1f;
         float pinHalfWidth = MyMath.rootHalf * barHalfWidth;
         BoxCollisionShape pinShape = new BoxCollisionShape(
@@ -352,7 +352,7 @@ public class Pachinko
             }
         }
 
-        // Add child shapes for the vertical bars.
+        // Add child shapes for the vertical bars:
         float barHalfLength = 0.5f * rowSpacing * (11 - numRows);
         BoxCollisionShape barShape = new BoxCollisionShape(
                 barHalfWidth, barHalfLength, pinHalfHeight);
@@ -364,7 +364,7 @@ public class Pachinko
             fieldShape.addChildShape(barShape, x, yBar, 0f);
         }
 
-        // Add a child shape for the horizontal stop at the bottom.
+        // Add a child shape for the horizontal stop at the bottom:
         float yStop = yBar - barHalfLength;
         float stopHalfWidth = pinSpacing * (numBars - 1) / 2f + barHalfWidth;
         BoxCollisionShape stopShape = new BoxCollisionShape(

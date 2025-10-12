@@ -152,7 +152,7 @@ public class Windlass
         PhysicsSpace result
                 = new PhysicsSpace(PhysicsSpace.BroadphaseType.DBVT);
 
-        // To enable the callbacks, register the application as a tick listener.
+        // To enable the callbacks, register the application as a tick listener:
         result.addTickListener(this);
         result.setAccuracy(timeStep);
         result.setGravity(new Vector3f(0f, -981f, 0f)); // 1 psu = 1 cm
@@ -200,7 +200,7 @@ public class Windlass
         localPivot.set(0f, 0f, segmentLength / 2f);
         /*
          * Make the first cable segment tangent to the +Z side of the barrel
-         * and attach it with a fixed joint (all DOFs locked).
+         * and attach it with a fixed joint (all DOFs locked):
          */
         float zRotation = FastMath.atan2(deltaX, deltaY);
         Quaternion orientation = new Quaternion().fromAngles(0f, zRotation, 0f);
@@ -221,19 +221,19 @@ public class Windlass
         int numCoils = 4;
         int numCoiledSegments = numCoils * numSegmentsPerCoil;
 
-        // Attach successive segments a spiral coiling around the barrel.
+        // Attach successive segments in a spiral coiling around the barrel:
         float phi = FastMath.HALF_PI;
         PhysicsRigidBody endSegment = segment;
         Vector3f center = attachPoint.clone();
         for (int segmentI = 0; segmentI < numCoiledSegments; ++segmentI) {
-            // Calculate the position of the next segment.
+            // Calculate the position of the next segment:
             center.x += deltaX;
             phi += deltaPhi;
             center.y = z0 * FastMath.cos(phi);
             center.z = z0 * FastMath.sin(phi);
             rotatePhi.mult(orientation, orientation);
 
-            // Create a new segment and splice it to the existing cable.
+            // Create a new segment and splice it to the existing cable:
             PhysicsRigidBody newSegment = addCableSegment(center, orientation);
             spliceCableSegments(newSegment, endSegment);
 
@@ -243,12 +243,12 @@ public class Windlass
         orientation.fromAngles(FastMath.HALF_PI, 0f, 0f);
         int numPendantSegments = 4;
 
-        // Attach successive segments in vertical drop.
+        // Attach successive segments in vertical drop:
         for (int segmentI = 0; segmentI < numPendantSegments; ++segmentI) {
-            // Calculate the location of the next segment.
+            // Calculate the location of the next segment:
             center.y -= segmentLength;
 
-            // Create a new segment and splice it to the existing cable.
+            // Create a new segment and splice it to the existing cable:
             PhysicsRigidBody newSegment = addCableSegment(center, orientation);
             spliceCableSegments(newSegment, endSegment);
 
@@ -292,7 +292,7 @@ public class Windlass
      */
     @Override
     public void prePhysicsTick(PhysicsSpace space, float timeStep) {
-        // Turn the barrel based on user-input signals.
+        // Turn the barrel based on user-input signals:
         float turnRate = 4f; // radians per second
         barrelXRotation += (signalCcw - signalCw) * turnRate * timeStep;
         barrelOrientation.fromAngles(barrelXRotation, 0f, 0f);
@@ -388,7 +388,7 @@ public class Windlass
      * @param cableRadius the radius of the cable (&gt;0)
      */
     private void addHook(PhysicsRigidBody endSegment, float cableRadius) {
-        // Locate the final pivot.
+        // Locate the final pivot:
         Transform endTransform = endSegment.getTransform(null);
         Vector3f pivotLocation
                 = MyMath.transform(endTransform, localPivot, null);
@@ -509,7 +509,7 @@ public class Windlass
      */
     private void spliceCableSegments(
             PhysicsRigidBody newSegment, PhysicsRigidBody endSegment) {
-        // Position the pivot.
+        // Position the pivot:
         Transform endTransform = endSegment.getTransform(null);
         Vector3f pivotLocation
                 = MyMath.transform(endTransform, localPivot, null);
