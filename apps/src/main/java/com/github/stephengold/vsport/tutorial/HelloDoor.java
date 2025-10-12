@@ -258,7 +258,7 @@ public class HelloDoor
         result.setKinematic(true);
         physicsSpace.addCollisionObject(result);
 
-        visualizeShape(result);
+        visualizeShape(result).setColor(Constants.YELLOW);
 
         return result;
     }
