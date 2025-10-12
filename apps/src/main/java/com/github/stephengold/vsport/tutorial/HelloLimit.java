@@ -308,9 +308,9 @@ public class HelloLimit
     private static void configureCamera() {
         getCameraInputProcessor().setRotationMode(RotateMode.None);
 
-        cam.setAzimuth(-1.6f)
-                .setLocation(0f, 5f, 10f)
-                .setUpAngle(-0.6f);
+        cam.setLocation(new Vector3f(0f, 5f, 10f));
+        cam.setUpAngle(-0.6f);
+        cam.setAzimuth(-1.6f);
     }
 
     /**

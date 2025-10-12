@@ -85,8 +85,9 @@ public class HelloSport extends BasePhysicsApp<PhysicsSpace> {
      */
     @Override
     public PhysicsSpace createSpace() {
-        PhysicsSpace.BroadphaseType bPhase = PhysicsSpace.BroadphaseType.DBVT;
-        return new PhysicsSpace(bPhase);
+        PhysicsSpace result
+                = new PhysicsSpace(PhysicsSpace.BroadphaseType.DBVT);
+        return result;
     }
 
     /**
