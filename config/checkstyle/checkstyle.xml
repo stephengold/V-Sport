@@ -168,9 +168,7 @@
         <module name="JavadocTagContinuationIndentation">
             <property name="offset" value="0"/>
         </module>
-        <module name="JavadocVariable">
-            <property name="accessModifiers" value="public, protected, package"/>
-        </module>
+        <module name="JavadocVariable"/>
         <module name="MissingJavadocMethod">
             <property name="allowedAnnotations" value=""/>
             <property name="minLineCount" value="-1"/>
@@ -237,7 +235,7 @@
             <message key="name.invalidPattern" value="Interface type name ''{0}'' must match pattern ''{1}''."/>
         </module>
         <module name="LambdaParameterName">
-            <property name="format" value="^[a-z][A-Za-z]{0,10}$"/>
+            <property name="format" value="^$"/>
             <message key="name.invalidPattern" value="Lambda parameter name ''{0}'' must match pattern ''{1}''."/>
         </module>
         <module name="LocalFinalVariableName"/>
