@@ -57,7 +57,7 @@ class NonGlobalUniformValues {
      */
     private float pointSize = 32f;
     /**
-     * temporary storage (TODO not thread-safe)
+     * temporary storage for a 3x3 matrix (TODO not thread-safe)
      */
     final private static Matrix3f tmpMatrix3f = new Matrix3f();
     /**

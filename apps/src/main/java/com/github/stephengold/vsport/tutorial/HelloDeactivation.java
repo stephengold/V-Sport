@@ -124,7 +124,7 @@ public class HelloDeactivation
                 largeCubeShape, PhysicsBody.massForStatic);
         physicsSpace.addCollisionObject(supportCube);
 
-        // The bottom body serves as a visual reference point.
+        // The bottom body serves as a visual reference point:
         float ballRadius = 0.5f;
         CollisionShape ballShape = new SphereCollisionShape(ballRadius);
         PhysicsRigidBody bottomBody = new PhysicsRigidBody(
