@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2023, Stephen Gold
+ Copyright (c) 2023-2025 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -117,6 +117,9 @@ enum ShaderInput {
     // *************************************************************************
     // fields
 
+    /**
+     * {@code true} if the input is a vertex attribute, otherwise {@code false}
+     */
     final private boolean isVertexAttribute;
     /**
      * name used in frag/txt/vert files (not null, not empty)

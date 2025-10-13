@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2023, Stephen Gold
+ Copyright (c) 2023-2025 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -60,6 +60,9 @@ class NonGlobalUniformValues {
      * temporary storage (TODO not thread-safe)
      */
     final private static Matrix3f tmpMatrix3f = new Matrix3f();
+    /**
+     * temporary storage for a 4x4 matrix (TODO not thread-safe)
+     */
     final private static Matrix4f tmpMatrix4f = new Matrix4f();
     /**
      * mesh-to-world rotation
