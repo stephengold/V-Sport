@@ -73,7 +73,7 @@ import org.joml.Vector4f;
  *
  * @param <T> the type of PhysicsSpace to simulate
  */
-public abstract class BasePhysicsApp<T extends PhysicsSpace>
+abstract public class BasePhysicsApp<T extends PhysicsSpace>
         extends BaseApplication {
     // *************************************************************************
     // fields
