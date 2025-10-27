@@ -38,7 +38,6 @@
         <property name="max" value="1400"/>
     </module>
     <module name="LineLength">
-        <property name="fileExtensions" value="java"/>
         <property name="ignorePattern" value="[.0-9A-Z_a-z]{60,}"/>
     </module>
 
@@ -101,6 +100,7 @@
         <module name="MutableException"/>
         <module name="OneTopLevelClass"/>
         <module name="ThrowsCount">
+            <property name="ignorePrivateMethods" value="false"/>
             <property name="max" value="1"/>
         </module>
 
