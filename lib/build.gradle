@@ -2,7 +2,7 @@
 
 // Note: "common.gradle" in the root project contains additional initialization
 //   for this project. This initialization is applied in the "build.gradle"
-//   of the root project.
+//   script of the root project.
 
 plugins {
     id 'java-library'  // to build JVM libraries
@@ -157,7 +157,7 @@ publishMavenPublicationToCentralRepository.dependsOn('assemble')
 
 // Signing relies on the existence of 3 properties
 // (signing.keyId, signing.password, and signing.secretKeyRingFile)
-// which should be stored in ~/.gradle/gradle.properties
+// which should be stored in the ~/.gradle/gradle.properties file
 
 signing {
     sign publishing.publications.maven

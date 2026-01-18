@@ -23,6 +23,6 @@ layout(binding = 1) uniform PerGeometry {
 layout(location = 0) in vec3 vertexPosition_modelspace;
 
 void main() {
-    // vertex position in clipspace
+    // vertex position in clipspace:
     gl_Position = global.projectionMatrix * global.viewMatrix * geometry.modelMatrix * vec4(vertexPosition_modelspace, 1.0);
 }

@@ -24,10 +24,10 @@ layout(binding = 1) uniform PerGeometry {
 layout(location = 0) in vec3 vertexPosition_modelspace; // positions from a vertex buffer
 
 void main() {
-    // vertex point size, in pixels
+    // vertex point size, in pixels:
     gl_PointSize = geometry.pointMaterialSize;
 
-    // vertex position in clipspace
+    // vertex position in clipspace:
     gl_Position = global.projectionMatrix * global.viewMatrix * geometry.modelMatrix
                 * vec4(vertexPosition_modelspace, 1.0);
 }
