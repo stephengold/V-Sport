@@ -805,6 +805,7 @@ final class Internals {
             mesh.makeImmutable();
             VkPipelineInputAssemblyStateCreateInfo iasCreateInfo
                     = mesh.generateIasCreateInfo(stack);
+            iasCreateInfo.primitiveRestartEnable(true);
 
             // multisample state:
             VkPipelineMultisampleStateCreateInfo msCreateInfo
