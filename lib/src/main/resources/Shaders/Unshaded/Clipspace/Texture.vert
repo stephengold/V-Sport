@@ -21,6 +21,6 @@ void main() {
     // vertex position in clipspace:
     gl_Position = geometry.modelMatrix * vec4(vertexPosition_modelspace, 1.0);
 
-    // texture coordinates of the vertex
+    // texture coordinates of the vertex:
     UV = vertexUV;
 }

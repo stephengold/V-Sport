@@ -23,7 +23,7 @@ layout(binding = 1) uniform PerGeometry {
 layout(location = 0) in vec3 vertexPosition_modelspace; // positions from a vertex buffer
 layout(location = 1) in vec3 vertexNormal_modelspace; // normals from a vertex buffer
 
-layout(location = 1) out vec3 Normal_worldspace; // normals to the frag shader
+layout(location = 1) out vec3 Normal_worldspace; // vertex normals to the frag shader
 
 void main() {
     // vertex position in clipspace:

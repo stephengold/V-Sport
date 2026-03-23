@@ -41,12 +41,12 @@ void main() {
     //   In cameraspace, the camera is at (0,0,0).
     EyeDirection_cameraspace = vec3(0,0,0) - vertexPosition_cameraspace.xyz;
 
-    // direction from the vertex to the light, in cameraspace
+    // vertex normal in cameraspace:
     LightDirection_cameraspace = (global.viewMatrix * vec4(global.LightDirection_worldspace, 0)).xyz;
 
-    // vertex normal in cameraspace
+    // vertex normal in cameraspace:
     Normal_cameraspace = (global.viewMatrix * vec4(geometry.modelRotationMatrix * vertexNormal_modelspace, 0)).xyz;
 
-    // texture coordinates of the vertex
+    // texture coordinates of the vertex:
     UV = vertexUV;
 }
