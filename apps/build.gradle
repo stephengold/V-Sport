@@ -204,6 +204,7 @@ tasks.withType(JavaExec).configureEach { // Java runtime options:
     classpath sourceSets.main.runtimeClasspath
     enableAssertions = assertions
     jvmArgs '--enable-native-access=ALL-UNNAMED' // suppress System::load() warning
+    jvmArgs '-XX:+UseG1GC', '-XX:MaxGCPauseMillis=10'
 }
 
 dependencies {
