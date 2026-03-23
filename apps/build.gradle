@@ -158,42 +158,34 @@ tasks.register('HelloWalk', JavaExec) {
 // graphics-only tests (no physics)
 tasks.register('AssimpTest', JavaExec) {
     description = 'Runs the Assimp test app.'
-    enableAssertions = true
     mainClass = 'com.github.stephengold.vsport.test.AssimpTest'
 }
 tasks.register('CheckerboardTest', JavaExec) {
     description = 'Runs the checkerboard test app.'
-    enableAssertions = true
     mainClass = 'com.github.stephengold.vsport.test.CheckerboardTest'
 }
 tasks.register('HelloVSport', JavaExec) {
     description = 'Runs the HelloVSport test app.'
-    enableAssertions = true
     mainClass = 'com.github.stephengold.vsport.test.HelloVSport'
 }
 tasks.register('MouseTest', JavaExec) {
     description = 'Runs the first mouse test app.'
-    enableAssertions = true
     mainClass = 'com.github.stephengold.vsport.test.MouseTest'
 }
 tasks.register('MouseTest2', JavaExec) {
     description = 'Runs the 2nd mouse test app.'
-    enableAssertions = true
     mainClass = 'com.github.stephengold.vsport.test.MouseTest2'
 }
 tasks.register('OctasphereTest', JavaExec) {
     description = 'Runs the octasphere test app.'
-    enableAssertions = true
     mainClass = 'com.github.stephengold.vsport.test.OctasphereTest'
 }
 tasks.register('SpriteTest', JavaExec) {
     description = 'Runs the sprite test app.'
-    enableAssertions = true
     mainClass = 'com.github.stephengold.vsport.test.SpriteTest'
 }
 tasks.register('TextureTest', JavaExec) {
     description = 'Runs the texture test app.'
-    enableAssertions = true
     mainClass = 'com.github.stephengold.vsport.test.TextureTest'
 }
 
