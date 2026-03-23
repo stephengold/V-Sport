@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2023, Stephen Gold
+ Copyright (c) 2023-2026 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -115,6 +115,18 @@ final public class Utils {
         result.flip();
 
         return result;
+    }
+
+    /**
+     * Test whether assertions are enabled.
+     *
+     * @return true if enabled, otherwise false
+     */
+    public static boolean areAssertionsEnabled() {
+        boolean enabled = false;
+        assert enabled = true; // Note: intentional side effect.
+
+        return enabled;
     }
 
     /**
