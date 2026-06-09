@@ -8,7 +8,7 @@ lwjgl = "3.4.1"
 
 [libraries]
 
-joml = "org.joml:joml:1.10.8"
+joml = "org.joml:joml:1.10.9"
 jsnaploader = "io.github.electrostat-lab:snaploader:1.1.1-stable"
 
 libbulletjme-linux64 = { module = "com.github.stephengold:Libbulletjme-Linux64", version.ref = "lbj" }
