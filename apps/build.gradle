@@ -245,6 +245,12 @@ dependencies {
         runtimeOnly(variantOf(libs.lwjgl.assimp){classifier("natives-windows")})
         runtimeOnly(variantOf(libs.lwjgl.glfw){classifier("natives-windows")})
         runtimeOnly(variantOf(libs.lwjgl.shaderc){classifier("natives-windows")})
+
+        runtimeOnly(variantOf(libs.libbulletjme.windowsarm64){classifier(bft)})
+        runtimeOnly(variantOf(libs.lwjgl){classifier("natives-windows-arm64")})
+        runtimeOnly(variantOf(libs.lwjgl.assimp){classifier("natives-windows-arm64")})
+        runtimeOnly(variantOf(libs.lwjgl.glfw){classifier("natives-windows-arm64")})
+        runtimeOnly(variantOf(libs.lwjgl.shaderc){classifier("natives-windows-arm64")})
     }
 
     //implementation 'com.github.stephengold:V-Sport:' + vsportVersion // for published library
