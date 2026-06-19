@@ -30,6 +30,7 @@ package com.github.stephengold.vsport.demo;
 
 import com.github.stephengold.vsport.Constants;
 import com.github.stephengold.vsport.Geometry;
+import com.github.stephengold.vsport.Mesh;
 import com.github.stephengold.vsport.Utils;
 import com.github.stephengold.vsport.input.InputProcessor;
 import com.github.stephengold.vsport.input.RotateMode;
@@ -67,6 +68,18 @@ public class ThousandCubes extends BasePhysicsApp<PhysicsSpace> {
      * simulation speed when "paused"
      */
     final private static float PAUSED_SPEED = 1e-9f;
+    /**
+     * how many columns of boxes (along the system's Z axis)
+     */
+    final private static int numColumns = 10;
+    /**
+     * how many layers of boxes (along the system's Y axis)
+     */
+    final private static int numLayers = 10;
+    /**
+     * how many rows of boxes (along the system's X axis)
+     */
+    final private static int numRows = 10;
     // *************************************************************************
     // fields
 
@@ -120,7 +133,8 @@ public class ThousandCubes extends BasePhysicsApp<PhysicsSpace> {
      */
     public static void main(String[] arguments) {
         Logger.getLogger("").setLevel(Level.WARNING);
-        new ThousandCubes().start();
+        ThousandCubes app = new ThousandCubes();
+        app.start();
     }
     // *************************************************************************
     // BasePhysicsApp methods
@@ -143,7 +157,9 @@ public class ThousandCubes extends BasePhysicsApp<PhysicsSpace> {
             System.out.println("Warning:  using a Dp native library");
         }
 
-        return new PhysicsSpace(PhysicsSpace.BroadphaseType.DBVT);
+        PhysicsSpace result
+                = new PhysicsSpace(PhysicsSpace.BroadphaseType.DBVT);
+        return result;
     }
 
     /**
@@ -175,9 +191,9 @@ public class ThousandCubes extends BasePhysicsApp<PhysicsSpace> {
         visualizeShape(floor, 0.05f);
 
         // Create many boxes, arranged in a rectangular grid:
-        for (int i = 0; i < 10; ++i) {
-            for (int j = 0; j < 10; ++j) {
-                for (int k = 0; k < 10; ++k) {
+        for (int i = 0; i < numRows; ++i) {
+            for (int j = 0; j < numLayers; ++j) {
+                for (int k = 0; k < numColumns; ++k) {
                     addBox(2f * i, 2f * j, 2f * k - 2.5f);
                 }
             }
@@ -189,7 +205,7 @@ public class ThousandCubes extends BasePhysicsApp<PhysicsSpace> {
      */
     @Override
     public void render() {
-        updateScale();
+        updateScales();
         super.render();
     }
 
@@ -239,11 +255,15 @@ public class ThousandCubes extends BasePhysicsApp<PhysicsSpace> {
      */
     private static void addCrosshairs() {
         float crossWidth = 0.1f;
-        cross = new Geometry(new CrosshairsMesh(crossWidth, crossWidth))
+        Mesh crossMesh = new CrosshairsMesh(crossWidth, crossWidth);
+        cross = new Geometry(crossMesh)
                 .setColor(Constants.YELLOW)
                 .setProgram("Unshaded/Clipspace/Monochrome");
-        loop = new Geometry(
-                new LoopMesh(32, 0.3f * crossWidth, 0.3f * crossWidth))
+
+        int numLines = 32;
+        float loopRadius = 0.3f * crossWidth;
+        Mesh loopMesh = new LoopMesh(numLines, loopRadius, loopRadius);
+        loop = new Geometry(loopMesh)
                 .setColor(Constants.YELLOW)
                 .setProgram("Unshaded/Clipspace/Monochrome");
     }
@@ -253,8 +273,8 @@ public class ThousandCubes extends BasePhysicsApp<PhysicsSpace> {
      */
     private static void configureCamera() {
         getCameraInputProcessor().setRotationMode(RotateMode.Immediate);
-        cam.setLocation(60f, 15f, 28f)
-                .setAzimuth(-2.7f)
+        cam.setAzimuth(-2.7f)
+                .setLocation(60f, 15f, 28f)
                 .setUpAngle(-0.25f);
     }
 
@@ -321,7 +341,7 @@ public class ThousandCubes extends BasePhysicsApp<PhysicsSpace> {
      * Scale the crosshair geometries so they will render as an equal-armed
      * cross and a circle, regardless of the window's aspect ratio.
      */
-    private static void updateScale() {
+    private static void updateScales() {
         float aspectRatio = aspectRatio();
         float yScale = Math.min(1f, aspectRatio);
         float xScale = yScale / aspectRatio;
