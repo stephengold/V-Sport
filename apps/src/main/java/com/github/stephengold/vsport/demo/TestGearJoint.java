@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2022-2025 Stephen Gold
+ Copyright (c) 2022-2026 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -257,6 +257,9 @@ public class TestGearJoint
         });
     }
 
+    /**
+     * Toggle the physics simulation: paused/running.
+     */
     private static void togglePause() {
         physicsSpeed = (physicsSpeed <= PAUSED_SPEED) ? 1f : PAUSED_SPEED;
     }

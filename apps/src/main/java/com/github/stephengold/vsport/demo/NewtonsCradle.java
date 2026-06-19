@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2020-2025 Stephen Gold
+ Copyright (c) 2020-2026 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -63,7 +63,7 @@ public class NewtonsCradle extends BasePhysicsApp<PhysicsSpace> {
      */
     final private static float PAUSED_SPEED = 1e-9f;
     /**
-     * color to visualize the balls
+     * color to visualize balls: nearly black
      */
     final private static Vector4fc BALL_COLOR
             = new Vector4f(0.01f, 0.01f, 0.01f, 1f);
@@ -105,7 +105,7 @@ public class NewtonsCradle extends BasePhysicsApp<PhysicsSpace> {
     /**
      * Create the PhysicsSpace. Invoked once during initialization.
      *
-     * @return a new instance
+     * @return a new object
      */
     @Override
     public PhysicsSpace createSpace() {
@@ -130,7 +130,8 @@ public class NewtonsCradle extends BasePhysicsApp<PhysicsSpace> {
     }
 
     /**
-     * Populate the PhysicsSpace. Invoked once during initialization.
+     * Populate the PhysicsSpace with bodies and constraints. Invoked once
+     * during initialization.
      */
     @Override
     public void populateSpace() {
@@ -156,10 +157,11 @@ public class NewtonsCradle extends BasePhysicsApp<PhysicsSpace> {
      * Add a dynamic ball to the space, suspended between 2 single-ended
      * point-to-point joints.
      *
-     * @param xOffset the desired location on the X axis
+     * @param xOffset the desired location along the system's X axis
      * @return a new instance
      */
     private PhysicsRigidBody addSuspendedBall(float xOffset) {
+        // Create and add the ball:
         float radius = 9.9f;
         SphereCollisionShape sphere = new SphereCollisionShape(radius);
         PhysicsRigidBody result = new PhysicsRigidBody(sphere);
@@ -173,11 +175,13 @@ public class NewtonsCradle extends BasePhysicsApp<PhysicsSpace> {
         float wireLength = 80f;
         float yOffset = wireLength * MyMath.rootHalf;
 
+        // Create and add the constraint on the +Z side:
         Vector3f offset = new Vector3f(0f, yOffset, +yOffset);
         Point2PointJoint joint1 = new Point2PointJoint(result, offset);
         physicsSpace.addJoint(joint1);
         new ConstraintGeometry(joint1, JointEnd.A);
 
+        // Create and add the constraint on the -Z side:
         offset.set(0f, yOffset, -yOffset);
         Point2PointJoint joint2 = new Point2PointJoint(result, offset);
         physicsSpace.addJoint(joint2);
@@ -187,7 +191,7 @@ public class NewtonsCradle extends BasePhysicsApp<PhysicsSpace> {
     }
 
     /**
-     * Configure the Camera and CIP during startup.
+     * Configure the Camera and CIP during initialization.
      */
     private static void configureCamera() {
         CameraInputProcessor cip = getCameraInputProcessor();
@@ -200,7 +204,7 @@ public class NewtonsCradle extends BasePhysicsApp<PhysicsSpace> {
     }
 
     /**
-     * Configure keyboard input during startup.
+     * Configure keyboard input during initialization.
      */
     private void configureInput() {
         getInputManager().add(new InputProcessor() {
@@ -270,9 +274,9 @@ public class NewtonsCradle extends BasePhysicsApp<PhysicsSpace> {
         physicsSpace.destroy();
         physicsSpeed = PAUSED_SPEED;
 
-        float xSeparation = 20f;
+        float xSeparation = 20f; // slightly more than the ball diameter
 
-        // center-to-center separation between the first and last balls
+        // center-to-center separation between the first and last balls:
         float xExtent = (numBalls - 1) * xSeparation;
 
         float x0 = -xExtent / 2;
@@ -286,6 +290,9 @@ public class NewtonsCradle extends BasePhysicsApp<PhysicsSpace> {
         balls[0].applyCentralImpulse(kick);
     }
 
+    /**
+     * Toggle the physics simulation: paused/running.
+     */
     private static void togglePause() {
         physicsSpeed = (physicsSpeed <= PAUSED_SPEED) ? 1f : PAUSED_SPEED;
     }

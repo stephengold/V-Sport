@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2023, Stephen Gold
+ Copyright (c) 2023-2026 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -48,7 +48,7 @@ public class CameraInputProcessor extends InputProcessor {
 
     /**
      * maximum magnitude of the camera's up angle after mouse rotation is
-     * applied. This prevents the camera from looking to straight up or straight
+     * applied. This prevents the camera from looking straight up or straight
      * down.
      */
     final private static float maxUpAngleRadians = MyMath.toRadians(85f);
@@ -222,6 +222,9 @@ public class CameraInputProcessor extends InputProcessor {
     // *************************************************************************
     // private methods
 
+    /**
+     * Update the state when camera rotation becomes active.
+     */
     private void activateRotation() {
         this.savedCursorInputMode
                 = GLFW.glfwGetInputMode(windowHandle, GLFW.GLFW_CURSOR);
@@ -230,6 +233,9 @@ public class CameraInputProcessor extends InputProcessor {
         this.isRotationActive = true;
     }
 
+    /**
+     * Update the state when camera rotation becomes inactive.
+     */
     private void deactivateRotation() {
         GLFW.glfwSetInputMode(
                 windowHandle, GLFW.GLFW_CURSOR, savedCursorInputMode);
@@ -288,6 +294,9 @@ public class CameraInputProcessor extends InputProcessor {
         return result;
     }
 
+    /**
+     * Check whether rotation has become active or ceased to be active.
+     */
     private void updateRotationActive() {
         boolean makeActive;
 

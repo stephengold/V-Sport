@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2022-2025 Stephen Gold
+ Copyright (c) 2022-2026 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -91,7 +91,7 @@ public class ThousandCubes extends BasePhysicsApp<PhysicsSpace> {
      */
     private static Geometry loop;
     /**
-     * generate random colors
+     * generate random colors for boxes
      */
     final private static Random random = new Random();
     /**
@@ -174,6 +174,7 @@ public class ThousandCubes extends BasePhysicsApp<PhysicsSpace> {
         physicsSpace.addCollisionObject(floor);
         visualizeShape(floor, 0.05f);
 
+        // Create many boxes, arranged in a rectangular grid:
         for (int i = 0; i < 10; ++i) {
             for (int j = 0; j < 10; ++j) {
                 for (int k = 0; k < 10; ++k) {
@@ -215,6 +216,7 @@ public class ThousandCubes extends BasePhysicsApp<PhysicsSpace> {
      * @param z the desired Z coordinate (in physics space)
      */
     private void addBox(float x, float y, float z) {
+        // Create and add a box:
         float mass = 10f;
         PhysicsRigidBody box = new PhysicsRigidBody(boxShape, mass);
         physicsSpace.addCollisionObject(box);
@@ -224,12 +226,17 @@ public class ThousandCubes extends BasePhysicsApp<PhysicsSpace> {
         tmpLocation.set(x, y, z);
         box.setPhysicsLocation(tmpLocation);
 
+        // Visualize the box in a random color:
         float red = FastMath.pow(random.nextFloat(), 2.2f);
         float green = FastMath.pow(random.nextFloat(), 2.2f);
         float blue = FastMath.pow(random.nextFloat(), 2.2f);
         visualizeShape(box).setColor(new Vector4f(red, green, blue, 1f));
     }
 
+    /**
+     * Create geometries to render yellow crosshairs at the center of the
+     * window.
+     */
     private static void addCrosshairs() {
         float crossWidth = 0.1f;
         cross = new Geometry(new CrosshairsMesh(crossWidth, crossWidth))
@@ -242,7 +249,7 @@ public class ThousandCubes extends BasePhysicsApp<PhysicsSpace> {
     }
 
     /**
-     * Configure the Camera and CIP during startup.
+     * Configure the Camera and CIP during initialization.
      */
     private static void configureCamera() {
         getCameraInputProcessor().setRotationMode(RotateMode.Immediate);
@@ -252,7 +259,7 @@ public class ThousandCubes extends BasePhysicsApp<PhysicsSpace> {
     }
 
     /**
-     * Configure keyboard input during startup.
+     * Configure keyboard input during initialization.
      */
     private void configureInput() {
         getInputManager().add(new InputProcessor() {
@@ -279,6 +286,9 @@ public class ThousandCubes extends BasePhysicsApp<PhysicsSpace> {
         });
     }
 
+    /**
+     * Launch a single red ball from the camera location.
+     */
     private void launchRedBall() {
         float mass = 10f;
         PhysicsRigidBody missile = new PhysicsRigidBody(launchShape, mass);
@@ -296,9 +306,13 @@ public class ThousandCubes extends BasePhysicsApp<PhysicsSpace> {
         missile.setLinearDamping(0.3f);
         missile.setPhysicsLocation(cam.getLocation());
 
+        // Visualize the ball in red:
         visualizeShape(missile).setColor(Constants.RED);
     }
 
+    /**
+     * Toggle the physics simulation: paused/running.
+     */
     private static void togglePause() {
         physicsSpeed = (physicsSpeed <= PAUSED_SPEED) ? 1f : PAUSED_SPEED;
     }

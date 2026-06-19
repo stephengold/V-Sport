@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2023, Stephen Gold
+ Copyright (c) 2023-2026 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -181,6 +181,9 @@ public class BufferResource extends DeviceResource {
         }
     }
 
+    /**
+     * Use staging to create the underlying resources.
+     */
     private void createByStaging() {
         // Create a temporary MappableBuffer for staging:
         LogicalDevice logicalDevice = Internals.getLogicalDevice();
@@ -210,6 +213,9 @@ public class BufferResource extends DeviceResource {
         stagingBuffer.destroy();
     }
 
+    /**
+     * Use persistent mapping to create the underlying resources.
+     */
     private void createWithPersistentMapping() {
         LogicalDevice logicalDevice = Internals.getLogicalDevice();
         int properties = VK10.VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT

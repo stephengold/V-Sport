@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2022-2025 Stephen Gold
+ Copyright (c) 2022-2026 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -181,7 +181,7 @@ public class Pachinko
      * Callback from Bullet, invoked just after each simulation step.
      *
      * @param space the space that was just stepped (not null)
-     * @param timeStep the time per simulation step (in seconds, &ge;0)
+     * @param timeStep the duration of the simulation step (in seconds, &ge;0)
      */
     @Override
     public void physicsTick(PhysicsSpace space, float timeStep) {
@@ -192,7 +192,7 @@ public class Pachinko
      * Callback from Bullet, invoked just before each simulation step.
      *
      * @param space the space that's about to be stepped (not null)
-     * @param timeStep the time per simulation step (in seconds, &ge;0)
+     * @param timeStep the duration of the simulation step (in seconds, &ge;0)
      */
     @Override
     public void prePhysicsTick(PhysicsSpace space, float timeStep) {
@@ -241,7 +241,7 @@ public class Pachinko
     }
 
     /**
-     * Configure keyboard input during startup.
+     * Configure keyboard input during initialization.
      */
     private void configureInput() {
         getInputManager().add(new InputProcessor() {
@@ -381,6 +381,9 @@ public class Pachinko
         timeSinceAdded = addInterval;
     }
 
+    /**
+     * Toggle the physics simulation: paused/running.
+     */
     private static void togglePause() {
         physicsSpeed = (physicsSpeed <= PAUSED_SPEED) ? 1f : PAUSED_SPEED;
     }

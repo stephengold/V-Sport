@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2022-2025 Stephen Gold
+ Copyright (c) 2022-2026 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -145,7 +145,7 @@ public class Windlass
     /**
      * Create the PhysicsSpace. Invoked once during initialization.
      *
-     * @return a new instance
+     * @return a new object
      */
     @Override
     public PhysicsSpace createSpace() {
@@ -459,7 +459,7 @@ public class Windlass
     }
 
     /**
-     * Configure the Camera and CIP during startup.
+     * Configure the camera and CIP during initialization.
      */
     private static void configureCamera() {
         CameraInputProcessor cip = getCameraInputProcessor();
@@ -472,7 +472,7 @@ public class Windlass
     }
 
     /**
-     * Configure keyboard input during startup.
+     * Configure keyboard input during initialization.
      */
     private void configureInput() {
         getInputManager().add(new InputProcessor() {
@@ -528,6 +528,9 @@ public class Windlass
         physicsSpace.addJoint(joint);
     }
 
+    /**
+     * Toggle the physics simulation: paused/running.
+     */
     private static void togglePause() {
         physicsSpeed = (physicsSpeed <= PAUSED_SPEED) ? 1f : PAUSED_SPEED;
     }
