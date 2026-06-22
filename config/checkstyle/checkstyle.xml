@@ -35,7 +35,7 @@
     <!-- Checks for size violations:             -->
     <!-- See https://checkstyle.org/checks/sizes -->
     <module name="FileLength">
-        <property name="max" value="1400"/>
+        <property name="max" value="1350"/>
     </module>
     <module name="LineLength">
         <property name="ignorePattern" value="[.0-9A-Z_a-z]{60,}"/>
@@ -79,7 +79,7 @@
         <module name="RightCurly">
             <property name="id" value="RightCurlyAlone"/>
             <property name="option" value="alone"/>
-            <property name="tokens" value="CLASS_DEF, METHOD_DEF, CTOR_DEF, LITERAL_FOR, LITERAL_WHILE, STATIC_INIT, INSTANCE_INIT, ANNOTATION_DEF, ENUM_DEF, INTERFACE_DEF, RECORD_DEF, COMPACT_CTOR_DEF, LITERAL_SWITCH, LITERAL_CASE"/>
+            <property name="tokens" value="CLASS_DEF, METHOD_DEF, CTOR_DEF, LITERAL_FOR, LITERAL_WHILE, STATIC_INIT, INSTANCE_INIT, ANNOTATION_DEF, ENUM_DEF, INTERFACE_DEF, RECORD_DEF, COMPACT_CTOR_DEF, LITERAL_SWITCH, LITERAL_CASE, LITERAL_FINALLY"/>
         </module>
         <module name="SuppressionXpathSingleFilter">
             <!-- suppression is required till https://github.com/checkstyle/checkstyle/issues/7541 -->
@@ -101,7 +101,7 @@
         <module name="OneTopLevelClass"/>
         <module name="ThrowsCount">
             <property name="ignorePrivateMethods" value="false"/>
-            <property name="max" value="1"/>
+            <property name="max" value="0"/>
         </module>
 
         <!-- Checks for common coding problems:       -->
@@ -169,7 +169,7 @@
         <module name="JavadocVariable"/>
         <module name="MissingJavadocMethod">
             <property name="allowedAnnotations" value=""/>
-            <property name="scope" value="package"/>
+            <property name="scope" value="private"/>
         </module>
         <module name="MissingJavadocType">
             <property name="scope" value="private"/>
@@ -291,7 +291,7 @@
         <!-- Checks for size violations:             -->
         <!-- See https://checkstyle.org/checks/sizes -->
         <module name="MethodLength">
-            <property name="max" value="160"/>
+            <property name="max" value="156"/>
         </module>
         <module name="ParameterNumber">
             <property name="max" value="8"/>
