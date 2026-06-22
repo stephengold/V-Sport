@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2022-2023, Stephen Gold
+ Copyright (c) 2022-2026 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -54,7 +54,7 @@ public class LinksGeometry extends Geometry {
      * Instantiate a Geometry to visualize the specified soft body and make the
      * Geometry visible.
      *
-     * @param softBody the body to visualize (not null, alias created)
+     * @param softBody the soft body to visualize (not null, alias created)
      */
     public LinksGeometry(PhysicsSoftBody softBody) {
         super();
@@ -74,7 +74,7 @@ public class LinksGeometry extends Geometry {
     // Geometry methods
 
     /**
-     * Update properties based on the body and then render.
+     * Update properties based on the soft body and then render.
      */
     @Override
     public void updateAndRender() {
@@ -86,7 +86,7 @@ public class LinksGeometry extends Geometry {
      * Test whether the body has been removed from the specified CollisionSpace.
      *
      * @param space the space to test (not null, unaffected)
-     * @return true if removed, otherwise false
+     * @return {@code true} if removed, otherwise {@code false}
      */
     @Override
     public boolean wasRemovedFrom(CollisionSpace space) {

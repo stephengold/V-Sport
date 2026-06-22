@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2022-2023, Stephen Gold
+ Copyright (c) 2022-2026 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -104,7 +104,7 @@ public class LocalAxisGeometry extends Geometry {
     // Geometry methods
 
     /**
-     * Update properties based on the body and then render.
+     * Update properties based on the collision object and then render.
      */
     @Override
     public void updateAndRender() {
@@ -116,7 +116,7 @@ public class LocalAxisGeometry extends Geometry {
      * Test whether the body has been removed from the specified CollisionSpace.
      *
      * @param space the space to test (not null, unaffected)
-     * @return true if removed, otherwise false
+     * @return {@code true} if removed, otherwise {@code false}
      */
     @Override
     public boolean wasRemovedFrom(CollisionSpace space) {
@@ -145,6 +145,7 @@ public class LocalAxisGeometry extends Geometry {
             Quaternion orientation = pco.getPhysicsRotation(null);
             setOrientation(orientation);
         }
+
         setScale(length);
     }
 }

@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2022-2023, Stephen Gold
+ Copyright (c) 2022-2026 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -49,16 +49,16 @@ public class RigidBodyShapeGeometry extends Geometry {
     // fields
 
     /**
-     * true to automatically update the color based on the properties of the
-     * rigid body, false for constant color
+     * {@code true} to automatically update the color based on properties of the
+     * rigid body, {@code false} for constant color
      */
     private boolean automaticColor = true;
     /**
-     * body to visualize
+     * rigid body to visualize
      */
     final private PhysicsRigidBody rigidBody;
     /**
-     * data used to generate the current Mesh
+     * auxiliary data used to generate the current mesh
      */
     private ShapeSummary summary;
     // *************************************************************************
@@ -68,7 +68,7 @@ public class RigidBodyShapeGeometry extends Geometry {
      * Instantiate a Geometry to visualize the specified rigid body and make the
      * Geometry visible.
      *
-     * @param rigidBody the body to visualize (not null, alias created)
+     * @param rigidBody the rigid body to visualize (not null, alias created)
      * @param meshingStrategy how to generate meshes (not null)
      */
     RigidBodyShapeGeometry(
@@ -84,7 +84,7 @@ public class RigidBodyShapeGeometry extends Geometry {
         Mesh mesh = BasePhysicsApp.meshForShape(shape, summary);
         super.setMesh(mesh);
 
-        // Disable back-face culling for "concave" collision shapes.
+        // Disable back-face culling for non-convex collision shapes.
         boolean isConcave = shape.isConcave();
         super.setBackCulling(!isConcave);
 
@@ -94,10 +94,11 @@ public class RigidBodyShapeGeometry extends Geometry {
     // Geometry methods
 
     /**
-     * Alter the color and disable automatic updating of it.
+     * Alter the base color and disable automatic updating of it.
      *
-     * @param newColor the desired color (not null)
-     * @return the (modified) current instance (for chaining)
+     * @param newColor the desired color (in the Linear colorspace, not null,
+     * unaffected)
+     * @return the (modified) current geometry (for chaining)
      */
     @Override
     public Geometry setColor(Vector4fc newColor) {
@@ -108,7 +109,7 @@ public class RigidBodyShapeGeometry extends Geometry {
     }
 
     /**
-     * Update properties based on the body and then render.
+     * Update properties based on the rigid body and then render.
      */
     @Override
     public void updateAndRender() {
@@ -123,7 +124,7 @@ public class RigidBodyShapeGeometry extends Geometry {
      * Test whether the body has been removed from the specified CollisionSpace.
      *
      * @param space the space to test (not null, unaffected)
-     * @return true if removed, otherwise false
+     * @return {@code true} if removed, otherwise {@code false}
      */
     @Override
     public boolean wasRemovedFrom(CollisionSpace space) {

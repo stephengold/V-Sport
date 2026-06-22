@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2022-2023, Stephen Gold
+ Copyright (c) 2022-2026 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -50,8 +50,8 @@ public class CharacterShapeGeometry extends Geometry {
     // fields
 
     /**
-     * true to automatically update the color based on the properties of the
-     * character, false for constant color
+     * {@code true} to automatically update the color based on properties of the
+     * character, {@code false} for custom color
      */
     private boolean automaticColor = true;
     /**
@@ -59,7 +59,7 @@ public class CharacterShapeGeometry extends Geometry {
      */
     final private PhysicsCharacter character;
     /**
-     * data used to generate the current Mesh
+     * auxiliary data used to generate the current mesh
      */
     private ShapeSummary summary;
     // *************************************************************************
@@ -91,10 +91,11 @@ public class CharacterShapeGeometry extends Geometry {
     // Geometry methods
 
     /**
-     * Alter the color and disable automatic updating of it.
+     * Alter the base color and disable automatic updating of it.
      *
-     * @param newColor the desired color (not null)
-     * @return the (modified) current instance (for chaining)
+     * @param newColor the desired color (in the Linear colorspace, not null,
+     * unaffected)
+     * @return the (modified) current geometry (for chaining)
      */
     @Override
     public Geometry setColor(Vector4fc newColor) {
@@ -105,7 +106,7 @@ public class CharacterShapeGeometry extends Geometry {
     }
 
     /**
-     * Update properties based on the PhysicsCharacter and then render.
+     * Update properties based on the character and then render.
      */
     @Override
     public void updateAndRender() {
@@ -121,7 +122,7 @@ public class CharacterShapeGeometry extends Geometry {
      * CollisionSpace.
      *
      * @param space the space to test (not null, unaffected)
-     * @return true if removed, otherwise false
+     * @return {@code true} if removed, otherwise {@code false}
      */
     @Override
     public boolean wasRemovedFrom(CollisionSpace space) {
