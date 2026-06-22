@@ -74,7 +74,6 @@ public class CharacterShapeGeometry extends Geometry {
      */
     CharacterShapeGeometry(
             PhysicsCharacter character, MeshingStrategy meshingStrategy) {
-        super();
         Validate.nonNull(character, "character");
         Validate.nonNull(meshingStrategy, "meshing strategy");
 

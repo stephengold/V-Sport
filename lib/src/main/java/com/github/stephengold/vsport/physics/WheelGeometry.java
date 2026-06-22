@@ -68,7 +68,6 @@ public class WheelGeometry extends Geometry {
      * @param wheelIndex which wheel (&ge;0)
      */
     public WheelGeometry(PhysicsVehicle vehicle, int wheelIndex) {
-        super();
         Validate.nonNull(vehicle, "vehicle");
         Validate.nonNegative(wheelIndex, "wheel index");
 

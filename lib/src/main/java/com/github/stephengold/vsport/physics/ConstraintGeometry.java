@@ -76,7 +76,6 @@ public class ConstraintGeometry extends Geometry {
      * @param end which end to visualize (not null)
      */
     public ConstraintGeometry(Constraint constraint, JointEnd end) {
-        super();
         Validate.nonNull(constraint, "constraint");
         Validate.nonNull(end, "end");
 

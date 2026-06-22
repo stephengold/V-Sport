@@ -107,6 +107,7 @@
         <!-- Checks for common coding problems:       -->
         <!-- See https://checkstyle.org/checks/coding -->
         <module name="AvoidDoubleBraceInitialization"/>
+        <module name="AvoidNoArgumentSuperConstructorCall"/>
         <module name="ConstructorsDeclarationGrouping"/>
         <module name="CovariantEquals"/>
         <module name="DefaultComesLast"/>

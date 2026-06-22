@@ -76,7 +76,6 @@ public class AabbGeometry extends Geometry {
      * @param pco the collision object (not null, alias created)
      */
     public AabbGeometry(PhysicsCollisionObject pco) {
-        super();
         Validate.nonNull(pco, "collision object");
 
         this.pco = pco;

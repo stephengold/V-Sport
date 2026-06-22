@@ -57,7 +57,6 @@ public class FacesGeometry extends Geometry {
      * @param softBody the soft body to visualize (not null, alias created)
      */
     public FacesGeometry(PhysicsSoftBody softBody) {
-        super();
         Validate.nonNull(softBody, "soft body");
 
         this.softBody = softBody;
