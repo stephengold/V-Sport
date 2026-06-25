@@ -100,7 +100,7 @@ public class RigidBodyShapeGeometry extends Geometry {
      * @return the (modified) current geometry (for chaining)
      */
     @Override
-    public Geometry setColor(Vector4fc newColor) {
+    public RigidBodyShapeGeometry setColor(Vector4fc newColor) {
         automaticColor = false;
         super.setColor(newColor);
 
