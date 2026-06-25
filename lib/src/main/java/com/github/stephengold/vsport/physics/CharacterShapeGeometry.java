@@ -98,7 +98,7 @@ public class CharacterShapeGeometry extends Geometry {
      */
     @Override
     public CharacterShapeGeometry setColor(Vector4fc newColor) {
-        automaticColor = false;
+        this.automaticColor = false;
         super.setColor(newColor);
 
         return this;

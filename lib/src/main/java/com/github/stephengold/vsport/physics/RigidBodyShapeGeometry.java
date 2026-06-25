@@ -101,7 +101,7 @@ public class RigidBodyShapeGeometry extends Geometry {
      */
     @Override
     public RigidBodyShapeGeometry setColor(Vector4fc newColor) {
-        automaticColor = false;
+        this.automaticColor = false;
         super.setColor(newColor);
 
         return this;
