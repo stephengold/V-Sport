@@ -157,7 +157,7 @@ public class RigidBodyShapeGeometry extends Geometry {
             MeshingStrategy strategy = summary.meshingStrategy();
             this.summary = new ShapeSummary(shape, strategy);
             Mesh mesh = BasePhysicsApp.meshForShape(shape, summary);
-            setMesh(mesh);
+            super.setMesh(mesh);
         }
     }
 

@@ -119,7 +119,7 @@ public class PinsGeometry extends Geometry {
         boolean success = mesh.update();
         if (!success) {
             mesh = new PinsMesh(softBody);
-            setMesh(mesh);
+            super.setMesh(mesh);
         }
     }
 }
