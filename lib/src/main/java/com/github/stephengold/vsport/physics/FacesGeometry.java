@@ -97,11 +97,11 @@ public class FacesGeometry extends Geometry {
      * Update the Mesh.
      */
     private void updateMesh() {
-        FacesMesh softMesh = (FacesMesh) getMesh();
-        boolean success = softMesh.update();
+        FacesMesh mesh = (FacesMesh) getMesh();
+        boolean success = mesh.update();
         if (!success) {
-            softMesh = new FacesMesh(softBody);
-            super.setMesh(softMesh);
+            mesh = new FacesMesh(softBody);
+            super.setMesh(mesh);
         }
     }
 }
