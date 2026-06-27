@@ -253,7 +253,7 @@ dependencies {
         runtimeOnly(variantOf(libs.lwjgl.shaderc){classifier("natives-windows-arm64")})
     }
 
-    //implementation 'com.github.stephengold:V-Sport:' + vsportVersion // for published library
+    //implementation 'com.github.stephengold:V-Sport:' + providers.gradleProperty('vsportVersion').get() // for published library
     implementation project(':lib') // for latest sourcecode
 }
 

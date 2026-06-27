@@ -13,7 +13,7 @@ plugins {
 ext {
     group = 'com.github.stephengold'
     artifact = 'V-Sport'
-    version = vsportVersion
+    version = providers.gradleProperty('vsportVersion').get()
     baseName = "${artifact}-${version}" // for artifacts
     websiteUrl = 'https://github.com/stephengold/V-Sport'
 }
