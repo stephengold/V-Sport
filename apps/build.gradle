@@ -198,6 +198,9 @@ Boolean includeMacOsX = os.isMacOsX()
 Boolean includeWindows = os.isWindows()
 
 tasks.withType(JavaExec).configureEach { // Java runtime options:
+    if (os.isLinux()) {
+        environment('__GL_THREADED_OPTIMIZATIONS', '0') // see lwjgl3 issue #1071
+    }
     if (os.isMacOsX()) {
         jvmArgs '-XstartOnFirstThread' // required for GLFW on macOS
     }

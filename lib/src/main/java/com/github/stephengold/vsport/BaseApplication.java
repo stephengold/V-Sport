@@ -651,10 +651,17 @@ abstract public class BaseApplication {
         GLFW.glfwWindowHint(GLFW.GLFW_CLIENT_API, GLFW.GLFW_NO_API);
         GLFW.glfwWindowHint(GLFW.GLFW_RESIZABLE, GLFW.GLFW_TRUE);
 
+        long monitor = GLFW.glfwGetPrimaryMonitor();
+        GLFWVidMode videoMode = GLFW.glfwGetVideoMode(monitor);
+        int leftX = (videoMode.width() - Internals.framebufferWidth()) / 2;
+        int topY = (videoMode.height() - Internals.framebufferHeight()) / 2;
+        GLFW.glfwWindowHint(GLFW.GLFW_POSITION_X, leftX);
+        GLFW.glfwWindowHint(GLFW.GLFW_POSITION_Y, topY);
+
         // Create the window:
         int width = Internals.framebufferWidth();
         int height = Internals.framebufferHeight();
-        long monitor = MemoryUtil.NULL; // for windowed mode, not fullscreen
+        monitor = MemoryUtil.NULL; // for windowed mode, not fullscreen
         windowHandle = GLFW.glfwCreateWindow(width, height, initialWindowTitle,
                 monitor, MemoryUtil.NULL);
         /*
@@ -675,13 +682,11 @@ abstract public class BaseApplication {
                     + width + ", height=" + height);
         }
 
-        // Center the window.
-        GLFWVidMode videoMode
-                = GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor());
-        GLFW.glfwSetWindowPos(windowHandle,
-                (videoMode.width() - width) / 2,
-                (videoMode.height() - height) / 2
-        );
+        int glfwPlatform = GLFW.glfwGetPlatform();
+        if (glfwPlatform != GLFW.GLFW_PLATFORM_WAYLAND) {
+            GLFW.glfwSetWindowPos(windowHandle, leftX, topY);
+            // in case the window hints didn't correctly position it
+        }
 
         // Request callback when the frame buffer is resized:
         GLFW.glfwSetFramebufferSizeCallback(
