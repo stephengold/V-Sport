@@ -599,8 +599,9 @@ abstract public class BaseApplication {
             @Override
             public void onKeyboard(int keyId, boolean isPressed) {
                 if (keyId == GLFW.GLFW_KEY_C) {
-                    if (isPressed) { // print camera state
+                    if (isPressed) { // print camera and projection states
                         System.out.println(cam);
+                        System.out.println(projection);
                         System.out.flush();
                     }
                     return;
