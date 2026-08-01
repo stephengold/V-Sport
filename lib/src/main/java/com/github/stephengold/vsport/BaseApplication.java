@@ -645,7 +645,8 @@ abstract public class BaseApplication {
         windowHandle = GLFW.glfwCreateWindow(width, height, initialWindowTitle,
                 monitor, MemoryUtil.NULL);
         if (windowHandle == MemoryUtil.NULL) {
-            throw new RuntimeException("Failed to create a GLFW window");
+            throw new RuntimeException("Failed to create a GLFW window; width="
+                    + width + ", height=" + height);
         }
 
         // Center the window.
