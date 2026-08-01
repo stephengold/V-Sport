@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2023-2025 Stephen Gold
+ Copyright (c) 2023-2026 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -44,7 +44,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import jme3utilities.MyString;
 import org.joml.Vector4f;
-import org.joml.Vector4fc;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWVulkan;
@@ -566,11 +565,14 @@ final class Internals {
     /**
      * Alter the background color of the window.
      *
-     * @param desiredColor the desired color (not null, unaffected,
-     * default=black)
+     * @param red the red component of the desired color (default=0)
+     * @param green the green component of the desired color (default=0)
+     * @param blue the blue component of the desired color (default=0)
+     * @param opacity the opacity component of the desired color (default=0)
      */
-    static void setBackgroundColor(Vector4fc desiredColor) {
-        backgroundColor.set(desiredColor);
+    static void setBackgroundColor(
+            float red, float green, float blue, float opacity) {
+        backgroundColor.set(red, green, blue, opacity);
     }
 
     /**
