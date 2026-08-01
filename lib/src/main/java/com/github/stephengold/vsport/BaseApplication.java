@@ -640,8 +640,9 @@ abstract public class BaseApplication {
         // Create the window:
         int width = Internals.framebufferWidth();
         int height = Internals.framebufferHeight();
+        long monitor = MemoryUtil.NULL; // for windowed mode, not fullscreen
         windowHandle = GLFW.glfwCreateWindow(width, height, initialWindowTitle,
-                MemoryUtil.NULL, MemoryUtil.NULL);
+                monitor, MemoryUtil.NULL);
         if (windowHandle == MemoryUtil.NULL) {
             throw new RuntimeException("Failed to create a GLFW window");
         }
