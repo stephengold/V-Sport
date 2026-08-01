@@ -42,6 +42,7 @@ import com.jme3.bullet.objects.PhysicsRigidBody;
 import com.jme3.math.Vector3f;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import jme3utilities.Validate;
 import jme3utilities.math.MyMath;
 import org.joml.Vector4f;
 import org.joml.Vector4fc;
@@ -285,6 +286,8 @@ public class NewtonsCradle extends BasePhysicsApp<PhysicsSpace> {
      * @param numBalls (&ge;1)
      */
     private void restartSimulation(int numBalls) {
+        Validate.positive(numBalls, "number of balls");
+
         physicsSpace.destroy();
         physicsSpeed = PAUSED_SPEED;
 
