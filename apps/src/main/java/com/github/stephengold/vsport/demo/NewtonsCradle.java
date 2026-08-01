@@ -152,6 +152,22 @@ public class NewtonsCradle extends BasePhysicsApp<PhysicsSpace> {
         float simulateSeconds = physicsSpeed * wallClockSeconds;
         physicsSpace.update(simulateSeconds);
     }
+
+    /**
+     * Invoked before each frame is rendered, to update the text in the window's
+     * title bar.
+     */
+    @Override
+    protected void updateWindowTitle() {
+        String initialWindowTitle = initialWindowTitle();
+        String title;
+        if (isPaused()) {
+            title = initialWindowTitle + "  *PAUSED*";
+        } else {
+            title = initialWindowTitle;
+        }
+        setWindowTitle(title);
+    }
     // *************************************************************************
     // private methods
 
