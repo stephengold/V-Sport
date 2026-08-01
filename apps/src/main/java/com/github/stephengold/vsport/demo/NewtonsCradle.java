@@ -49,10 +49,9 @@ import org.joml.Vector4fc;
 import org.lwjgl.glfw.GLFW;
 
 /**
- * A physics demo that simulates a Newton's cradle.
- * <p>
- * https://en.wikipedia.org/wiki/Newton%27s_cradle
+ * A physics demo that simulates a "Newton's cradle" toy.
  *
+ * @see <a href="https://en.wikipedia.org/wiki/Newton%27s_cradle">Wikipedia</a>
  * @author Stephen Gold sgold@sonic.net
  */
 public class NewtonsCradle extends BasePhysicsApp<PhysicsSpace> {
@@ -114,6 +113,8 @@ public class NewtonsCradle extends BasePhysicsApp<PhysicsSpace> {
                 = new PhysicsSpace(PhysicsSpace.BroadphaseType.DBVT);
 
         result.setGravity(new Vector3f(0f, -150f, 0f));
+
+        // Reduce the timestep for better accuracy:
         result.setAccuracy(0.01f);
 
         return result;
@@ -188,6 +189,7 @@ public class NewtonsCradle extends BasePhysicsApp<PhysicsSpace> {
         result.setRestitution(1f);
         physicsSpace.addCollisionObject(result);
 
+        // Visualize the ball:
         visualizeShape(result).setColor(BALL_COLOR);
 
         float wireLength = 80f;

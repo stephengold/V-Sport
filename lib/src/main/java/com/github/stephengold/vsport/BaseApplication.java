@@ -101,8 +101,8 @@ abstract public class BaseApplication {
      */
     private static int frameCount;
     /**
-     * JVM time of the most recent FPS update (in nanoseconds) or null if no
-     * update yet
+     * JVM time of the most recent FPS update (in nanoseconds) or {@code null}
+     * if no update yet
      */
     private static Long previousFpsUpdateNanoTime;
     /**
@@ -644,6 +644,19 @@ abstract public class BaseApplication {
         long monitor = MemoryUtil.NULL; // for windowed mode, not fullscreen
         windowHandle = GLFW.glfwCreateWindow(width, height, initialWindowTitle,
                 monitor, MemoryUtil.NULL);
+        /*
+          On Wayland platforms with NVIDIA drivers and threaded optimizations
+          enabled, LWJGL logs a GLFW_PLATFORM_ERROR here. Although no valid
+          window is created, glfwCreateWindow() returns a non-null handle,
+          preventing the application from detecting the error.
+
+          The suggested workaround is to disable threaded optimizations
+          by setting the __GL_THREADED_OPTIMIZATIONS environment variable to 0.
+          In bash, for instance:  export __GL_THREADED_OPTIMIZATIONS=0
+
+          For the updates on this issue, browse to:
+              https://github.com/LWJGL/lwjgl3/issues/1071
+         */
         if (windowHandle == MemoryUtil.NULL) {
             throw new RuntimeException("Failed to create a GLFW window; width="
                     + width + ", height=" + height);
