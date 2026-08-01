@@ -346,6 +346,19 @@ abstract public class BaseApplication {
     }
 
     /**
+     * Alter the color and intensity of lights.
+     *
+     * @param desiredColor the desired color (not {@code null}, unaffected,
+     * default=white)
+     */
+    public static void setLightColor(Vector4fc desiredColor) {
+        float red = desiredColor.x();
+        float green = desiredColor.y();
+        float blue = desiredColor.z();
+        setLightColor(red, green, blue);
+    }
+
+    /**
      * Alter the direction to the distant light.
      *
      * @param x the X component of the desired direction (in world coordinates)
