@@ -706,10 +706,10 @@ abstract public class BaseApplication {
      * The body of the main update loop.
      */
     private void updateBase() {
+        updateWindowTitle();
+        Internals.renderNextFrame();
         render();
         GLFW.glfwPollEvents();
         cameraInputProcessor.update();
-        updateWindowTitle();
-        Internals.renderNextFrame();
     }
 }
