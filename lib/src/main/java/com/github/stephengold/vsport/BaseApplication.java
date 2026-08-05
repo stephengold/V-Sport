@@ -124,7 +124,7 @@ abstract public class BaseApplication {
      */
     final private static Projection projection = new Projection(1f, 1_000f);
     /**
-     * initial text for the window's title bar (not null)
+     * initial text for the window's title bar (not {@code null})
      */
     private static String initialWindowTitle;
     // *************************************************************************
@@ -167,7 +167,7 @@ abstract public class BaseApplication {
     /**
      * Access the camera for rendering.
      *
-     * @return the pre-existing instance (not null)
+     * @return the pre-existing instance (not {@code null})
      */
     public static Camera getCamera() {
         assert cam != null;
@@ -177,7 +177,7 @@ abstract public class BaseApplication {
     /**
      * Access the camera's input processor.
      *
-     * @return the pre-existing instance (not null)
+     * @return the pre-existing instance (not {@code null})
      */
     public static CameraInputProcessor getCameraInputProcessor() {
         assert cameraInputProcessor != null;
@@ -187,7 +187,7 @@ abstract public class BaseApplication {
     /**
      * Access the input manager.
      *
-     * @return the pre-existing instance (not null)
+     * @return the pre-existing instance (not {@code null})
      */
     public static InputManager getInputManager() {
         assert inputManager != null;
@@ -198,8 +198,8 @@ abstract public class BaseApplication {
      * Obtain a shader program from the specified key, returning a cached result
      * if possible.
      *
-     * @param name the name to use (not null)
-     * @return a valid program (not null)
+     * @param name the name to use (not {@code null})
+     * @return a valid program (not {@code null})
      */
     static ShaderProgram getProgram(String name) {
         if (!programMap.containsKey(name)) {
@@ -215,7 +215,7 @@ abstract public class BaseApplication {
     /**
      * Access the current view-to-clip transform for rendering.
      *
-     * @return the pre-existing instance (not null)
+     * @return the pre-existing instance (not {@code null})
      */
     public static Projection getProjection() {
         return projection;
@@ -225,8 +225,8 @@ abstract public class BaseApplication {
      * Obtain a texture from the specified key, returning a cached result if
      * possible.
      *
-     * @param key the key to use (not null)
-     * @return a valid texture (not null)
+     * @param key the key to use (not {@code null})
+     * @return a valid texture (not {@code null})
      */
     static Texture getTexture(TextureKey key) {
         if (!textureMap.containsKey(key)) {
@@ -242,7 +242,7 @@ abstract public class BaseApplication {
     /**
      * Access the GLFW window.
      *
-     * @return the handle of the pre-existing window (not null)
+     * @return the handle of the pre-existing window (not {@code null})
      */
     static long glfwWindowHandle() {
         assert windowHandle != MemoryUtil.NULL;
@@ -253,7 +253,8 @@ abstract public class BaseApplication {
      * Hide the specified geometries. When a Geometry is hidden, it loses its
      * place in the deferred queue.
      *
-     * @param geometries the geometries to de-visualize (not null, unaffected)
+     * @param geometries the geometries to de-visualize (not {@code null},
+     * unaffected)
      */
     public static void hideAll(Collection<Geometry> geometries) {
         deferredQueue.removeAll(geometries);
@@ -273,7 +274,7 @@ abstract public class BaseApplication {
      * Enumerate all visible geometries that omit depth testing, in the order
      * they will be rendered.
      *
-     * @return the pre-existing object (not null)
+     * @return the pre-existing object (not {@code null})
      */
     static Deque<Geometry> listDeferred() {
         return deferredQueue;
@@ -293,7 +294,7 @@ abstract public class BaseApplication {
      * previous visible, append it to the deferred queue (causing it to be
      * rendered last).
      *
-     * @param geometry the Geometry to visualize (not null, unaffected)
+     * @param geometry the Geometry to visualize (not {@code null}, unaffected)
      */
     public static void makeVisible(Geometry geometry) {
         assert geometry.getMesh() != null;
@@ -322,7 +323,7 @@ abstract public class BaseApplication {
     /**
      * Alter the background color of the window.
      *
-     * @param desiredColor the desired color (not null, unaffected,
+     * @param desiredColor the desired color (not {@code null}, unaffected,
      * default=black)
      */
     public static void setBackgroundColor(Vector4fc desiredColor) {
@@ -401,7 +402,7 @@ abstract public class BaseApplication {
     /**
      * Start the application.
      *
-     * @param appName the name of the application (not null)
+     * @param appName the name of the application (not {@code null})
      * @param appMajor the major version number of the application
      * @param appMinor the minor version number of the application
      * @param appPatch the patch version number of the application
@@ -452,8 +453,8 @@ abstract public class BaseApplication {
      * <p>
      * This method has no effect on invisible geometries.
      *
-     * @param geometry the Geometry to enqueue/dequeue (not null, alias possibly
-     * created)
+     * @param geometry the Geometry to enqueue/dequeue (not {@code null}, alias
+     * possibly created)
      */
     static void updateDeferredQueue(Geometry geometry) {
         assert geometry != null;
