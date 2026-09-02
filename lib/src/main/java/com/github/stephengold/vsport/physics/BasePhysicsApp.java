@@ -308,7 +308,7 @@ abstract public class BasePhysicsApp<T extends PhysicsSpace>
                 new DirectoryPath("linux/x86-64/com/github/stephengold"),
                 "bulletjme", DirectoryPath.USER_DIR);
         NativeBinaryLoader loader = new NativeBinaryLoader(info);
-        NativeDynamicLibrary[] libraries = new NativeDynamicLibrary[]{
+        NativeDynamicLibrary[] libraries = new NativeDynamicLibrary[] {
             new NativeDynamicLibrary("native/linux/arm64",
             PlatformPredicate.LINUX_ARM_64),
             new NativeDynamicLibrary("native/linux/arm32",
