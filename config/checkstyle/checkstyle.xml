@@ -184,7 +184,7 @@
         <module name="RequireEmptyLineBeforeBlockTagGroup"/>
         <module name="SingleLineJavadoc"/>
         <module name="SummaryJavadoc">
-            <property name="forbiddenSummaryFragments" value="^@return the *|^This method returns |^A [{]@code [0-9A-Za-z]+[}]( is a )"/>
+            <property name="forbiddenSummaryFragments" value="^@return the *|^This method returns |^A [{]@code [0-9A-Za-z]+[}]( is a )|^[a-z]"/>
             <property name="period" value=""/>
         </module>
 
