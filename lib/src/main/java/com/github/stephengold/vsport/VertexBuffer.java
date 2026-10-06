@@ -597,12 +597,12 @@ final public class VertexBuffer {
     /**
      * Apply the specified 3-D rotation to all vertices. Requires fpv=3.
      *
-     * @param quaternion the rotation to apply (not null, not zero, unaffected)
+     * @param rotation the rotation to apply (not null, not zero, unaffected)
      * @return the (modified) current instance (for chaining)
      */
-    public VertexBuffer rotate(Quaternion quaternion) {
-        Validate.nonZero(quaternion, "quaternion");
-        if (MyQuaternion.isRotationIdentity(quaternion)) {
+    public VertexBuffer rotate(Quaternion rotation) {
+        Validate.nonZero(rotation, "rotation");
+        if (MyQuaternion.isRotationIdentity(rotation)) {
             return this;
         }
         verifyMutable();
@@ -611,7 +611,7 @@ final public class VertexBuffer {
         }
 
         int numFloats = capacity();
-        MyBuffer.rotate(dataBuffer, 0, numFloats, quaternion);
+        MyBuffer.rotate(dataBuffer, 0, numFloats, rotation);
         setModified();
 
         return this;
