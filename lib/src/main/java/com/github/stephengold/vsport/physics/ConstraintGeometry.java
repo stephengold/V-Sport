@@ -99,18 +99,24 @@ public class ConstraintGeometry extends Geometry {
      */
     @Override
     public void updateAndRender() {
-        Transform meshToWorld = new Transform();
+        if (!constraint.isEnabled()) {
+            // Don't render disabled constraints.
+            return;
+        }
 
         Vector3f zDir = constraint.getPivot(end, null); // TODO garbage
         float length = zDir.length();
+        if (length == 0f) {
+            return;
+        }
+
+        Transform meshToWorld = new Transform();
         meshToWorld.setScale(length);
 
-        if (length > 0f) {
-            Vector3f xDir = new Vector3f(); // TODO garbage
-            Vector3f yDir = new Vector3f(); // TODO garbage
-            MyVector3f.generateBasis(zDir, xDir, yDir);
-            meshToWorld.getRotation().fromAxes(xDir, yDir, zDir);
-        }
+        Vector3f xDir = new Vector3f(); // TODO garbage
+        Vector3f yDir = new Vector3f(); // TODO garbage
+        MyVector3f.generateBasis(zDir, xDir, yDir);
+        meshToWorld.getRotation().fromAxes(xDir, yDir, zDir);
         // at this point, meshToWorld holds the mesh-to-body transform
 
         PhysicsBody body = constraint.getBody(end);
