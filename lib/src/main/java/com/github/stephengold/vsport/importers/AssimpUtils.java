@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2023, Stephen Gold
+ Copyright (c) 2023-2026 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -86,9 +86,9 @@ final public class AssimpUtils {
         ByteBuffer pLoadedBytes = Utils.loadResourceAsBytes(resourceName);
 
         if (BaseApplication.isDebuggingEnabled()) {
-            AILogStream logStream = AILogStream.create();
             String filename = null;
-            logStream = Assimp.aiGetPredefinedLogStream(
+            AILogStream logStream = AILogStream.create();
+            Assimp.aiGetPredefinedLogStream(
                     Assimp.aiDefaultLogStream_STDOUT, filename, logStream);
             Assimp.aiAttachLogStream(logStream);
             Assimp.aiEnableVerboseLogging(true);
