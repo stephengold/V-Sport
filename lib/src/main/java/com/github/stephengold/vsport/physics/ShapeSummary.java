@@ -170,13 +170,13 @@ class ShapeSummary {
 
         } else if (otherObject != null
                 && otherObject.getClass() == getClass()) {
-            ShapeSummary otherKey = (ShapeSummary) otherObject;
-            result = (shapeId == otherKey.shapeId)
-                    && scale.equals(otherKey.scale)
-                    && (Float.compare(margin, otherKey.margin) == 0)
-                    && meshingStrategy.equals(otherKey.meshingStrategy());
+            ShapeSummary otherSummary = (ShapeSummary) otherObject;
+            result = (shapeId == otherSummary.shapeId)
+                    && scale.equals(otherSummary.scale)
+                    && (Float.compare(margin, otherSummary.margin) == 0)
+                    && meshingStrategy.equals(otherSummary.meshingStrategy());
             if (result && childSummaryList != null) {
-                result = childSummaryList.equals(otherKey.childSummaryList);
+                result = childSummaryList.equals(otherSummary.childSummaryList);
             }
 
         } else {
