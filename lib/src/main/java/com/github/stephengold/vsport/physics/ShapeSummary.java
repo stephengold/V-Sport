@@ -32,6 +32,7 @@ import com.jme3.bullet.collision.shapes.CollisionShape;
 import com.jme3.bullet.collision.shapes.CompoundCollisionShape;
 import com.jme3.bullet.collision.shapes.infos.ChildCollisionShape;
 import com.jme3.math.Vector3f;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 /**
@@ -192,14 +193,8 @@ class ShapeSummary {
      */
     @Override
     public int hashCode() {
-        int hash = (int) (shapeId >> 4);
-        hash = 7 * hash + scale.hashCode();
-        hash = 7 * hash + Float.floatToIntBits(margin);
-        hash = 7 * hash + meshingStrategy.hashCode();
-        if (childSummaryList != null) {
-            hash = 7 * hash + childSummaryList.hashCode();
-        }
-
+        int hash = Objects.hash(
+                childSummaryList, margin, meshingStrategy, scale, shapeId);
         return hash;
     }
 }
