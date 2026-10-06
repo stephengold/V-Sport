@@ -67,11 +67,11 @@ class LinksMesh extends Mesh {
 
         this.softBody = softBody;
 
-        // Create the VertexBuffer for node locations.
+        // Create the VertexBuffer for vertex positions.
         VertexBuffer positions = super.createPositions();
         positions.setDynamic();
 
-        // Create the IndexBuffer for line indices.
+        // Create the IndexBuffer for vertex indices.
         int numLines = softBody.countLinks();
         int numIndices = vpe * numLines;
         IndexBuffer indices = super.createIndices(numIndices);
@@ -82,6 +82,8 @@ class LinksMesh extends Mesh {
 
         update();
     }
+    // *************************************************************************
+    // new methods exposed
 
     /**
      * Update this Mesh to match the soft body.

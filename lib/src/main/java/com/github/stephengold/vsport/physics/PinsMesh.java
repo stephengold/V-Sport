@@ -65,6 +65,8 @@ class PinsMesh extends Mesh {
         boolean localFlag = false;
         NativeSoftBodyUtil.updatePinMesh(softBody, this, localFlag);
     }
+    // *************************************************************************
+    // new methods exposed
 
     /**
      * Update this Mesh to match the soft body.

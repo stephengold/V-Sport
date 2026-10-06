@@ -75,7 +75,7 @@ class FacesMesh extends Mesh {
         VertexBuffer normals = super.createNormals();
         normals.setDynamic();
 
-        // Create the IndexBuffer for triangle indices.
+        // Create the IndexBuffer for vertex indices.
         int numFaces = softBody.countFaces();
         int numIndices = vpt * numFaces;
         IndexBuffer indices = super.createIndices(numIndices);
@@ -86,6 +86,8 @@ class FacesMesh extends Mesh {
 
         update();
     }
+    // *************************************************************************
+    // new methods exposed
 
     /**
      * Update this Mesh to match the soft body.

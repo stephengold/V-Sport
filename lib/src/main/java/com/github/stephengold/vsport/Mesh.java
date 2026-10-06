@@ -483,16 +483,20 @@ public class Mesh implements jme3utilities.lbj.Mesh {
             case Facet:
                 generateFacetNormals();
                 break;
+
             case None:
                 this.normalBuffer = null;
                 break;
+
             case Smooth:
                 generateFacetNormals();
                 smoothNormals();
                 break;
+
             case Sphere:
                 generateSphereNormals();
                 break;
+
             default:
                 throw new IllegalArgumentException("option = " + option);
         }
@@ -547,11 +551,13 @@ public class Mesh implements jme3utilities.lbj.Mesh {
             switch (option) {
                 case Linear:
                     break;
+
                 case Spherical:
                     Utils.toSpherical(tmpVector);
                     tmpVector.y /= FastMath.PI;
                     tmpVector.z /= FastMath.PI;
                     break;
+
                 default:
                     throw new IllegalArgumentException("option = " + option);
             }
