@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2022-2023, Stephen Gold
+ Copyright (c) 2022-2026 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -50,14 +50,14 @@ class LinksMesh extends Mesh {
      */
     final private IntBuffer copyIndices;
     /**
-     * body being visualized
+     * soft body being visualized
      */
     final private PhysicsSoftBody softBody;
     // *************************************************************************
     // constructors
 
     /**
-     * Auto-generate a mutable mesh for the specified soft body.
+     * Auto-generate a mutable line mesh for the specified soft body.
      *
      * @param softBody the soft body from which to generate the mesh (not null,
      * alias created)
@@ -86,7 +86,7 @@ class LinksMesh extends Mesh {
     /**
      * Update this Mesh to match the soft body.
      *
-     * @return true if successful, otherwise false
+     * @return {@code true} if successful, otherwise {@code false}
      */
     boolean update() {
         int numNodes = softBody.countNodes();

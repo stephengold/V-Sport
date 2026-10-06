@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2022-2023, Stephen Gold
+ Copyright (c) 2022-2026 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -53,7 +53,8 @@ class ShapeSummary {
     // fields
 
     /**
-     * summary of children (for a compound shape) or null if not a compound
+     * summary of children (for a compound shape) or {@code null} if not a
+     * compound shape
      */
     final private ChildSummaryList childSummaryList;
     /**
@@ -110,7 +111,7 @@ class ShapeSummary {
      * Test whether this summary matches the specified shape.
      *
      * @param shape the shape to compare (not null, unaffected)
-     * @return true for a match, otherwise false
+     * @return {@code true} for a match, otherwise {@code false}
      */
     boolean matches(CollisionShape shape) {
         if (shapeId != shape.nativeId() || margin != shape.getMargin()) {
@@ -144,9 +145,9 @@ class ShapeSummary {
     }
 
     /**
-     * Return the algorithm to generate normals, if any.
+     * Return the algorithm to generate meshes, if any.
      *
-     * @return the enum value (not null)
+     * @return the pre-existing object (not null)
      */
     MeshingStrategy meshingStrategy() {
         return meshingStrategy;

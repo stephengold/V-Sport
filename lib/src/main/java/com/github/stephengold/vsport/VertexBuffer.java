@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2022-2023, Stephen Gold
+ Copyright (c) 2022-2026 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -262,7 +262,7 @@ final public class VertexBuffer {
      * Create a mutable color buffer from a collection of vertices.
      *
      * @param vertices the vertices to use (not null, unaffected)
-     * @return a new instance (not null)
+     * @return a new buffer (not null)
      */
     static VertexBuffer newColor(Collection<Vertex> vertices) {
         int fpv = 3;
@@ -302,7 +302,7 @@ final public class VertexBuffer {
      *
      * @param fpv the number of floats per vertex (&ge;1, &le;4)
      * @param floatBuffer the initial data (not null, unaffected)
-     * @return a new flipped instance (not null)
+     * @return a new flipped buffer (not {@code null})
      */
     static VertexBuffer newInstance(int fpv, FloatBuffer floatBuffer) {
         int numFloats = floatBuffer.capacity();
@@ -368,7 +368,7 @@ final public class VertexBuffer {
      * Create a mutable normal buffer from a collection of vertices.
      *
      * @param vertices the vertices to use (not null, unaffected)
-     * @return a new instance (not null)
+     * @return a new buffer (not {@code null})
      */
     static VertexBuffer newNormal(Collection<Vertex> vertices) {
         int numVertices = vertices.size();
@@ -387,7 +387,7 @@ final public class VertexBuffer {
      * Create a mutable position buffer from a collection of vertices.
      *
      * @param vertices the vertices to use (not null, unaffected)
-     * @return a new instance (not null)
+     * @return a new buffer (not {@code null})
      */
     static VertexBuffer newPosition(Collection<Vertex> vertices) {
         int fpv = Mesh.numAxes;
@@ -406,7 +406,7 @@ final public class VertexBuffer {
      * Create a texture-coordinates buffer from a collection of vertices.
      *
      * @param vertices the vertices to use (not null, unaffected)
-     * @return a new instance (not null)
+     * @return a new buffer (not {@code null})
      */
     static VertexBuffer newTexCoords(Collection<Vertex> vertices) {
         int fpv = 2;

@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2022-2023, Stephen Gold
+ Copyright (c) 2022-2026 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -42,7 +42,7 @@ class PinsMesh extends Mesh {
     // fields
 
     /**
-     * body being visualized
+     * soft body being visualized
      */
     final private PhysicsSoftBody softBody;
     // *************************************************************************
@@ -69,7 +69,7 @@ class PinsMesh extends Mesh {
     /**
      * Update this Mesh to match the soft body.
      *
-     * @return true if successful, otherwise false
+     * @return {@code true} if successful, otherwise {@code false}
      */
     boolean update() {
         int numNodes = softBody.countPinnedNodes();

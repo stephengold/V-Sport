@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2023, Stephen Gold
+ Copyright (c) 2023-2026 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -257,7 +257,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
 
     /**
      * Count how many vertices the mesh renders, taking indexing into account,
-     * but not the topology.
+     * but not the topology. The mesh is unaffected.
      *
      * @return the count (&ge;0)
      */
@@ -268,7 +268,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
 
     /**
      * Count how many line primitives the mesh contains, taking indexing and
-     * topology into account.
+     * topology into account. The mesh is unaffected.
      *
      * @return the count (&ge;0)
      */
@@ -291,7 +291,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
 
     /**
      * Count how many point primitives the mesh contains, taking indexing and
-     * topology into account.
+     * topology into account. The mesh is unaffected.
      *
      * @return the count (&ge;0)
      */
@@ -308,7 +308,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
 
     /**
      * Count how many triangle primitives the mesh contains, taking indexing and
-     * topology into account.
+     * topology into account. The mesh is unaffected.
      *
      * @return the count (&ge;0)
      */
@@ -328,7 +328,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
 
     /**
      * Count how many vertices the mesh contains, based on buffer capacities,
-     * unmodified by primitive topology and indexing.
+     * unmodified by primitive topology and indexing. The mesh is unaffected.
      *
      * @return the count (&ge;0)
      */
@@ -569,7 +569,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     }
 
     /**
-     * Test whether the mesh is indexed.
+     * Test whether the mesh is indexed. It is unaffected.
      *
      * @return true if indexed, otherwise false
      */
@@ -625,7 +625,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
      *
      * @param topology the desired primitive topology (not null)
      * @param vertices the vertex data to use (not null, unaffected)
-     * @return a new instance
+     * @return a new mesh
      */
     public static Mesh newInstance(
             Topology topology, Collection<Vertex> vertices) {
@@ -706,7 +706,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
 
     /**
      * Return the primitive topology, which indicates how mesh vertices/indices
-     * are organized into primitives.
+     * are organized into primitives. The mesh is unaffected.
      *
      * @return an enum value (not null)
      */

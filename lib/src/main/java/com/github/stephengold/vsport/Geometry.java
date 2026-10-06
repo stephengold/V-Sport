@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2023, Stephen Gold
+ Copyright (c) 2023-2026 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -736,7 +736,7 @@ public class Geometry {
 
     /**
      * Test whether the physics object (if any) has been removed from the
-     * specified CollisionSpace. Meant to be overridden.
+     * specified {@code CollisionSpace}. Meant to be overridden.
      *
      * @param space the CollisionSpace to test (not null)
      * @return true if removed, otherwise false

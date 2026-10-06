@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2022-2024 Stephen Gold
+ Copyright (c) 2022-2026 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -121,7 +121,7 @@ class MeshingStrategy {
      * Apply this strategy to the specified shape.
      *
      * @param shape the input shape (not null, unaffected)
-     * @return a new instance
+     * @return a new mesh
      */
     Mesh applyTo(CollisionShape shape) {
         Mesh result;

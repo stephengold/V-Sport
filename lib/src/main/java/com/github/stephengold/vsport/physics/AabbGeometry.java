@@ -71,7 +71,7 @@ public class AabbGeometry extends Geometry {
 
     /**
      * Instantiate a Geometry to visualize the axis-aligned bounding box of the
-     * specified collision object.
+     * specified collision object and make the Geometry visible.
      *
      * @param pco the collision object (not null, alias created)
      */
