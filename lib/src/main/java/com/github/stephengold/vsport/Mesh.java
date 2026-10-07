@@ -484,7 +484,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
                 generateFacetNormals();
                 break;
 
-            case None:
+            case NoNormals:
                 this.normalBuffer = null;
                 break;
 

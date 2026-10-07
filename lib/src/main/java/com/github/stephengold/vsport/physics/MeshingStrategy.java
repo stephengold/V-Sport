@@ -234,7 +234,7 @@ class MeshingStrategy {
                 result = delimiter + uvs + delimiter + us + delimiter + vs;
             }
 
-            if (!result.isEmpty() || normals != NormalsOption.None) {
+            if (!result.isEmpty() || normals != NormalsOption.NoNormals) {
                 result = delimiter + normals + result;
             }
 
@@ -289,7 +289,7 @@ class MeshingStrategy {
      */
     private static NormalsOption parseNormals(String description) {
         String[] items = description.split(delimiter);
-        NormalsOption result = NormalsOption.None;
+        NormalsOption result = NormalsOption.NoNormals;
         if (items.length >= 2) {
             String nString = items[1];
             if (!nString.isEmpty()) {
