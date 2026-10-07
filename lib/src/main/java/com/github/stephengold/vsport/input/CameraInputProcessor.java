@@ -108,21 +108,26 @@ public class CameraInputProcessor extends InputProcessor {
      *
      * @param newSpeed the desired translation rate (in world units per second,
      * default=10)
+     * @return the (modified) current processor (for chaining)
      */
-    public void setMoveSpeed(float newSpeed) {
+    public CameraInputProcessor setMoveSpeed(float newSpeed) {
         this.moveSpeed = newSpeed;
+        return this;
     }
 
     /**
      * Alter the rotation mode.
      *
-     * @param newMode (not null, default=None)
+     * @param newMode (not null, default=Off)
+     * @return the (modified) current processor (for chaining)
      */
-    public void setRotationMode(RotateMode newMode) {
+    public CameraInputProcessor setRotationMode(RotateMode newMode) {
         Validate.nonNull(newMode, "new mode");
 
         this.rotationMode = newMode;
         updateRotationActive();
+
+        return this;
     }
 
     /**
@@ -130,9 +135,11 @@ public class CameraInputProcessor extends InputProcessor {
      *
      * @param newRate the desired rate of rotation (in radians per window
      * height, default=1)
+     * @return the (modified) current processor (for chaining)
      */
-    public void setRotationRate(float newRate) {
+    public CameraInputProcessor setRotationRate(float newRate) {
         this.rotationRate = newRate;
+        return this;
     }
 
     /**
