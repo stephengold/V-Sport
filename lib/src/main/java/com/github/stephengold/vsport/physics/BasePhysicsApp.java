@@ -83,7 +83,8 @@ abstract public class BasePhysicsApp<T extends PhysicsSpace>
      */
     private int renderCount;
     /**
-     * timestamp of the previous render() if renderCount > 0
+     * timestamp of the previous render() (for {@code renderCount>0}, in
+     * nanoseconds)
      */
     private long lastPhysicsUpdate;
     /**
@@ -110,7 +111,7 @@ abstract public class BasePhysicsApp<T extends PhysicsSpace>
     /**
      * Create the PhysicsSpace during initialization.
      *
-     * @return a new instance
+     * @return a new object
      */
     abstract protected T createSpace();
 
@@ -138,13 +139,13 @@ abstract public class BasePhysicsApp<T extends PhysicsSpace>
     }
 
     /**
-     * Add physics objects to the PhysicsSpace during initialization.
+     * Populate the PhysicsSpace. Invoked once during initialization.
      */
     abstract protected void populateSpace();
 
     /**
-     * Advance the physics simulation by the specified amount. Invoked during
-     * each update.
+     * Advance the physics simulation by the specified interval. Invoked during
+     * each update. Meant to be overridden.
      *
      * @param intervalSeconds the elapsed (real) time since the previous
      * invocation of {@code updatePhysics} (in seconds, &ge;0)
@@ -175,9 +176,9 @@ abstract public class BasePhysicsApp<T extends PhysicsSpace>
     }
 
     /**
-     * Visualize the collision shape of the specified collision object.
+     * Visualize the shape of the specified collision object.
      *
-     * @param pco the rigid body to visualize (not null)
+     * @param pco the collision object to visualize (not null)
      * @return a new, visible Geometry
      */
     public static Geometry visualizeShape(PhysicsCollisionObject pco) {
@@ -188,9 +189,9 @@ abstract public class BasePhysicsApp<T extends PhysicsSpace>
     }
 
     /**
-     * Visualize the collision shape of the specified collision object.
+     * Visualize the shape of the specified collision object.
      *
-     * @param pco the rigid body to visualize (not null)
+     * @param pco the collision object to visualize (not null)
      * @param uvScale the UV scale factor to use (default=1)
      * @return a new, visible Geometry
      */
@@ -269,7 +270,7 @@ abstract public class BasePhysicsApp<T extends PhysicsSpace>
     /**
      * Visualize the wheels of the specified vehicle.
      *
-     * @param vehicle the vehicle to visualize
+     * @param vehicle the vehicle to visualize (not null)
      * @return an array of new, visible geometries
      */
     public static Geometry[] visualizeWheels(PhysicsVehicle vehicle) {
