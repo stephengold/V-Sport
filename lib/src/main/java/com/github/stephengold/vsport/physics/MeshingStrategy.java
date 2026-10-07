@@ -171,7 +171,7 @@ class MeshingStrategy {
             if (result && positions >= 0) {
                 result = (normals == otherStrategy.normals)
                         && (uvs == otherStrategy.uvs);
-                if (result && uvs != UvsOption.None) {
+                if (result && uvs != UvsOption.NoUvs) {
                     result = uCoefficients.equals(otherU)
                             && vCoefficients.equals(otherV);
                 }
@@ -198,7 +198,7 @@ class MeshingStrategy {
         if (positions >= 0) {
             hash = 707 * hash + normals.ordinal();
             hash = 707 * hash + uvs.ordinal();
-            if (uvs != UvsOption.None) {
+            if (uvs != UvsOption.NoUvs) {
                 hash = 707 * hash + uCoefficients.hashCode();
                 hash = 707 * hash + vCoefficients.hashCode();
             }
@@ -228,7 +228,7 @@ class MeshingStrategy {
                 vCoefficients.w);
 
         if (positions >= 0) {
-            if (uvs == UvsOption.None) {
+            if (uvs == UvsOption.NoUvs) {
                 result = "";
             } else {
                 result = delimiter + uvs + delimiter + us + delimiter + vs;
@@ -323,7 +323,7 @@ class MeshingStrategy {
      */
     private static UvsOption parseUvs(String description) {
         String[] items = description.split(delimiter);
-        UvsOption result = UvsOption.None;
+        UvsOption result = UvsOption.NoUvs;
         if (items.length > 2) {
             String uvString = items[2];
             if (!uvString.isEmpty()) {

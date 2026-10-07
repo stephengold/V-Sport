@@ -538,7 +538,7 @@ public class Mesh implements jme3utilities.lbj.Mesh {
     public Mesh generateUvs(UvsOption option, Vector4fc uCoefficients,
             Vector4fc vCoefficients) {
         verifyMutable();
-        if (option == UvsOption.None) {
+        if (option == UvsOption.NoUvs) {
             texCoordsBuffer = null;
             return this;
         }
