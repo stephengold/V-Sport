@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2020-2025 Stephen Gold
+ Copyright (c) 2020-2026 Stephen Gold
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -287,7 +287,7 @@ public class HelloJoint
      * Configure the Camera and CIP during startup.
      */
     private static void configureCamera() {
-        getCameraInputProcessor().setRotationMode(RotateMode.None);
+        getCameraInputProcessor().setRotationMode(RotateMode.Off);
 
         cam.setAzimuth(-1.6f)
                 .setLocation(0f, 5f, 10f)

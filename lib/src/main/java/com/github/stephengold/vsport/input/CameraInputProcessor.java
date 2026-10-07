@@ -96,7 +96,7 @@ public class CameraInputProcessor extends InputProcessor {
      * @param windowHandle the GLFW handle of the window (not null)
      */
     public CameraInputProcessor(long windowHandle) {
-        this.rotationMode = RotateMode.None;
+        this.rotationMode = RotateMode.Off;
         this.windowHandle = windowHandle;
         this.keyIdsSeen = new HashSet<>(99);
     }
@@ -307,7 +307,7 @@ public class CameraInputProcessor extends InputProcessor {
             case Immediate:
                 makeActive = true;
                 break;
-            case None:
+            case Off:
                 makeActive = false;
                 break;
             default:
