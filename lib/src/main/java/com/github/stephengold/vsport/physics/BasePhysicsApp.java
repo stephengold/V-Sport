@@ -225,7 +225,7 @@ abstract public class BasePhysicsApp<T extends PhysicsSpace>
                     "procedural:///checkerboard?size=2&color0=999999ff",
                     Filter.Nearest, Filter.Nearest);
 
-        } else {
+        } else { // shape isn't a plane or sphere:
             programName = "Phong/Distant/Monochrome";
             textureKey = null;
 
@@ -292,6 +292,7 @@ abstract public class BasePhysicsApp<T extends PhysicsSpace>
     protected void cleanUp() {
         physicsSpace.destroy();
 
+        // Discard all meshes auto-generated for collision shapes:
         for (Mesh mesh : meshCache.values()) {
             mesh.cleanUp();
         }
@@ -349,7 +350,7 @@ abstract public class BasePhysicsApp<T extends PhysicsSpace>
     protected void render() {
         ++renderCount;
 
-        // Advance the physics, but not during the first render().
+        // Advance the physics, but not during the first invocation.
         long nanoTime = System.nanoTime();
         if (renderCount > 1) {
             long nanoseconds = nanoTime - lastPhysicsUpdate;
