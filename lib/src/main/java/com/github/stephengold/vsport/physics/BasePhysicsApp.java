@@ -209,14 +209,17 @@ abstract public class BasePhysicsApp<T extends PhysicsSpace>
                     new Vector4f(0f, 0f, uvScale, 0f)
             );
             programName = "Phong/Distant/Texture";
+            boolean mipmaps = true;
+            float maxAniso = 16f;
             textureKey = new TextureKey("procedural:///checkerboard?size=128",
                     Filter.Linear, Filter.NearestMipmapLinear,
-                    WrapFunction.Repeat, WrapFunction.Repeat, true,
-                    FlipAxes.noFlip, 16f);
+                    WrapFunction.Repeat, WrapFunction.Repeat, mipmaps,
+                    FlipAxes.noFlip, maxAniso);
 
         } else if (shape instanceof SphereCollisionShape) {
+            int positionStrategy = -3;
             meshingStrategy = new MeshingStrategy(
-                    -3, NormalsOption.Sphere, UvsOption.Spherical,
+                    positionStrategy, NormalsOption.Sphere, UvsOption.Spherical,
                     new Vector4f(uvScale, 0f, 0f, 0f),
                     new Vector4f(0f, uvScale, 0f, 0f)
             );
@@ -310,7 +313,7 @@ abstract public class BasePhysicsApp<T extends PhysicsSpace>
                 new DirectoryPath("linux/x86-64/com/github/stephengold"),
                 "bulletjme", DirectoryPath.USER_DIR);
         NativeBinaryLoader loader = new NativeBinaryLoader(info);
-        NativeDynamicLibrary[] libraries = new NativeDynamicLibrary[] {
+        NativeDynamicLibrary[] libraries = {
             new NativeDynamicLibrary("native/linux/arm64",
             PlatformPredicate.LINUX_ARM_64),
             new NativeDynamicLibrary("native/linux/arm32",
