@@ -3,7 +3,7 @@
 [versions]
 
 checkstyle = "14.3.0"
-lbj = "23.1.2"
+lbj = "23.2.0"
 lwjgl = "3.4.3"
 
 [libraries]
