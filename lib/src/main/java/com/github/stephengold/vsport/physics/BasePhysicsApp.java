@@ -338,7 +338,7 @@ abstract public class BasePhysicsApp<T extends PhysicsSpace>
             loader.loadLibrary(LoadingCriterion.INCREMENTAL_LOADING);
         } catch (Exception exception) {
             throw new IllegalStateException(
-                    "Failed to load the Libbulletjme library!");
+                    "Failed to load the Libbulletjme native library!");
         }
 
         this.physicsSpace = createSpace();
